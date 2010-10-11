@@ -5,11 +5,11 @@ Tags: seo, google, meta, meta description, search engine optimization, xml sitem
 Requires at least: 3.0
 Tested up to: 3.0.1
 
-WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, optimized breadcrumbs, XML sitemaps, robots meta settings and much much more.
+WordPress SEO is an All in one solution to SEO your WordPress blog, featuring titles, meta descriptions, breadcrumbs, XML sitemaps & more.
 
 == Description ==
 
-The most complete all in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
+The most complete All in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
 
 * Post title and meta description meta box to change these on a per post basis.
 * Taxonomy (tag, category & custom taxonomy) title and meta description support.
@@ -28,7 +28,8 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Pages or posts that have been noindexed will not show in XML sitemap.
 * XML News Sitemaps.
 * .htaccess and robots.txt editor.
-* Basic import functionality for HeadSpace2 and All in One SEO.
+
+Find the full feature list on the [WordPress SEO plugin](http://yoast.com/wordpress/seo/)'s homepage.
 
 == Installation ==
 
