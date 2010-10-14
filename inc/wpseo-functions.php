@@ -98,6 +98,18 @@ function wpseo_replace_vars($string, $args) {
 	return $string;
 }
 
+// Don't do plugin update checks just yet, for this plugin that is.
+function wpseo_hide_plugin( $r, $url ) {
+	if ( 0 !== strpos( $url, 'http://api.wordpress.org/plugins/update-check' ) )
+		return $r; // Not a plugin update request. Bail immediately.
+	$plugins = unserialize( $r['body']['plugins'] );
+	unset( $plugins->plugins[ WPSEO_BASENAME ] );
+	unset( $plugins->active[ array_search( WPSEO_BASENAME, $plugins->active ) ] );
+	$r['body']['plugins'] = serialize( $plugins );
+	return $r;
+}
+add_filter( 'http_request_args', 'wpseo_hide_plugin', 5, 2 );
+
 function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 	if ( is_string( $term ) ) 
 		$term = get_term_by('slug', $term, $taxonomy);

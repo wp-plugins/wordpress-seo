@@ -61,7 +61,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		}
 		
 		function plugin_options_url() {
-			return admin_url( 'admin.php?page='.$this->hook );
+			return admin_url( 'admin.php?page=wpseo_dashboard' );
 		}
 		
 		/**
@@ -106,8 +106,11 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 * Create a Text input field
 		 */
 		function textinput($id, $label) {
-			$options = get_option($this->currentoption);
-			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$this->currentoption.'['.$id.']" value="'.htmlspecialchars($options[$id]).'"/><br/>';
+			$options = get_option($this->currentoption);			
+			$val = '';
+			if (isset($options[$id]))
+				$val = htmlspecialchars($options[$id]);
+			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$this->currentoption.'['.$id.']" value="'.$val.'"/><br/>';
 		}
 		
 		/**
@@ -192,6 +195,11 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		function news() {
 			include_once(ABSPATH . WPINC . '/feed.php');
 			$rss = fetch_feed('http://yoast.com/feed/');
+
+			// Bail if feed doesn't work
+			if ( is_wp_error($rss) )
+				return;
+				
 			$rss_items = $rss->get_items( 0, $rss->get_item_quantity(5) );
 			$content = '<ul>';
 			if ( !$rss_items ) {

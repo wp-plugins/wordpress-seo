@@ -82,9 +82,6 @@ function testfocuskw() {
 	if (focuskw != '') {
 		var html = '<p>Your focus keyword was found in:<br/>';
 		html += 'Page title: ' + ptest( jQuery('#title').val(), p ) + '<br/>';
-		if (jQuery('#yoast_wpseo_title').val().length > 0) {
-			updateAutogenTitle();
-		}
 		html += 'SEO title: ' + ptest( jQuery('#yoast_wpseo_title').val(), p ) + '<br/>';
 		html += 'Page URL: ' + ptest( jQuery('#sample-permalink').text(), p2 ) + '<br/>';
 		html += 'Content: ' + ptest( jQuery('#content').val(), p ) + '<br/>';
@@ -103,30 +100,17 @@ function getAutogenTitle() {
 		postid: jQuery('#post_ID').val(),
 	}
 	jQuery.post(ajaxurl, data, function(response) {
-		jQuery('#yoast_wpseo_title').attr('placeholder',response);
-		return response;
+		jQuery('#yoast_wpseo_title').val( response );
+		updateSnippet();
 	});	
-	return false;
-}
-
-function updateAutogenTitle() {
-	if ( !(jQuery('#yoast_wpseo_title').val().length > 0) && jQuery('#title').val().length > 0) {
-		title = getAutogenTitle();
-		if ( title )
-			updateSnippetTitle( title );
-	}
-}
-
-function updateSnippetTitle( title ) {
-	jQuery("#snippet .title").html( title );	
 }
 
 function updateSnippet() {
-	focuskw = testfocuskw();
+	focuskw = jQuery.trim( jQuery('#yoast_wpseo_focuskw').val() );
 
 	if ( !focuskw.length > 0 )
 		focuskw = 'yoast';
-	if ( focuskw.search(' ') != '-1' ) {
+	if ( focuskw.search(' ') != -1 ) {
 		var keywords 	= focuskw.split(' ');
 	} else {
 		var keywords	= new Array(focuskw);
@@ -134,22 +118,29 @@ function updateSnippet() {
 	var url 	= jQuery('#sample-permalink').text().replace('http://','');
 	var title 	= jQuery("#yoast_wpseo_title").val();
 	if ( !title || !title.length > 0 ) {
-		if (!jQuery("#yoast_wpseo_title").attr('placeholder')) {
+		if (jQuery("#yoast_wpseo_title").val() == '') {
 			getAutogenTitle();
 		}
-		title = jQuery("#yoast_wpseo_title").attr('placeholder');
-		
 	}
 	if ( !title )
 		return;
 	var desc	= jQuery("#yoast_wpseo_metadesc").val();
 	if ( !desc.length > 0 ) {
-		desc = jQuery("#content").text();
+		desc = jQuery("#editorcontainer #content").val();
+		desc = yst_strip_tags( desc );
 		if (jQuery("#snippet").hasClass('video'))
-			desc = yst_strip_tags(desc).substr(0, 130);
+			var desclen = 130;
 		else
-			desc = yst_strip_tags(desc).substr(0, 145);
-		desc += ' ...';
+			var desclen = 150;
+
+		var descsearch = new RegExp( focuskw, 'i');
+		if ( desc.search(descsearch) != -1 ) {
+			var descstart  = ( desclen - focuskw.length ) / 2;
+			alert(descstart);
+			desc = desc.substr( descstart, desclen );
+		} else {
+			desc = desc.substr(0, desclen);
+		}
 	}
 	for (var i in keywords) {
 		var urlfocuskw 	= keywords[i].replace(' ','-').toLowerCase();
@@ -160,24 +151,23 @@ function updateSnippet() {
 		url 			= url.replace( urlfocuskwregex, '<strong>'+"$1"+'</strong>' );
 	}
 	jQuery('#snippet').css('display','block');
-	updateSnippetTitle( title );
 	jQuery("#snippet .url").html( url );
+	jQuery("#snippet .title").html( title );
 	jQuery("#snippet .desc span").html( desc );		
 }
 
 jQuery(document).ready(function(){	
 	jQuery('#related_keywords_heading').hide();
 	
-	jQuery('#yoast_wpseo_title[placeholder]').placeholder({color: '#aaa'});
-	
 	jQuery('#yoast_wpseo_title').keyup(function() {
-		var len = 70 - jQuery('#yoast_wpseo_title').val().length;
+		var title = jQuery('#yoast_wpseo_title').val();
+		var len = 70 - title.length;
 		if (len < 0)
 			len = '<span class="wrong">'+len+'</span>';
 		else
 			len = '<span class="good">'+len+'</span>';
 		jQuery('#yoast_wpseo_title-length').html(len);
-		updateSnippet();
+		jQuery('#snippet .title').text( title );
 	}).keyup();
 	
 	jQuery('#yoast_wpseo_metadesc').keyup(function() {
@@ -210,11 +200,10 @@ jQuery(document).ready(function(){
 	jQuery('#tinymce').change(function() {
 		updateSnippet();
 	}).change();
-	jQuery('#titlewrap #title').keyup(function() {
-		title = updateAutogenTitle();
-		updateSnippetTitle( title );
+	jQuery('#titlewrap #title').change(function() {
+		getAutogenTitle();
 	}).change();
-	jQuery('#sample-permalink').keyup( function() {
+	jQuery('#sample-permalink').change( function() {
 		updateSnippet();
 	});
 	jQuery('#yoast_wpseo_focuskw').change( function() {

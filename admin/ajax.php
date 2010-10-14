@@ -67,7 +67,7 @@ function wpseo_test_sitemap_callback($return = false, $type = '') {
 
 	$resp = wp_remote_get($url);
 		
-	if ($resp['response']['code'] == 200)
+	if ( is_array($resp) && $resp['response']['code'] == 200 )
 		$output .= '<div class="correct">XML '.$type.'Sitemap URL correct.</div>';
 	else
 		$output .= '<div class="wrong">XML '.$type.'Sitemap URL could not be verified, please make sure it\'s correct.</div>';

@@ -7,16 +7,16 @@ class WPSEO_Breadcrumbs {
 
 		if (isset($options['trytheme']) && $options['trytheme']) {
 			// Thesis
-			add_action('thesis_hook_before_content','yoast_breadcrumb_output',10,1);
+			add_action('thesis_hook_before_content', array(&$this, 'breadcrumb_output'),10,1);
 
 			// Hybrid
 			remove_action( 'hybrid_before_content', 'hybrid_breadcrumb' );
-			add_action( 'hybrid_before_content', 'yoast_breadcrumb_output', 10, 1 );
+			add_action( 'hybrid_before_content', array(&$this, 'breadcrumb_output'), 10, 1 );
 
 			// Thematic
-			add_action('thematic_belowheader','yoast_breadcrumb_output',10,1);
+			add_action('thematic_belowheader', array(&$this, 'breadcrumb_output'),10,1);
 						
-			add_action('framework_hook_content_open','yoast_breadcrumb_output',10,1);			
+			add_action('framework_hook_content_open', array(&$this, 'breadcrumb_output'),10,1);			
 		}
 
 	}
@@ -60,7 +60,7 @@ class WPSEO_Breadcrumbs {
 
 		if ($on_front == "page") {
 			$homelink = '<a href="'.get_permalink(get_option('page_on_front')).'">'.$opt['breadcrumbs-home'].'</a>';
-			if ($blog_page)
+			if ( $blog_page && !$opt['breadcrumbs-blog-remove'] )
 				$bloglink = $homelink.' '.$opt['breadcrumbs-sep'].' <a href="'.get_permalink($blog_page).'">'.$this->get_bc_title($blog_page).'</a>';
 		} else {
 			$homelink = '<a href="'.get_bloginfo('url').'">'.$opt['breadcrumbs-home'].'</a>';
@@ -83,7 +83,7 @@ class WPSEO_Breadcrumbs {
 							$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'wpseo_bctitle' );
 							if (!$bctitle)
 								$bctitle = $parent->name;
-							$output .= '<a href="'.get_term_link( $parent, $taxonomy ).'">'.$bctitle.'</a> '.$opt['breadcrumbs-sep'].' ';
+							$output .= '<a href="'.get_term_link( $parent, $main_tax ).'">'.$bctitle.'</a> '.$opt['breadcrumbs-sep'].' ';
 						}
 					}
 					$bctitle = wpseo_get_term_meta( $terms[0], $main_tax, 'wpseo_bctitle' );

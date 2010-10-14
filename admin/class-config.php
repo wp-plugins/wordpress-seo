@@ -80,14 +80,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			<div class="wrap">
 				<?php 
 				if (isset($_GET['updated']) && $_GET['updated'] == 'true') {
-					$msg = 'Settings updated ';
+					$msg = __('Settings updated');
 
 					if ( function_exists('w3tc_pgcache_flush') ) {
 						w3tc_pgcache_flush();
-						$msg .= '&amp; W3 Total Cache Page Cache flushed';
+						$msg .= __(' &amp; W3 Total Cache Page Cache flushed');
 					} else if (function_exists('wp_cache_clear_cache() ')) {
 						wp_cache_clear_cache();
-						$msg .= '&amp; WP Super Cache flushed';
+						$msg .= __(' &amp; WP Super Cache flushed');
 					}
 					
 					echo '<div id="message" style="width:94%;" class="message updated"><p><strong>'.$msg.'.</strong></p></div>';
@@ -209,7 +209,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$this->replace_meta('title', '_yoast_wpseo_title', $replace);
 					if ($deletekw)
 						$this->delete_meta('keywords');
-					$msg .= '<p>All in One SEO (Old version) data successfully imported.</p>';
+					$msg .= '<p>'.__('All in One SEO (Old version) data successfully imported.').'</p>';
 				}
 				if ( isset($_POST['wpseo']['importrobotsmeta']) ) {
 					$posts = $wpdb->get_results("SELECT ID, robotsmeta FROM $wpdb->posts");
@@ -220,7 +220,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							$i++;
 						}
 					}
-					$msg .= '<p>Robots Meta values imported for '.$i.' posts and pages.</p>';
+					$msg .= '<p>'.__('Robots Meta values imported.').'</p>';
 				}
 				if ( isset($_POST['wpseo']['importrssfooter']) ) {
 					$optold = get_option( 'RSSFooterOptions' );
@@ -233,7 +233,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							$optnew['rssbefore'] = $optold['footerstring'];						
 					}
 					update_option( 'wpseo_rss', $optnew );
-					$msg .= '<p>RSS Footer options imported successfully.</p>';
+					$msg .= '<p>'.__('RSS Footer options imported successfully.').'</p>';
 				}
 				if ( isset($_POST['wpseo']['importbreadcrumbs']) ) {
 					$optold = get_option( 'yoast_breadcrumbs' );
@@ -247,15 +247,15 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 								$optnew['breadcrumbs-'.$opt] = $val;
 						}						
 						update_option( 'wpseo_internallinks', $optnew );
-						$msg .= '<p>Yoast Breadcrumbs options imported successfully.</p>';
+						$msg .= '<p>'.__('Yoast Breadcrumbs options imported successfully.').'</p>';
 					} else {
-						$msg .= '<p>Yoast Breadcrumbs options could not be found.</p>';
+						$msg .= '<p>'.__('Yoast Breadcrumbs options could not be found').'</p>';
 					}
 				}
 				if ($replace)
-					$msg .= ', and old data deleted';
+					$msg .= __(', and old data deleted');
 				if ($deletekw)
-					$msg .= ', and meta keywords data deleted';
+					$msg .= __(', and meta keywords data deleted');
 			}
 			
 			$this->admin_header('Import', false, false);
@@ -305,7 +305,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			foreach (get_post_types() as $posttype) {
 				if ( in_array($posttype, array('revision','nav_menu_item') ) )
 					continue;
-				if ($options['redirectattachment'] && $posttype == 'attachment')
+				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
 					continue;
 				$content .= '<h4>'.ucfirst($posttype).'</h4>';
 				$content .= $this->textinput('title-'.$posttype,'Title template');
@@ -484,10 +484,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br/>';
 			$content .= $this->textinput('breadcrumbs-sep',__('Separator between breadcrumbs'));
 			$content .= $this->textinput('breadcrumbs-home',__('Anchor text for the Homepage'));
-			$content .= $this->textinput('breadcrumbs-blog',__('Anchor text for the Blog'));
 			$content .= $this->textinput('breadcrumbs-prefix',__('Prefix for the breadcrumb path'));
 			$content .= $this->textinput('breadcrumbs-archiveprefix',__('Prefix for Archive breadcrumbs'));
 			$content .= $this->textinput('breadcrumbs-searchprefix',__('Prefix for Search Page breadcrumbs'));
+			$content .= $this->checkbox('breadcrumbs-blog-remove',__('Remove Blog page from Breadcrumbs'));
 			$content .= '<br class="clear"><br/><br/>';
 			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:').'</strong><br/>';
 			foreach (get_post_types() as $pt) {
@@ -510,6 +510,12 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->checkbox('breadcrumbs-trytheme',__('Try to add automatically'));
 			$content .= '<p class="desc">'.__('If you\'re using Hybrid, Thesis or Thematic, check this box for some lovely simple action').'.</p>';
 
+			$content .= '<br class="clear"/>';
+			$content .= '<h4>'.__('How to insert breadcrumbs in your theme').'</h4>';
+			$content .= '<p>'.__('Usage of this breadcrumbs feature is explained <a href="http://yoast.com/wordpress/breadcrumbs/">here</a>. For the more code savvy, insert this in your theme:').'</p>';
+			$content .= '<pre>&lt;?php if ( function_exists(&#x27;yoast_breadcrumb&#x27;) ) {
+	yoast_breadcrumb(&#x27;&lt;p id=&quot;breadcrumbs&quot;&gt;&#x27;,&#x27;&lt;/p&gt;&#x27;);
+} ?&gt;</pre>';
 			$this->postbox('internallinks',__('Breadcrumbs Settings', 'yoast-wpseo'),$content); 
 			
 			$this->admin_footer('Internal Links');
@@ -519,8 +525,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($_POST['submitrobots']) ) {
 				if (!current_user_can('manage_options')) die(__('You cannot edit the robots.txt file.', 'yoast-wpseo'));
 				
-				if (file_exists($_SERVER['DOCUMENT_ROOT']."/robots.txt")) {
-					$robots_file = $_SERVER['DOCUMENT_ROOT']."/robots.txt";
+				if (file_exists( get_home_path()."robots.txt") ) {
+					$robots_file = get_home_path()."robots.txt";
 					$robotsnew = stripslashes($_POST['robotsnew']);
 					if (is_writable($robots_file)) {
 						$f = fopen($robots_file, 'w+');
@@ -534,8 +540,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($_POST['submithtaccess']) ) {
 				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', 'yoast-wpseo'));
 
-				if (file_exists($_SERVER['DOCUMENT_ROOT']."/.htaccess")) {
-					$htaccess_file = $_SERVER['DOCUMENT_ROOT']."/.htaccess";
+				if (file_exists( get_home_path().".htaccess" ) {
+					$htaccess_file = get_home_path().".htaccess";
 					$htaccessnew = stripslashes($_POST['htaccessnew']);
 					if (is_writeable($htaccess_file)) {
 						$f = fopen($htaccess_file, 'w+');
@@ -564,8 +570,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				echo '<div id="message" style="width:94%;" class="updated fade"><p>'.$msg.'</p></div>';
 			}
 
-			if (file_exists($_SERVER['DOCUMENT_ROOT'] ."/robots.txt")) {
-				$robots_file = $_SERVER['DOCUMENT_ROOT'] ."/robots.txt";
+			if (file_exists( get_home_path()."robots.txt")) {
+				$robots_file = get_home_path()."robots.txt";
 				$f = fopen($robots_file, 'r');
 				if (filesize($robots_file) > 0)
 					$content = fread($f, filesize($robots_file));
@@ -586,8 +592,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$this->postbox('robotstxt',__('Robots.txt', 'yoast-wpseo'),$content);
 			}
 			
-			if (file_exists($_SERVER['DOCUMENT_ROOT'] ."/.htaccess")) {
-				$htaccess_file = $_SERVER['DOCUMENT_ROOT'] ."/.htaccess";
+			if (file_exists( get_home_path().".htaccess" )) {
+				$htaccess_file = get_home_path()."/.htaccess";
 				$f = fopen($htaccess_file, 'r');
 				$contentht = fread($f, filesize($htaccess_file));
 				$contentht = htmlspecialchars($contentht);
@@ -716,17 +722,25 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			$content = '<p>'."The feature below is used to automatically add content to your RSS, more specifically, it's meant to add links back to your blog and your blog posts, so dumb scrapers will automatically add these links too, helping search engines identify you as the original source of the content.".'</p>';
 			$rows = array();
+			$rssbefore = '';
+			if ( isset($options['rssbefore']) )
+				$rssbefore = stripslashes(htmlentities($options['rssbefore']));
+
+			$rssafter = '';
+			if ( isset($options['rssafter']) )
+				$rssafter = stripslashes(htmlentities($options['rssafter']));
+			
 			$rows[] = array(
 				"id" => "rssbefore",
 				"label" => __("Content to put before each post in the feed", 'yoast-wpseo'),
 				"desc" => __("(HTML allowed)", 'yoast-wpseo'),
-				"content" => '<textarea cols="50" rows="5" id="rssbefore" name="wpseo_rss[rssbefore]">'.stripslashes(htmlentities($options['rssbefore'])).'</textarea>',
+				"content" => '<textarea cols="50" rows="5" id="rssbefore" name="wpseo_rss[rssbefore]">'.$rssbefore.'</textarea>',
 			);
 			$rows[] = array(
 				"id" => "rssafter",
 				"label" => __("Content to put after each post", 'yoast-wpseo'),
 				"desc" => __("(HTML allowed)", 'yoast-wpseo'),
-				"content" => '<textarea cols="50" rows="5" id="rssafter" name="wpseo_rss[rssafter]">'.stripslashes(htmlentities($options['rssafter'])).'</textarea>',
+				"content" => '<textarea cols="50" rows="5" id="rssafter" name="wpseo_rss[rssafter]">'.$rssafter.'</textarea>',
 			);
 			$rows[] = array(
 				"label" => __('Explanation', 'yoast-wpseo'),
@@ -761,9 +775,9 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
 							
 			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:').'</p>';
-			$content .= $this->textinput('googleverify', '<a href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'yoast-wpseo').'</a>');
-			$content .= $this->textinput('yahooverify','<a href="https://siteexplorer.search.yahoo.com/mysites">'.__('Yahoo! Site Explorer', 'yoast-wpseo').'</a>');
-			$content .= $this->textinput('msverify','<a href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'yoast-wpseo').'</a>');
+			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'yoast-wpseo').'</a>');
+			$content .= $this->textinput('yahooverify','<a target="_blank" href="https://siteexplorer.search.yahoo.com/mysites">'.__('Yahoo! Site Explorer', 'yoast-wpseo').'</a>');
+			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'yoast-wpseo').'</a>');
 
 			$content .= '<br class="clear"/><br/>';
 			
@@ -792,7 +806,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			foreach (get_post_types() as $post_type) {
 				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
 					$pt = get_post_type_object($post_type);
-					$content .= $this->checkbox('post_types-'.$post_type.'-not_in_sitemap', ucfirst($pt->name));
+					$content .= $this->checkbox('post_types-'.$post_type.'-not_in_sitemap', $pt->labels->name);
 				}
 			}
 
@@ -802,7 +816,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			foreach (get_taxonomies() as $taxonomy) {
 				if ( !in_array( $taxonomy, array('nav_menu','link_category') ) ) {
 					$tax = get_taxonomy($taxonomy);
-					$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->singular_name);					
+					$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->name);
 				}
 			}
 			

@@ -32,7 +32,7 @@ class WPSEO_Metabox {
 		if (in_array($pagenow, array('post.php', 'page.php', 'post-new.php'))) {
 			wp_enqueue_script('jquery-bgiframe', WPSEO_URL.'js/jquery.bgiframe.min.js', array('jquery'));
 			wp_enqueue_script('jquery-autocomplete', WPSEO_URL.'js/jquery.autocomplete.min.js', array('jquery'));
-			wp_enqueue_script('html5-placeholder', WPSEO_URL.'js/html5placeholder.jquery.min.js', array('jquery'));
+			// wp_enqueue_script('html5-placeholder', WPSEO_URL.'js/html5placeholder.jquery.min.js', array('jquery'));
 			wp_enqueue_script('wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-bgiframe','jquery-autocomplete'));
 		} elseif ($pagenow == 'edit.php') {
 			wp_enqueue_script('jquery-bgiframe', WPSEO_URL.'js/inline-edit.js',array('jquery'));

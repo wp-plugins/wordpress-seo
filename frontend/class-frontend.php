@@ -110,7 +110,7 @@ class WPSEO_Frontend {
 		} else if ( is_404() && isset($options['title-404']) && !empty($options['title-404']) ) {
 			$title = wpseo_replace_vars($options['title-404'], array('post_title' => $title) );
 		} 
-		return htmlentities(stripslashes($title));
+		return htmlspecialchars( strip_tags( stripslashes( $title ) ) );
 	}
 	
 	function wpseo_fix_generator($generator) {
@@ -164,7 +164,7 @@ class WPSEO_Frontend {
 				$robots .= ','.yoast_get_value('meta-robots-adv');
 			}
 		} else {
-			if ( is_object($term) ) {
+			if ( isset($term) && is_object($term) ) {
 				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_noindex' ) )
 					$robots .= 'noindex,';
 				else
@@ -246,8 +246,14 @@ class WPSEO_Frontend {
 					$metadesc = wpseo_replace_vars($options['metadesc-'.$post->post_type], (array) $post );
 				}
 			} else {
-				if ( is_home() ) {
+				if ( is_home() && 'posts' == get_option('show_on_front') && isset($options['metadesc-home']) ) {
 					$metadesc = wpseo_replace_vars($options['metadesc-home'], array() );
+				} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
+					$post = get_post( get_option('page_for_posts') );
+					$metadesc = yoast_get_value('metadesc');
+					if ( ($metadesc == '' || !$metadesc) && isset($options['metadesc-'.$post->post_type]) ) { 
+						$metadesc = wpseo_replace_vars($options['metadesc-'.$post->post_type], (array) $post );
+					}
 				} else if ( is_category() || is_tag() || is_tax() ) {
 					$term = $wp_query->get_queried_object();
 					
@@ -262,7 +268,7 @@ class WPSEO_Frontend {
 			}
 		
 			if (!empty($metadesc))
-				echo "\t".'<meta name="description" content="'. htmlentities( stripslashes( $metadesc ) ) .'"/>'."\n";
+				echo "\t".'<meta name="description" content="'. htmlspecialchars( strip_tags( stripslashes( $metadesc ) ) ).'"/>'."\n";
 		}
 	}
 

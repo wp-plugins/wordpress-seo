@@ -5,11 +5,11 @@ Tags: seo, google, meta, meta description, search engine optimization, xml sitem
 Requires at least: 3.0
 Tested up to: 3.0.1
 
-WordPress SEO is an All in one solution to SEO your WordPress blog, featuring titles, meta descriptions, breadcrumbs, XML sitemaps & more.
+WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, optimized breadcrumbs, XML sitemaps, robots meta settings and much much more.
 
 == Description ==
 
-The most complete All in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
+The most complete all in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
 
 * Post title and meta description meta box to change these on a per post basis.
 * Taxonomy (tag, category & custom taxonomy) title and meta description support.
@@ -28,8 +28,7 @@ The most complete All in one SEO solution for your WordPress blog, this plugin h
 	* Pages or posts that have been noindexed will not show in XML sitemap.
 * XML News Sitemaps.
 * .htaccess and robots.txt editor.
-
-Find the full feature list on the [WordPress SEO plugin](http://yoast.com/wordpress/seo/)'s homepage.
+* Basic import functionality for HeadSpace2 and All in One SEO.
 
 == Installation ==
 
@@ -38,6 +37,34 @@ Find the full feature list on the [WordPress SEO plugin](http://yoast.com/wordpr
 1. Configure the plugin by going to the `SEO` menu that appears in your admin menu
 
 == Changelog ==
+
+= 0.1.2 =
+
+* Bugs fixed:
+	* Non ASCII characaters should now display properly.
+	* Google News Module: added input field for Google News publication name, as this has to match how Google has you on file.
+	* Stripped tags out of title and meta description output when using, f.i., excerpts in template.
+	* Meta description now updates in snippet preview as well when post content changes and no meta description has been set yet.
+	* Meta description generated from post content now searches ahead to focus keyword and bolds it.
+	* Meta description should now show properly on blog pages when blog page is not site homepage.
+	* Alt or title for previous image could show up in image sitemap when one image didn't have that attribute.
+	* Prevented fatal error on remote_get of XML sitemap in admin/ajax.php.
+	* When there's a blog in / and in /example/ file editor should now properly get robots.txt and .htaccess from /example/ and not /.
+	* Reference to wrongly named yoast_breadcrumb_output fixed, should fix auto insertion of breadcrumbs in supported theme frameworks.
+	* Prevented error when yoast.com/feed/ doesn't work.
+	* Fixed several notices for unset variables.
+	* Added get text calls in several places to allow localization.
+
+* (Inline) Documentation fixes:	
+	* Exclusion list in XML sitemap box for post types now shows proper label instead of internal name.
+	* Exclusion list in XML sitemap box for custom taxonomies now shows plural instead of singular form.
+	* Added explanation on how to add breadcrumbs to your theme, as well as link to more explanatory page.
+	
+* Changes:
+	* Links to Webmaster Tools etc. now open in new window.
+	* Heavily simplified the javascript used for snippet preview, removing HTML5 placeholder code and instead inserting the title into the input straight away. Lot faster this way.
+	* Removed Anchor text for the blog page option from breadcrumbs section as you can simply set a breadcrumbs title on the blog page itself.
+	* Added option to always remove the Blog page from the breadcrumb.
 
 = 0.1.1 =
 

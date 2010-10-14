@@ -99,6 +99,9 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 				foreach ($matches as $imgarr) {
 					unset($imgarr[0]);
 					foreach($imgarr as $img) {
+						unset($image['title']);
+						unset($image['alt']);
+						
 						// FIXME: get true caption instead of alt / title
 						$res = preg_match( '/src=("|\')([^"\']+)("|\')/', $img, $match );
 						if ($res) {
@@ -107,7 +110,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 								$image['src'] = get_bloginfo('url').$image['src'];
 							}
 						}
-						if (in_array($image['src'], $tmp_img))
+						if ( in_array($image['src'], $tmp_img) )
 							continue;
 						else
 							$tmp_img[] = $image['src'];
