@@ -38,6 +38,9 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.1.2.1 =
+* Added a missing ) to prevent death on install / going into wp-admin.
+
 = 0.1.2 =
 
 * Bugs fixed:

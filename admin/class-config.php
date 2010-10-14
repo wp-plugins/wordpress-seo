@@ -540,7 +540,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($_POST['submithtaccess']) ) {
 				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', 'yoast-wpseo'));
 
-				if (file_exists( get_home_path().".htaccess" ) {
+				if (file_exists( get_home_path().".htaccess" ) ) {
 					$htaccess_file = get_home_path().".htaccess";
 					$htaccessnew = stripslashes($_POST['htaccessnew']);
 					if (is_writeable($htaccess_file)) {
