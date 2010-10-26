@@ -45,6 +45,11 @@ class WPSEO_XML_Sitemap_Base {
 
 		if ($echo && $resp['response']['code'] == '200')
 			echo 'Successfully notified Bing of updated sitemap.<br/>';	
+
+		$resp = wp_remote_get('http://submissions.ask.com/ping?sitemap='.$sitemapurl);
+
+		if ($echo && $resp['response']['code'] == '200')
+			echo 'Successfully notified Ask.com of updated sitemap.<br/>';	
 	}
 
 	function w3c_date($time='') { 
@@ -57,7 +62,7 @@ class WPSEO_XML_Sitemap_Base {
 	}
 
 	function xml_clean( $str ) {
-		return ent2ncr( htmlentities( str_replace ( "’", "&quot;", $str ) ) );
+		return ent2ncr( esc_html( str_replace ( "’", "&quot;", $str ) ) );
 	}
 
 	function make_image_local( $url, $post_id, $title, $type = '' ) {

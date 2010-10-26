@@ -55,8 +55,7 @@ class WPSEO_Metabox {
 			"std" => "",
 			"type" => "text",
 			"title" => __("SEO Title"),
-			"description" => __("The SEO title is limited to 70 chars, <span id='yoast_wpseo_title-length'></span> chars left. It's used in the <code>&lt;title&gt;</code> tag, unlike the page title, which is used on the page itself. This overwrites the post type's title template.")
-		);
+			"description" => __('<div class="alignright" style="padding:5px;"><a class="button" href="#wpseo_title" id="wpseo_regen_title">'.__('Regenerate SEO Title').'</a></div><p>'."The SEO title is limited to 70 chars, <span id='yoast_wpseo_title-length'></span> chars left. It's used in the <code>&lt;title&gt;</code> tag, unlike the page title, which is used on the page itself. This overwrites the post type's title template.".'</p>'));
 		$mbs['metadesc'] = array(
 			"name" => "metadesc",
 			"std" => "",
@@ -486,7 +485,7 @@ class WPSEO_Metabox {
 				$tableopen = false;
 				echo '</table>';
 				echo '</div>';
-				echo '<div class="divtoggle"><small><a href="" id="'.$meta_box['id'].'_open">'.$meta_box['label'].' &darr;</a></small></div>';
+				echo '<div class="divtoggle"><small><a class="button" href="" id="'.$meta_box['id'].'_open">'.$meta_box['label'].' &darr;</a></small></div>';
 				break;
 		}
 		if ($meta_box['type'] != 'div' && $meta_box['type'] != 'divclose') {

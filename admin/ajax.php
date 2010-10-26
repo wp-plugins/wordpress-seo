@@ -93,8 +93,12 @@ function wpseo_ajax_generate_sitemap_callback() {
 	
 	if (!empty($type))
 		$type .= '-';
-	require_once WPSEO_PATH.'/sitemaps/xml-'.$type.'sitemap-class.php';
 	
+	if ($type == '')
+		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
+	else
+		require_once WPSEO_PATH.'/modules/admin/xml-'.$type.'sitemap-class.php';
+		
 	die();
 }
 add_action('wp_ajax_wpseo_generate_sitemap', 'wpseo_ajax_generate_sitemap_callback');

@@ -38,6 +38,27 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.1.3 =
+
+* Bugs fixed:
+	* SEO Title no longer being overwritten when it's already set.
+	* Titles for date archives work too now.
+	* On initial page load or SEO title regeneration number of chars remaining updates properly.
+	* Entities in titles and meta descriptions should now work correctly.
+	* When editing SEO title snippet preview now correctly updates with focus keyword bolded.
+	* Entities in XML sitemap should now show correctly.
+	* When using %%excerpt%% in descriptions it now correctly is shortened to 155 chars.
+	* Regenerating XML News sitemaps should no longer give a Fatal error but just work.
+	* Focus keyword should now properly be recognized in slug even when slug is too long to display.
+	* Breadcrumbs now show proper home link when showing blog link is disabled.
+	* Non post singular pages (pages and custom post types) no longer show blog link in breadcrumb path.
+
+* New features:
+	* Added option to regenerate SEO title (just click the button).
+	* Advanced button now looks cooler (hey even little changes deserve a changelog line!).
+	* Now pinging Ask.com too for updated sitemaps.
+	* Added plugin version number to "branding" comment to help in bug fixing.
+	
 = 0.1.2.1 =
 * Added a missing ) to prevent death on install / going into wp-admin.
 

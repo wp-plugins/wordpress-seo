@@ -68,7 +68,7 @@ function wpseo_replace_vars($string, $args) {
 		'%%title%%'					=> stripslashes($r['post_title']),
 		'%%sitename%%'				=> get_bloginfo('name'),
 		'%%sitedesc%%'				=> get_bloginfo('description'),
-		'%%excerpt%%'				=> !empty($r['post_excerpt']) ? apply_filters('get_the_excerpt', $r['post_excerpt']) : wp_trim_excerpt($r['post_content']),
+		'%%excerpt%%'				=> !empty($r['post_excerpt']) ? apply_filters('get_the_excerpt', $r['post_excerpt']) : substr(wp_trim_excerpt($r['post_content']), 0, 155),
 		'%%excerpt_only%%'			=> $r['post_excerpt'],
 		'%%category%%'				=> ( get_the_category_list('','',$r['ID']) != '' ) ? get_the_category_list('','',$r['ID']) : $r['name'],
 		'%%category_description%%'	=> !empty($r['taxonomy']) ? trim(strip_tags(get_term_field( 'description', $r['term_id'], $r['taxonomy'] ))) : '',

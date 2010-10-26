@@ -107,10 +107,12 @@ class WPSEO_Frontend {
 			if ( empty($title) && isset($options['title-author']) && !empty($options['title-author']) ) {
 				$title = wpseo_replace_vars($options['title-author'], array() );
 			}
+		} else if ( is_archive() && isset($options['title-archive']) && !empty($options['title-archive']) ) {
+			$title = wpseo_replace_vars($options['title-archive'], array('post_title' => $title) );
 		} else if ( is_404() && isset($options['title-404']) && !empty($options['title-404']) ) {
 			$title = wpseo_replace_vars($options['title-404'], array('post_title' => $title) );
 		} 
-		return htmlspecialchars( strip_tags( stripslashes( $title ) ) );
+		return esc_html( strip_tags( stripslashes( $title ) ) );
 	}
 	
 	function wpseo_fix_generator($generator) {
@@ -124,7 +126,7 @@ class WPSEO_Frontend {
 		
 		$robots = '';
 
-		echo "\t<!-- This site is optimized with the Yoast WordPress SEO plugin. -->\n";
+		echo "\t<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION.". -->\n";
 		$this->wpseo_metadesc();
 		
 		// Set decent canonicals for homepage, singulars and taxonomy pages
@@ -264,11 +266,11 @@ class WPSEO_Frontend {
 				} else if ( is_author() ) {
 					$author_id = get_query_var('author');
 					$metadesc = get_the_author_meta('wpseo_metadesc', $author_id);
-				}
+				} 
 			}
 		
 			if (!empty($metadesc))
-				echo "\t".'<meta name="description" content="'. htmlspecialchars( strip_tags( stripslashes( $metadesc ) ) ).'"/>'."\n";
+				echo "\t".'<meta name="description" content="'. esc_attr( strip_tags( stripslashes( $metadesc ) ) ).'"/>'."\n";
 		}
 	}
 
