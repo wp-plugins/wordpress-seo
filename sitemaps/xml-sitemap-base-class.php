@@ -8,17 +8,18 @@ class WPSEO_XML_Sitemap_Base {
 	function generate_sitemap() {
 	}
 	
-	function write_sitemap( $sitemappath, $output ) {
-		$f = fopen($sitemappath, 'w+');
+	function write_sitemap( $filename, $output ) {
+		$f = fopen( WPSEO_UPLOAD_DIR.$filename, 'w+');
 		fwrite($f, $output);
 		fclose($f);
-		if ( $this->gzip_sitemap( $sitemappath, $output ) )
+
+		if ( $this->gzip_sitemap( $filename, $output ) )
 			return true;
 		return false;
 	}
 	
-	function gzip_sitemap( $sitemap, $output ) {
-		$f = fopen( $sitemap.'.gz', "w" );
+	function gzip_sitemap( $filename, $output ) {
+		$f = fopen( WPSEO_UPLOAD_DIR . $filename . '.gz', "w" );
 		if ( $f ) {
 			fwrite( $f, gzencode( $output , 9 ) );
 			fclose( $f );
@@ -27,8 +28,8 @@ class WPSEO_XML_Sitemap_Base {
 		return false;
 	}
 	
-	function ping_search_engines( $sitemapurl, $echo = false ) {
-		$sitemapurl = urlencode($sitemapurl.'.gz');
+	function ping_search_engines( $filename, $echo = false ) {
+		$sitemapurl = urlencode( get_bloginfo('url') . '/' . $filename . '.gz');
 
 		$resp = wp_remote_get('http://www.google.com/webmasters/tools/ping?sitemap='.$sitemapurl);
 
@@ -79,7 +80,10 @@ class WPSEO_XML_Sitemap_Base {
 			$file_array['tmp_name'] = '';
 			return false;
 		} else {
-			return media_handle_sideload($file_array, $post_id, 'Poster image for '.$type.' video in '.$title);
+			$ret = media_handle_sideload($file_array, $post_id, 'Poster image for '.$type.' video in '.$title);
+			if ( is_numeric($ret) )
+				$ret = get_attachment_link($ret);
+			return $ret;
 		}
 	}
 	
@@ -237,4 +241,3 @@ class WPSEO_XML_Sitemap_Base {
 	}
 } 
 
-?>

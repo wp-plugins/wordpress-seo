@@ -73,6 +73,10 @@ class WPSEO_Metabox {
 			"title" => __("Focus Keyword"),
 			"description" => "<div class='alignright' style='width: 300px;'><a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a><p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
 		);
+		
+		// Apply filters before entering the advanced section
+		$mbs = apply_filters('wpseo_metabox_entries', $mbs);
+		
 		$mbs['advancedopen'] = array(
 			"type" => "div",
 			"id" => "advancedseo",
@@ -156,14 +160,15 @@ class WPSEO_Metabox {
 			"description" => "The URL that this page should redirect to."
 		);
 		
-		$mbs = apply_filters('wpseo_metabox_entries', $mbs);
+		// Apply filters for in advanced section
+		$mbs = apply_filters('wpseo_metabox_entries_advanced', $mbs);
 		
 		$mbs['advancedclose'] = array(
 			"type" => "divclose",
 			"id" => "advancedseo",
 			"label" => "Advanced",
 		);
-
+		
 		return $mbs;
 	}
 
@@ -261,6 +266,8 @@ class WPSEO_Metabox {
 			$post = get_post($post_id);
 
 		foreach($this->get_meta_boxes($post->post_type) as $meta_box) {  
+			if ( !isset($meta_box['name']) )
+				continue;
 			// // Verify  
 			// if ( !wp_verify_nonce( $_POST['yoast_wpseo_nonce'], 'yoast-wpseo-form-submit' )) {  
 			// 	return $post;
@@ -274,7 +281,10 @@ class WPSEO_Metabox {
 					return $post_id;  
 			}  
 
-			$data = $_POST['yoast_wpseo_'.$meta_box['name']];  
+			if ( isset($_POST['yoast_wpseo_'.$meta_box['name']]) )
+				$data = $_POST['yoast_wpseo_'.$meta_box['name']];  
+			else 
+				continue;
 			if ($meta_box['type'] == 'checkbox') {
 				if (isset($_POST['yoast_wpseo_'.$meta_box['name']]))
 					$data = true;
@@ -303,7 +313,7 @@ class WPSEO_Metabox {
 
 	function update_video_meta($post_id, $post = null) {
 		$options = get_wpseo_options();
-		if ( !$options['enablexmlvideositemap'])
+		if ( !isset($options['enablexmlvideositemap']) || !$options['enablexmlvideositemap'] )
 			return;
 			
 		if (!is_object($post))
@@ -487,24 +497,29 @@ class WPSEO_Metabox {
 				echo '</div>';
 				echo '<div class="divtoggle"><small><a class="button" href="" id="'.$meta_box['id'].'_open">'.$meta_box['label'].' &darr;</a></small></div>';
 				break;
+			case "divtext":
+				echo '<p>' . $meta_box['description'] . '</p>';
 		}
-		if ($meta_box['type'] != 'div' && $meta_box['type'] != 'divclose') {
-			echo '<p>'.$meta_box['description'].'</p></td>';  
+		
+		if ($meta_box['type'] != 'div' && $meta_box['type'] != 'divclose' && $meta_box['type'] != 'divtext') {
+			if ( isset($meta_box['description']) )
+				echo '<p>'.$meta_box['description'].'</p>';
+			echo '</td>';  
 			echo '</tr>';	
 		}
 	}
 	
 	function wpseo_page_title( $postid ) {
-
-		$fixed_title = yoast_get_value('title', $post->ID);
+		$fixed_title = yoast_get_value('title', $postid );
 		if ($fixed_title) {
 			return $fixed_title;
 		} else {
+			$post = get_post( $postid );
 			$options = get_wpseo_options();
 			if (!empty($options['title-'.$post->post_type]))
 				return wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );				
 			else
-				return '';
+				return wpseo_replace_vars('%%title%%', (array) $post );				
 		}
 	}
 }

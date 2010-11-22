@@ -61,3 +61,31 @@ function testSitemap( baseurl, type ) {
 		} 
 	);
 }
+
+function rebuildKml( baseurl ) {
+	jQuery('#kmlgeneration').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
+	jQuery.post(ajaxurl, { 
+			action: 'wpseo_generate_sitemap', 
+			type: 'kml', 
+			sitemappath: jQuery('#kmlpath').val(), 
+			sitemapurl: jQuery('#kmlurl').val() 
+		}, function(response) { 
+			jQuery('#kmlgeneration').html(response); 
+			rebuildSitemap(baseurl, 'geo');
+		}
+	);
+}
+
+function testKml( baseurl ) {
+	jQuery('#kmltestresult').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
+	jQuery.post(ajaxurl, { 
+			action: 'wpseo_test_sitemap', 
+			type: 'kml', 
+			sitemappath: jQuery('#kmlpath').val(), 
+			sitemapurl: jQuery('#kmlurl').val() 
+		}, function(response) { 
+			jQuery('#kmltestresult').html(response); 
+			testSitemap(baseurl, 'geo'); // After testing KML, test Geo Sitemap
+		} 
+	);
+}

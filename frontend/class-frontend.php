@@ -64,8 +64,16 @@ class WPSEO_Frontend {
 		if (isset($options['cleanpermalinks']) && $options['cleanpermalinks'])
 			add_action('get_header',array(&$this,'wpseo_clean_permalink'),1);	
 
-		add_filter('the_content_feed', array(&$this, 'wpseo_embed_rssfooter') );
-		add_filter('the_excerpt_rss', array(&$this, 'wpseo_embed_rssfooter_excerpt') );	
+		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {
+			add_action('generate_rewrite_rules', array(&$this,'add_rewrite_rules') );
+		}
+		
+		add_filter('query_vars', array(&$this,'add_sitemap_query_var') );
+		add_filter('robots_txt', array(&$this,'sitemap_output'), 10, 2 ); 
+		add_action('do_robotstxt', array(&$this,'sitemap_header'), 99);		
+		
+		add_filter('the_content_feed', array(&$this, 'embed_rssfooter') );
+		add_filter('the_excerpt_rss', array(&$this, 'embed_rssfooter_excerpt') );	
 		
 	}
 
@@ -77,7 +85,7 @@ class WPSEO_Frontend {
 
 		$options = get_wpseo_options();
 
-		if ( is_home() && 'posts' == get_option('show_on_front') ) {
+		if ( is_home() && 'posts' == get_option('show_on_front') && isset($options['title-home']) && $options['title-home'] != '' ) {
 			$title = wpseo_replace_vars($options['title-home'], (array) $post );
 		} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
 			$post = get_post(get_option('page_for_posts'));
@@ -147,9 +155,10 @@ class WPSEO_Frontend {
 						$canonical = get_term_link( $term, $term->taxonomy );
 				}
 				if ($paged)
-					$canonical .= 'page/'.$paged.'/';
+					$canonical = user_trailingslashit( trailingslashit( $canonical ) . 'page/' . $paged );
 					
-				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
+				if ( !empty($canonical) )
+					echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
 			}
 		}
 		
@@ -245,7 +254,8 @@ class WPSEO_Frontend {
 			if (is_singular()) { 
 				$metadesc = yoast_get_value('metadesc');
 				if ($metadesc == '' || !$metadesc) {
-					$metadesc = wpseo_replace_vars($options['metadesc-'.$post->post_type], (array) $post );
+					if ( isset($options['metadesc-'.$post->post_type]) && $options['metadesc-'.$post->post_type] != '' )
+						$metadesc = wpseo_replace_vars($options['metadesc-'.$post->post_type], (array) $post );
 				}
 			} else {
 				if ( is_home() && 'posts' == get_option('show_on_front') && isset($options['metadesc-home']) ) {
@@ -276,6 +286,8 @@ class WPSEO_Frontend {
 
 	function wpseo_yoast_page_redirect($input) {
 		global $post;
+		if ( !isset($post) )
+			return;
 		$redir = yoast_get_value('redirect', $post->ID);
 		if (!empty($redir)) {
 			wp_redirect($redir, 301);
@@ -351,6 +363,9 @@ class WPSEO_Frontend {
 	}
 
 	function wpseo_clean_permalink() {
+		if ( is_robots() )
+			return;
+
 		$options = get_wpseo_options();
 		global $wp_query;
 	
@@ -388,8 +403,9 @@ class WPSEO_Frontend {
 				$properurl = get_bloginfo('url').'/search/'.$wp_query->query_vars['s'].'/';
 		}
 		if ( !empty($properurl) && $wp_query->query_vars['paged'] != 0 && $wp_query->post_count != 0 ) {
-			$properurl .= 'page/'.$wp_query->query_vars['paged'].'/';
+			$properurl = user_trailingslashit( trailingslashit($properurl). 'page/' . $wp_query->query_vars['paged'] );
 		}
+		// TODO: add option to edit the array below through admin.
 		if (isset($options['cleanpermalink-googlesitesearch']) && $options['cleanpermalink-googlesitesearch']) {
 			// Prevent cleaning out Google Site searches
 			foreach (array('q','cx','debug','cof','ie','sa') as $get) {
@@ -452,7 +468,41 @@ class WPSEO_Frontend {
 			} 
 		}
 		return $content;
-	}	
+	}
+	
+	function add_rewrite_rules( $rewrite ) { 
+		$new_rules = array(
+			'((news)?_?sitemap\.xml)(\.gz)?$' => 'index.php?robots=1&wpseo_sitemap='.$rewrite->preg_index(1).'&wpseo_sitemap_gz='.$rewrite->preg_index(3),
+		);
+		$rewrite->rules = $new_rules + $rewrite->rules;
+	} 
+	
+	function add_sitemap_query_var( $query_vars ) {
+		$query_vars[] = 'wpseo_sitemap';
+		$query_vars[] = 'wpseo_sitemap_gz';
+		return $query_vars;
+	}
+	
+	function sitemap_output( $robots, $public ) {
+		if ( !get_query_var('wpseo_sitemap') )
+			return $robots;
+
+		if ( !WPSEO_UPLOAD_DIR )
+			return $robots;
+
+		$robots = file_get_contents(WPSEO_UPLOAD_DIR.get_query_var('wpseo_sitemap').get_query_var('wpseo_sitemap_gz'));
+
+		return $robots;
+	}
+	
+	function sitemap_header() {
+		if ( get_query_var('wpseo_sitemap') ) {
+			if ( get_query_var('wpseo_sitemap_gz') )
+				header( 'Content-Type: application/x-gzip; charset=utf-8' );
+			else
+				header( 'Content-Type: application/xml; charset=utf-8' );
+		}
+	}
 }
 
 $wpseo_front = new WPSEO_Frontend;

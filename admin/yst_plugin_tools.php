@@ -19,7 +19,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles');
 		
 		function Yoast_WPSEO_Plugin_Admin() {
-			add_action( 'admin_menu', array(&$this, 'register_settings_page') );
+			add_action( 'admin_menu', array(&$this, 'register_settings_page'), 10 );
 			add_filter( 'plugin_action_links', array(&$this, 'add_action_link'), 10, 2 );
 			add_filter( 'ozh_adminmenu_icon', array(&$this, 'add_ozh_adminmenu_icon' ) );				
 			
@@ -95,38 +95,114 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		/**
 		 * Create a Checkbox input field
 		 */
-		function checkbox($id, $label) {
-			$options = get_option($this->currentoption);
+		function checkbox($id, $label, $label_left = false, $option = '') {
+			$option = !empty($option) ? $option : $this->currentoption;
+			$options = get_option($option);
+
 			if (!isset($options[$id]))
 				$options[$id] = false;
-			return '<input type="checkbox" id="'.$id.'" name="'.$this->currentoption.'['.$id.']"'. checked($options[$id],'on',false).'/> <label for="'.$id.'">'.$label.'</label><br/>';
+				
+			$output_label = '<label class="textinput" for="'.$id.'">'.$label.'</label>';
+			$output_input = '<input type="checkbox" id="'.$id.'" name="'.$option.'['.$id.']"'. checked($options[$id],'on',false).'/> ';
+			
+			if($label_left) {
+				$output = $output_label . $output_input;
+			}
+			else {
+				$output = $output_input . $output_label;
+			}
+			return $output . '<br class="clear" />';
 		}
 		
 		/**
 		 * Create a Text input field
 		 */
-		function textinput($id, $label) {
-			$options = get_option($this->currentoption);			
+		function textinput($id, $label, $option = '') {
+			$option = !empty($option) ? $option : $this->currentoption;
+			$options = get_option($option);
+			
 			$val = '';
 			if (isset($options[$id]))
 				$val = htmlspecialchars($options[$id]);
-			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$this->currentoption.'['.$id.']" value="'.$val.'"/><br/>';
+			
+			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$option.'['.$id.']" value="'.$val.'"/><br/>';
+		}
+		
+		/**
+		 * Create a Hidden input field
+		 */
+		function hiddeninput($id, $option = '') {
+			$option = !empty($option) ? $option : $this->currentoption;
+			$options = get_option($option);
+			
+			$val = '';
+			if (isset($options[$id]))
+				$val = htmlspecialchars($options[$id]);
+			return '<input class="hidden" type="hidden" id="'.$id.'" name="'.$option.'['.$id.']" value="'.$val.'"/>';
 		}
 		
 		/**
 		 * Create a Select Box
 		 */
-		function select($id, $label, $values) {
-			$options = get_option($this->currentoption);
+		function select($id, $label, $values, $option = '') {
+			$option = !empty($option) ? $option : $this->currentoption;
+			$options = get_option($option);
+			
 			$output = '<label class="select" for="'.$id.'">'.$label.':</label>';
-			$output .= '<select class="select" name="'.$this->currentoption.'['.$id.']" id="'.$id.'">';
+			$output .= '<select class="select" name="'.$option.'['.$id.']" id="'.$id.'">';
+			
 			foreach($values as $value => $label) {
 				$sel = '';
-				if ($options[$id] == $value)
+				if ($options[$id] == $value) {
 					$sel = 'selected="selected" ';
+				}
 				$output .= '<option '.$sel.'value="'.$value.'">'.$label.'</option>';
 			}
 			$output .= '</select>';
+			return $output;
+		}
+		
+		/**
+		 * Create a File upload
+		 */
+		function file_upload($id, $label, $option = '') {
+			$option = !empty($option) ? $option : $this->currentoption;
+			$options = get_option($option);
+			
+			$val = '';
+			if (isset($options[$id]) && strtolower(gettype($options[$id])) == 'array') {
+				$val = $options[$id]['url'];
+			}
+			$output = '<label class="select" for="'.$id.'">'.$label.':</label>';
+			$output .= '<input type="file" value="' . $val . '" class="textinput" name="'.$option.'['.$id.']" id="'.$id.'"/>';
+			
+			// Need to save separate array items in hidden inputs, because empty file inputs type will be deleted by settings API.
+			if(!empty($options[$id])) {
+				$output .= '<input class="hidden" type="hidden" id="' . $id . '_file" name="wpseo_local[' . $id . '][file]" value="' . $options[$id]['file'] . '"/>'; 
+				$output .= '<input class="hidden" type="hidden" id="' . $id . '_url" name="wpseo_local[' . $id . '][url]" value="' . $options[$id]['url'] . '"/>'; 
+				$output .= '<input class="hidden" type="hidden" id="' . $id . '_type" name="wpseo_local[' . $id . '][type]" value="' . $options[$id]['type'] . '"/>'; 
+			}
+			$output .= '<br class="clear"/>';
+			
+			return $output;
+		}
+		
+		/**
+		 * Create a Radio input field
+		 */
+		function radio($id, $values, $label, $option = '') {
+			$option = !empty($option) ? $option : $this->currentoption;
+			$options = get_option($option);
+			
+			if (!isset($options[$id]))
+				$options[$id] = false;
+
+			$output = '<br/><label class="select">'.$label.':</label>'; 
+			foreach($values as $key => $value) {
+				$output .= '<input type="radio" class="radio" id="'.$id.'-' . $key . '" name="'.$option.'['.$id.']" value="'. $key.'" ' . ($options[$id] == $key ? ' checked="checked"' : '') . ' /> <label class="radio" for="'.$id.'-' . $key . '">'.$value.'</label>';
+			}
+			$output .= '<br/>';
+			
 			return $output;
 		}
 		
@@ -236,28 +312,40 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				echo "If you reload, this widget will be gone and never appear again, unless you decide to delete the database option 'yoastdbwidget'.";
 				return;
 			}
-			require_once(ABSPATH.WPINC.'/rss.php');
-			if ( $rss = fetch_rss( 'http://yoast.com/feed/' ) ) {
-				echo '<div class="rss-widget">';
-				echo '<a href="http://yoast.com/" title="Go to Yoast.com"><img src="http://cdn.yoast.com/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
-				echo '<ul>';
-				$rss->items = array_slice( $rss->items, 0, 3 );
-				foreach ( (array) $rss->items as $item ) {
-					echo '<li>';
-					echo '<a class="rsswidget" href="'.esc_url( $item['link'], $protocolls=null, 'display' ).'">'. htmlentities($item['title']) .'</a> ';
-					echo '<span class="rss-date">'. date('F j, Y', strtotime($item['pubdate'])) .'</span>';
-					echo '<div class="rssSummary">'. $this->text_limit($item['summary'],250) .'</div>';
+			include_once(ABSPATH . WPINC . '/feed.php');
+			$rss = fetch_feed('http://yoast.com/feed/');
+			
+			// Bail if feed doesn't work
+			if ( is_wp_error($rss) )
+				return;
+			
+			$rss_items = $rss->get_items( 0, $rss->get_item_quantity(3) );
+			
+			echo '<div class="rss-widget">';
+			echo '<a href="http://yoast.com/" title="Go to Yoast.com"><img src="http://cdn.yoast.com/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
+			echo '<ul>';
+
+			if ( !$rss_items ) {
+			    $content .= '<li class="yoast">no news items, feed might be broken...</li>';
+			} else {
+			    foreach ( $rss_items as $item ) {
+					// echo '<pre>'.print_r($item,1).'</pre>';
+					echo '<li class="yoast">';
+					echo '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. htmlentities($item->get_title()) .'</a>';
+					echo ' <span class="rss-date">'. $item->get_date('F j, Y') .'</span>';
+					echo '<div class="rssSummary">'. substr( $item->get_description(), 0, 250 ) .'</div>';
 					echo '</li>';
-				}
-				echo '</ul>';
-				echo '<div style="border-top: 1px solid #ddd; padding-top: 10px; text-align:center;">';
-				echo '<a href="http://feeds2.feedburner.com/joostdevalk"><img src="'.get_bloginfo('wpurl').'/wp-includes/images/rss.png" alt=""/> Subscribe with RSS</a>';
-				echo ' &nbsp; &nbsp; &nbsp; ';
-				echo '<a href="http://yoast.com/email-blog-updates/"><img src="http://cdn.yoast.com/email_sub.png" alt=""/> Subscribe by email</a>';
-				echo '<form class="alignright" method="post"><input type="hidden" name="yoast_removedbwidget" value="true"/><input title="Remove this widget from all users dashboards" type="submit" value="X"/></form>';
-				echo '</div>';
-				echo '</div>';
-			}
+			    }
+			}						
+
+			echo '</ul>';
+			echo '<div style="border-top: 1px solid #ddd; padding-top: 10px; text-align:center;">';
+			echo '<a href="http://feeds2.feedburner.com/joostdevalk"><img src="'.get_bloginfo('wpurl').'/wp-includes/images/rss.png" alt=""/> Subscribe with RSS</a>';
+			echo ' &nbsp; &nbsp; &nbsp; ';
+			echo '<a href="http://yoast.com/email-blog-updates/"><img src="http://cdn.yoast.com/email_sub.png" alt=""/> Subscribe by email</a>';
+			echo '<form class="alignright" method="post"><input type="hidden" name="yoast_removedbwidget" value="true"/><input title="Remove this widget from all users dashboards" type="submit" value="X"/></form>';
+			echo '</div>';
+			echo '</div>';
 		}
 
 		function widget_setup() {

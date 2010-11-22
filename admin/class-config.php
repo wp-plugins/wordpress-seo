@@ -28,10 +28,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_action('edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
 						
 			if ( '0' == get_option('blog_public') )
-				add_action('admin_footer', array(&$this,'blog_public_warning'));		
+				add_action('admin_footer', array(&$this,'blog_public_warning'));
 		}
 
-		function options_init(){
+		function options_init() {
 			register_setting( 'yoast_wpseo_options', 'wpseo' );
 			register_setting( 'yoast_wpseo_indexation_options', 'wpseo_indexation' );
 			register_setting( 'yoast_wpseo_permalinks_options', 'wpseo_permalinks' );
@@ -75,7 +75,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		<?php
 		}
 		
-		function admin_header($title, $expl = true, $form = true, $option = 'yoast_wpseo_options', $optionshort = 'wpseo') {
+		function admin_header($title, $expl = true, $form = true, $option = 'yoast_wpseo_options', $optionshort = 'wpseo', $contains_files = false) {
 			?>
 			<div class="wrap">
 				<?php 
@@ -100,7 +100,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						<div class="meta-box-sortables">
 			<?php
 			if ($form) {
-				echo '<form action="options.php" method="post" id="wpseo-conf">';
+				echo '<form action="options.php" method="post" id="wpseo-conf"' . ($contains_files ? ' enctype="multipart/form-data"' : '') . '>';
 				settings_fields($option); 
 				$this->currentoption = $optionshort;
 			}
@@ -278,10 +278,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->checkbox('importrobotsmeta',__('Import from Robots Meta (by Yoast)?','yoast-wpseo'));
 			$content .= $this->checkbox('importrssfooter',__('Import from RSS Footer (by Yoast)?','yoast-wpseo'));
 			$content .= $this->checkbox('importbreadcrumbs',__('Import from Yoast Breadcrumbs?','yoast-wpseo'));
-			$content .= '<input type="submit" class="button-primary" name="import" value="Import" />';
-			$content .= '</form>';
+			$content .= '<input type="submit" class="button-primary" name="import" value="Import" />';			
+			$content .= '</form>';			
 			
 			$this->postbox('import',__('Import', 'yoast-wpseo'),$content); 
+			
+			do_action('wpseo_import', $this);
+			
 			$this->admin_footer('Import', false);
 		}
 
@@ -756,10 +759,16 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->admin_footer('RSS');
 		}
 		
-		function config_page() {			
+		function config_page() {
+
 			$this->admin_header('General', false);
 
 			$content = '';
+
+			if ( !WPSEO_UPLOAD_DIR ) {
+				$content .= '<p class="wrong">WordPress SEO can\'t write to the directory <code>'.WPSEO_UPLOAD_NOTDIR.'</code>, XML Sitemap creation will not work, please make sure the directory is writable.</p>';
+				$wpseodir = false;
+			}
 			
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false )
 				$content .= '<p class="wrong"><a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Go fix it.').'</a>'.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.').'</p>';
@@ -767,10 +776,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( get_option('page_comments') )
 				$content .= '<p class="wrong"><a href="'.admin_url('options-discussion.php').'" class="button fixit">'.__('Go fix it.').'</a>'.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
 
-			if ( strpos( get_option('ping_sites'), 'http://blogsearch.google.com/ping/RPC2' ) === false )
-				$content .= '<p class="wrong"><a href="'.admin_url('options-writing.php').'" class="button fixit">'.__('Go fix it.').'</a>'.__('You\'re not pinging Google Blogsearch when you publish new blogposts, you should add <strong>http://blogsearch.google.com/ping/RPC2</strong> to the textarea under the "Update Services" header.').'</p>';
-
-			// $content .= '<pre>'.print_r(get_option('ping_sites'),1).'</pre>';
 			if ($content != '')
 				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
 							
@@ -783,24 +788,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			$this->postbox('webmastertools',__('Webmaster Tools', 'yoast-wpseo'),$content);
 			
-			$options = get_option($this->currentoption);
-			if ( empty($options['sitemappath']) )
-				$options['sitemappath'] = get_home_path()."sitemap.xml";
-			if ( empty($options['sitemapurl']) )
-				$options['sitemapurl'] = get_bloginfo('url')."/sitemap.xml";
-			if ( empty($options['newssitemappath']) )
-				$options['newssitemappath'] = get_home_path()."news_sitemap.xml";
-			if ( empty($options['newssitemapurl']) )
-				$options['newssitemapurl'] = get_bloginfo('url')."/news_sitemap.xml";
-			update_option($this->currentoption, $options);
-			
 			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'));
 			$content .= '<div id="sitemapinfo">';
-			$content .= '<p>'.__('Please check whether the auto-detected path and URL are correct:').'</p>';
-			$content .= $this->textinput('sitemappath',__('Path to the XML Sitemap', 'yoast-wpseo'));
-			$content .= $this->textinput('sitemapurl',__('URL to the XML Sitemap', 'yoast-wpseo'));
-			
-			$content .= '<br class="clear"/><br/>';
 			$content .= '<strong>'.__('Exclude post types').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_post_types() as $post_type) {
@@ -816,16 +805,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			foreach (get_taxonomies() as $taxonomy) {
 				if ( !in_array( $taxonomy, array('nav_menu','link_category') ) ) {
 					$tax = get_taxonomy($taxonomy);
-					$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->name);
+					if ( isset( $tax->labels->name ) && trim($tax->labels->name) != '' )
+						$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->name);
 				}
 			}
 			
 			$content .= '<br class="clear"/>';
 			$content .= '<p>'.__('<strong>Note:</strong> make sure to save the settings if you\'ve changed anything above before regenerating the XML sitemap.').'</p>';
-			$content .= '<a class="button" href="javascript:testSitemap(\''.WPSEO_URL.'\',\'\');">Test XML sitemap values</a> ';
 			$content .= '<a class="button" href="javascript:rebuildSitemap(\''.WPSEO_URL.'\',\'\');">(Re)build XML sitemap</a><br/><br/>';
-			$content .= '<div id="sitemaptestresult">'.wpseo_test_sitemap_callback(true).'</div>';
-			$content .= '<br/>';
 			$content .= '<div id="sitemapgeneration"></div>';
 			$content .= '</div>';
 			$this->postbox('xmlsitemaps',__('XML Sitemap', 'yoast-wpseo'),$content);

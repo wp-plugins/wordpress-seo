@@ -11,20 +11,14 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 
 		if ( !$options['enablexmlsitemap'])
 			return;
-		
-		if ( !isset($options['sitemappath']) || empty($options['sitemappath']) )
-			return;
-
-		$this->generate_sitemap( $options['sitemapurl'], $options['sitemappath'], $wpseo_echo );
-		$this->ping_search_engines( $options['sitemapurl'], $wpseo_echo );
 	}
 	
-	function generate_sitemap( $sitemapurl, $sitemappath, $echo = false ) {
+	function generate_sitemap( $filename, $echo = false ) {
 		global $wpdb, $wp_taxonomies, $wp_rewrite;
 
 		$options = get_option("wpseo");
 		
-		$wp_rewrite->flush_rules();
+		// $wp_rewrite->flush_rules();
 
 		// The stack of URL's to add to the sitemap
 		$stack = array();
@@ -41,7 +35,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 
 		$post_types = array();
 		foreach (get_post_types() as $post_type) {
-			if ($options['post_types-'.$post_type.'-not_in_sitemap'])
+			if ( isset($options['post_types-'.$post_type.'-not_in_sitemap']) && $options['post_types-'.$post_type.'-not_in_sitemap'] )
 				continue;
 			if ( in_array( $post_type, array('revision','nav_menu_item','attachment') ) )
 				continue;
@@ -147,7 +141,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		// Grab all taxonomies and add to stack
 		$sitemap_taxonomies = array();
 		foreach($wp_taxonomies as $taxonomy) {
-			if ($options['taxonomies-'.$taxonomy->name.'-not_in_sitemap'])
+			if ( isset($options['taxonomies-'.$taxonomy->name.'-not_in_sitemap']) && $options['taxonomies-'.$taxonomy->name.'-not_in_sitemap'] )
 				continue;
 
 			// Skip link and nav categories
@@ -269,10 +263,10 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		}
 		$output .= '</urlset>';
 
-		if ($this->write_sitemap( $sitemappath, $output ) && $echo)
-			echo date('H:i').': <a href="'.$sitemapurl.'">Sitemap</a> successfully (re-)generated.<br/><br/>';
+		if ($this->write_sitemap( $filename, $output ) && $echo)
+			echo date('H:i').': <a href="'.get_bloginfo('url').'/'.$filename.'">Sitemap</a> successfully (re-)generated.<br/><br/>';
 		else if ($echo)
-			echo date('H:i').': <a href="'.$sitemapurl.'">Something went wrong...</a>.<br/><br/>';
+			echo date('H:i').': <a href="'.get_bloginfo('url').'/'.$filename.'">Something went wrong...</a>.<br/><br/>';
 	}
 } 
 

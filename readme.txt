@@ -3,7 +3,7 @@ Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer
 Requires at least: 3.0
-Tested up to: 3.0.1
+Tested up to: 3.1
 
 WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, optimized breadcrumbs, XML sitemaps, robots meta settings and much much more.
 
@@ -37,6 +37,21 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 1. Configure the plugin by going to the `SEO` menu that appears in your admin menu
 
 == Changelog ==
+
+= 0.1.4 =
+
+* Bugs fixed:
+	* Fixed canonical for paginated archives of any kind when permalink structure doesn't end with /
+	* Fixed permalink redirect for paginated archives of any kind when permalink structure doesn't end with /
+	* Made sure blog shows up in breadcrumbs when you want it too.
+	* Fixed small javascript notice for js/wp-seo-metabox.js
+	* Rewrote parts of XML Sitemap generation so it's now fully compliant with MultiSite. You no longer have to choose paths for sitemaps, they'll all have fixed locations and using WP Rewrite will be placed in the correct positions, f.i. example.com/sitemap.xml.
+	* Heavily reduced memory usage on admin pages.
+	* Rewrote module structure and added some API's to be used in the modules.
+	* Plugin now creates uploads/wpseo dir to store all files it creates and takes in.
+	* Fixed several notices throughout the code.
+	* Made sure SEO title in edit posts screen shows correct SEO Title.
+	* Changed table sorting javascript for XSL's to Yoast CDN.
 
 = 0.1.3 =
 

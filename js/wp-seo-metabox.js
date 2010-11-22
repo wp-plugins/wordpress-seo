@@ -115,7 +115,7 @@ function getAutogenTitle( force ) {
 	var data = {
 		action: 'wpseo_autogen_title',
 		curtitle: jQuery('#title').val(),
-		postid: jQuery('#post_ID').val(),
+		postid: jQuery('#post_ID').val()
 	}
 	jQuery.post(ajaxurl, data, function(response) {
 		jQuery('#yoast_wpseo_title').val( response );

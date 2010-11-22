@@ -123,7 +123,7 @@ class WPSEO_Breadcrumbs {
 				}
 			}
 		} else {
-			$output = $homelink.' '.$opt['breadcrumbs-sep'].' ';
+			$output = $bloglink.' '.$opt['breadcrumbs-sep'].' ';
 			
 			if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();

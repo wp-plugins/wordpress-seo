@@ -37,10 +37,13 @@ div.inside ul {
 	float: left;
 }
 
-label.textinput, label.select {
+label.textinput, label.select, label {
 	width: 200px;
 	line-height: 24px;
 	clear:  both;
+}
+label.radio {
+	margin-right: 20px;
 }
 
 .postbox form {

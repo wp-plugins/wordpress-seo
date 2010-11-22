@@ -10,8 +10,8 @@
 			<head>
 				<title>XML News Sitemap</title>
 				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-				<script type="text/javascript" src="http://tablesorter.com/jquery.tablesorter.min.js"></script>
+				<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+				<script type="text/javascript" src="http://cdn.yoast.com/js/jquery.tablesorter.min.js"></script>
 				<script	type="text/javascript"><![CDATA[
 					$(document).ready(function() { 
 				        $("#sitemap").tablesorter( { widgets: ['zebra'] } ); 
