@@ -5,7 +5,7 @@ Tags: seo, google, meta, meta description, search engine optimization, xml sitem
 Requires at least: 3.0
 Tested up to: 3.0.1
 
-WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, optimized breadcrumbs, XML sitemaps, robots meta settings and much much more.
+WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, XML sitemaps & much much more.
 
 == Description ==
 
