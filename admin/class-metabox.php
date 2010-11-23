@@ -15,14 +15,11 @@ class WPSEO_Metabox {
 		
 		add_action('save_post', array(&$this,'update_video_meta'));
 	
-		add_action('edit_post',array(&$this,'yoast_wpseo_save_inline_edit'),10,1);
-
 		add_filter('manage_page_posts_columns',array(&$this,'yoast_wpseo_page_title_column_heading'),10,1);
 		add_filter('manage_post_posts_columns',array(&$this,'yoast_wpseo_page_title_column_heading'),10,1);
 		add_action('manage_pages_custom_column',array(&$this,'yoast_wpseo_page_title_column_content'), 10, 2);
 		add_action('manage_posts_custom_column',array(&$this,'yoast_wpseo_page_title_column_content'), 10, 2);
 
-		add_action('quick_edit_custom_box', array(&$this,'yoast_wpseo_quick_edit'), 10, 1 );
 		add_action('get_inline_data',array(&$this,'yoast_wpseo_inline_edit'));
 	}
 	
@@ -328,6 +325,9 @@ class WPSEO_Metabox {
 	}
 	
 	function rebuild_sitemap() {
+		global $wpseo_generate, $wpseo_echo;
+		$wpseo_generate = true;
+		$wpseo_echo = false;
 		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
 	}
 
@@ -343,23 +343,6 @@ class WPSEO_Metabox {
 		// require_once WPSEO_PATH.'/sitemaps/xml-video-sitemap-class.php';
 	}
 
-	function yoast_wpseo_save_inline_edit($post_id) {
-		if (!isset($_POST['_inline_edit']))
-			return;
-
-		update_post_meta($post_id, '_yoast_wpseo_title', $_POST['yoast_wpseo_page_title']);  
-		update_post_meta($post_id, '_yoast_wpseo_meta-robots', $_POST['yoast_wpseo_page_meta_robots']);  
-
-		if ( 'page' == $_POST['post_type'] ) {
-			$post[] = get_post($_POST['post_ID']);
-			page_rows($post);
-		} elseif ( 'post' == $_POST['post_type'] || in_array($_POST['post_type'], get_post_types( array('public' => true) ) ) ) {
-			$mode = $_POST['post_view'];
-			$post[] = get_post($_POST['post_ID']);
-			post_rows($post);
-		}
-	}
-
 	function yoast_wpseo_page_title_column_heading( $columns ) {
 		return array_merge(array_slice($columns, 0, 2), array('page-title' => 'Yoast SEO Title'), array_slice($columns, 2, 6), array('page-meta-robots' => 'Robots Meta'));
 	}
@@ -369,45 +352,17 @@ class WPSEO_Metabox {
 			echo $this->wpseo_page_title($id);
 		}
 		if ( $column_name == 'page-meta-robots' ) {
-			$meta_robots = yoast_get_value( 'meta-robots', $id );
-			if ( empty($meta_robots) )
-				$meta_robots = 'index,follow';
-			echo ucwords( str_replace( ',', ', ', $meta_robots ) );
+			$robots 			= array();
+			$robots['index'] 	= 'Index';
+			$robots['follow'] 	= 'Follow';
+
+			if ( yoast_get_value('meta-robots-noindex') )
+				$robots['index'] = 'Noindex';
+			if ( yoast_get_value('meta-robots-nofollow') )
+				$robots['follow'] = 'Nofollow';
+			
+			echo $robots['index'].', '.$robots['follow'];
 		}
-	}
-
-	function yoast_wpseo_quick_edit( $column_name ) {
-		global $screen;
-		echo '<fieldset class="inline-edit-col-left">';
-		echo '<div class="inline-edit-col">';
-		if ( $column_name == 'page-title' ) {
-			echo '<label>';
-			echo '<span class="title">SEO Title</span>';
-			echo '<span class="input-text-wrap"><input type="text" name="yoast_wpseo_page_title" class="ptitle" value=""/></span>';
-			echo '</label>';
-		} else if ( $column_name == 'page-meta-robots') {
-			echo '<label for="yoast_wpseo_page_meta_robots">';
-			echo '<span class="title">Robots</span>';
-			echo '<select id="yoast_wpseo_page_meta_robots" name="yoast_wpseo_page_meta_robots">';
-			foreach (array(
-				"index,follow" => "Index, Follow",
-				"index,nofollow" => "Index, Nofollow",
-				"noindex,follow" => "Noindex, Follow",
-				"noindex,nofollow" => "Noindex, Nofollow",
-			) as $option => $val) {
-				echo '<option value="'.$option.'">'.$val.'</option>';
-			}
-			echo '</select>';
-			echo '</label>';
-		}	
-		echo '<br class="clear">';
-		echo '</div>';
-		echo '</fieldset>';
-	}
-
-	function yoast_wpseo_inline_edit($post) {
-		echo '<div class="yoast_wpseo_page_meta_robots">'.yoast_get_value( 'meta-robots', $post->ID ).'</div>';
-		echo '<div class="yoast_wpseo_page_title">'.yoast_get_value( 'title', $post->ID ).'</div>';
 	}
 
 	function yoast_wpseo_do_meta_box( $meta_box ) {

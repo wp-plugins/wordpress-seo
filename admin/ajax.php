@@ -36,11 +36,12 @@ function wpseo_ajax_generate_sitemap_callback() {
 	$type = (isset($_POST['type'])) ? $_POST['type'] : '';
 	
 	if ($type == '') {
+		global $wpseo_generate, $wpseo_echo;
+		$wpseo_generate = true;
+		$wpseo_echo = true;
 		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
-		$wpseo_xml->generate_sitemap( 'sitemap.xml', 1 );
-		$wpseo_xml->ping_search_engines( 'sitemap.xml', 1 );
 	} else {
-		global $wpseo_generate;
+		global $wpseo_generate, $wpseo_echo;
 		$wpseo_generate = true;
 		$module_name = $type;
 		if($type == 'kml' || $type == 'geo') {

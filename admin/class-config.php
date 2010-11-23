@@ -42,7 +42,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				
 		function blog_public_warning() {
 			$options = get_option('wpseo');
-			if ($options['blog_public_warning'] == 'nolonger')
+			if ( isset($options['blog_public_warning']) && $options['blog_public_warning'] == 'nolonger' )
 				return;
 			echo "<div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_hide_blog_public_warning()' class='button'>I know, don't bug me.</a></p></div>";
 			echo "<script type='text/javascript'>
@@ -65,7 +65,12 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						<?php
 							$this->plugin_like();
 							$this->plugin_support();
-							$this->postbox('wpseo','SEO &amp; WordPress','<p>'.__('If you haven\'t read it yet, my <a href="http://yoast.com/articles/wordpress-seo/">article on WordPress SEO</a> is probably a good place to start learning about how to optimize your WordPress.', 'yoast-wpseo').'</p>');
+							$this->postbox('donate','<strong class="red">Donate $10, $20 or $50!</strong>','<p>This plugin has cost me countless hours of work, if it helps you make money, please donate a token of your appreciation!</p><br/><form style="margin-left:30px;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+							<input type="hidden" name="cmd" value="_s-xclick">
+							<input type="hidden" name="hosted_button_id" value="83KQ269Q2SR82">
+							<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+							<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+							</form>');
 							$this->news(); 
 						?>
 					</div>
@@ -291,9 +296,12 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function titles_page() {
 			$this->admin_header('Titles', false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
 			$options = get_wpseo_options();
-			$content = '<p>'.__('Be aware that for WordPress SEO to be able to modify your page titles, your header.php file should contain a reference to <code>wp_title(\'\')</code>, and preferably nothing else.').'</p>';
-			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.").'</p>';
+			$content = '<p>'.__('Be aware that for WordPress SEO to be able to modify your page titles, the title section of your header.php file should look like this:').'</p>';
+			$content .= '<pre>&lt;title&gt;&lt;?php wp_title(&#x27;&#x27;); ?&gt;&lt;/title&gt;</pre>';
+			$content .= '<p>'.__('If you can\'t modify or don\'t know how to modify your template, check the box below. Be aware that changing your template will be faster.').'</p>';
+			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles','yoast-wpseo'));
 			$content .= '<h4 class="big">Singular pages</h4>';
+			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.").'</p>';
 			if ( 'posts' == get_option('show_on_front') ) {
 				$content .= '<h4>Homepage</h4>';
 				$content .= $this->textinput('title-home','Title template');
@@ -491,7 +499,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->textinput('breadcrumbs-archiveprefix',__('Prefix for Archive breadcrumbs'));
 			$content .= $this->textinput('breadcrumbs-searchprefix',__('Prefix for Search Page breadcrumbs'));
 			$content .= $this->checkbox('breadcrumbs-blog-remove',__('Remove Blog page from Breadcrumbs'));
-			$content .= '<br class="clear"><br/><br/>';
+			$content .= '<br/><br/>';
 			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:').'</strong><br/>';
 			foreach (get_post_types() as $pt) {
 				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
@@ -508,7 +516,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$content .= $this->select('post_types-'.$pt.'-maintax', $ptobj->labels->name, $values);					
 				}
 			}
-			$content .= '<br class="clear"/><br/><br/>';
+			$content .= '<br/>';
 			$content .= $this->checkbox('breadcrumbs-boldlast',__('Bold the last page in the breadcrumb'));
 			$content .= $this->checkbox('breadcrumbs-trytheme',__('Try to add automatically'));
 			$content .= '<p class="desc">'.__('If you\'re using Hybrid, Thesis or Thematic, check this box for some lovely simple action').'.</p>';
@@ -697,7 +705,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->checkbox('hidewpgenerator','Hide WordPress Generator');
 			$content .= '<p class="desc">'.__('If you want to show off that you\'re on the latest version, don\'t check this box.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('hideindexrel','Hide Index Relation Links');
-			$content .= '<p class="desc">'.__('Check this box, or please tell the plugin author why you shouldn\'t.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('hidestartrel','Hide Start Relation Links');
+			$content .= '<p class="desc">'.__('Check these boxes, or please tell the plugin author why you shouldn\'t.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('hideprevnextpostlink','Hide Previous &amp; Next Post Links');
 			$content .= $this->checkbox('hideshortlink','Hide Shortlink for posts');
 			$content .= '<p class="desc">'.__('Hides the shortlink for the current post.', 'yoast-wpseo').'</p>';
@@ -788,9 +797,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			$this->postbox('webmastertools',__('Webmaster Tools', 'yoast-wpseo'),$content);
 			
-			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'));
+			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
 			$content .= '<div id="sitemapinfo">';
-			$content .= '<strong>'.__('Exclude post types').'</strong><br/>';
+			$content .= $this->checkbox('no_xmlsitemap_update', __("Don't update the XML sitemap automatically when a post is published."), false);
+			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_post_types() as $post_type) {
 				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
@@ -799,7 +809,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}
 			}
 
-			$content .= '<br class="clear"/><br/>';
+			$content .= '<br/>';
 			$content .= '<strong>'.__('Exclude taxonomies').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_taxonomies() as $taxonomy) {

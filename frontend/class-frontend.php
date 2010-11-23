@@ -5,29 +5,30 @@ class WPSEO_Frontend {
 	function WPSEO_Frontend() {
 		$options = get_wpseo_options();
 
-		add_action('wp_head', array(&$this, 'wpseo_head'), 10, 1);
+		add_action('wp_head', array(&$this, 'head'), 10, 1);
 		remove_action('wp_head', 'rel_canonical');
 
-		add_filter('wp_title', array(&$this, 'wpseo_title'), 10, 3);
+		add_filter('wp_title', array(&$this, 'title'), 10, 3);
+		add_filter( 'thematic_doctitle', array(&$this, 'thematic_title') );
 		
-		add_action('wp',array(&$this,'wpseo_yoast_page_redirect'),99,1);
+		add_action('wp',array(&$this,'page_redirect'),99,1);
 
 		if (isset($options['login']) && $options['login'])
-			add_action('login_head', array(&$this, 'wpseo_noindex_page') );
+			add_action('login_head', array(&$this, 'noindex_page') );
 		if (isset($options['admin']) && $options['admin'])
-			add_action('admin_head', array(&$this, 'wpseo_noindex_page') );
+			add_action('admin_head', array(&$this, 'noindex_page') );
 
 		if (isset($options['allfeeds']) && $options['allfeeds']) {
-			add_action('rss_head', array(&$this, 'wpseo_noindex_feed') );
-			add_action('rss2_head', array(&$this, 'wpseo_noindex_feed') );
-			add_action('commentsrss2_head', array(&$this, 'wpseo_noindex_feed') );
+			add_action('rss_head', array(&$this, 'noindex_feed') );
+			add_action('rss2_head', array(&$this, 'noindex_feed') );
+			add_action('commentsrss2_head', array(&$this, 'noindex_feed') );
 		} else if (isset($options['commentfeeds']) && $options['commentfeeds']) {
-			add_action('commentsrss2_head', array(&$this, 'wpseo_noindex_feed') );
+			add_action('commentsrss2_head', array(&$this, 'noindex_feed') );
 		}
 
 		if (isset($options['nofollowmeta']) && $options['nofollowmeta']) {
-			add_filter('loginout',array(&$this,'wpseo_nofollow_link'));
-			add_filter('register',array(&$this,'wpseo_nofollow_link'));
+			add_filter('loginout',array(&$this,'nofollow_link'));
+			add_filter('register',array(&$this,'nofollow_link'));
 		}
 
 		if ( isset($options['hidersdlink']) && $options['hidersdlink'] )
@@ -35,10 +36,12 @@ class WPSEO_Frontend {
 		if ( isset($options['hidewlwmanifest']) && $options['hidewlwmanifest'] )
 			remove_action('wp_head', 'wlwmanifest_link');
 		if ( isset($options['hidewpgenerator']) && $options['hidewpgenerator'] ) {
-			add_filter('the_generator', array(&$this, 'wpseo_fix_generator') ,10,1);
+			add_filter('the_generator', array(&$this, 'fix_generator') ,10,1);
 		}
 		if ( isset($options['hideindexrel']) && $options['hideindexrel'] )
 			remove_action('wp_head', 'index_rel_link');
+		if ( isset($options['hidestartrel']) && $options['hidestartrel'] )
+			remove_action('wp_head', 'start_post_rel_link');
 		if ( isset($options['hideprevnextpostlink']) && $options['hideprevnextpostlink'] )
 			remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
 		if ( isset($options['hideshortlink']) && $options['hideshortlink'] )
@@ -47,26 +50,24 @@ class WPSEO_Frontend {
 		if (isset($options['replacemetawidget']) && $options['replacemetawidget'])
 			add_action('plugins_loaded', array(&$this, 'widget_yoast_wpseo_meta_init') );
 
-		if (
-			(isset($options['disabledate']) && $options['disabledate']) || 
-			(isset($options['disableauthor']) && $options['disableauthor']) )
-			add_action('wp', array(&$this, 'wpseo_archive_redirect') );
+		if ( (isset($options['disabledate']) && $options['disabledate']) || 
+			 (isset($options['disableauthor']) && $options['disableauthor']) )
+			add_action('wp', array(&$this, 'archive_redirect') );
 
 		if (isset($options['redirectattachment']) && $options['redirectattachment'])
-			add_action('template_redirect', array(&$this,'wpseo_attachment_redirect'),1);
+			add_action('template_redirect', array(&$this,'attachment_redirect'),1);
 
 		if (isset($options['nofollowcommentlinks']) && $options['nofollowcommentlinks'])
-			add_filter('comments_popup_link_attributes',array(&$this,'wpseo_echo_nofollow'));
+			add_filter('comments_popup_link_attributes',array(&$this,'echo_nofollow'));
 
 		if (isset($options['trailingslash']) && $options['trailingslash'])
-			add_filter('user_trailingslashit', array(&$this, 'wpseo_add_trailingslash') , 10, 2);
+			add_filter('user_trailingslashit', array(&$this, 'add_trailingslash') , 10, 2);
 
 		if (isset($options['cleanpermalinks']) && $options['cleanpermalinks'])
-			add_action('get_header',array(&$this,'wpseo_clean_permalink'),1);	
+			add_action('get_header',array(&$this,'clean_permalink'),1);	
 
-		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {
+		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'])
 			add_action('generate_rewrite_rules', array(&$this,'add_rewrite_rules') );
-		}
 		
 		add_filter('query_vars', array(&$this,'add_sitemap_query_var') );
 		add_filter('robots_txt', array(&$this,'sitemap_output'), 10, 2 ); 
@@ -75,59 +76,104 @@ class WPSEO_Frontend {
 		add_filter('the_content_feed', array(&$this, 'embed_rssfooter') );
 		add_filter('the_excerpt_rss', array(&$this, 'embed_rssfooter_excerpt') );	
 		
+		if (isset($options['forcerewritetitle']) && $options['forcerewritetitle']) {
+			add_action('get_header', array(&$this, 'force_rewrite_output_buffer') );
+			add_action('wp_footer', array(&$this, 'flush_cache') );			
+		}
 	}
 
-	function wpseo_title( $title, $sep = '', $seplocation = '', $postid = '' ) {
+	function title( $title, $sep = '', $seplocation = '', $postid = '' ) {
 		global $post, $wp_query;
 		if ( empty($post) && is_singular() ) {
-			$post = get_post($postid);
+			$post = $wp_query->get_queried_object();
 		}
 
 		$options = get_wpseo_options();
 
-		if ( is_home() && 'posts' == get_option('show_on_front') && isset($options['title-home']) && $options['title-home'] != '' ) {
-			$title = wpseo_replace_vars($options['title-home'], (array) $post );
+		if ( is_home() && 'posts' == get_option('show_on_front') ) {
+			if ( isset($options['title-home']) && $options['title-home'] != '' )
+				$title = wpseo_replace_vars($options['title-home'], (array) $post );
+			else
+				$title = get_bloginfo('name').' - '.get_bloginfo('description');
 		} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
-			$post = get_post(get_option('page_for_posts'));
+			$post = get_post( get_option( 'page_for_posts' ) );
 			$fixed_title = yoast_get_value('title');
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
-			} else if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) ) {
-				$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
+			} else {
+				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
+					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
+				else
+					$title = get_bloginfo('name').' - '.get_bloginfo('description');
 			}
 		} else if ( is_singular() ) {
 			$fixed_title = yoast_get_value('title');
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
-			} else if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) ) {
-				$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
+			} else {
+				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
+					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
+				else
+					$title = $post->post_title.' '.get_bloginfo('name'); 
 			}
 		} else if ( is_category() || is_tag() || is_tax() ) {
 			$term = $wp_query->get_queried_object();
-			$title = wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_title' );
-			if ( !$title && isset($options['title-'.$term->taxonomy]) && !empty($options['title-'.$term->taxonomy]) )
-				$title = wpseo_replace_vars($options['title-'.$term->taxonomy], (array) $term );
-		} else if ( is_search() && isset($options['title-search']) && !empty($options['title-search']) ) {
-			$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );
+			$title = wpseo_get_term_meta( $term, $term->taxonomy, 'title' );
+			if ( !$title ) {
+				if ( isset($options['title-'.$term->taxonomy]) && !empty($options['title-'.$term->taxonomy]) ) {
+					$title = wpseo_replace_vars($options['title-'.$term->taxonomy], (array) $term );
+				} else {
+					if ( is_category() )
+						$title = single_cat_title('', false);
+					else if ( is_tag() )
+						$title = single_tag_title('', false);
+					else if ( is_tax() )
+						$title = single_term_title('', false);
+						
+					$title .= ' - '.get_bloginfo('name'); 
+				}
+			}
+		} else if ( is_search() ) {
+			if ( isset($options['title-search']) && !empty($options['title-search']) )
+				$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );	
+			else
+				$title = __('Search for "').get_search_query().'" - '.get_bloginfo('name');
 		} else if ( is_author() ) {
 			$author_id = get_query_var('author');
-			$title = get_the_author_meta('wpseo_title', $author_id);
-			if ( empty($title) && isset($options['title-author']) && !empty($options['title-author']) ) {
-				$title = wpseo_replace_vars($options['title-author'], array() );
+			$title = get_the_author_meta('title', $author_id);
+			if ( empty($title) ) {
+				if ( isset($options['title-author']) && !empty($options['title-author']) )
+					$title = wpseo_replace_vars($options['title-author'], array() );
+				else
+					$title = get_the_author_meta('display_name', $author_id).' - '.get_bloginfo('name'); 
 			}
-		} else if ( is_archive() && isset($options['title-archive']) && !empty($options['title-archive']) ) {
-			$title = wpseo_replace_vars($options['title-archive'], array('post_title' => $title) );
-		} else if ( is_404() && isset($options['title-404']) && !empty($options['title-404']) ) {
-			$title = wpseo_replace_vars($options['title-404'], array('post_title' => $title) );
+		} else if ( is_archive() ) {
+		 	if ( isset($options['title-archive']) && !empty($options['title-archive']) )
+				$title = wpseo_replace_vars($options['title-archive'], array('post_title' => $title) );
+			else {
+				if ( is_month() )
+					$title = single_month_title(' ', false).' '.__('Archives').' - '.get_bloginfo('name'); 
+				else if ( is_year() )
+					$title = get_query_var('year').' '.__('Archives').' - '.get_bloginfo('name'); 
+			}
+		} else if ( is_404() ) {
+		 	if ( isset($options['title-404']) && !empty($options['title-404']) )
+				$title = wpseo_replace_vars($options['title-404'], array('post_title' => $title) );
+			else
+				$title = __('Page not found').' - '.get_bloginfo('name');
 		} 
-		return esc_html( strip_tags( stripslashes( $title ) ) );
+		return esc_html( strip_tags( stripslashes( trim( $title ) ) ) );
 	}
 	
-	function wpseo_fix_generator($generator) {
+	function thematic_title() {
+		return wp_title('', 0);
+	}
+	
+	function fix_generator($generator) {
 		return preg_replace('/\s?'.get_bloginfo('version').'/','',$generator);
 	}
 	
-	function wpseo_head() {
+	function head() {
 		$options = get_wpseo_options();
 
 		global $wp_query, $paged;
@@ -135,7 +181,7 @@ class WPSEO_Frontend {
 		$robots = '';
 
 		echo "\t<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION.". -->\n";
-		$this->wpseo_metadesc();
+		$this->metadesc();
 		
 		// Set decent canonicals for homepage, singulars and taxonomy pages
 		if ( yoast_get_value('canonical') && yoast_get_value('canonical') != '' ) { 
@@ -162,28 +208,27 @@ class WPSEO_Frontend {
 			}
 		}
 		
+		$robots 			= array();
+		$robots['index'] 	= 'index';
+		$robots['follow'] 	= 'follow';
+		$robots['other'] 	= array();
+		
 		if (is_singular()) {
 			if ( yoast_get_value('meta-robots-noindex') )
-				$robots .= 'noindex,';
-			else
-				$robots .= 'index,';
+				$robots['index'] = 'noindex';
 			if ( yoast_get_value('meta-robots-nofollow') )
-				$robots .= 'nofollow';
-			else
-				$robots .= 'follow';
+				$robots['follow'] = 'nofollow';
 			if ( yoast_get_value('meta-robots-adv') && yoast_get_value('meta-robots-adv') != 'none' ) { 
-				$robots .= ','.yoast_get_value('meta-robots-adv');
+				foreach ( explode( ',', yoast_get_value('meta-robots-adv') ) as $r ) {
+					$robots['other'][] = $r;
+				}
 			}
 		} else {
 			if ( isset($term) && is_object($term) ) {
 				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_noindex' ) )
-					$robots .= 'noindex,';
-				else
-					$robots .= 'index,';
+					$robots['index'] = 'noindex';
 				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_nofollow' ) )
-					$robots .= 'nofollow';
-				else
-					$robots .= 'follow';
+					$robots['follow'] = 'nofollow';
 			} 
 			if ( 
 				(is_author() 	&& isset($options['noindexauthor']) && $options['noindexauthor']) || 
@@ -193,28 +238,30 @@ class WPSEO_Frontend {
 				(is_search() 	&& isset($options['search']) && $options['search']) || 
 				(is_home() 		&& isset($options['pagedhome']) && $options['pagedhome'] && get_query_var('paged') > 1) )
 			{
-				$robots = "noindex,follow";
+				$robots['index']  = 'noindex';
+				$robots['follow'] = 'follow';
 			}
 		}
 		
-		// Clean up, index, follow is the default and doesn't need to be in output. All other combinations should be.
-		if ($robots == 'index,follow')
-			$robots = '';
-		if (strpos($robots, 'index,follow,') === 0)
-			$robots = str_replace('index,follow,','',$robots);
-
-		foreach (array('noodp','noydir','noarchive','nosnippet') as $robot) {
-			if (isset($options[$robot]) && $options[$robot]) {
-				if (!empty($robots) && substr($robots, -1) != ',')
-					$robots .= ',';
-				$robots .= $robot;
+		foreach ( array('noodp','noydir','noarchive','nosnippet') as $robot ) {
+			if ( isset($options[$robot]) && $options[$robot] ) {
+				$robots['other'][] = $robot;
 			}
 		}
 
-		if ($robots != '') {
-			$robots = rtrim($robots,',');
-			echo "\t".'<meta name="robots" content="'.$robots.'"/>'."\n";
+		$robotsstr = $robots['index'].','.$robots['follow'];
+
+		$robots['other'] = array_unique( $robots['other'] );
+		foreach ($robots['other'] as $robot) {
+			$robotsstr .= ','.$robot;
 		}
+
+		$robotsstr = preg_replace( '/^index,follow,/', '', $robotsstr );
+		
+		if ($robotsstr != '') {
+			echo "\t".'<meta name="robots" content="'.$robotsstr.'"/>'."\n";
+		}
+		
 		if ( is_front_page() ) {
 			if (!empty($options['googleverify'])) {
 				$google_meta = $options['googleverify'];
@@ -246,7 +293,7 @@ class WPSEO_Frontend {
 		echo "\t<!-- / Yoast WordPress SEO plugin. -->\n";
 	}
 
-	function wpseo_metadesc() {
+	function metadesc() {
 		if ( !is_admin() ) {
 			global $post, $wp_query;
 			$options = get_wpseo_options();
@@ -275,16 +322,19 @@ class WPSEO_Frontend {
 					}
 				} else if ( is_author() ) {
 					$author_id = get_query_var('author');
-					$metadesc = get_the_author_meta('wpseo_metadesc', $author_id);
+					$metadesc = get_the_author_meta('metadesc', $author_id);
 				} 
 			}
 		
 			if (!empty($metadesc))
 				echo "\t".'<meta name="description" content="'. esc_attr( strip_tags( stripslashes( $metadesc ) ) ).'"/>'."\n";
+			else if ( current_user_can('manage_options') )
+				echo "\t".'<!-- Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template. -->'."\n";
+			
 		}
 	}
 
-	function wpseo_yoast_page_redirect($input) {
+	function page_redirect($input) {
 		global $post;
 		if ( !isset($post) )
 			return;
@@ -295,20 +345,20 @@ class WPSEO_Frontend {
 		}
 	}
 	
-	function wpseo_noindex_page() {
+	function noindex_page() {
 		echo "\t<!-- This site is optimized with the Yoast WordPress SEO plugin. -->\n";
 		echo "\t".'<meta name="robots" content="noindex" />'."\n";
 	}
 
-	function wpseo_noindex_feed() {
+	function noindex_feed() {
 		echo '<xhtml:meta xmlns:xhtml="http://www.w3.org/1999/xhtml" name="robots" content="noindex" />'."\n";
 	}
 
-	function wpseo_nofollow_link($output) {
+	function nofollow_link($output) {
 		return str_replace('<a ','<a rel="nofollow" ',$output);
 	}
 
-	function wpseo_echo_nofollow() {
+	function echo_nofollow() {
 		return ' rel="nofollow"';
 	}
 
@@ -335,7 +385,7 @@ class WPSEO_Frontend {
 		wp_register_sidebar_widget('meta','meta','yoast_wpseo_meta');
 	}
 
-	function wpseo_archive_redirect() {
+	function archive_redirect() {
 		global $wp_query;
 		$options  = get_wpseo_options();
 		if ( ($options['disabledate'] && $wp_query->is_date) || ($options['disableauthor'] && $wp_query->is_author) ) {
@@ -344,15 +394,15 @@ class WPSEO_Frontend {
 		}
 	}
 
-	function wpseo_attachment_redirect() {
+	function attachment_redirect() {
 		global $post;
-		if (is_attachment()) {
+		if ( is_attachment() ) {
 			wp_redirect(get_permalink($post->post_parent), 301);
 			exit;
 		}
 	}
 
-	function wpseo_add_trailingslash($url, $type) {
+	function add_trailingslash($url, $type) {
 		// trailing slashes for everything except is_single()
 		// Thanks to Mark Jaquith for this
 		if ( 'single' === $type ) {
@@ -362,7 +412,7 @@ class WPSEO_Frontend {
 		}
 	}
 
-	function wpseo_clean_permalink() {
+	function clean_permalink() {
 		if ( is_robots() )
 			return;
 
@@ -430,7 +480,7 @@ class WPSEO_Frontend {
 		}
 	}
 
-	function wpseo_rss_replace_vars($temp) {
+	function rss_replace_vars($temp) {
 		$postlink = '<a href="'.get_permalink().'">'.get_the_title()."</a>";
 		$bloglink = '<a href="'.get_bloginfo('url').'">'.get_bloginfo('name').'</a>';
 		$blogdesclink = '<a href="'.get_bloginfo('url').'">'.get_bloginfo('name').' - '.get_bloginfo('description').'</a>';
@@ -442,29 +492,29 @@ class WPSEO_Frontend {
 		return $temp;
 	}
 
-	function wpseo_embed_rssfooter($content) {
+	function embed_rssfooter($content) {
 		if(is_feed()) {
 			$options  = get_wpseo_options();
 
 			if ( isset($options['rssbefore']) && !empty($options['rssbefore']) ) {
-				$content = "<p>" . $this->wpseo_rss_replace_vars($options['rssbefore']) . "</p>" . $content;
+				$content = "<p>" . $this->rss_replace_vars($options['rssbefore']) . "</p>" . $content;
 			} 
 			if ( isset($options['rssafter']) && !empty($options['rssafter']) ) {
-				$content .= "<p>" . $this->wpseo_rss_replace_vars($options['rssafter']). "</p>";
+				$content .= "<p>" . $this->rss_replace_vars($options['rssafter']). "</p>";
 			} 
 		}
 		return $content;
 	}
 
-	function wpseo_embed_rssfooter_excerpt($content) {
+	function embed_rssfooter_excerpt($content) {
 		if(is_feed()) {
 			$options  = get_wpseo_options();
 
 			if ( isset($options['rssbefore']) && !empty($options['rssbefore']) ) {
-				$content = "<p>".$this->wpseo_rss_replace_vars($options['rssbefore']) . "</p><p>" . $content ."</p>";
+				$content = "<p>".$this->rss_replace_vars($options['rssbefore']) . "</p><p>" . $content ."</p>";
 			} 
 			if ( isset($options['rssafter']) && !empty($options['rssafter']) ) {
-				$content = "<p>".$content."</p><p>".$this->wpseo_rss_replace_vars($options['rssafter'])."</p>";
+				$content = "<p>".$content."</p><p>".$this->rss_replace_vars($options['rssafter'])."</p>";
 			} 
 		}
 		return $content;
@@ -490,7 +540,12 @@ class WPSEO_Frontend {
 		if ( !WPSEO_UPLOAD_DIR )
 			return $robots;
 
-		$robots = file_get_contents(WPSEO_UPLOAD_DIR.get_query_var('wpseo_sitemap').get_query_var('wpseo_sitemap_gz'));
+		$file = WPSEO_UPLOAD_DIR . get_query_var('wpseo_sitemap') . get_query_var('wpseo_sitemap_gz');
+
+		if ( file_exists( $file ) ) 
+			$robots = file_get_contents( $file );
+		else
+			$robots = '';
 
 		return $robots;
 	}
@@ -502,6 +557,26 @@ class WPSEO_Frontend {
 			else
 				header( 'Content-Type: application/xml; charset=utf-8' );
 		}
+	}
+	
+	function flush_cache() {
+		global $wp_query, $post, $wpseo_ob;
+
+		if ( !$wpseo_ob )
+			return;
+			
+		$content = ob_get_contents();
+		$title = $this->title( '' );
+		
+		$content = preg_replace('/<title>(.*)<\/title>/','<title>'.$title.'</title>', $content);
+		ob_end_clean();
+		echo $content;
+	}
+	
+	function force_rewrite_output_buffer() {
+		global $wpseo_ob;
+		$wpseo_ob = true;
+		ob_start();
 	}
 }
 

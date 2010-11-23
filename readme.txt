@@ -3,7 +3,7 @@ Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer
 Requires at least: 3.0
-Tested up to: 3.1
+Tested up to: 3.0.1
 
 WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, optimized breadcrumbs, XML sitemaps, robots meta settings and much much more.
 
@@ -38,6 +38,29 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.1.5 =
+
+* Bugs fixed:
+	* Duplicate noodp,noydir showing up in some occasions. Reworked most of robots meta output function.
+	* Fixed couple more notices.
+	* Trailing slash (when option set) now applied correctly in XML sitemap too.
+	* Made sure regenerating sitemap worked again on post publish.
+	* Force flush rewrite rules on activation / upgrade of plugin to make rewrite work.
+	* Fixed empty RSS content bug caused in 0.1.4.
+	
+* Changes:
+	* Removed part done quick edit functionality, will need to revisit once API improves.
+	* Implemented a hook that would make the title work with Thematic based themes properly.
+	* Added option to remove "start" rel link from head section.
+	* Several style sheet changes to make backend styling easier and more robust.
+	* Added option to force rewrite titles for people that can't adapt their theme.
+	* If title templates aren't set, the plugin now generates proper default titles.
+	* The News module has moved to a separate directory, where all other modules will reside too, so they can be updated individually later. Download link for the news module will appear on yoast.com shortly.
+	
+* Documentation:
+	* Added Admin Only notice in HTML code when no meta description could be generated.
+	* Added a donation box, I'll gladly take your money ;)
+	
 = 0.1.4 =
 
 * Bugs fixed:

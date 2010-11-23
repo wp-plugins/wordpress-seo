@@ -102,13 +102,12 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			if (!isset($options[$id]))
 				$options[$id] = false;
 				
-			$output_label = '<label class="textinput" for="'.$id.'">'.$label.'</label>';
-			$output_input = '<input type="checkbox" id="'.$id.'" name="'.$option.'['.$id.']"'. checked($options[$id],'on',false).'/> ';
+			$output_label = '<label for="'.$id.'">'.$label.'</label>';
+			$output_input = '<input class="checkbox" type="checkbox" id="'.$id.'" name="'.$option.'['.$id.']"'. checked($options[$id],'on',false).'/> ';
 			
-			if($label_left) {
+			if( $label_left ) {
 				$output = $output_label . $output_input;
-			}
-			else {
+			} else {
 				$output = $output_input . $output_label;
 			}
 			return $output . '<br class="clear" />';
@@ -125,7 +124,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			if (isset($options[$id]))
 				$val = htmlspecialchars($options[$id]);
 			
-			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$option.'['.$id.']" value="'.$val.'"/><br/>';
+			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$option.'['.$id.']" value="'.$val.'"/>' . '<br class="clear" />';
 		}
 		
 		/**
@@ -159,7 +158,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				$output .= '<option '.$sel.'value="'.$value.'">'.$label.'</option>';
 			}
 			$output .= '</select>';
-			return $output;
+			return $output . '<br class="clear"/>';
 		}
 		
 		/**

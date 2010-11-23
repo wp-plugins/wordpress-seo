@@ -32,16 +32,20 @@ div.inside ul {
 	font-size: 12px;
 }
 
-.textinput, .select {
-	width: 320px;
+.textinput, .select, .checkbox, label {
 	float: left;
+	margin: 5px 10px 5px 0;
+	line-height: 12px;
 }
 
-label.textinput, label.select, label {
-	width: 200px;
-	line-height: 24px;
-	clear:  both;
+.textinput, .select {
+	width: 320px;
 }
+
+label.textinput, label.select {
+	width: 200px;
+}
+
 label.radio {
 	margin-right: 20px;
 }
@@ -130,4 +134,10 @@ table.yoast_help tr:hover {
 
 .button {
 	color: #000 !important;
+}
+
+strong.red {
+	color: green;
+	font-weight: bold;
+	font-size: 105%;
 }

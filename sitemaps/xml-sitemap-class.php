@@ -11,6 +11,10 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 
 		if ( !$options['enablexmlsitemap'])
 			return;
+	
+		global $wpseo_generate, $wpseo_echo;
+		if ( $wpseo_generate )
+			$this->generate_sitemap( 'sitemap.xml', $wpseo_echo );
 	}
 	
 	function generate_sitemap( $filename, $echo = false ) {
@@ -161,9 +165,11 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 				continue;
 				
 			$url['loc'] = wpseo_get_term_meta( $c, $c->taxonomy, 'wpseo_canonical' );
-			if ( !$url['loc'] )
+			if ( !$url['loc'] ) {
 				$url['loc'] = get_term_link( $c, $c->taxonomy );
-			
+				if ( isset($options['trailingslash']) && $options['trailingslash'] )
+					$url['loc'] = trailingslashit($url['loc']);
+			}
 			if ($c->count > 10) {
 				$url['pri'] = 0.6;
 			} else if ($c->count > 3) {

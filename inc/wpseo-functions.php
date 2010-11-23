@@ -148,4 +148,7 @@ function wpseo_get_country_arr(){
 	return $countries;
 }
 
-?>
+function wpseo_activate() {
+	// Force a flush of rewrite rules
+	delete_option('rewrite_rules');
+}
