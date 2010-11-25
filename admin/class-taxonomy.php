@@ -10,8 +10,9 @@ class WPSEO_Taxonomy {
 		add_action('edit_term', array(&$this,'update_term'), 10, 3 );
 	}
 	
-	function form_row( $id, $label, $desc, $tax_meta, $type = 'text' ) {
-		$val = stripslashes($tax_meta[$id]);
+	function form_row( $id, $label, $desc, $tax_meta, $type = 'text', $options = '' ) {
+		if ( isset($tax_meta[$id]) )
+			$val = stripslashes($tax_meta[$id]);
 		
 		echo '<tr class="form-field">'."\n";
 		echo "\t".'<th scope="row" valign="top"><label for="'.$id.'">'.$label.':</label></th>'."\n";
@@ -24,6 +25,17 @@ class WPSEO_Taxonomy {
 		} else if ($type == 'checkbox') {
 ?>
 			<input name="<?php echo $id; ?>" id="<?php echo $id; ?>" type="checkbox" <?php checked($val); ?>/>
+<?php
+		} else if ($type == 'select') {
+?>
+			<select name="<?php echo $id; ?>" id="<?php echo $id; ?>">
+				<?php foreach ($options as $option => $label) {
+					$sel = '';
+					if ($option == $val)
+						$sel = " selected='selected'";
+					echo "<option".$sel." value='".$option."'>".$label."</option>";
+				}?>
+			</select>
 <?php
 		}
 		echo "\t".'</td>'."\n";
@@ -47,13 +59,19 @@ class WPSEO_Taxonomy {
 		$this->form_row( 'wpseo_noindex', 'Noindex this '.$taxonomy, '', $tax_meta, 'checkbox' );
 		$this->form_row( 'wpseo_nofollow', 'Nofollow this '.$taxonomy, '', $tax_meta, 'checkbox' );
 
+		$this->form_row( 'wpseo_sitemap_include', 'Include in sitemap?', '', $tax_meta, 'select', array(
+			"-" => __("Auto detect"),
+			"always" => __("Always include"),
+			"never" => __("Never include"),
+		) );
+
 		echo '</table>';
 	}
 	
 	function update_term( $term_id, $tt_id, $taxonomy ) {
 		$tax_meta = get_option( 'wpseo_taxonomy_meta' );
 
-		foreach (array('title', 'desc', 'bctitle', 'canonical') as $key) {
+		foreach (array('title', 'desc', 'bctitle', 'canonical', 'sitemap_include') as $key) {
 			$tax_meta[$taxonomy][$term_id]['wpseo_'.$key] 	= $_POST['wpseo_'.$key];
 		}
 
@@ -73,6 +91,10 @@ class WPSEO_Taxonomy {
 		    $w3_objectcache->flush();			
 		}
 	    
+		global $wpseo_generate, $wpseo_echo;
+		$wpseo_generate = true;
+		$wpseo_echo = false;
+		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
 	}	
 }
 $wpseo_taxonomy = new WPSEO_Taxonomy();

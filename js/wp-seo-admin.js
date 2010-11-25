@@ -36,6 +36,39 @@ jQuery(document).ready(function () {
 	}).change();		
 });
 
+function wpseo_exportSettings() {
+	jQuery.post(ajaxurl, { 
+			action: 'wpseo_export_settings', 
+		}, function(response) { 
+			jQuery('#exportbutton').attr('href', response);
+			jQuery('#exportbutton').text('Download export file');
+		}
+	);
+}
+
+function setWPOption( option, newval, hide ) {
+	jQuery.post(ajaxurl, { 
+			action: 'wpseo_set_option', 
+			option: option,
+			newval: newval 
+		}, function(response) { 
+			if (response)
+				jQuery('#'+hide).hide();
+		}
+	);
+}
+
+function setIgnore( option, hide ) {
+	jQuery.post(ajaxurl, { 
+			action: 'wpseo_set_ignore', 
+			option: option,
+		}, function(response) { 
+			if (response)
+				jQuery('#'+hide).hide();
+		}
+	);
+}
+
 function rebuildSitemap( baseurl, type ) {
 	jQuery('#'+type+'sitemapgeneration').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
 	jQuery.post(ajaxurl, { 

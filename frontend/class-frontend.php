@@ -35,9 +35,8 @@ class WPSEO_Frontend {
 			remove_action('wp_head', 'rsd_link');
 		if ( isset($options['hidewlwmanifest']) && $options['hidewlwmanifest'] )
 			remove_action('wp_head', 'wlwmanifest_link');
-		if ( isset($options['hidewpgenerator']) && $options['hidewpgenerator'] ) {
+		if ( isset($options['hidewpgenerator']) && $options['hidewpgenerator'] )
 			add_filter('the_generator', array(&$this, 'fix_generator') ,10,1);
-		}
 		if ( isset($options['hideindexrel']) && $options['hideindexrel'] )
 			remove_action('wp_head', 'index_rel_link');
 		if ( isset($options['hidestartrel']) && $options['hidestartrel'] )
@@ -46,7 +45,11 @@ class WPSEO_Frontend {
 			remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
 		if ( isset($options['hideshortlink']) && $options['hideshortlink'] )
 			remove_action('wp_head', 'wp_shortlink_wp_head');
-
+		if ( isset($options['hidefeedlinks']) && $options['hidefeedlinks'] ) {
+			// TODO: add option to display just normal feed and hide comment feed.
+			remove_action('wp_head', 'feed_links', 2);
+			remove_action('wp_head', 'feed_links_extra', 3);
+		}
 		if (isset($options['replacemetawidget']) && $options['replacemetawidget'])
 			add_action('plugins_loaded', array(&$this, 'widget_yoast_wpseo_meta_init') );
 
@@ -66,10 +69,6 @@ class WPSEO_Frontend {
 		if (isset($options['cleanpermalinks']) && $options['cleanpermalinks'])
 			add_action('get_header',array(&$this,'clean_permalink'),1);	
 
-		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'])
-			add_action('generate_rewrite_rules', array(&$this,'add_rewrite_rules') );
-		
-		add_filter('query_vars', array(&$this,'add_sitemap_query_var') );
 		add_filter('robots_txt', array(&$this,'sitemap_output'), 10, 2 ); 
 		add_action('do_robotstxt', array(&$this,'sitemap_header'), 99);		
 		
@@ -127,8 +126,15 @@ class WPSEO_Frontend {
 						$title = single_cat_title('', false);
 					else if ( is_tag() )
 						$title = single_tag_title('', false);
-					else if ( is_tax() )
-						$title = single_term_title('', false);
+					else if ( is_tax() ) {
+						if ( function_exists('single_term_title') ) {
+							$title = single_term_title('', false);
+						} else {
+							$term = get_queried_object();
+							$title = $term->name;
+						}
+					}
+						
 						
 					$title .= ' - '.get_bloginfo('name'); 
 				}
@@ -193,6 +199,8 @@ class WPSEO_Frontend {
 			} else {
 				if ( is_front_page() ) {
 					$canonical = get_bloginfo('url').'/';
+				} else if (is_home() && get_option('show_on_front') == "page") {
+					$canonical = get_permalink( get_option( 'page_for_posts' ) );
 				} else if ( is_tax() || is_tag() || is_category() ) {
 					$term = $wp_query->get_queried_object();
 					
@@ -256,10 +264,10 @@ class WPSEO_Frontend {
 			$robotsstr .= ','.$robot;
 		}
 
-		$robotsstr = preg_replace( '/^index,follow,/', '', $robotsstr );
+		$robotsstr = preg_replace( '/^index,follow,?/', '', $robotsstr );
 		
 		if ($robotsstr != '') {
-			echo "\t".'<meta name="robots" content="'.$robotsstr.'"/>'."\n";
+			echo "\t<meta name='robots' content='".$robotsstr."'/>\n";
 		}
 		
 		if ( is_front_page() ) {
@@ -269,7 +277,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $google_meta, $match);
 					$google_meta = $match[1];
 				}
-				echo "\t".'<meta name="google-site-verification" content="'.$google_meta.'" />'."\n";
+				echo "\t<meta name='google-site-verification' content='$google_meta' />\n";
 			}
 			if (!empty($options['yahooverify'])) {
 				$yahoo_meta = $options['yahooverify'];
@@ -277,7 +285,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $yahoo_meta, $match);
 					$yahoo_meta = $match[1];
 				}				
-				echo "\t".'<meta name="y_key" content="'.$yahoo_meta.'" />'."\n";
+				echo "\t<meta name='y_key' content='$yahoo_meta' />\n";
 			}
 				
 			if (!empty($options['msverify'])) {
@@ -326,15 +334,16 @@ class WPSEO_Frontend {
 				} 
 			}
 		
-			if (!empty($metadesc))
-				echo "\t".'<meta name="description" content="'. esc_attr( strip_tags( stripslashes( $metadesc ) ) ).'"/>'."\n";
+			$metadesc = trim( $metadesc );
+			if ( !empty( $metadesc ) )
+				echo "\t<meta name='description' content='".esc_attr( strip_tags( stripslashes( $metadesc ) ) )."'/>\n";
 			else if ( current_user_can('manage_options') )
 				echo "\t".'<!-- Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template. -->'."\n";
 			
 		}
 	}
 
-	function page_redirect($input) {
+	function page_redirect( $input ) {
 		global $post;
 		if ( !isset($post) )
 			return;
@@ -416,8 +425,8 @@ class WPSEO_Frontend {
 		if ( is_robots() )
 			return;
 
-		$options = get_wpseo_options();
 		global $wp_query;
+		$options = get_wpseo_options();
 	
 		// Recreate current URL
 		$cururl = 'http';
@@ -431,6 +440,7 @@ class WPSEO_Frontend {
 			$cururl .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
 
 		$properurl = '';
+		
 		if ( is_singular() ) {
 			$properurl = get_permalink($wp_query->post->ID);
 			// Fix reply to comment links, whoever decided this should be a GET variable?
@@ -447,10 +457,8 @@ class WPSEO_Frontend {
 			$term = $wp_query->get_queried_object();
 			$properurl = get_term_link( $term, $term->taxonomy );
 		} else if ( is_search() ) {
-			if ( function_exists('get_search_link') )
-				$properurl = get_search_link($wp_query->query_vars['s']); // get_search_link is new in WP 3.0
-			else
-				$properurl = get_bloginfo('url').'/search/'.$wp_query->query_vars['s'].'/';
+			$s = preg_replace( '/(%20|\+)/', ' ', get_search_query() );
+			$properurl = get_bloginfo('url').'/?s=' . rawurlencode( $s );
 		}
 		if ( !empty($properurl) && $wp_query->query_vars['paged'] != 0 && $wp_query->post_count != 0 ) {
 			$properurl = user_trailingslashit( trailingslashit($properurl). 'page/' . $wp_query->query_vars['paged'] );
@@ -473,7 +481,15 @@ class WPSEO_Frontend {
 				}		
 			}		
 		}
-	
+
+		if ( isset($options['cleanpermalink-extravars']) && strlen($options['cleanpermalink-extravars']) > 0 ) {
+			foreach ( explode( ',', $options['cleanpermalink-extravars'] ) as $get ) {
+				if ( isset($_GET[ trim( $get ) ]) ) {
+					$properurl = '';
+				}		
+			}
+		}
+		
 		if ( !empty($properurl) && $cururl != $properurl ) {	
 			wp_redirect($properurl, 301);
 			exit;
@@ -518,19 +534,6 @@ class WPSEO_Frontend {
 			} 
 		}
 		return $content;
-	}
-	
-	function add_rewrite_rules( $rewrite ) { 
-		$new_rules = array(
-			'((news)?_?sitemap\.xml)(\.gz)?$' => 'index.php?robots=1&wpseo_sitemap='.$rewrite->preg_index(1).'&wpseo_sitemap_gz='.$rewrite->preg_index(3),
-		);
-		$rewrite->rules = $new_rules + $rewrite->rules;
-	} 
-	
-	function add_sitemap_query_var( $query_vars ) {
-		$query_vars[] = 'wpseo_sitemap';
-		$query_vars[] = 'wpseo_sitemap_gz';
-		return $query_vars;
 	}
 	
 	function sitemap_output( $robots, $public ) {

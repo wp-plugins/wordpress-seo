@@ -57,25 +57,27 @@ class WPSEO_Breadcrumbs {
 		$opt 		= get_option("wpseo_internallinks");
 		$on_front 	= get_option('show_on_front');
 		$blog_page 	= get_option('page_for_posts');
-
+		$sep		= ( isset($opt['breadcrumbs-sep']) && $opt['breadcrumbs-sep'] != '' ) ? $opt['breadcrumbs-sep'] : '&raquo;';
+		$home		= ( isset($opt['breadcrumbs-home']) && $opt['breadcrumbs-home'] != '' ) ? $opt['breadcrumbs-home'] : __('Home');
+		
 		if ($on_front == "page") {
-			$homelink = '<a href="'.get_permalink(get_option('page_on_front')).'">'.$opt['breadcrumbs-home'].'</a>';
-			if ( $blog_page && !$opt['breadcrumbs-blog-remove'] )
-				$bloglink = $homelink.' '.$opt['breadcrumbs-sep'].' <a href="'.get_permalink($blog_page).'">'.$this->get_bc_title($blog_page).'</a>';
+			$homelink = '<a href="'.get_permalink(get_option('page_on_front')).'">'.$home.'</a>';
+			if ( $blog_page && ( !isset($opt['breadcrumbs-blog-remove']) || !$opt['breadcrumbs-blog-remove'] ) )
+				$bloglink = $homelink.' '.$sep.' <a href="'.get_permalink($blog_page).'">'.$this->get_bc_title($blog_page).'</a>';
 		} else {
-			$homelink = '<a href="'.get_bloginfo('url').'">'.$opt['breadcrumbs-home'].'</a>';
+			$homelink = '<a href="'.get_bloginfo('url').'">'.$home.'</a>';
 			$bloglink = $homelink;
 		}
 
 		if ( ( $on_front == "page" && is_front_page() ) || ( $on_front == "posts" && is_home() ) ) {
-			$output = $this->bold_or_not($opt['breadcrumbs-home']);
+			$output = $this->bold_or_not($home);
 		} else if ( $on_front == "page" && is_home() ) {
-			$output = $homelink.' '.$opt['breadcrumbs-sep'].' '.$this->bold_or_not( $this->get_bc_title($blog_page) );
+			$output = $homelink.' '.$sep.' '.$this->bold_or_not( $this->get_bc_title($blog_page) );
 		} else if ( is_singular() ) {
-			$output = $bloglink.' '.$opt['breadcrumbs-sep'].' ';
+			$output = $bloglink.' '.$sep.' ';
 			if ( 0 == $post->post_parent ) {
-				$main_tax = $opt['post_types-'.$post->post_type.'-maintax'];
-				if (isset($main_tax) && $main_tax != '0') {
+				if ( isset( $opt['post_types-'.$post->post_type.'-maintax'] ) && $opt['post_types-'.$post->post_type.'-maintax'] != '0' ) {
+					$main_tax = $opt['post_types-'.$post->post_type.'-maintax'];
 					$terms = wp_get_object_terms( $post->ID, $main_tax );
 					if (is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0) {
 						$parents = $this->get_term_parents($terms[0], $main_tax);
@@ -83,18 +85,20 @@ class WPSEO_Breadcrumbs {
 							$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'wpseo_bctitle' );
 							if (!$bctitle)
 								$bctitle = $parent->name;
-							$output .= '<a href="'.get_term_link( $parent, $main_tax ).'">'.$bctitle.'</a> '.$opt['breadcrumbs-sep'].' ';
+							$output .= '<a href="'.get_term_link( $parent, $main_tax ).'">'.$bctitle.'</a> '.$sep.' ';
 						}
 					}
-					$bctitle = wpseo_get_term_meta( $terms[0], $main_tax, 'wpseo_bctitle' );
-					if (!$bctitle)
-						$bctitle = $terms[0]->name;
-					$output .= '<a href="'.get_term_link($terms[0], $main_tax).'">'.$bctitle.'</a> '.$opt['breadcrumbs-sep'].' ';
-				} 
+					if ( count($terms) > 0 ) {
+						$bctitle = wpseo_get_term_meta( $terms[0], $main_tax, 'wpseo_bctitle' );
+						if (!$bctitle)
+							$bctitle = $terms[0]->name;
+						$output .= '<a href="'.get_term_link($terms[0], $main_tax).'">'.$bctitle.'</a> '.$sep.' ';
+					}
+				}
 				$output .= $this->bold_or_not( $this->get_bc_title( $post->ID ) );
 			} else {
 				if ( 0 == $post->post_parent ) {
-					$output = $homelink." ".$opt['breadcrumbs-sep']." ".$this->bold_or_not( $this->get_bc_title() );
+					$output = $homelink." ".$sep." ".$this->bold_or_not( $this->get_bc_title() );
 				} else {
 					if (isset($post->ancestors)) {
 						if (is_array($post->ancestors))
@@ -114,7 +118,7 @@ class WPSEO_Breadcrumbs {
 					$output = $homelink;
 
 					foreach ( $ancestors as $ancestor ) {
-						$output .= ' '.$opt['breadcrumbs-sep'].' ';
+						$output .= ' '.$sep.' ';
 						if ($ancestor != $post->ID)
 							$output .= '<a href="'.get_permalink($ancestor).'">'.$this->get_bc_title( $ancestor ).'</a>';
 						else
@@ -123,7 +127,11 @@ class WPSEO_Breadcrumbs {
 				}
 			}
 		} else {
-			$output = $bloglink.' '.$opt['breadcrumbs-sep'].' ';
+			if (! is_404() ) {
+				$output = $bloglink.' '.$sep.' ';
+			} else {
+				$output = $homelink.' '.$sep.' ';
+			}
 			
 			if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
@@ -135,7 +143,7 @@ class WPSEO_Breadcrumbs {
 						$bctitle = wpseo_get_term_meta( $parent, $term->taxonomy, 'wpseo_bctitle' );
 						if (!$bctitle)
 							$bctitle = $parent->name;
-						$output .= '<a href="'.get_term_link( $parent, $term->taxonomy ).'">'.$bctitle.'</a> '.$opt['breadcrumbs-sep'].' ';
+						$output .= '<a href="'.get_term_link( $parent, $term->taxonomy ).'">'.$bctitle.'</a> '.$sep.' ';
 					}
 				}
 
@@ -148,16 +156,34 @@ class WPSEO_Breadcrumbs {
 				else
 					$output .= $bctitle;
 			} else if ( is_date() ) { 
-				$output .= $this->bold_or_not($opt['breadcrumbs-archiveprefix']." ".single_month_title(' ',false));
+				if ( isset($opt['breadcrumbs-archiveprefix']) )
+					$bc = $opt['breadcrumbs-archiveprefix'];
+				else
+					$bc = __('Archives for');
+				$output .= $this->bold_or_not($bc." ".single_month_title(' ',false));
 			} elseif ( is_author() ) {
+				if ( isset($opt['breadcrumbs-archiveprefix']) )
+					$bc = $opt['breadcrumbs-archiveprefix'];
+				else
+					$bc = __('Archives for');
 				$user = $wp_query->get_queried_object();
-				$output .= $this->bold_or_not($opt['breadcrumbs-archiveprefix']." ".$user->display_name);
+				$output .= $this->bold_or_not($bc." ".$user->display_name);
 			} elseif ( is_search() ) {
-				$output .= $this->bold_or_not($opt['breadcrumbs-searchprefix'].' "'.stripslashes(strip_tags(get_search_query())).'"');
+				if ( isset($opt['breadcrumbs-searchprefix']) && $opt['breadcrumbs-searchprefix'] != '' )
+					$bc = $opt['breadcrumbs-searchprefix'];
+				else
+					$bc = __('You searched for');
+				$output .= $this->bold_or_not($bc.' "'.stripslashes(strip_tags(get_search_query())).'"');
+			} elseif ( is_404() ) {
+				if ( isset($opt['breadcrumbs-404crumb']) && $opt['breadcrumbs-404crumb'] != '' )
+					$crumb404 = $opt['breadcrumbs-404crumb'];
+				else
+					$crumb404 = __('Error 404: Page not found');
+				$output .= $this->bold_or_not($crumb404);
 			}
 		}
 		
-		if ($opt['breadcrumbs-prefix'] != "") {
+		if ( isset($opt['breadcrumbs-prefix']) && $opt['breadcrumbs-prefix'] != "" ) {
 			$output = $opt['breadcrumbs-prefix']." ".$output;
 		}
 		if ($display) {

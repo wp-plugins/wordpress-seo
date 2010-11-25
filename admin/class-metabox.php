@@ -10,6 +10,9 @@ class WPSEO_Metabox {
 		add_action('wpsc_edit_product', array(&$this,'rebuild_sitemap'));
 		add_action('wpsc_rate_product', array(&$this,'rebuild_sitemap'));
 
+		// When permalink structure is changed, sitemap should be regenerated
+		add_action('permalink_structure_changed', array(&$this,'rebuild_sitemap') );
+
 		add_action('admin_menu', array(&$this,'yoast_wpseo_create_meta_box'));
 		add_action('save_post', array(&$this,'yoast_wpseo_save_postdata'));
 		
@@ -121,6 +124,18 @@ class WPSEO_Metabox {
 			);
 		}
 		if ($options['enablexmlsitemap']) {		
+			$mbs['sitemap-include'] = array(
+				"name" => "sitemap-include",
+				"std" => "-",
+				"type" => "select",
+				"title" => __("Include in Sitemap"),
+				"description" => __("Should this page be in the XML Sitemap at all times, regardless of Robots Meta settings?"),
+				"options" => array(
+					"-" => __("Auto detect"),
+					"always" => __("Always include"),
+					"never" => __("Never include"),
+				),
+			);
 			$mbs['sitemap-prio'] = array(
 				"name" => "sitemap-prio",
 				"std" => "-",

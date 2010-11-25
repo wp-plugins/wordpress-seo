@@ -1,5 +1,8 @@
 input.yoast, textarea.yoast {
-	width: 100%;
+	width: 95%;
+}
+select.yoast {
+	width: 250px;
 }
 textarea.yoast {
 	height: 100px;

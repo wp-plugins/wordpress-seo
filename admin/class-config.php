@@ -42,19 +42,9 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				
 		function blog_public_warning() {
 			$options = get_option('wpseo');
-			if ( isset($options['blog_public_warning']) && $options['blog_public_warning'] == 'nolonger' )
+			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
-			echo "<div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_hide_blog_public_warning()' class='button'>I know, don't bug me.</a></p></div>";
-			echo "<script type='text/javascript'>
-			function wpseo_hide_blog_public_warning() {
-				var data = {
-					action: 'wpseo_hide_blog_public_warning',
-				}
-				jQuery.post(ajaxurl, data, function(response) {
-					if (response == 'nolonger')
-						jQuery('#message.error').hide();
-				});
-			} </script>";
+			echo "<div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
 		}
 		
 		function admin_sidebar() {
@@ -288,7 +278,51 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			$this->postbox('import',__('Import', 'yoast-wpseo'),$content); 
 			
+			// echo '<h2>Ini file</h2>';
+			// echo '<pre>'.print_r(parse_ini_file(WPSEO_UPLOAD_DIR.'settings.ini'),1).'</pre>';
+			
 			do_action('wpseo_import', $this);
+
+			$content = '</form>';
+			$content .= '<strong>Export</strong><br/>';
+			$content .= '<form method="post">';
+			$content .= '<p>'.__('Export your WordPress SEO settings here, to import them again later or to import them on another site.').'</p>';
+			$content .= '<input type="submit" class="button" name="wpseo_export" value="'.__('Export settings').'"/>';
+			$content .= '</form>';
+			if ( isset($_POST['wpseo_export']) ) {
+				$url = wpseo_export_settings();
+				if ($url) {
+					$content .= '<script type="text/javascript">
+						document.location = \''.$url.'\';
+					</script>';
+				} else {
+					$content .= 'Error: '.$url;
+				}
+			}
+			
+			$content .= '<br class="clear"/><br/><strong>Import</strong><br/>';
+			if ( !isset($_FILES['settings_import_file']) ) {
+				$content .= '<p>'.__('Import settings by locating <em>settings.zip</em> and clicking').' "'.__('Import settings').'":</p>';
+				$content .= '<form method="post" enctype="multipart/form-data">';
+				$content .= '<input type="file" name="settings_import_file"/>';
+				$content .= '<input type="hidden" name="action" value="wp_handle_upload"/>';
+				$content .= '<input type="submit" class="button" value="'.__('Import settings').'"/>';
+				$content .= '</form>';
+			} else {
+				// unzip_file needs WP_Filesystem, and it doesn't initialize it when it's not there. Stupid, I know.
+				WP_Filesystem();
+				$file = wp_handle_upload($_FILES['settings_import_file']);
+				$file = unzip_file($file['file'], WPSEO_UPLOAD_DIR.'/import/');
+				if ( $file ) {
+					// Hardcoded name of the file because unzip_file doesn't return an actual file name or array of file names...
+					$options = parse_ini_file( WPSEO_UPLOAD_DIR.'/import/settings.ini', true );
+					foreach ($options as $name => $optgroup) {
+						update_option($name, $optgroup);
+					}
+					$content = '<p><strong>'.__('Settings successfully imported.').'</strong></p>';
+				}
+			}
+			$this->postbox('wpseo_export',__('Export & Import SEO Settings', 'yoast-wpseo'),$content); 
 			
 			$this->admin_footer('Import', false);
 		}
@@ -466,22 +500,25 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		
 		function permalinks_page() {
 			$this->admin_header('Permalinks', true, true, 'yoast_wpseo_permalinks_options', 'wpseo_permalinks');
-			$content = $this->checkbox('trailingslash','Enforce a trailing slash on all category and tag URL\'s');
+			$content = $this->checkbox('trailingslash',__('Enforce a trailing slash on all category and tag URL\'s'));
 			$content .= '<p class="desc">'.__('If you choose a permalink for your posts with <code>.html</code>, or anything else but a / on the end, this will force WordPress to add a trailing slash to non-post pages nonetheless.', 'yoast-wpseo').'</p>';
 
-			$content .= $this->checkbox('redirectattachment','Redirect attachment URL\'s to parent post URL.');
+			$content .= $this->checkbox('redirectattachment',__('Redirect attachment URL\'s to parent post URL.'));
 			$content .= '<p class="desc">'.__('Attachments to posts are stored in the database as posts, this means they\'re accessible under their own URL\'s if you do not redirect them, enabling this will redirect them to the post they were attached to.', 'yoast-wpseo').'</p>';
 
-			$content .= $this->checkbox('cleanpermalinks','Redirect ugly URL\'s to clean permalinks.');
+			$content .= $this->checkbox('cleanpermalinks',__('Redirect ugly URL\'s to clean permalinks.'));
 			$content .= '<p class="desc">'.__('People make mistakes in their links towards you sometimes, or unwanted parameters are added to the end of your URLs, this allows you to redirect them all away.', 'yoast-wpseo').'</p>';
 
 			$this->postbox('permalinks',__('Permalink Settings', 'yoast-wpseo'),$content); 
 
-			$content = $this->checkbox('cleanpermalink-googlesitesearch','Prevent cleaning out Google Site Search URL\'s.');
+			$content = $this->checkbox('cleanpermalink-googlesitesearch',__('Prevent cleaning out Google Site Search URL\'s.'));
 			$content .= '<p class="desc">'.__('Google Site Search URL\'s look weird, and ugly, but if you\'re using Google Site Search, you probably do not want them cleaned out.', 'yoast-wpseo').'</p>';
 
-			$content .= $this->checkbox('cleanpermalink-googlecampaign','Prevent cleaning out Google Analytics Campaign Parameters.');
+			$content .= $this->checkbox('cleanpermalink-googlecampaign',__('Prevent cleaning out Google Analytics Campaign Parameters.'));
 			$content .= '<p class="desc">'.__('If you use Google Analytics campaign parameters starting with <code>?utm_</code>, check this box. You shouldn\'t use these btw, you should instead use the hash tagged version instead.', 'yoast-wpseo').'</p>';
+
+			$content .= $this->textinput('cleanpermalink-extravars',__('Other variables not to clean'));
+			$content .= '<p class="desc">'.__('You might have extra variables you want to prevent from cleaning out, add them here, comma separarted.', 'yoast-wpseo').'</p>';
 			
 			$this->postbox('cleanpermalinksdiv',__('Clean Permalink Settings', 'yoast-wpseo'),$content); 
 			
@@ -498,6 +535,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->textinput('breadcrumbs-prefix',__('Prefix for the breadcrumb path'));
 			$content .= $this->textinput('breadcrumbs-archiveprefix',__('Prefix for Archive breadcrumbs'));
 			$content .= $this->textinput('breadcrumbs-searchprefix',__('Prefix for Search Page breadcrumbs'));
+			$content .= $this->textinput('breadcrumbs-404crumb',__('Breadcrumb for 404 Page'));
 			$content .= $this->checkbox('breadcrumbs-blog-remove',__('Remove Blog page from Breadcrumbs'));
 			$content .= '<br/><br/>';
 			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:').'</strong><br/>';
@@ -770,6 +808,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		
 		function config_page() {
 
+			$options = get_wpseo_options();
+			
 			$this->admin_header('General', false);
 
 			$content = '';
@@ -779,11 +819,17 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$wpseodir = false;
 			}
 			
-			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false )
-				$content .= '<p class="wrong"><a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Go fix it.').'</a>'.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.').'</p>';
+			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
+				$content .= '<p id="wrong_permalink" class="wrong">'
+				.'<a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Fix it.').'</a>'
+				.'<a href="javascript:setIgnore(\'permalink\',\'wrong_permalink\');" class="button fixit">'.__('Ignore.').'</a>'
+				.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.').'</p>';
 
-			if ( get_option('page_comments') )
-				$content .= '<p class="wrong"><a href="'.admin_url('options-discussion.php').'" class="button fixit">'.__('Go fix it.').'</a>'.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
+			if ( get_option('page_comments') && !isset( $options['ignore_page_comments'] ) )
+				$content .= '<p id="wrong_page_comments" class="wrong">'
+				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\');" class="button fixit">'.__('Fix it.').'</a>'
+				.'<a href="javascript:setIgnore(\'page_comments\',\'wrong_page_comments\');" class="button fixit">'.__('Ignore.').'</a>'
+				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
 
 			if ($content != '')
 				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
@@ -825,6 +871,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<a class="button" href="javascript:rebuildSitemap(\''.WPSEO_URL.'\',\'\');">(Re)build XML sitemap</a><br/><br/>';
 			$content .= '<div id="sitemapgeneration"></div>';
 			$content .= '</div>';
+
 			$this->postbox('xmlsitemaps',__('XML Sitemap', 'yoast-wpseo'),$content);
 			
 			do_action('wpseo_dashboard', $this);

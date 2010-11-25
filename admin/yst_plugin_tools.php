@@ -54,10 +54,11 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			add_submenu_page('wpseo_dashboard','Internal Links','Internal Links',$this->accesslvl, 'wpseo_internal-links', array(&$this,'internallinks_page'));
 			add_submenu_page('wpseo_dashboard','RSS','RSS',$this->accesslvl, 'wpseo_rss', array(&$this,'rss_page'));
 			add_submenu_page('wpseo_dashboard','Edit files','Edit files',$this->accesslvl, 'wpseo_files', array(&$this,'files_page'));
-			add_submenu_page('wpseo_dashboard','Import','Import',$this->accesslvl, 'wpseo_import', array(&$this,'import_page'));
+			add_submenu_page('wpseo_dashboard','Import & Export','Import & Export',$this->accesslvl, 'wpseo_import', array(&$this,'import_page'));
 			
-			global $submenu;					
-			$submenu['wpseo_dashboard'][0][0] = 'Dashboard';
+			global $submenu;
+			if ( isset($submenu['wpseo_dashboard']) )
+				$submenu['wpseo_dashboard'][0][0] = 'Dashboard';
 		}
 		
 		function plugin_options_url() {
@@ -97,7 +98,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function checkbox($id, $label, $label_left = false, $option = '') {
 			$option = !empty($option) ? $option : $this->currentoption;
-			$options = get_option($option);
+			$options = get_wpseo_options();
 
 			if (!isset($options[$id]))
 				$options[$id] = false;
@@ -118,7 +119,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function textinput($id, $label, $option = '') {
 			$option = !empty($option) ? $option : $this->currentoption;
-			$options = get_option($option);
+			$options = get_wpseo_options();
 			
 			$val = '';
 			if (isset($options[$id]))
@@ -132,7 +133,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function hiddeninput($id, $option = '') {
 			$option = !empty($option) ? $option : $this->currentoption;
-			$options = get_option($option);
+			$options = get_wpseo_options();
 			
 			$val = '';
 			if (isset($options[$id]))
@@ -145,17 +146,18 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function select($id, $label, $values, $option = '') {
 			$option = !empty($option) ? $option : $this->currentoption;
-			$options = get_option($option);
+			$options = get_wpseo_options();
 			
 			$output = '<label class="select" for="'.$id.'">'.$label.':</label>';
 			$output .= '<select class="select" name="'.$option.'['.$id.']" id="'.$id.'">';
 			
 			foreach($values as $value => $label) {
 				$sel = '';
-				if ($options[$id] == $value) {
+				if (isset($options[$id]) && $options[$id] == $value)
 					$sel = 'selected="selected" ';
-				}
-				$output .= '<option '.$sel.'value="'.$value.'">'.$label.'</option>';
+
+				if (!empty($label))
+					$output .= '<option '.$sel.'value="'.$value.'">'.$label.'</option>';
 			}
 			$output .= '</select>';
 			return $output . '<br class="clear"/>';
@@ -166,7 +168,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function file_upload($id, $label, $option = '') {
 			$option = !empty($option) ? $option : $this->currentoption;
-			$options = get_option($option);
+			$options = get_wpseo_options();
 			
 			$val = '';
 			if (isset($options[$id]) && strtolower(gettype($options[$id])) == 'array') {
@@ -191,7 +193,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function radio($id, $values, $label, $option = '') {
 			$option = !empty($option) ? $option : $this->currentoption;
-			$options = get_option($option);
+			$options = get_wpseo_options();
 			
 			if (!isset($options[$id]))
 				$options[$id] = false;

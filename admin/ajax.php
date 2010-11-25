@@ -1,21 +1,20 @@
 <?php
 
-function wpseo_hide_blog_public_warning() {
-	$options = get_option('wpseo');
-	$options['blog_public_warning'] = 'nolonger';
-	update_option('wpseo', $options);
-	die();
-}
-add_action('wp_ajax_wpseo_hide_blog_public_warning', 'wpseo_hide_blog_public_warning');
-
 function wpseo_set_option() {
-	$option = $_POST['option'];
-	$newval = $_POST['newval'];
-	
-	update_option($option, $newval);
+	update_option($_POST['option'], $_POST['newval']);
 	return 1;
 	die();
 }
+add_action('wp_ajax_wpseo_set_option', 'wpseo_set_option');
+
+function wpseo_set_ignore() {
+	$options = get_option('wpseo');
+	$options['ignore_'.$_POST['option']] = 'ignore';
+	update_option('wpseo', $options);
+	return 1;
+	die();
+}
+add_action('wp_ajax_wpseo_set_ignore', 'wpseo_set_ignore');
 
 function wpseo_autogen_title_callback() {
 	$options = get_wpseo_options();
@@ -39,7 +38,12 @@ function wpseo_ajax_generate_sitemap_callback() {
 		global $wpseo_generate, $wpseo_echo;
 		$wpseo_generate = true;
 		$wpseo_echo = true;
+		
+		$mem_before = memory_get_peak_usage() / 1024;
 		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
+		$mem_after = memory_get_peak_usage() / 1024;
+		echo number_format($mem_after - $mem_before).'KB of memory used.';
+
 	} else {
 		global $wpseo_generate, $wpseo_echo;
 		$wpseo_generate = true;

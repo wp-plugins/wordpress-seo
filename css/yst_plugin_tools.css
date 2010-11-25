@@ -42,6 +42,11 @@ div.inside ul {
 	width: 320px;
 }
 
+textarea.import {
+	width: 500px;
+	height: 100px;
+}
+
 label.textinput, label.select {
 	width: 200px;
 }

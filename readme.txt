@@ -3,7 +3,7 @@ Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer
 Requires at least: 3.0
-Tested up to: 3.0.1
+Tested up to: 3.1
 
 WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, XML sitemaps & much much more.
 
@@ -38,6 +38,32 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.1.6 =
+
+* New features:
+	* Export & Import your WordPress Settings easily.
+	* You can now supply extra variables to prevent from being cleaned out when clean permalinks is on.
+	
+* Bugs fixed:
+	* No longer throw errors when wpseo dir cannot be created.
+	* Your blog is not public warning can now be properly dismissed.
+	* Fixed rewrite issues: apparently if you only load rewrite rules on the front-end, they don't get added when changing rewrites in the backend. D0h.
+	* Rewrite rule for sitemap is now forced even harder when regenerating sitemap by hand.
+	* Search permalinks now work properly, though in "old" ?s=query style, because of a bug in core. 
+	* Breadcrumbs no longer errors when term that is supposed to show is empty.
+	* Enabling breadcrumbs without setting any of the text fields no longer gives notices but proper defaults.
+	* Proper fallback for get_term_title for pre WP 3.1 sites with custom taxonomies.
+	
+* Changes:
+	* You can now dismiss settings advice.
+	* You can now fix some of the settings advice just by clicking the button.
+	* You can now make posts, pages and taxonomy terms of any kind always appear in sitemap even if they're noindex, or never, set on a piece by piece basis.
+	* Permalink changes now invoke immediate XML sitemap update.
+	* Added canonical url to the blog page if using a static page for front page (props [@rrolfe](http://twitter.com/rrolfe)).
+	* Removing RSS feeds now actually works (props @rrolfe).
+	* Added breadcrumb for 404 pages (props @rrolfe).
+	* Drastically reduced memory usage during XML sitemap generation.
+	
 = 0.1.5 =
 
 * Bugs fixed:
