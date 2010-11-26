@@ -130,7 +130,7 @@ class WPSEO_Frontend {
 						if ( function_exists('single_term_title') ) {
 							$title = single_term_title('', false);
 						} else {
-							$term = get_queried_object();
+							$term = $wp_query->get_queried_object();
 							$title = $term->name;
 						}
 					}
@@ -168,7 +168,7 @@ class WPSEO_Frontend {
 			else
 				$title = __('Page not found').' - '.get_bloginfo('name');
 		} 
-		return esc_html( strip_tags( stripslashes( trim( $title ) ) ) );
+		return esc_html( stripslashes( trim( $title ) ) );
 	}
 	
 	function thematic_title() {

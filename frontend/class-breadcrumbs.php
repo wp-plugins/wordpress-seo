@@ -28,7 +28,7 @@ class WPSEO_Breadcrumbs {
 
 	function bold_or_not($input) {
 		$opt = get_option("wpseo_internallinks");
-		if ($opt['breadcrumbs-boldlast']) {
+		if ( isset($opt['breadcrumbs-boldlast']) && $opt['breadcrumbs-boldlast'] ) {
 			return '<strong>'.$input.'</strong>';
 		} else {
 			return $input;
@@ -62,6 +62,7 @@ class WPSEO_Breadcrumbs {
 		
 		if ($on_front == "page") {
 			$homelink = '<a href="'.get_permalink(get_option('page_on_front')).'">'.$home.'</a>';
+			$bloglink = $homelink;
 			if ( $blog_page && ( !isset($opt['breadcrumbs-blog-remove']) || !$opt['breadcrumbs-blog-remove'] ) )
 				$bloglink = $homelink.' '.$sep.' <a href="'.get_permalink($blog_page).'">'.$this->get_bc_title($blog_page).'</a>';
 		} else {

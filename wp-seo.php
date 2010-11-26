@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: WordPress SEO
-Version: 0.1.6
+Version: 0.1.7
 Plugin URI: http://yoast.com/wordpress/seo/
 Description: The first true all-in-one SEO solution for WordPress.
 Author: Joost de Valk
@@ -17,7 +17,7 @@ define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
 define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
 define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
 
-define( 'WPSEO_VERSION', '0.1.6' );
+define( 'WPSEO_VERSION', '0.1.7' );
 
 require_once 'inc/wpseo-functions.php';
 if ( !defined('DOING_AJAX') || !DOING_AJAX )
@@ -27,7 +27,7 @@ $options = get_wpseo_options();
 
 wpseo_dir_setup();
 
-if (is_admin()) {
+if ( is_admin() ) {
 	require_once 'admin/ajax.php';
 	if ( !defined('DOING_AJAX') || !DOING_AJAX ) {
 		require_once 'admin/yst_plugin_tools.php';

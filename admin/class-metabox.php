@@ -55,7 +55,7 @@ class WPSEO_Metabox {
 			"std" => "",
 			"type" => "text",
 			"title" => __("SEO Title"),
-			"description" => __('<div class="alignright" style="padding:5px;"><a class="button" href="#wpseo_title" id="wpseo_regen_title">'.__('Regenerate SEO Title').'</a></div><p>'."The SEO title is limited to 70 chars, <span id='yoast_wpseo_title-length'></span> chars left. It's used in the <code>&lt;title&gt;</code> tag, unlike the page title, which is used on the page itself. This overwrites the post type's title template.".'</p>'));
+			"description" => __('<div class="alignright" style="padding:5px;"><a class="button" href="#" id="wpseo_regen_title">'.__('Regenerate SEO title').'</a></div><p>'."The SEO title is limited to 70 chars, <span id='yoast_wpseo_title-length'></span> chars left. It's used in the <code>&lt;title&gt;</code> tag, unlike the page title, which is used on the page itself. This overwrites the post type's title template.".'</p>'));
 		$mbs['metadesc'] = array(
 			"name" => "metadesc",
 			"std" => "",
@@ -71,7 +71,11 @@ class WPSEO_Metabox {
 			"std" => "",
 			"type" => "text",
 			"title" => __("Focus Keyword"),
-			"description" => "<div class='alignright' style='width: 300px;'><a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a><p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
+			"description" => "<div class='alignright' style='width: 300px;'>"
+			."<a class='preview button' id='wpseo_retestfocus' href='#'>".__('(Re-)test focus keyword')."</a>"
+			."<br/><br/><br/>"
+			."<a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a> "
+			."<p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
 		);
 		
 		// Apply filters before entering the advanced section
@@ -123,7 +127,7 @@ class WPSEO_Metabox {
 				"description" => __("Title to use for this page in breadcrumb paths"),
 			);
 		}
-		if ($options['enablexmlsitemap']) {		
+		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {		
 			$mbs['sitemap-include'] = array(
 				"name" => "sitemap-include",
 				"std" => "-",
@@ -187,7 +191,9 @@ class WPSEO_Metabox {
 	function yoast_wpseo_meta_boxes() {
 		global $post;
 
-		echo '<script type="text/javascript">var lang = "'.substr(get_locale(),0,2).'";</script>';
+		echo '<script type="text/javascript">
+			var lang = "'.substr(get_locale(),0,2).'";
+		</script>';
 
 		// echo '<pre>'.print_r(get_post_custom($post->ID),1).'</pre>';
 		// echo '<pre>'.print_r(get_post($post->ID),1).'</pre>';
@@ -359,12 +365,12 @@ class WPSEO_Metabox {
 	}
 
 	function yoast_wpseo_page_title_column_heading( $columns ) {
-		return array_merge(array_slice($columns, 0, 2), array('page-title' => 'Yoast SEO Title'), array_slice($columns, 2, 6), array('page-meta-robots' => 'Robots Meta'));
+		return array_merge(array_slice($columns, 0, 2), array('page-title' => 'WP SEO Title'), array_slice($columns, 2, 6), array('page-meta-robots' => 'Robots Meta'));
 	}
 
 	function yoast_wpseo_page_title_column_content( $column_name, $id ) {
 		if ( $column_name == 'page-title' ) {
-			echo $this->wpseo_page_title($id);
+			echo esc_html( $this->wpseo_page_title($id) );
 		}
 		if ( $column_name == 'page-meta-robots' ) {
 			$robots 			= array();

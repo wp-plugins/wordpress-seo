@@ -45,6 +45,7 @@ function wpseo_replace_vars($string, $args) {
 		'post_author' => '',
 		'post_content' => '',
 		'post_date' => '',
+		'post_content' => '',
 		'post_excerpt' => '',
 		'post_modified' => '',
 		'post_title' => '',
@@ -59,25 +60,26 @@ function wpseo_replace_vars($string, $args) {
 			$pagenum = '';
 	}
 	
-	$r = wp_parse_args($args, $defaults);
+	$r = (object) wp_parse_args($args, $defaults);
 	
 	$replacements = array(
-		'%%date%%' 					=> $r['post_date'],
-		'%%title%%'					=> stripslashes($r['post_title']),
+		'%%date%%' 					=> $r->post_date,
+		'%%title%%'					=> stripslashes( $r->post_title ),
 		'%%sitename%%'				=> get_bloginfo('name'),
 		'%%sitedesc%%'				=> get_bloginfo('description'),
-		'%%excerpt%%'				=> !empty($r['post_excerpt']) ? $r['post_excerpt'] : substr(wp_trim_excerpt($r['post_content']), 0, 155),
-		'%%excerpt_only%%'			=> $r['post_excerpt'],
-		'%%category%%'				=> ( get_the_category_list('','',$r['ID']) != '' ) ? get_the_category_list('','',$r['ID']) : $r['name'],
-		'%%category_description%%'	=> !empty($r['taxonomy']) ? trim(strip_tags(get_term_field( 'description', $r['term_id'], $r['taxonomy'] ))) : '',
-		'%%tag_description%%'		=> !empty($r['taxonomy']) ? trim(strip_tags(get_term_field( 'description', $r['term_id'], $r['taxonomy'] ))) : '',
-		'%%term_description%%'		=> !empty($r['taxonomy']) ? trim(strip_tags(get_term_field( 'description', $r['term_id'], $r['taxonomy'] ))) : '',
-		'%%term_title%%'			=> $r['name'],
-		'%%tag%%'					=> $r['name'],
-		'%%modified%%'				=> $r['post_modified'],
-		'%%id%%'					=> $r['ID'],
-		'%%name%%'					=> get_the_author_meta('display_name', !empty($r['post_author']) ? $r['post_author'] : get_query_var('author')),
-		'%%userid%%'				=> !empty($r['post_author']) ? $r['post_author'] : get_query_var('author'),
+		// '%%excerpt%%'				=> ( !empty($r->post_excerpt) ) ? strip_tags( $r->post_excerpt ) : substr( wp_trim_excerpt( strip_shortcodes( strip_tags( $r->post_content ) ) ), 0, 155 ),
+		'%%excerpt%%'				=> ( !empty($r->post_excerpt) ) ? strip_tags( $r->post_excerpt ) : substr( strip_shortcodes( strip_tags( $r->post_content ) ), 0, 155 ),
+		'%%excerpt_only%%'			=> strip_tags( $r->post_excerpt ),
+		'%%category%%'				=> ( !empty($r->ID) && get_the_category_list('','',$r->ID) != '' ) ? get_the_category_list('','',$r->ID) : $r->name,
+		'%%category_description%%'	=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
+		'%%tag_description%%'		=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
+		'%%term_description%%'		=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
+		'%%term_title%%'			=> $r->name,
+		'%%tag%%'					=> $r->name,
+		'%%modified%%'				=> $r->post_modified,
+		'%%id%%'					=> $r->ID,
+		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
+		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
 		'%%searchphrase%%'			=> esc_html(get_query_var('s')),
 		'%%currenttime%%'			=> date('H:i'),
 		'%%currentdate%%'			=> date('M jS Y'),
@@ -86,7 +88,7 @@ function wpseo_replace_vars($string, $args) {
 		'%%page%%'		 			=> ( get_query_var('paged') != 0 ) ? 'Page '.get_query_var('paged').' of '.$wp_query->max_num_pages : '', 
 		'%%pagetotal%%'	 			=> ( $wp_query->max_num_pages > 1 ) ? $wp_query->max_num_pages : '', 
 		'%%pagenumber%%' 			=> $pagenum,
-		'%%caption%%'				=> $r['post_excerpt'],
+		'%%caption%%'				=> $r->post_excerpt,
 	);
 	
 	foreach ($replacements as $var => $repl) {
@@ -119,14 +121,18 @@ function wpseo_dir_setup() {
 		if ( is_wp_error($dir) ) {
 			$wpseodir = false;
 		} else if ( !file_exists( $dir['basedir'].'/wpseo/' ) ) {
-			$wpseodir = @mkdir( $dir['basedir'].'/wpseo/' );
-			if ( $wpseodir ) {
+			$dircreated = @mkdir( $dir['basedir'].'/wpseo/' );
+			if ( $dircreated ) {
+				$wpseodir = $dir['basedir'].'/wpseo/';
 				$stat = @stat( dirname( $wpseodir ) );
 				$dir_perms = $stat['mode'] & 0007777;
 				@chmod( dirname( $wpseodir ), $dir_perms );
+				
 				$options['wpseodir'] = $wpseodir;
 				$wpseourl = $options['wpseourl'] = $dir['baseurl'].'/wpseo/';
 				update_option( 'wpseo' , $options );
+			} else {
+				$wpseodir = false;
 			}
 		} else {
 			$wpseodir = $options['wpseodir'] = $dir['basedir'].'/wpseo/';

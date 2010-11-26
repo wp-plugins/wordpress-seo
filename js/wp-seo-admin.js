@@ -58,17 +58,6 @@ function setWPOption( option, newval, hide ) {
 	);
 }
 
-function setIgnore( option, hide ) {
-	jQuery.post(ajaxurl, { 
-			action: 'wpseo_set_ignore', 
-			option: option,
-		}, function(response) { 
-			if (response)
-				jQuery('#'+hide).hide();
-		}
-	);
-}
-
 function rebuildSitemap( baseurl, type ) {
 	jQuery('#'+type+'sitemapgeneration').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
 	jQuery.post(ajaxurl, { 

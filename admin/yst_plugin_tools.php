@@ -19,14 +19,6 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles');
 		
 		function Yoast_WPSEO_Plugin_Admin() {
-			add_action( 'admin_menu', array(&$this, 'register_settings_page'), 10 );
-			add_filter( 'plugin_action_links', array(&$this, 'add_action_link'), 10, 2 );
-			add_filter( 'ozh_adminmenu_icon', array(&$this, 'add_ozh_adminmenu_icon' ) );				
-			
-			add_action('admin_print_scripts', array(&$this,'config_page_scripts'));
-			add_action('admin_print_styles', array(&$this,'config_page_styles'));	
-			
-			add_action('wp_dashboard_setup', array(&$this,'widget_setup'));	
 		}
 		
 		function add_ozh_adminmenu_icon( $hook ) {
@@ -59,6 +51,8 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			global $submenu;
 			if ( isset($submenu['wpseo_dashboard']) )
 				$submenu['wpseo_dashboard'][0][0] = 'Dashboard';
+				
+			
 		}
 		
 		function plugin_options_url() {
@@ -84,8 +78,9 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		
 		function config_page_scripts() {
 			global $pagenow;
+			wp_enqueue_script('wpseo-admin-global-script', WPSEO_URL.'js/wp-seo-admin-global.js',array('jquery'));
 			if ( $pagenow == 'admin.php' && isset($_GET['page']) && in_array($_GET['page'], $this->adminpages) ) {
-				wp_enqueue_script('robots-meta-script', WPSEO_URL.'js/wp-seo-admin.js',array('jquery'));
+				wp_enqueue_script('wpseo-admin-script', WPSEO_URL.'js/wp-seo-admin.js',array('jquery'));
 				wp_enqueue_script('postbox');
 				wp_enqueue_script('dashboard');
 				wp_enqueue_script('thickbox');
@@ -271,7 +266,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function news() {
 			include_once(ABSPATH . WPINC . '/feed.php');
-			$rss = fetch_feed('http://yoast.com/feed/');
+			$rss = fetch_feed('http://feeds.feedburner.com/joostdevalk');
 
 			// Bail if feed doesn't work
 			if ( is_wp_error($rss) )
@@ -284,7 +279,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			} else {
 			    foreach ( $rss_items as $item ) {
 					$content .= '<li class="yoast">';
-					$content .= '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. htmlentities($item->get_title()) .'</a> ';
+					$content .= '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. esc_html( $item->get_title() ) .'</a> ';
 					$content .= '</li>';
 			    }
 			}						
@@ -304,15 +299,21 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		}
 
 		function db_widget() {
-			$options = get_option('yoastdbwidget');
+			$options = get_option('wpseo_yoastdbwidget');
+			
+			$network = '';
+			if ( is_network_admin() )
+				$network = '_network';
+
 			if (isset($_POST['yoast_removedbwidget'])) {
-				$options['removedbwidget'] = true;
+				$options['removedbwidget'.$network] = true;
 				update_option('yoastdbwidget',$options);
 			}			
-			if ($options['removedbwidget']) {
+			if ( isset($options['removedbwidget'.$network]) && $options['removedbwidget'.$network] ) {
 				echo "If you reload, this widget will be gone and never appear again, unless you decide to delete the database option 'yoastdbwidget'.";
 				return;
 			}
+
 			include_once(ABSPATH . WPINC . '/feed.php');
 			$rss = fetch_feed('http://yoast.com/feed/');
 			
@@ -324,6 +325,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			
 			echo '<div class="rss-widget">';
 			echo '<a href="http://yoast.com/" title="Go to Yoast.com"><img src="http://cdn.yoast.com/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
+
 			echo '<ul>';
 
 			if ( !$rss_items ) {
@@ -332,29 +334,52 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			    foreach ( $rss_items as $item ) {
 					// echo '<pre>'.print_r($item,1).'</pre>';
 					echo '<li class="yoast">';
-					echo '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. htmlentities($item->get_title()) .'</a>';
+					echo '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. esc_html( $item->get_title() ) .'</a>';
 					echo ' <span class="rss-date">'. $item->get_date('F j, Y') .'</span>';
-					echo '<div class="rssSummary">'. substr( $item->get_description(), 0, 250 ) .'</div>';
+					echo '<div class="rssSummary">'. esc_html( substr( strip_tags( $item->get_description() ), 0, 150 ) ).'</div>';
 					echo '</li>';
 			    }
 			}						
 
 			echo '</ul>';
 			echo '<div style="border-top: 1px solid #ddd; padding-top: 10px; text-align:center;">';
-			echo '<a href="http://feeds2.feedburner.com/joostdevalk"><img src="'.get_bloginfo('wpurl').'/wp-includes/images/rss.png" alt=""/> Subscribe with RSS</a>';
+			echo '<a href="http://yoast.com/feed/"><img src="'.get_bloginfo('wpurl').'/wp-includes/images/rss.png" alt=""/> Subscribe with RSS</a>';
 			echo ' &nbsp; &nbsp; &nbsp; ';
-			echo '<a href="http://yoast.com/email-blog-updates/"><img src="http://cdn.yoast.com/email_sub.png" alt=""/> Subscribe by email</a>';
+			echo '<a href="http://yoast.com/wordpress-newsletter/"><img src="http://cdn.yoast.com/email_sub.png" alt=""/> Subscribe by email</a>';
 			echo '<form class="alignright" method="post"><input type="hidden" name="yoast_removedbwidget" value="true"/><input title="Remove this widget from all users dashboards" type="submit" value="X"/></form>';
 			echo '</div>';
 			echo '</div>';
 		}
 
 		function widget_setup() {
-			$options = get_option('yoastdbwidget');
-			if (!$options['removedbwidget'])
-		    	wp_add_dashboard_widget( 'yoast_db_widget' , 'The Latest news from Yoast' , array(&$this, 'db_widget'));
+			$network = '';
+			if ( is_network_admin() )
+				$network = '_network';
+
+			$options = get_option('wpseo_yoastdbwidget');
+			if ( !isset($options['removedbwidget'.$network]) || !$options['removedbwidget'.$network] )
+	    		wp_add_dashboard_widget( 'yoast_db_widget' , 'The Latest From Yoast' , array(&$this, 'db_widget') );
+		}
+		
+		function widget_order( $arr ) {
+			global $wp_meta_boxes;
+			if ( is_network_admin() ) {
+				$plugins = $wp_meta_boxes['dashboard-network']['normal']['core']['dashboard_plugins'];
+				unset($wp_meta_boxes['dashboard-network']['normal']['core']['dashboard_plugins']);
+				$wp_meta_boxes['dashboard-network']['normal']['core'][] = $plugins;
+			} else if ( is_admin() ) {
+				if ( isset($wp_meta_boxes['dashboard']['normal']['core']['yoast_db_widget']) ) {
+					$yoast_db_widget = $wp_meta_boxes['dashboard']['normal']['core']['yoast_db_widget'];
+					unset($wp_meta_boxes['dashboard']['normal']['core']['yoast_db_widget']);
+					$begin = array_slice($wp_meta_boxes['dashboard']['side']['core'], 0, 1);
+					$end = array_slice($wp_meta_boxes['dashboard']['side']['core'], 1, 5);
+					$wp_meta_boxes['dashboard']['side']['core'] = $begin;
+					$wp_meta_boxes['dashboard']['side']['core'][] = $yoast_db_widget;
+					$wp_meta_boxes['dashboard']['side']['core'] += $end;
+				} 
+			}
+			return $arr;
 		}
 	}
 }
 
-?>

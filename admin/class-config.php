@@ -15,11 +15,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_filter( 'plugin_action_links', array(&$this, 'add_action_link'), 10, 2 );
 			add_filter( 'ozh_adminmenu_icon', array(&$this, 'add_ozh_adminmenu_icon' ) );				
 			
-			add_action('admin_print_scripts', array(&$this,'config_page_scripts'));
-			add_action('admin_print_styles', array(&$this,'config_page_styles'));	
+			add_action( 'admin_print_scripts', array(&$this,'config_page_scripts'));
+			add_action( 'admin_print_styles', array(&$this,'config_page_styles'));	
 			
-			add_action('wp_dashboard_setup', array(&$this,'widget_setup'));	
-
+			add_action( 'wp_dashboard_setup', array(&$this,'widget_setup'));	
+			add_action( 'wp_network_dashboard_setup', array(&$this,'widget_setup'));	
+			add_filter( 'wp_dashboard_widgets', array(&$this, 'widget_order'));
+			add_filter( 'wp_network_dashboard_widgets', array(&$this, 'widget_order'));
+			
 			add_action('admin_init', array(&$this, 'options_init') );
 
 			add_action('show_user_profile', array(&$this,'wpseo_user_profile'));
@@ -44,7 +47,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$options = get_option('wpseo');
 			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
-			echo "<div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
+			echo "<div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
 		}
 		
 		function admin_sidebar() {
@@ -822,13 +825,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
 				$content .= '<p id="wrong_permalink" class="wrong">'
 				.'<a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:setIgnore(\'permalink\',\'wrong_permalink\');" class="button fixit">'.__('Ignore.').'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\');" class="button fixit">'.__('Ignore.').'</a>'
 				.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.').'</p>';
 
 			if ( get_option('page_comments') && !isset( $options['ignore_page_comments'] ) )
 				$content .= '<p id="wrong_page_comments" class="wrong">'
 				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\');" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:setIgnore(\'page_comments\',\'wrong_page_comments\');" class="button fixit">'.__('Ignore.').'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\');" class="button fixit">'.__('Ignore.').'</a>'
 				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
 
 			if ($content != '')

@@ -5,7 +5,7 @@ Tags: seo, google, meta, meta description, search engine optimization, xml sitem
 Requires at least: 3.0
 Tested up to: 3.1
 
-WordPress SEO is an all in one solution to search engine optimize your WordPress blog, featuring titles, meta descriptions, XML sitemaps & much much more.
+WordPress SEO is an all in one solution to search engine optimize your WordPress blog: SEO titles, meta descriptions, XML sitemaps & much more.
 
 == Description ==
 
@@ -25,7 +25,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 * XML Sitemaps with:
  	* Images
 	* Configurable removal of post types and taxonomies
-	* Pages or posts that have been noindexed will not show in XML sitemap.
+	* Pages or posts that have been noindexed will not show in XML sitemap (but can if you want them too).
 * XML News Sitemaps.
 * .htaccess and robots.txt editor.
 * Basic import functionality for HeadSpace2 and All in One SEO.
@@ -38,6 +38,22 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.1.7 =
+
+* Bugs fixed:
+	* Empty Home link when blog page is used and no settings have been set.
+	* Fixed couple more notices (well, like, 10).
+	* Bug in directory creation that would create the directory correctly but still throw an error and save the path wrongly to options.
+	* Dismissing Blog public warning was only possible on SEO pages, now it's possible everywhere.
+	* Excerpts, when used in description, are now properly sanitized from tags and shortcodes.
+	* Properly fallback to $wp_query->get_queried_object() instead of get_queried_object() for < 3.1 installs.
+	* Fixed several bugs in title generation, making it more stable and faster in the process.
+	* Properly escape entities in page titles, both in front end and in posts overview.
+	
+* Changes:
+	* Latest news from Yoast now appears on Network Admin too, and you can disable it there and on normal admin pages individually. First step towards getting a Multi Site Network Admin SEO page.
+	* Added a "Re-test focus keyword" button for people using the Rich Text editor, which wasn't sending update events properly.
+	
 = 0.1.6 =
 
 * New features:

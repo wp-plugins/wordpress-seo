@@ -122,14 +122,13 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 
 					// If a post has just been updated, make sure you scan the *new* content for images, not the old one.
 					if ( isset($_POST) && isset($_POST['post_ID']) && $_POST['post_ID'] == $p->ID ) {
-						$p = (object) $_POST;
 						$p->post_modified = current_time( 'mysql' );
-						$p->post_content = stripslashes($p->post_content);
+						$p->post_content = stripslashes($_POST['post_content']);
 					}	
 
 					$url = array();
-
-					$url['mod']	= ( $p->post_modified_gmt != '0000-00-00 00:00:00' ) ? $p->post_modified_gmt : $p->post_date_gmt ;
+					
+					$url['mod']	= ( isset( $p->post_modified_gmt ) && $p->post_modified_gmt != '0000-00-00 00:00:00' ) ? $p->post_modified_gmt : $p->post_date_gmt ;
 					$url['chf'] = 'weekly';
 
 					if ( yoast_get_value('canonical', $p->ID) && yoast_get_value('canonical', $p->ID) != '' && yoast_get_value('canonical', $p->ID) != $link ) {
