@@ -38,6 +38,10 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.1.7.1 =
+
+* Apparently is_network_admin() didn't exist before WP 3.1. D0h!!!
+
 = 0.1.7 =
 
 * Bugs fixed:

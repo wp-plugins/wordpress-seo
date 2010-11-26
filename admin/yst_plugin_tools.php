@@ -302,7 +302,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			$options = get_option('wpseo_yoastdbwidget');
 			
 			$network = '';
-			if ( is_network_admin() )
+			if ( function_exists('is_network_admin') && is_network_admin() )
 				$network = '_network';
 
 			if (isset($_POST['yoast_removedbwidget'])) {
@@ -353,7 +353,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 
 		function widget_setup() {
 			$network = '';
-			if ( is_network_admin() )
+			if ( function_exists('is_network_admin') && is_network_admin() )
 				$network = '_network';
 
 			$options = get_option('wpseo_yoastdbwidget');
@@ -363,7 +363,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		
 		function widget_order( $arr ) {
 			global $wp_meta_boxes;
-			if ( is_network_admin() ) {
+			if ( function_exists('is_network_admin') && is_network_admin() ) {
 				$plugins = $wp_meta_boxes['dashboard-network']['normal']['core']['dashboard_plugins'];
 				unset($wp_meta_boxes['dashboard-network']['normal']['core']['dashboard_plugins']);
 				$wp_meta_boxes['dashboard-network']['normal']['core'][] = $plugins;
