@@ -202,6 +202,18 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			return $output;
 		}
 		
+		/**
+		 * Create a hidden input field
+		 */
+		function hidden($id, $option = '') {
+			$option = !empty($option) ? $option : $this->currentoption;
+			$options = get_wpseo_options();
+
+			if (!isset($options[$id]))
+				$options[$id] = '';
+			
+			return '<input type="hidden" id="hidden_'.$id.'" name="'.$option.'['.$id.']" value="'.$options[$id].'"/>';
+		}
 
 		/**
 		 * Create a potbox widget
@@ -216,7 +228,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				</div>
 			</div>
 		<?php
-		}	
+		}
 
 
 		/**
@@ -324,7 +336,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			$rss_items = $rss->get_items( 0, $rss->get_item_quantity(3) );
 			
 			echo '<div class="rss-widget">';
-			echo '<a href="http://yoast.com/" title="Go to Yoast.com"><img src="http://cdn.yoast.com/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
+			echo '<a href="http://yoast.com/" title="Go to Yoast.com"><img src="'.WPSEO_URL.'images/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
 
 			echo '<ul>';
 

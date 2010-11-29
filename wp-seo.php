@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: WordPress SEO
-Version: 0.1.7.1
+Version: 0.1.8
 Plugin URI: http://yoast.com/wordpress/seo/
 Description: The first true all-in-one SEO solution for WordPress.
 Author: Joost de Valk
@@ -10,14 +10,14 @@ Author URI: http://yoast.com/
 
 $pluginurl = plugin_dir_url(__FILE__);
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
-	$pluginurl = preg_replace( '/^https', '/^http', $pluginurl );
+	$pluginurl = preg_replace( '/^https', 'http', $pluginurl );
 define( 'WPSEO_FRONT_URL', $pluginurl );
 
 define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
 define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
 define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
 
-define( 'WPSEO_VERSION', '0.1.7.1' );
+define( 'WPSEO_VERSION', '0.1.8' );
 
 require_once 'inc/wpseo-functions.php';
 if ( !defined('DOING_AJAX') || !DOING_AJAX )
@@ -44,8 +44,9 @@ if ( is_admin() ) {
 
 // Load all extra modules
 if ( !defined('DOING_AJAX') || !DOING_AJAX )
-	wpseo_load_plugins(WP_PLUGIN_DIR.'/wordpress-seo-modules/');
+	wpseo_load_plugins( WP_PLUGIN_DIR.'/wordpress-seo-modules/' );
 
+// Let's act as though this is AIOSEO so plugins and themes that act differently for that will fix do it for this plugin as well.
 if ( !class_exists('All_in_One_SEO_Pack') ) {
 	class All_in_One_SEO_Pack {
 		function All_in_One_SEO_Pack() {

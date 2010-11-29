@@ -47,7 +47,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$options = get_option('wpseo');
 			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
-			echo "<div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
+			echo "<div id='blogpublicmsg'><div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"blogpublicmsg\");' class='button'>I know, don't bug me.</a></p></div></div>";
 		}
 		
 		function admin_sidebar() {
@@ -312,17 +312,23 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$content .= '<input type="submit" class="button" value="'.__('Import settings').'"/>';
 				$content .= '</form>';
 			} else {
-				// unzip_file needs WP_Filesystem, and it doesn't initialize it when it's not there. Stupid, I know.
-				WP_Filesystem();
 				$file = wp_handle_upload($_FILES['settings_import_file']);
-				$file = unzip_file($file['file'], WPSEO_UPLOAD_DIR.'/import/');
-				if ( $file ) {
-					// Hardcoded name of the file because unzip_file doesn't return an actual file name or array of file names...
-					$options = parse_ini_file( WPSEO_UPLOAD_DIR.'/import/settings.ini', true );
-					foreach ($options as $name => $optgroup) {
-						update_option($name, $optgroup);
+				
+				if ( $file && !is_wp_error($file) ) {
+					require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
+					$zip = new PclZip( $file['file'] );
+					$unzipped = $zip->extract( $p_path = WPSEO_UPLOAD_DIR.'import/' );
+					if ( $unzipped[0]['stored_filename'] == 'settings.ini' ) {
+						$options = parse_ini_file( WPSEO_UPLOAD_DIR.'import/settings.ini', true );
+						foreach ($options as $name => $optgroup) {
+							update_option($name, $optgroup);
+						}
+						$content .= '<p><strong>'.__('Settings successfully imported.').'</strong></p>';
+					} else {
+						$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Unzipping failed.').'</strong></p>';
 					}
-					$content = '<p><strong>'.__('Settings successfully imported.').'</strong></p>';
+				} else {
+					$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Upload failed.').'</strong></p>';
 				}
 			}
 			$this->postbox('wpseo_export',__('Export & Import SEO Settings', 'yoast-wpseo'),$content); 
@@ -344,18 +350,17 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$content .= $this->textinput('title-home','Title template');
 				$content .= $this->textinput('metadesc-home','Meta description template');
 			} else {
-				$content .= '<h4>Homepage &amp; Frontpage</h4>';
-				$content .= '<p>'.__('You can determine the title and description for the frontpage by').' <a href="'.get_edit_post_link( get_option('page_on_front') ).'">'.__('editing the frontpage itself').' &raquo;</a>.</p>';
+				$content .= '<h4>Homepage &amp; Front page</h4>';
+				$content .= '<p>'.__('You can determine the title and description for the front page by').' <a href="'.get_edit_post_link( get_option('page_on_front') ).'">'.__('editing the front page itself').' &raquo;</a>.</p>';
 				if ( is_numeric( get_option('page_for_posts') ) )
 				$content .= '<p>'.__('You can determine the title and description for the blog page by').' <a href="'.get_edit_post_link( get_option('page_for_posts') ).'">'.__('editing the blog page itself').' &raquo;</a>.</p>';
 			}
-			// $content .= '<pre>'.print_r(get_post_types(),1).'</pre>';
 			foreach (get_post_types() as $posttype) {
-				if ( in_array($posttype, array('revision','nav_menu_item') ) )
+				if ( in_array($posttype, array('revision','nav_menu_item','post_format') ) )
 					continue;
 				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
 					continue;
-				$content .= '<h4>'.ucfirst($posttype).'</h4>';
+				$content .= '<h4 id="'.$posttype.'">'.ucfirst($posttype).'</h4>';
 				$content .= $this->textinput('title-'.$posttype,'Title template');
 				$content .= $this->textinput('metadesc-'.$posttype,'Meta description template');
 				$content .= '<br/>';
@@ -491,6 +496,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							<th>%%caption%%</th>
 							<td>Attachment caption</td>
 						</tr>
+						<tr class="alt">
+							<th>%%monthyear%%</th>
+							<td>Replaced with "Month Year" or "Year" on date archives</td>
+						</tr>
 					</table>';
 			$this->postbox('titleshelp',__('Help on Title Settings', 'yoast-wpseo'), $content); 
 			
@@ -543,7 +552,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br/><br/>';
 			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:').'</strong><br/>';
 			foreach (get_post_types() as $pt) {
-				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
+				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item', 'post_format')))
 					continue;
 
 				$taxonomies = get_object_taxonomies($pt);
@@ -836,23 +845,33 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 			if ($content != '')
 				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
-							
-			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:').'</p>';
+					
+			// Set some of the ignore booleans here to prevent unsetting.
+			$content .= $this->hidden('ignore_blog_public_warning');
+			$content .= $this->hidden('ignore_page_comments');
+			$content .= $this->hidden('ignore_permalink');
+					
+			$content .= '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:').'</p>';
 			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'yoast-wpseo').'</a>');
 			$content .= $this->textinput('yahooverify','<a target="_blank" href="https://siteexplorer.search.yahoo.com/mysites">'.__('Yahoo! Site Explorer', 'yoast-wpseo').'</a>');
 			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'yoast-wpseo').'</a>');
 
-			$content .= '<br class="clear"/><br/>';
-			
 			$this->postbox('webmastertools',__('Webmaster Tools', 'yoast-wpseo'),$content);
 			
 			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
-			$content .= '<div id="sitemapinfo">';
+			$content .= '<div id="sitemapinfo"><br/>';
+			$content .= '<strong>'.__('General settings').'</strong><br/><br/>';
 			$content .= $this->checkbox('no_xmlsitemap_update', __("Don't update the XML sitemap automatically when a post is published."), false);
+			$content .= $this->checkbox('xml_include_images', __("Add images to XML Sitemap."), false);
+			$content .= '<p>'.__('After sitemap generation:').'</p>';
+			$content .= $this->checkbox('xml_ping_google', __("Ping Google."), false);
+			$content .= $this->checkbox('xml_ping_bing', __("Ping Bing."), false);
+			$content .= $this->checkbox('xml_ping_yahoo', __("Ping Yahoo!."), false);
+			$content .= $this->checkbox('xml_ping_ask', __("Ping Ask.com."), false);
 			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_post_types() as $post_type) {
-				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
+				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment','post_format') ) ) {
 					$pt = get_post_type_object($post_type);
 					$content .= $this->checkbox('post_types-'.$post_type.'-not_in_sitemap', $pt->labels->name);
 				}

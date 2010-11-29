@@ -3,8 +3,10 @@ function wpseo_setIgnore( option, hide ) {
 			action: 'wpseo_set_ignore', 
 			option: option,
 		}, function(response) { 
-			if (response)
+			if (response) {
 				jQuery('#'+hide).hide();
+				jQuery('#hidden_ignore_'+option).val('ignore');
+			}
 		}
 	);
 }

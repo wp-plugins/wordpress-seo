@@ -12,7 +12,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		if ( ( !isset($options['enablexmlsitemap']) || !$options['enablexmlsitemap'] ) && !$wpseo_generate )
 			return;
 
-		if ( ( !isset($options['enablexmlsitemap']) || !$options['enablexmlsitemap'] ) && $wpseo_generate ) {
+		if ( ( !isset($options['enablexmlsitemap']) || !$options['enablexmlsitemap'] ) && $wpseo_generate && $wpseo_echo ) {
 			$options['enablexmlsitemap'] = 'on';
 			update_option('wpseo', $options);
 		}
@@ -22,9 +22,6 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 	}
 	
 	function write_sitemap_loc( $f, $url, $echo = false ) {
-		// if ( $echo )
-		// 	echo $url['loc']." : ".number_format(memory_get_peak_usage()/1024).' KB<br/>';
-		
 		global $count;
 
 		if (!isset($url['mod']))
@@ -55,8 +52,18 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 
 		$f = fopen( WPSEO_UPLOAD_DIR.$filename, 'w');
 
+		$options = get_wpseo_options();
+		
+		$images_in_sitemap = false;
+		if ( isset($options['xml_include_images']) && $options['xml_include_images'] )
+			$images_in_sitemap = true;
+			
 		$output = '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="'.WPSEO_FRONT_URL.'css/xml-sitemap.xsl"?>'."\n";
-		$output .= '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n"; 
+		$output .= '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
+		if ( $images_in_sitemap )
+			$output .= 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ';
+		$output .= 	'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" '
+					.'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n"; 
 
 		fwrite($f, $output);
 		
@@ -66,8 +73,6 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		// If sitemap is regenerated manually, throw away rewrite rules to make sure /sitemap.xml is rewriting properly.
 		if ( $echo )
 			delete_option('rewrite_rules');
-		
-		$options = get_wpseo_options();
 		
 		// The stack of URL's to add to the sitemap
 		$stackedurls = array();
@@ -99,7 +104,13 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 
 			while( $typecount > $offset ) {
 				// Grab posts of $post_type
-				$posts = $wpdb->get_results("SELECT ID, post_content, post_parent, post_type, post_modified_gmt, post_date_gmt 
+
+				// If we're not going to include images, we might as well save ourselves the memory of grabbing post_content.
+				$post_content_query = '';
+				if ( $images_in_sitemap )
+					$post_content_query = "post_content,";
+				
+				$posts = $wpdb->get_results("SELECT ID, $post_content_query post_parent, post_type, post_modified_gmt, post_date_gmt 
 												FROM $wpdb->posts 
 												WHERE post_status = 'publish' 
 												AND	post_password = ''
@@ -148,50 +159,52 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 					else 
 						$url['pri'] = 0.6;
 
-					$url['images'] = array();
+					if ( $images_in_sitemap ) {
+						$url['images'] = array();
 
-					preg_match_all("|(<img [^>]+?>)|", $p->post_content, $matches, PREG_SET_ORDER);
+						preg_match_all("|(<img [^>]+?>)|", $p->post_content, $matches, PREG_SET_ORDER);
 
-					if ( count($matches) > 0 ) {
-						$tmp_img = array();
-						foreach ($matches as $imgarr) {
-							unset($imgarr[0]);
-							foreach($imgarr as $img) {
-								if ( isset( $image ) ) {
-									unset($image['title']);
-									unset($image['alt']);
-								}
-
-								// FIXME: get true caption instead of alt / title
-								$res = preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match );
-								if ($res) {
-									$image['src'] = $match[2];							
-									if ( strpos($image['src'], 'http') !== 0 ) {
-										$image['src'] = get_bloginfo('url').$image['src'];
-									}
-									if ( in_array( $image['src'], $tmp_img ) )
-										continue;
-									else
-										$tmp_img[] = $image['src'];
-
-									$res = preg_match( '/title=("|\')([^"\']+)("|\')/', $img, $match );
-									if ($res)
-										$image['title'] = str_replace('-',' ',str_replace('_',' ',$match[2]));
-
-									$res = preg_match( '/alt=("|\')([^"\']+)("|\')/', $img, $match );
-									if ($res)
-										$image['alt'] = str_replace('-',' ',str_replace('_',' ',$match[2]));
-
-									if (empty($image['title']))
+						if ( count($matches) > 0 ) {
+							$tmp_img = array();
+							foreach ($matches as $imgarr) {
+								unset($imgarr[0]);
+								foreach($imgarr as $img) {
+									if ( isset( $image ) ) {
 										unset($image['title']);
-									if (empty($image['alt']))
 										unset($image['alt']);
-									$url['images'][] = $image;
-								} 
+									}
+
+									// FIXME: get true caption instead of alt / title
+									$res = preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match );
+									if ($res) {
+										$image['src'] = $match[2];							
+										if ( strpos($image['src'], 'http') !== 0 ) {
+											$image['src'] = get_bloginfo('url').$image['src'];
+										}
+										if ( in_array( $image['src'], $tmp_img ) )
+											continue;
+										else
+											$tmp_img[] = $image['src'];
+
+										$res = preg_match( '/title=("|\')([^"\']+)("|\')/', $img, $match );
+										if ($res)
+											$image['title'] = str_replace('-',' ',str_replace('_',' ',$match[2]));
+
+										$res = preg_match( '/alt=("|\')([^"\']+)("|\')/', $img, $match );
+										if ($res)
+											$image['alt'] = str_replace('-',' ',str_replace('_',' ',$match[2]));
+
+										if (empty($image['title']))
+											unset($image['title']);
+										if (empty($image['alt']))
+											unset($image['alt']);
+										$url['images'][] = $image;
+									} 
+								}
 							}
 						}
 					}
-
+					
 					if ( !in_array( $url['loc'], $stackedurls ) ) {
 						$this->write_sitemap_loc( $f, $url, $echo );
 						$stackedurls[] = $url['loc'];
@@ -322,6 +335,9 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		
 		if ( $this->gzip_sitemap( $filename, file_get_contents( WPSEO_UPLOAD_DIR.$filename ) ) & $echo )
 			echo date('H:i:s').': <a href="'.get_bloginfo('url').'/'.$filename.'.gz">Sitemap</a> successfully gzipped.<br/>';
+			
+		if ( file_exists( ABSPATH.'/'.$filename ) )
+			unlink( ABSPATH.'/'.$filename );
 	}
 } 
 

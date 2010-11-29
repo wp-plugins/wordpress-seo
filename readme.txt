@@ -38,9 +38,45 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.1.8 =
+
+* Notice: The functionality in the post / page editor has changed quite a bit. Meta descriptions are now generated using the meta descriptions template if no meta description is entered, so it will for instance use the post excerpt, the SEO title is no longer filled automatically BUT it is properly shown in the snippet preview based on your title template. It should work faster, more intuitive and just better in general, but I do need your feedback, let me know if it's an improvement.
+	
+* Bugs fixed:
+	* Fixed a notice for non existing metadesc.
+	* Fixed several notices in title generation.
+	* Directory paths in backend now properly recognized even when erroneously set to 1.
+	* Fixed bug where frontpage title wouldn't be generated properly.
+	* Made sure unzip of settings.zip (for settings import) works properly everywhere (by getting rid of `WP_Filesystem` and `unzip_file()`, as they do not work reliably).
+	* Made sure meta descriptions are not shown on paged archives or homepages.
+	
+* Changes:
+	* Admin:
+		* Moved image used in news widget into images directory instead of loading from CDN to prevent https issues.
+	* Breadcrumbs:
+		* Creating proper breadcrumbs for daily archives now (linking back to month archives).
+	* Post / Page edit box:
+		* Meta description now properly generated using template for that particular post_type.
+		* SEO Title is no longer auto filled, if you leave it empty "normal" title template generation is used.
+		* Several improvements to javascripts.
+	* Titles, Meta descriptions & Canonicals:
+		* Speed up of variable replacement for titles and meta descriptions.
+		* In fallback titles (when there's no template), plugin now sticks to `$sep` defined in `wp_title`.
+		* Now properly generating canonical links for date archives.
+		* The %%date%% variable now works properly on date archives too.
+		* Added new filter to make title work properly on HeadWay 2.0.5 and up.
+		* Fixed canonical and permalink redirection for paginated pages and posts (props to @rrolfe for finding the bug and coming up with first patch).
+	* XML Sitemaps:
+		* During sitemap generation, plugin now checks whether old sitemap.xml or sitemap.xml.gz files exist in root and deletes those if so.
+		* Made including images optional.
+		* Made it possible to pick which search engines to ping.
+		* Fix in XSL path generation on HTTPS admin backends when frontend is normal HTTP.
+		* XML Sitemap update on post publish now actually works properly.
+		* No longer are XML Sitemaps enabled automatically when publishing a post (sorry about that).
+	
 = 0.1.7.1 =
 
-* Apparently is_network_admin() didn't exist before WP 3.1. D0h!!!
+* Apparently `is_network_admin()` didn't exist before WP 3.1. D0h!!!
 
 = 0.1.7 =
 
@@ -50,7 +86,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Bug in directory creation that would create the directory correctly but still throw an error and save the path wrongly to options.
 	* Dismissing Blog public warning was only possible on SEO pages, now it's possible everywhere.
 	* Excerpts, when used in description, are now properly sanitized from tags and shortcodes.
-	* Properly fallback to $wp_query->get_queried_object() instead of get_queried_object() for < 3.1 installs.
+	* Properly fallback to `$wp_query->get_queried_object()` instead of `get_queried_object()` for < 3.1 installs.
 	* Fixed several bugs in title generation, making it more stable and faster in the process.
 	* Properly escape entities in page titles, both in front end and in posts overview.
 	
@@ -144,6 +180,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Added plugin version number to "branding" comment to help in bug fixing.
 	
 = 0.1.2.1 =
+
 * Added a missing ) to prevent death on install / going into wp-admin.
 
 = 0.1.2 =
@@ -219,3 +256,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 * Initial beta release.
 
+== Upgrade Notice ==
+
+= 0.1.8 =
+Several fixes to how SEO title is handled and generated to make editor faster and more intuitive.

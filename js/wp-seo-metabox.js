@@ -81,20 +81,22 @@ function testfocuskw() {
 	var p2 = new RegExp(focuskw.replace(/\s+/g,"[-_\\/]"),'gim');
 	if (focuskw != '') {
 		var html = '<p>Your focus keyword was found in:<br/>';
-		html += 'Page title: ' + ptest( jQuery('#title').val(), p ) + '<br/>';
-		html += 'SEO title: ' + ptest( jQuery('#yoast_wpseo_title').val(), p ) + '<br/>';
-		html += 'Page URL: ' + ptest( jQuery('#editable-post-name-full').text(), p2 ) + '<br/>';
+		html += 'Article Heading: ' + ptest( jQuery('#title').val(), p ) + '<br/>';
+		html += 'Page title: ' + ptest( jQuery('#snippet .title').text(), p ) + '<br/>';
+		html += 'Page URL: ' + ptest( jQuery('#snippet .url').text(), p2 ) + '<br/>';
 		html += 'Content: ' + ptest( jQuery('#content').val(), p ) + '<br/>';
-		html += 'Meta description: ' + ptest( jQuery('#yoast_wpseo_metadesc').val(), p );
+		html += 'Meta description: ' + ptest( jQuery('#wpseo_hidden_metadesc').text(), p );
 		html += '</p>';
 		jQuery('#focuskwresults').html(html);
 	}
-	
-	return focuskw;
+	updateSnippet( focuskw );
 }
 
 function updateTitleLength() {
 	var title = jQuery('#yoast_wpseo_title').val();
+	if ( !title || title == "" )
+		title = jQuery('#snippet .title').text();
+
 	var len = 70 - title.length;
 	if (len < 0)
 		len = '<span class="wrong">'+len+'</span>';
@@ -104,7 +106,16 @@ function updateTitleLength() {
 }
 
 function updateDescLength() {
-	
+	var desc = jQuery("#yoast_wpseo_metadesc").val();
+	if ( !desc || desc == "" )
+		desc = jQuery("#snippet .desc span").text();
+		
+	var len = wpseo_meta_desc_length - desc.length;
+	if (len < 0)
+		len = '<span class="wrong">'+len+'</span>';
+	else
+		len = '<span class="good">'+len+'</span>';
+	jQuery('#yoast_wpseo_metadesc-length').html(len);
 }
 
 function getAutogenTitle( force ) {
@@ -113,56 +124,91 @@ function getAutogenTitle( force ) {
 	if ( jQuery('#yoast_wpseo_title').val() != '' && !force ) {
 		return false;
 	}
+	title =jQuery('#title').val();
 	var data = {
 		action: 'wpseo_autogen_title',
-		curtitle: jQuery('#title').val(),
+		curtitle: title,
 		post_type: jQuery('#post_type').val(),
 		postid: jQuery('#post_ID').val()
 	}
-	jQuery.post(ajaxurl, data, function(response) {
-		jQuery('#yoast_wpseo_title').val( response );
-		updateSnippet();
+	jQuery.post(ajaxurl, data, function( response ) {
+		var title = response;
+		if ( force ) {
+			jQuery('#yoast_wpseo_title').val( title );
+		}
+		jQuery('#snippet .title').text( title );
 		updateTitleLength();
+		testfocuskw();
 	});	
+	if ( title && title != '' )
+		return title;
+	return false;
 }
 
-function updateSnippet() {
-	focuskw = jQuery.trim( jQuery('#yoast_wpseo_focuskw').val() );
+function getAutogenDesc() {
+	var desc = jQuery("#yoast_wpseo_metadesc").val();
+	jQuery("#snippet .desc span").css('color','#000000');
+	if ( !desc || desc == '' ) {
+		var data = {
+			action: 'wpseo_autogen_metadesc',
+			post_content: jQuery('#content').val(),
+			post_excerpt: jQuery('#excerpt').val(),
+			post_type: jQuery('#post_type').val(),
+			postid: jQuery('#post_ID').val()
+		}
+		jQuery.post(ajaxurl, data, function( response ) {
+			if ( response.length > 0 && response != '' ) {
+				jQuery('#snippet .desc span').text( response );
+				jQuery('#wpseo_hidden_metadesc').text( response );
+				updateDescLength();
+				testfocuskw();
+				updateSnippet();
+			} else {
+				jQuery('#snippet .desc span').text( '' );
+				jQuery('#wpseo_hidden_metadesc').text( '' );
+				updateDescLength();
+				testfocuskw();
+				updateSnippet();
+			}
+		});
+	} else {
+		jQuery('#snippet .desc span').text( desc );
+		jQuery('#wpseo_hidden_metadesc').text( desc );
+		updateDescLength();
+		testfocuskw();
+		updateSnippet();
+	}
+}
 
-	if ( !focuskw.length > 0 )
-		focuskw = 'yoast';
+function updateSnippet( focuskw ) {
+	if ( !focuskw || focuskw == '' ) {
+		focuskw = jQuery.trim( jQuery('#yoast_wpseo_focuskw').val() );
+	}
 	if ( focuskw.search(' ') != -1 ) {
 		var keywords 	= focuskw.split(' ');
 	} else {
 		var keywords	= new Array(focuskw);
 	}
-	var url 	= jQuery('#sample-permalink').text().replace('http://','');
-	var title 	= jQuery("#yoast_wpseo_title").val();
-	if ( !title || !title.length > 0 ) {
-		if (jQuery("#yoast_wpseo_title").val() == '') {
-			getAutogenTitle();
-		}
-	}
-	if ( !title )
-		return;
-	var desc	= jQuery("#yoast_wpseo_metadesc").val();
-	if ( !desc.length > 0 ) {
-		desc = jQuery("#editorcontainer #content").val();
-		desc = yst_strip_tags( desc );
-		if (jQuery("#snippet").hasClass('video'))
-			var desclen = 130;
-		else
-			var desclen = 150;
+	var url	 	= jQuery('#sample-permalink').text().replace('http://','');
+	if ( jQuery("#yoast_wpseo_title").val() )
+		var title 	= jQuery("#yoast_wpseo_title").val();
+	else
+		var title 	= jQuery("#snippet .title").text();
 
-		var descsearch = new RegExp( focuskw, 'i');
+	desc = jQuery("#snippet .desc span").text();
+	
+	if ( !desc || desc.length < 1 ) {
+		desc = jQuery("#content").val();
+		desc = yst_strip_tags( desc );
+		var descsearch = new RegExp( focuskw, 'gim');
 		if ( desc.search(descsearch) != -1 ) {
-			var descstart  = ( desclen - focuskw.length ) / 2;
-			descstart = Math.round( descstart );
-			desc = desc.substr( descstart, desclen );
+			desc = desc.substr( desc.search(descsearch), wpseo_meta_desc_length );
 		} else {
-			desc = desc.substr(0, desclen);
+			desc = desc.substr(0, wpseo_meta_desc_length );
 		}
+		jQuery("#snippet .desc span").css('color','#777777');
 	}
+	
 	for (var i in keywords) {
 		var urlfocuskw 	= keywords[i].replace(' ','-').toLowerCase();
 		focuskwregex 	= new RegExp( '('+keywords[i]+')', 'gim');
@@ -181,26 +227,19 @@ jQuery(document).ready(function(){
 	jQuery('#related_keywords_heading').hide();
 	
 	jQuery('#yoast_wpseo_title').keyup(function() {
-		updateSnippet();
-		updateTitleLength();
-	}).keyup();
+		if ( jQuery(this).val() == '' )
+			getAutogenTitle();
+		testfocuskw();
+	});
 	
 	jQuery('#yoast_wpseo_metadesc').keyup(function() {
-		var len = 160 - jQuery('#yoast_wpseo_metadesc').val().length;
-		if (len < 0)
-			out = '<span class="wrong">'+len+'</span>';
-		else
-			out = '<span class="good">'+len+'</span>';
-		jQuery('#yoast_wpseo_description-length').html(out);
-		if (len > 80 && len < 160)
-			jQuery('#yoast_wpseo_metadesc_notice').html(' <p class="warn">Notice: You might want to make your description a bit longer, this\'ll only stretch one line.</p>');
-		else
-			jQuery('#yoast_wpseo_metadesc_notice').html('');
-		updateSnippet();
-	}).keyup();
+		getAutogenDesc();
+		updateDescLength();
+		testfocuskw();
+	});
 	
 	jQuery('#yoast_wpseo_focuskw').change(function() {
-		jQuery.getJSON('http://www.google.com/complete/search?hl='+lang+'&qu='+jQuery(this).val()+'&callback=?', function (data) {
+		jQuery.getJSON('http://www.google.com/complete/search?hl='+wpseo_lang+'&qu='+jQuery(this).val()+'&callback=?', function (data) {
 			var suggested = new Array();
 			for (x in data[1]) {
 				suggested[x] = data[1][x][0];
@@ -208,21 +247,27 @@ jQuery(document).ready(function(){
 			jQuery("#yoast_wpseo_focuskw").autocomplete(suggested, { selectFirst: false } );
 		});
 		testfocuskw();
-	}).change();
+	});
+	jQuery('#excerpt').change(function() {
+		getAutogenDesc();
+	});
 	jQuery('#content').change(function() {
-		updateSnippet();
-	}).change();
+		getAutogenDesc();
+		testfocuskw();
+	});
 	jQuery('#tinymce').change(function() {
-		updateSnippet();
-	}).change();
+		testfocuskw();
+	});
 	jQuery('#titlewrap #title').change(function() {
 		getAutogenTitle();
-	}).change();
+		testfocuskw();
+		updateTitleLength();
+	});
 	jQuery('#sample-permalink').change( function() {
-		updateSnippet();
+		testfocuskw();
 	});
 	jQuery('#yoast_wpseo_focuskw').change( function() {
-		updateSnippet();
+		testfocuskw();
 		jQuery('#wpseo_relatedkeywords').show();
 		jQuery('#related_keywords_heading').hide();
 		jQuery('#wpseo_tag_suggestions').html('');
@@ -253,7 +298,7 @@ jQuery(document).ready(function(){
 			return false;
 		jQuery.getJSON("http://boss.yahooapis.com/ysearch/web/v1/"+jQuery('#yoast_wpseo_focuskw').val()+"?"
 			+"appid=NTPCcr7V34Gspq8myEAxcQZs2w.WLOE2a2z.p.1WjSc_u5XQn9xnf8n_N9oOCOs-"
-			+"&lang="+lang
+			+"&lang="+wpseo_lang
 			+"&format=json"
 			+"&count=50"
 			+"&view=keyterms"
@@ -285,4 +330,7 @@ jQuery(document).ready(function(){
 		jQuery(this).hide();
 		return false;
 	});
+	
+	getAutogenDesc();
+	getAutogenTitle();
 });

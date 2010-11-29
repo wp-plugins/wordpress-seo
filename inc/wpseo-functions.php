@@ -37,6 +37,27 @@ function get_wpseo_options() {
 }
 
 function wpseo_replace_vars($string, $args) {
+	// Let's see if we can bail super early.
+	if ( strpos( $string, '%%' ) === false )
+		return trim( preg_replace('/\s+/',' ', $string) );
+
+	$simple_replacements = array(
+		'%%sitename%%'				=> get_bloginfo('name'),
+		'%%sitedesc%%'				=> get_bloginfo('description'),
+		'%%currenttime%%'			=> date('H:i'),
+		'%%currentdate%%'			=> date('M jS Y'),
+		'%%currentmonth%%'			=> date('F'),
+		'%%currentyear%%'			=> date('Y'),
+	);
+
+	foreach ($simple_replacements as $var => $repl) {
+		$string = str_replace($var, $repl, $string);
+	}
+	
+	// Let's see if we can bail early.
+	if ( strpos( $string, '%%' ) === false )
+		return trim( preg_replace('/\s+/',' ', $string) );
+
 	global $wp_query;
 	
 	$defaults = array(
@@ -50,6 +71,7 @@ function wpseo_replace_vars($string, $args) {
 		'post_modified' => '',
 		'post_title' => '',
 		'taxonomy' => '',
+		'term_id' => '',
 	);
 	
 	$pagenum = get_query_var('paged');
@@ -61,13 +83,16 @@ function wpseo_replace_vars($string, $args) {
 	}
 	
 	$r = (object) wp_parse_args($args, $defaults);
+
+	// Only global $post on single's, otherwise some expressions will return wrong results.
+	if ( is_singular() ) {
+		global $post;
+		$post = $r;
+	}
 	
 	$replacements = array(
-		'%%date%%' 					=> $r->post_date,
+		'%%date%%' 					=> ( get_query_var('day') != '' ) ? get_the_date() : ( ( single_month_title(' ', false) != '' ) ? single_month_title(' ', false) : get_query_var('year') ),
 		'%%title%%'					=> stripslashes( $r->post_title ),
-		'%%sitename%%'				=> get_bloginfo('name'),
-		'%%sitedesc%%'				=> get_bloginfo('description'),
-		// '%%excerpt%%'				=> ( !empty($r->post_excerpt) ) ? strip_tags( $r->post_excerpt ) : substr( wp_trim_excerpt( strip_shortcodes( strip_tags( $r->post_content ) ) ), 0, 155 ),
 		'%%excerpt%%'				=> ( !empty($r->post_excerpt) ) ? strip_tags( $r->post_excerpt ) : substr( strip_shortcodes( strip_tags( $r->post_content ) ), 0, 155 ),
 		'%%excerpt_only%%'			=> strip_tags( $r->post_excerpt ),
 		'%%category%%'				=> ( !empty($r->ID) && get_the_category_list('','',$r->ID) != '' ) ? get_the_category_list('','',$r->ID) : $r->name,
@@ -81,10 +106,6 @@ function wpseo_replace_vars($string, $args) {
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
 		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
 		'%%searchphrase%%'			=> esc_html(get_query_var('s')),
-		'%%currenttime%%'			=> date('H:i'),
-		'%%currentdate%%'			=> date('M jS Y'),
-		'%%currentmonth%%'			=> date('F'),
-		'%%currentyear%%'			=> date('Y'),
 		'%%page%%'		 			=> ( get_query_var('paged') != 0 ) ? 'Page '.get_query_var('paged').' of '.$wp_query->max_num_pages : '', 
 		'%%pagetotal%%'	 			=> ( $wp_query->max_num_pages > 1 ) ? $wp_query->max_num_pages : '', 
 		'%%pagenumber%%' 			=> $pagenum,
@@ -95,7 +116,7 @@ function wpseo_replace_vars($string, $args) {
 		$string = str_replace($var, $repl, $string);
 	}
 	
-	return $string;
+	return trim( preg_replace('/\s+/',' ', $string) );
 }
 
 function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
@@ -113,7 +134,7 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 function wpseo_dir_setup() {
 	$options = get_option('wpseo');
 	
-	if ( isset( $options['wpseodir'] ) && $options['wpseodir'] ) {
+	if ( isset( $options['wpseodir'] ) && strlen( $options['wpseodir'] ) > 1 ) {
 		$wpseodir = $options['wpseodir'];
 		$wpseourl = $options['wpseourl'];
 	} else {

@@ -161,7 +161,13 @@ class WPSEO_Breadcrumbs {
 					$bc = $opt['breadcrumbs-archiveprefix'];
 				else
 					$bc = __('Archives for');
-				$output .= $this->bold_or_not($bc." ".single_month_title(' ',false));
+				if ( is_day() ) {
+					global $wp_locale;
+					$output .= '<a href="'.get_month_link( get_query_var('year'), get_query_var('monthnum') ).'">'.$wp_locale->get_month( get_query_var('monthnum') ).' '.get_query_var('year').'</a> '.$sep.' ';
+					$output .= $this->bold_or_not( $bc." ".get_the_date() );
+				} else {
+					$output .= $this->bold_or_not($bc." ".single_month_title(' ',false));
+				}
 			} elseif ( is_author() ) {
 				if ( isset($opt['breadcrumbs-archiveprefix']) )
 					$bc = $opt['breadcrumbs-archiveprefix'];

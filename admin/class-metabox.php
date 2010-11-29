@@ -2,6 +2,9 @@
 
 class WPSEO_Metabox {
 	
+	var $wpseo_meta_length = 155;
+	var $wpseo_meta_length_reason = '';
+	
 	function WPSEO_Metabox() {
 		add_action('admin_print_scripts', array(&$this,'scripts'));
 		add_action('admin_print_styles', array(&$this,'styles'));	
@@ -12,16 +15,15 @@ class WPSEO_Metabox {
 
 		// When permalink structure is changed, sitemap should be regenerated
 		add_action('permalink_structure_changed', array(&$this,'rebuild_sitemap') );
+		add_action('publish_post', array(&$this,'rebuild_sitemap') );
 
-		add_action('admin_menu', array(&$this,'yoast_wpseo_create_meta_box'));
-		add_action('save_post', array(&$this,'yoast_wpseo_save_postdata'));
+		add_action('admin_menu', array(&$this,'create_meta_box') );
+		add_action('save_post', array(&$this,'save_postdata') );
 		
-		add_action('save_post', array(&$this,'update_video_meta'));
-	
-		add_filter('manage_page_posts_columns',array(&$this,'yoast_wpseo_page_title_column_heading'),10,1);
-		add_filter('manage_post_posts_columns',array(&$this,'yoast_wpseo_page_title_column_heading'),10,1);
-		add_action('manage_pages_custom_column',array(&$this,'yoast_wpseo_page_title_column_content'), 10, 2);
-		add_action('manage_posts_custom_column',array(&$this,'yoast_wpseo_page_title_column_content'), 10, 2);
+		add_filter('manage_page_posts_columns',array(&$this,'page_title_column_heading'),10,1);
+		add_filter('manage_post_posts_columns',array(&$this,'page_title_column_heading'),10,1);
+		add_action('manage_pages_custom_column',array(&$this,'page_title_column_content'), 10, 2);
+		add_action('manage_posts_custom_column',array(&$this,'page_title_column_content'), 10, 2);
 
 		add_action('get_inline_data',array(&$this,'yoast_wpseo_inline_edit'));
 	}
@@ -32,7 +34,6 @@ class WPSEO_Metabox {
 		if (in_array($pagenow, array('post.php', 'page.php', 'post-new.php'))) {
 			wp_enqueue_script('jquery-bgiframe', WPSEO_URL.'js/jquery.bgiframe.min.js', array('jquery'));
 			wp_enqueue_script('jquery-autocomplete', WPSEO_URL.'js/jquery.autocomplete.min.js', array('jquery'));
-			// wp_enqueue_script('html5-placeholder', WPSEO_URL.'js/html5placeholder.jquery.min.js', array('jquery'));
 			wp_enqueue_script('wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-bgiframe','jquery-autocomplete'));
 		} elseif ($pagenow == 'edit.php') {
 			wp_enqueue_script('jquery-bgiframe', WPSEO_URL.'js/inline-edit.js',array('jquery'));
@@ -55,7 +56,7 @@ class WPSEO_Metabox {
 			"std" => "",
 			"type" => "text",
 			"title" => __("SEO Title"),
-			"description" => __('<div class="alignright" style="padding:5px;"><a class="button" href="#" id="wpseo_regen_title">'.__('Regenerate SEO title').'</a></div><p>'."The SEO title is limited to 70 chars, <span id='yoast_wpseo_title-length'></span> chars left. It's used in the <code>&lt;title&gt;</code> tag, unlike the page title, which is used on the page itself. This overwrites the post type's title template.".'</p>'));
+			"description" => __('<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title').'</a></div><p>'."Title display in search engines is limited to 70 chars, <span id='yoast_wpseo_title-length'></span> chars left.<br/>If the SEO Title is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>title template</a>.".'</p>'));
 		$mbs['metadesc'] = array(
 			"name" => "metadesc",
 			"std" => "",
@@ -64,7 +65,7 @@ class WPSEO_Metabox {
 			"title" => __("Meta Description"),
 			"rows" => 2,
 			"richedit" => false,
-			"description" => "The <code>meta</code> description is limited to 160 chars, <span id='yoast_wpseo_description-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"
+			"description" => "The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
 		);
 		$mbs['focuskw'] = array(
 			"name" => "focuskw",
@@ -72,8 +73,6 @@ class WPSEO_Metabox {
 			"type" => "text",
 			"title" => __("Focus Keyword"),
 			"description" => "<div class='alignright' style='width: 300px;'>"
-			."<a class='preview button' id='wpseo_retestfocus' href='#'>".__('(Re-)test focus keyword')."</a>"
-			."<br/><br/><br/>"
 			."<a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a> "
 			."<p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
 		);
@@ -188,43 +187,39 @@ class WPSEO_Metabox {
 		return $mbs;
 	}
 
-	function yoast_wpseo_meta_boxes() {
+	function meta_boxes() {
 		global $post;
 
-		echo '<script type="text/javascript">
-			var lang = "'.substr(get_locale(),0,2).'";
-		</script>';
-
-		// echo '<pre>'.print_r(get_post_custom($post->ID),1).'</pre>';
-		// echo '<pre>'.print_r(get_post($post->ID),1).'</pre>';
+		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', 155);
+		
 		$date = '';
 		if ($post->post_type == 'post') {
 			if ( isset($post->post_date) )
 				$date = date('M j, Y', strtotime($post->post_date));
 			else 
 				$date = date('M j, Y');
+
+			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
+			$this->wpseo_meta_length_reason = ' (because of date display)';
 		}
+		
+		echo '<script type="text/javascript">
+			var wpseo_lang = "'.substr(get_locale(),0,2).'";
+			var wpseo_meta_desc_length = '.$this->wpseo_meta_length.';
+		</script>
+		<div class="hidden" id="wpseo_hidden_metadesc"></div>';
 		
 		echo '<table class="yoasttable">';
 		
 		$title = yoast_get_value('title');
-		if (empty($title))
-			$title = $post->post_title;
-		if (empty($title))
-			$title = "temp title";
-			
 		$desc = yoast_get_value('metadesc');
-		if (empty($desc))
-			$desc = substr(strip_tags($post->post_content), 0, 130).' ...';
-		if (empty($desc))
-			$desc = 'temp description';
 			
 		$slug = $post->post_name;
 		if (empty($slug))
 			$slug = sanitize_title($title);
 		
 ?>
-	<tr>
+	<tr id="snippetpreview">
 		<th><label>Snippet Preview:</label></th>
 		<td>
 <?php 
@@ -262,25 +257,30 @@ class WPSEO_Metabox {
 <?php
 	
 		foreach($this->get_meta_boxes($post->post_type) as $meta_box) {
-			$this->yoast_wpseo_do_meta_box( $meta_box );
+			$this->do_meta_box( $meta_box );
 		}  
 		echo '</table>';
 	}
 
-	function yoast_wpseo_create_meta_box() {  
+	function create_meta_box() {  
 		if ( function_exists('add_meta_box') ) {  
-			foreach (get_post_types() as $posttype) {
-				add_meta_box( 'yoast-wpseo-meta-box', 'Yoast WordPress SEO', array(&$this, 'yoast_wpseo_meta_boxes'), $posttype, 'normal', 'high' );  
+			foreach ( get_post_types() as $posttype ) {
+				if ( in_array( $posttype, array('revision','nav_menu_item','post_format','attachment') ) )
+					continue;
+				add_meta_box( 'yoast-wpseo-meta-box', 'WordPress SEO', array(&$this, 'meta_boxes'), $posttype, 'normal', 'high' );  
 			}
 		}  
 	}
 
-	function yoast_wpseo_save_postdata( $post_id ) {  
+	function save_postdata( $post_id ) {  
 		if ($post_id == null || empty($_POST))
 			return;
 
+		if ( wp_is_post_revision( $post_id ) )
+			$post_id = wp_is_post_revision( $post_id );
+			
 		global $post;  
-		if (empty($post))
+		if ( empty( $post ) )
 			$post = get_post($post_id);
 
 		foreach($this->get_meta_boxes($post->post_type) as $meta_box) {  
@@ -326,51 +326,22 @@ class WPSEO_Metabox {
 				delete_post_meta($post_id, $option, $oldval);  
 		}  
 		do_action('wpseo_saved_postdata');
-		$this->rebuild_sitemap();
 	}
 
-	function update_video_meta($post_id, $post = null) {
-		$options = get_wpseo_options();
-		if ( !isset($options['enablexmlvideositemap']) || !$options['enablexmlvideositemap'] )
-			return;
-			
-		if (!is_object($post))
-			$post = get_post($post_id);
-			
-		if ( !wp_is_post_revision($post) ) {
-			require_once WPSEO_PATH.'/sitemaps/xml-sitemap-base-class.php';
-			$wpseo_xml_base = new WPSEO_XML_Sitemap_Base();
-			$wpseo_xml_base->update_video_meta($post);
-			// echo '<pre>'.print_r(yoast_get_value( 'video_meta', $post->ID ), 1).'</pre>';			
-		}
-	}
-	
-	function rebuild_sitemap() {
+	function rebuild_sitemap( $post ) {
 		global $wpseo_generate, $wpseo_echo;
 		$wpseo_generate = true;
 		$wpseo_echo = false;
 		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
 	}
 
-	function ping_feed() {
-		// require_once WPSEO_PATH.'/sitemaps/feed-class.php';
-	}
-	
-	function rebuild_news_sitemap() {
-		// require_once WPSEO_PATH.'/sitemaps/xml-news-sitemap-class.php';
-	}
-
-	function rebuild_video_sitemap() {
-		// require_once WPSEO_PATH.'/sitemaps/xml-video-sitemap-class.php';
-	}
-
-	function yoast_wpseo_page_title_column_heading( $columns ) {
+	function page_title_column_heading( $columns ) {
 		return array_merge(array_slice($columns, 0, 2), array('page-title' => 'WP SEO Title'), array_slice($columns, 2, 6), array('page-meta-robots' => 'Robots Meta'));
 	}
 
-	function yoast_wpseo_page_title_column_content( $column_name, $id ) {
+	function page_title_column_content( $column_name, $id ) {
 		if ( $column_name == 'page-title' ) {
-			echo esc_html( $this->wpseo_page_title($id) );
+			echo esc_html( $this->page_title($id) );
 		}
 		if ( $column_name == 'page-meta-robots' ) {
 			$robots 			= array();
@@ -386,7 +357,7 @@ class WPSEO_Metabox {
 		}
 	}
 
-	function yoast_wpseo_do_meta_box( $meta_box ) {
+	function do_meta_box( $meta_box ) {
 		global $post;
 		if (!isset($meta_box['name'])) {
 			$meta_box['name'] = '';
@@ -485,14 +456,14 @@ class WPSEO_Metabox {
 		}
 	}
 	
-	function wpseo_page_title( $postid ) {
+	function page_title( $postid ) {
 		$fixed_title = yoast_get_value('title', $postid );
 		if ($fixed_title) {
 			return $fixed_title;
 		} else {
 			$post = get_post( $postid );
 			$options = get_wpseo_options();
-			if (!empty($options['title-'.$post->post_type]))
+			if ( isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
 				return wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );				
 			else
 				return wpseo_replace_vars('%%title%%', (array) $post );				

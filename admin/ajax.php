@@ -18,13 +18,15 @@ add_action('wp_ajax_wpseo_set_ignore', 'wpseo_set_ignore');
 
 function wpseo_autogen_title_callback() {
 	$options = get_wpseo_options();
-	$p['post_title'] = trim(stripslashes($_POST['curtitle']));
-	if ( empty($p['post_title']) )
+	$p = get_post( $_POST['postid'] );
+	$p->post_title = trim( stripslashes($_POST['curtitle']) );
+	if ( empty($p->post_title) )
 		die();
 	if ( isset($options['title-'.$_POST['post_type']]) && $options['title-'.$_POST['post_type']] != '' )
-		echo wpseo_replace_vars($options['title-'.$_POST['post_type']], $p );
+		$title = wpseo_replace_vars($options['title-'.$_POST['post_type']], $p );
 	else
-		echo $p['post_title'] . ' - ' .get_bloginfo('name'); 
+		$title = $p->post_title . ' - ' .get_bloginfo('name'); 
+	echo trim( preg_replace( '/\s+/', ' ', $title ) );
 	die();
 }
 add_action('wp_ajax_wpseo_autogen_title', 'wpseo_autogen_title_callback');
@@ -32,9 +34,9 @@ add_action('wp_ajax_wpseo_autogen_title', 'wpseo_autogen_title_callback');
 // TODO: make this actually work and used in post editor.
 function wpseo_autogen_metadesc_callback() {
 	$options = get_wpseo_options();
-	$p['post_content'] = trim(stripslashes($_POST['content']));
-	if ( empty($p['post_content']) )
-		die();
+	$p = get_post( $_POST['postid'] );
+	$p->post_content = trim( stripslashes( $_POST['post_content'] ) );
+	$p->post_excerpt = trim( stripslashes( $_POST['post_excerpt'] ) );
 	if ( isset($options['metadesc-'.$_POST['post_type']]) && $options['metadesc-'.$_POST['post_type']] != '' )
 		echo wpseo_replace_vars($options['metadesc-'.$_POST['post_type']], $p );
 	die();
