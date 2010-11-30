@@ -1,11 +1,11 @@
-=== WordPress SEO ===
+=== WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer
 Requires at least: 3.0
 Tested up to: 3.1
 
-WordPress SEO is an all in one solution to search engine optimize your WordPress blog: SEO titles, meta descriptions, XML sitemaps & much more.
+Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
 == Description ==
 
@@ -38,6 +38,15 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= =
+
+* Bugs fixed:
+	* Chars left counter works again as you type in title and SEO title.
+	* No longer error out when unable to delete sitemap files in site root.
+
+* Changes:
+	* Plugin now properly reports which sitemap files are blocking it from working properly and asks you to delete them if it can't delete them itself.
+	
 = 0.1.8 =
 
 * Notice: The functionality in the post / page editor has changed quite a bit. Meta descriptions are now generated using the meta descriptions template if no meta description is entered, so it will for instance use the post excerpt, the SEO title is no longer filled automatically BUT it is properly shown in the snippet preview based on your title template. It should work faster, more intuitive and just better in general, but I do need your feedback, let me know if it's an improvement.
