@@ -229,6 +229,7 @@ jQuery(document).ready(function(){
 	jQuery('#yoast_wpseo_title').keyup(function() {
 		if ( jQuery(this).val() == '' )
 			getAutogenTitle();
+		updateTitleLength();
 		testfocuskw();
 	});
 	
@@ -250,6 +251,7 @@ jQuery(document).ready(function(){
 	});
 	jQuery('#excerpt').change(function() {
 		getAutogenDesc();
+		updateDescLength();
 	});
 	jQuery('#content').change(function() {
 		getAutogenDesc();

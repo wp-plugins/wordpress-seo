@@ -38,14 +38,33 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
-= =
+= 0.2 =
 
 * Bugs fixed:
 	* Chars left counter works again as you type in title and SEO title.
 	* No longer error out when unable to delete sitemap files in site root.
+	* Fixed error when `memory_get_peak_usage` doesn't exist (below PHP 5.2).
+	* Fixed error when Yoast News feed couldn't be loaded.
+	* Fix for people who agressively empty their dashboards.
+	* Permalink redirect fix for paginated searches.
 
 * Changes:
 	* Plugin now properly reports which sitemap files are blocking it from working properly and asks you to delete them if it can't delete them itself.
+	* Some cosmetic fixes to dashboard widget.
+	* Removed some old links to Yoast CDN and replaced with images shipped with plugin, for SSL backends.
+	* New general settings panel on WPSEO Dashboard which allows you to disable WordPress SEO box on certain post types.
+	* Option to use focus keyword in title, meta description and keyword templates.
+	* Changed the hook for the permalink cleaning from `get_header` to `template_redirect`, which means it redirects faster and is less error prone.
+	
+* New Features:
+	* Added option to export taxonomy metadata (PHP 5.2+ only for now).
+	* Meta keywords are now an option... I don't like them but there's sufficient demand apparently. Works for homepage, post types, author pages and taxonomies.
+	* Added an option to disable the advanced part of the edit post / page metabox.
+	* Added option to disable date display in snippet preview for posts.
+	* Multisite Network Admin page added, with three features:
+		* The option to make WordPress SEO only accessible to Super admins instead of site admins.
+		* The option to set a "default" site, from which new sites will henceforth acquire their settings on creation.
+		* The option to revert a site to the "default" site's settings.
 	
 = 0.1.8 =
 
@@ -266,6 +285,9 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 * Initial beta release.
 
 == Upgrade Notice ==
+
+= 0.2 =
+Upgrade to 0.2 now to get: MultiSite compatibility. Meta Keywords added. Several bugs fixed, speed optimizations and the option to disable the WP SEO edit boxes on specific post types & more.
 
 = 0.1.8 =
 Several fixes to how SEO title is handled and generated to make editor faster and more intuitive.

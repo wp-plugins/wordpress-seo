@@ -10,25 +10,42 @@ class WPSEO_XML_Sitemap_Base {
 	
 	function write_sitemap( $filename, $output ) {
 		$f = fopen( WPSEO_UPLOAD_DIR.$filename, 'w+');
-		fwrite($f, $output);
-		fclose($f);
+		if ( $f ) {
+			fwrite($f, $output);
+			fclose($f);
 
-		if ( file_exists( ABSPATH.'/'.$filename ) )
-			unlink( ABSPATH.'/'.$filename );
-
-		if ( $this->gzip_sitemap( $filename, $output ) )
-			return true;
+			if ( file_exists( ABSPATH.$filename ) ) {
+				$return = @unlink( ABSPATH.$filename );
+				
+				if (!$return) {
+					$options = get_option('wpseo');
+					$options['blocking_files'][] = ABSPATH.$filename;
+					update_option( 'wpseo', $options );
+				}
+			}
+			
+			if ( $this->gzip_sitemap( $filename, $output ) )
+				return true;
+		}
 		return false;
 	}
 	
 	function gzip_sitemap( $filename, $output ) {
-		$f = fopen( WPSEO_UPLOAD_DIR . $filename . '.gz', "w" );
+		$filename = $filename . '.gz';
+		$f = fopen( WPSEO_UPLOAD_DIR . $filename, "w" );
 		if ( $f ) {
 			fwrite( $f, gzencode( $output , 9 ) );
 			fclose( $f );
 			
-			if ( file_exists( ABSPATH.'/'.$filename.'.gz' ) )
-				unlink( ABSPATH.'/'.$filename.'.gz' );
+			if ( file_exists( ABSPATH.$filename ) ) {
+				$return = @unlink( ABSPATH.$filename );
+				
+				if (!$return) {
+					$options = get_option('wpseo');
+					$options['blocking_files'][] = ABSPATH.$filename;
+					update_option( 'wpseo', $options );
+				}
+			}
 			
 			return true;
 		} 

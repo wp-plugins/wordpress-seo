@@ -35,8 +35,12 @@ add_action('wp_ajax_wpseo_autogen_title', 'wpseo_autogen_title_callback');
 function wpseo_autogen_metadesc_callback() {
 	$options = get_wpseo_options();
 	$p = get_post( $_POST['postid'] );
-	$p->post_content = trim( stripslashes( $_POST['post_content'] ) );
-	$p->post_excerpt = trim( stripslashes( $_POST['post_excerpt'] ) );
+
+	if ( isset( $_POST['post_content'] ) )
+		$p->post_content = trim( stripslashes( $_POST['post_content'] ) );
+	if ( isset( $_POST['post_excerpt'] ) )
+		$p->post_excerpt = trim( stripslashes( $_POST['post_excerpt'] ) );
+		
 	if ( isset($options['metadesc-'.$_POST['post_type']]) && $options['metadesc-'.$_POST['post_type']] != '' )
 		echo wpseo_replace_vars($options['metadesc-'.$_POST['post_type']], $p );
 	die();
@@ -52,10 +56,10 @@ function wpseo_ajax_generate_sitemap_callback() {
 		$wpseo_generate = true;
 		$wpseo_echo = true;
 		
-		$mem_before = memory_get_peak_usage() / 1024;
+		$mem_before = function_exists('memory_get_peak_usage') ? memory_get_peak_usage() : memory_get_usage();
 		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
-		$mem_after = memory_get_peak_usage() / 1024;
-		echo number_format($mem_after - $mem_before).'KB of memory used.';
+		$mem_after = function_exists('memory_get_peak_usage') ? memory_get_peak_usage() : memory_get_usage();
+		echo number_format( ($mem_after - $mem_before) / 1024 ).'KB of memory used.';
 
 	} else {
 		global $wpseo_generate, $wpseo_echo;

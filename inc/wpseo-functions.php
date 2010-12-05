@@ -95,12 +95,13 @@ function wpseo_replace_vars($string, $args) {
 		'%%title%%'					=> stripslashes( $r->post_title ),
 		'%%excerpt%%'				=> ( !empty($r->post_excerpt) ) ? strip_tags( $r->post_excerpt ) : substr( strip_shortcodes( strip_tags( $r->post_content ) ), 0, 155 ),
 		'%%excerpt_only%%'			=> strip_tags( $r->post_excerpt ),
-		'%%category%%'				=> ( !empty($r->ID) && get_the_category_list('','',$r->ID) != '' ) ? get_the_category_list('','',$r->ID) : $r->name,
+		'%%category%%'				=> wpseo_get_terms($r->ID, 'category'),
 		'%%category_description%%'	=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
 		'%%tag_description%%'		=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
 		'%%term_description%%'		=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
 		'%%term_title%%'			=> $r->name,
-		'%%tag%%'					=> $r->name,
+		'%%focuskw%%'				=> yoast_get_value('focuskw', $r->ID),
+		'%%tag%%'					=> wpseo_get_terms($r->ID, 'post_tag'),
 		'%%modified%%'				=> $r->post_modified,
 		'%%id%%'					=> $r->ID,
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
@@ -116,7 +117,20 @@ function wpseo_replace_vars($string, $args) {
 		$string = str_replace($var, $repl, $string);
 	}
 	
-	return trim( preg_replace('/\s+/',' ', $string) );
+	$string = preg_replace( '/\s\s+/',' ', $string );
+	return trim( $string );
+}
+
+function wpseo_get_terms($id, $taxonomy) {
+	$output = '';
+	$terms = get_the_terms($id, $taxonomy);
+	if ( $terms ) {
+		foreach ($terms as $term) {
+			$output .= $term->name.' ';
+		}
+		return trim($output);
+	}
+	return '';
 }
 
 function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
@@ -134,9 +148,18 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 function wpseo_dir_setup() {
 	$options = get_option('wpseo');
 	
+	if ( !is_array($options) )
+		$options = array();
+		
 	if ( isset( $options['wpseodir'] ) && strlen( $options['wpseodir'] ) > 1 ) {
-		$wpseodir = $options['wpseodir'];
-		$wpseourl = $options['wpseourl'];
+		if ( @is_writable( $options['wpseodir'] ) ) {
+			$wpseodir = $options['wpseodir'];
+			$wpseourl = $options['wpseourl'];
+		} else {
+			unset($options['wpseodir']);
+			unset($options['wpseourl']);
+			udpate_option('wpseo', $options);
+		}
 	} else {
 		$dir = wp_upload_dir();
 		if ( is_wp_error($dir) ) {

@@ -11,25 +11,34 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		var $ozhicon		= 'tag.png';
 		
 		function WPSEO_Admin() {
-			add_action( 'admin_menu', array(&$this, 'register_settings_page') );
-			add_filter( 'plugin_action_links', array(&$this, 'add_action_link'), 10, 2 );
+			$this->multisite_defaults();
+			add_action( 'init', array(&$this, 'init') );
+		}
+		
+		function init() {
+			if ( $this->grant_access() ) {
+				add_action( 'admin_init', array(&$this, 'options_init') );
+				add_action( 'admin_menu', array(&$this, 'register_settings_page') );
+				add_action( 'network_admin_menu', array(&$this, 'register_network_settings_page') );
+
+				add_filter( 'plugin_action_links', array(&$this, 'add_action_link'), 10, 2 );
+
+				add_action( 'admin_print_scripts', array(&$this,'config_page_scripts'));
+				add_action( 'admin_print_styles', array(&$this,'config_page_styles'));	
+			}
+				
 			add_filter( 'ozh_adminmenu_icon', array(&$this, 'add_ozh_adminmenu_icon' ) );				
-			
-			add_action( 'admin_print_scripts', array(&$this,'config_page_scripts'));
-			add_action( 'admin_print_styles', array(&$this,'config_page_styles'));	
 			
 			add_action( 'wp_dashboard_setup', array(&$this,'widget_setup'));	
 			add_action( 'wp_network_dashboard_setup', array(&$this,'widget_setup'));	
 			add_filter( 'wp_dashboard_widgets', array(&$this, 'widget_order'));
 			add_filter( 'wp_network_dashboard_widgets', array(&$this, 'widget_order'));
 			
-			add_action('admin_init', array(&$this, 'options_init') );
-
 			add_action('show_user_profile', array(&$this,'wpseo_user_profile'));
 			add_action('edit_user_profile', array(&$this,'wpseo_user_profile'));
 			add_action('personal_options_update', array(&$this,'wpseo_process_user_option_update'));
 			add_action('edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
-						
+
 			if ( '0' == get_option('blog_public') )
 				add_action('admin_footer', array(&$this,'blog_public_warning'));
 		}
@@ -41,13 +50,35 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			register_setting( 'yoast_wpseo_titles_options', 'wpseo_titles' );
 			register_setting( 'yoast_wpseo_rss_options', 'wpseo_rss' );
 			register_setting( 'yoast_wpseo_internallinks_options', 'wpseo_internallinks' );
+			
+			if ( function_exists('is_multisite') && is_multisite() )
+				register_setting( 'yoast_wpseo_multisite_options', 'wpseo_multisite' );
 		}
 				
+		function multisite_defaults() {
+			$option = get_option('wpseo');
+			if ( function_exists('is_multisite') && is_multisite() && !is_array($option) ) {
+				$options = get_site_option('wpseo_ms');
+				if ( is_array($options) && isset($options['defaultblog']) && !empty($options['defaultblog']) && $options['defaultblog'] != 0 ) {
+					foreach ( get_wpseo_options_arr() as $option ) {
+						update_option( $option, get_blog_option( $options['defaultblog'], $option) );
+					}
+				}
+				$option['ms_defaults_set'] = true;
+				update_option('wpseo', $option);
+			}
+		}
+		
 		function blog_public_warning() {
+			if ( function_exists('is_network_admin') && is_network_admin() )
+				return;
+				
 			$options = get_option('wpseo');
 			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
-			echo "<div id='blogpublicmsg'><div id='message' class='error'><p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"blogpublicmsg\");' class='button'>I know, don't bug me.</a></p></div></div>";
+			echo "<div id='message' class='error'>";
+			echo '<pre>'.print_r($options,1).'</pre>';
+			echo "<p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
 		}
 		
 		function admin_sidebar() {
@@ -91,14 +122,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					echo '<div id="message" style="width:94%;" class="message updated"><p><strong>'.$msg.'.</strong></p></div>';
 				}  
 				?>
-				<a href="http://yoast.com/"><div id="yoast-icon" style="background: url(http://netdna.yoast.com/wp-content/themes/yoast-v2/images/yoast-32x32.png) no-repeat;" class="icon32"><br /></div></a>
+				<a href="http://yoast.com/"><div id="yoast-icon" style="background: url(<?php echo WPSEO_URL; ?>images/wordpress-SEO-32x32.png) no-repeat;" class="icon32"><br /></div></a>
 				<h2><?php _e("Yoast WordPress SEO: ".$title, 'yoast-wpseo'); ?></h2>
 				<div class="postbox-container" style="width:70%;">
 					<div class="metabox-holder">	
 						<div class="meta-box-sortables">
 			<?php
 			if ($form) {
-				echo '<form action="options.php" method="post" id="wpseo-conf"' . ($contains_files ? ' enctype="multipart/form-data"' : '') . '>';
+				echo '<form action="'.admin_url('options.php').'" method="post" id="wpseo-conf"' . ($contains_files ? ' enctype="multipart/form-data"' : '') . '>';
 				settings_fields($option); 
 				$this->currentoption = $optionshort;
 			}
@@ -139,6 +170,72 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function delete_meta($metakey) {
 			global $wpdb;
 			$wpdb->query("DELETE FROM $wpdb->postmeta WHERE meta_key = '$metakey'");
+		}
+		
+		function grant_access() {
+			if ( !function_exists('is_multisite') || !is_multisite() )
+				return true;
+			
+			$options = get_site_option('wpseo_ms');
+			if ( !is_array( $options ) || !isset( $options['access'] ) )
+				return true;
+			
+			if ( $options['access'] == 'superadmin' && !is_super_admin() )
+				return false;
+			
+			return true;
+		}
+		
+		function network_config_page() {
+			$options = get_site_option('wpseo_ms');
+			
+			if ( isset( $_POST['wpseo_submit'] ) ) {
+				foreach ( array('access', 'defaultblog') as $opt ) {
+					$options[$opt] = $_POST['wpseo_ms'][$opt];
+				}
+				update_site_option('wpseo_ms', $options);
+				echo '<div id="message" class="updated">'.__('Settings Updated.').'</div>';
+			}
+			
+			if ( isset( $_POST['wpseo_restore_blog'] ) ) {
+				if ( isset( $_POST['wpseo_ms']['restoreblog'] ) && is_numeric( $_POST['wpseo_ms']['restoreblog'] ) ) {
+					$blog = get_blog_details( $_POST['wpseo_ms']['restoreblog'] );
+					if ( $blog ) {
+						foreach ( get_wpseo_options_arr() as $option ) {
+							$new_options = get_blog_option( $options['defaultblog'], $option );
+							if ( count($new_options) > 0 )
+								update_blog_option( $_POST['wpseo_ms']['restoreblog'], $option, $new_options );
+						}
+						echo '<div id="message" class="updated"><p>'.$blog->blogname.' '.__('restored to default SEO settings.').'</p></div>';
+					}
+				}
+			}
+			
+			$this->admin_header('MultiSite Settings', false, false);
+			
+			$content = '<form method="post">';
+			$content .= $this->select('access',__('Who should have access to the WordPress SEO settings'), 
+				array(
+					'admin' => 'Site Admins (default)',
+					'superadmin' => 'Super Admins only'
+				), 'wpseo_ms'
+			);
+			$content .= $this->textinput('defaultblog',__('New blogs get the SEO settings from this blog'),'wpseo_ms');
+			$content .= '<p>'.__('Enter the Blog ID for the site whose settings you want to use as default for all sites that are added to your network. Leave empty for none.').'</p>';
+			$content .= '<input type="submit" name="wpseo_submit" class="button-primary" value="'.__('Save MultiSite Settings').'"/>';
+			$content .= '</form>';
+
+			$this->postbox('wpseo_export',__('MultiSite Settings', 'yoast-wpseo'),$content); 
+			
+			$content = '<form method="post">';
+			$content .= '<p>'.__( 'Using this form you can reset a site to the default SEO settings.' ).'</p>';
+			$content .= $this->textinput( 'restoreblog', __('Blog ID'), 'wpseo_ms' );
+			$content .= '<input type="submit" name="wpseo_restore_blog" value="'.__('Restore site to defaults').'" class="button"/>';
+			$content .= '</form>';
+
+			$this->postbox('wpseo_export',__('Restore site to default settings', 'yoast-wpseo'),$content); 
+			
+			$this->admin_footer('Restore to Default', false);
 		}
 		
 		function import_page() {
@@ -290,10 +387,15 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<strong>Export</strong><br/>';
 			$content .= '<form method="post">';
 			$content .= '<p>'.__('Export your WordPress SEO settings here, to import them again later or to import them on another site.').'</p>';
+			if ( phpversion() > 5.2 )
+				$content .= $this->checkbox('include_taxonomy_meta', __('Include Taxonomy Metadata'));
 			$content .= '<input type="submit" class="button" name="wpseo_export" value="'.__('Export settings').'"/>';
 			$content .= '</form>';
 			if ( isset($_POST['wpseo_export']) ) {
-				$url = wpseo_export_settings();
+				$include_taxonomy = false;
+				if ( isset($_POST['wpseo']['include_taxonomy_meta']) )
+					$include_taxonomy = true;
+				$url = wpseo_export_settings( $include_taxonomy );
 				if ($url) {
 					$content .= '<script type="text/javascript">
 						document.location = \''.$url.'\';
@@ -304,7 +406,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			}
 			
 			$content .= '<br class="clear"/><br/><strong>Import</strong><br/>';
-			if ( !isset($_FILES['settings_import_file']) ) {
+			if ( !isset($_FILES['settings_import_file']) || empty($_FILES['settings_import_file']) ) {
 				$content .= '<p>'.__('Import settings by locating <em>settings.zip</em> and clicking').' "'.__('Import settings').'":</p>';
 				$content .= '<form method="post" enctype="multipart/form-data">';
 				$content .= '<input type="file" name="settings_import_file"/>';
@@ -314,21 +416,29 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			} else {
 				$file = wp_handle_upload($_FILES['settings_import_file']);
 				
-				if ( $file && !is_wp_error($file) ) {
+				if ( isset( $file['file'] ) && !is_wp_error($file) ) {
 					require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
 					$zip = new PclZip( $file['file'] );
 					$unzipped = $zip->extract( $p_path = WPSEO_UPLOAD_DIR.'import/' );
 					if ( $unzipped[0]['stored_filename'] == 'settings.ini' ) {
 						$options = parse_ini_file( WPSEO_UPLOAD_DIR.'import/settings.ini', true );
 						foreach ($options as $name => $optgroup) {
-							update_option($name, $optgroup);
+							if ($name != 'wpseo_taxonomy_meta') {
+								update_option($name, $optgroup);
+							} else {
+								// echo '<textarea>'.print_r( json_decode( urldecode( $optgroup['wpseo_taxonomy_meta'] ) ) ).'</textarea>';
+								update_option($name, json_decode( urldecode( $optgroup['wpseo_taxonomy_meta'] ), true ) );
+							}
 						}
 						$content .= '<p><strong>'.__('Settings successfully imported.').'</strong></p>';
 					} else {
 						$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Unzipping failed.').'</strong></p>';
 					}
 				} else {
-					$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Upload failed.').'</strong></p>';
+					if ( is_wp_error($file) )
+						$content .= '<p><strong>'.__('Settings could not be imported:').' '.$file['error'].'</strong></p>';
+					else
+						$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Upload failed.').'</strong></p>';
 				}
 			}
 			$this->postbox('wpseo_export',__('Export & Import SEO Settings', 'yoast-wpseo'),$content); 
@@ -349,6 +459,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$content .= '<h4>Homepage</h4>';
 				$content .= $this->textinput('title-home','Title template');
 				$content .= $this->textinput('metadesc-home','Meta description template');
+				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+					$content .= $this->textinput('metakey-home','Meta keywords template');
 			} else {
 				$content .= '<h4>Homepage &amp; Front page</h4>';
 				$content .= '<p>'.__('You can determine the title and description for the front page by').' <a href="'.get_edit_post_link( get_option('page_on_front') ).'">'.__('editing the front page itself').' &raquo;</a>.</p>';
@@ -363,6 +475,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$content .= '<h4 id="'.$posttype.'">'.ucfirst($posttype).'</h4>';
 				$content .= $this->textinput('title-'.$posttype,'Title template');
 				$content .= $this->textinput('metadesc-'.$posttype,'Meta description template');
+				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+					$content .= $this->textinput('metakey-'.$posttype,'Meta keywords template');
 				$content .= '<br/>';
 			}
 			$content .= '<br/>';
@@ -373,6 +487,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$content .= '<h4>'.ucfirst($taxonomy).'</h4>';
 				$content .= $this->textinput('title-'.$taxonomy,'Title template');
 				$content .= $this->textinput('metadesc-'.$taxonomy,'Meta description template');
+				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+					$content .= $this->textinput('metakey-'.$taxonomy,'Meta keywords template');
 				$content .= '<br/>';				
 			}
 			$content .= '<br/>';
@@ -380,6 +496,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<h4>Author Archives</h4>';
 			$content .= $this->textinput('title-author','Title template');
 			$content .= $this->textinput('metadesc-author','Meta description template');
+			if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+				$content .= $this->textinput('metakey-author','Meta keywords template');
 			$content .= '<br/>';
 			$content .= '<h4>Date Archives</h4>';
 			$content .= $this->textinput('title-archive','Title template');
@@ -497,8 +615,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							<td>Attachment caption</td>
 						</tr>
 						<tr class="alt">
-							<th>%%monthyear%%</th>
-							<td>Replaced with "Month Year" or "Year" on date archives</td>
+							<th>%%focuskw%%</th>
+							<td>Replaced with the posts focus keyword</td>
 						</tr>
 					</table>';
 			$this->postbox('titleshelp',__('Help on Title Settings', 'yoast-wpseo'), $content); 
@@ -819,16 +937,40 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 		
 		function config_page() {
-
 			$options = get_wpseo_options();
 			
 			$this->admin_header('General', false);
-
+			
+			ksort($options);
 			$content = '';
-
+			
 			if ( !WPSEO_UPLOAD_DIR ) {
 				$content .= '<p class="wrong">WordPress SEO can\'t write to the directory <code>'.WPSEO_UPLOAD_NOTDIR.'</code>, XML Sitemap creation will not work, please make sure the directory is writable.</p>';
 				$wpseodir = false;
+			}
+						
+			if ( isset($options['blocking_files']) && is_array($options['blocking_files']) && count($options['blocking_files']) > 0 ) {
+				// Let's try and see if the issue has been fixed first.
+				foreach($options['blocking_files'] as $num => $file) {
+					if ( file_exists( $file ) ) {
+						$return = @unlink($file);
+						if ( $return )
+							unset( $options['blocking_files'][$num] );
+					} else {
+						unset( $options['blocking_files'][$num] );
+					}
+				}
+				$options['blocking_files'] = array_unique( $options['blocking_files'] );
+				update_option('wpseo', $options);
+				if ( count($options['blocking_files']) > 0 ) {
+					$content .= '<p id="blocking_files" class="wrong">'
+					.'<a href="javascript:wpseo_setIgnore(\'blocking_files\',\'blocking_files\');" class="button fixit">'.__('Ignore.').'</a>'
+					.'The following file(s) is/are blocking your XML Sitemap from working properly, please delete them:<br/>';
+					foreach($options['blocking_files'] as $file) {
+						$content .= $file.'<br/>';
+					}
+					$content .= '</p>';
+				}
 			}
 			
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
@@ -845,13 +987,30 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 			if ($content != '')
 				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
-					
+			
 			// Set some of the ignore booleans here to prevent unsetting.
-			$content .= $this->hidden('ignore_blog_public_warning');
+			$content = $this->hidden('ignore_blog_public_warning');
 			$content .= $this->hidden('ignore_page_comments');
 			$content .= $this->hidden('ignore_permalink');
+			$content .= $this->hidden('ms_defaults_set');
+
+			$content .= $this->checkbox('usemetakeywords', 'Use <code>meta</code> keywords tag?');
+			$content .= $this->checkbox('disabledatesnippet', 'Disable date in snippet preview for posts');
+			
+			// TODO: make this settable per user level...
+			$content .= $this->checkbox('disableadvanced_meta', __('Disable the Advanced part of the WordPress SEO meta box'));
+			
+			
+			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following post types:').'</strong></p>';
+			foreach ( get_post_types() as $posttype ) {
+				if ( in_array( $posttype, array('revision','nav_menu_item','post_format') ) )
+					continue;
+				$content .= $this->checkbox('hideeditbox-'.$posttype, $posttype);
+			}	
+			$this->postbox('general-settings',__('General Settings', 'yoast-wpseo'),$content); 
+			
 					
-			$content .= '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:').'</p>';
+			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:').'</p>';
 			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'yoast-wpseo').'</a>');
 			$content .= $this->textinput('yahooverify','<a target="_blank" href="https://siteexplorer.search.yahoo.com/mysites">'.__('Yahoo! Site Explorer', 'yoast-wpseo').'</a>');
 			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'yoast-wpseo').'</a>');
@@ -904,6 +1063,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function wpseo_user_profile($user) {
 			if (!current_user_can('edit_users'))
 				return;
+				
+			$options = get_wpseo_options();
 			?>
 				<h3 id="wordpress-seo">WordPress SEO settings</h3>
 				<table class="form-table">
@@ -915,14 +1076,21 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						<th>Meta description to use for Author page</th>
 						<td><textarea rows="3" cols="30" name="wpseo_author_metadesc"><?php echo esc_html(get_the_author_meta('wpseo_metadesc', $user->ID) ); ?></textarea></td>
 					</tr>
+			<?php 	if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] ) {  ?>
+					<tr>
+						<th>Meta keywords to use for Author page</th>
+						<td><input class="regular-text" type="text" name="wpseo_author_metakey" value="<?php echo esc_attr(get_the_author_meta('wpseo_metakey', $user->ID) ); ?>"/></td>
+					</tr>
+			<?php } ?>
 				</table>
 				<br/><br/>
 			<?php
 		}
 		
 		function wpseo_process_user_option_update($user_id) {
-			update_usermeta($user_id, 'wpseo_title', ( isset($_POST['wpseo_author_title']) ? $_POST['wpseo_author_title'] : '' ) );
-			update_usermeta($user_id, 'wpseo_metadesc', ( isset($_POST['wpseo_author_metadesc']) ? $_POST['wpseo_author_metadesc'] : '' ) );
+			update_user_meta($user_id, 'wpseo_title', ( isset($_POST['wpseo_author_title']) ? $_POST['wpseo_author_title'] : '' ) );
+			update_user_meta($user_id, 'wpseo_metadesc', ( isset($_POST['wpseo_author_metadesc']) ? $_POST['wpseo_author_metadesc'] : '' ) );
+			update_user_meta($user_id, 'wpseo_metakey', ( isset($_POST['wpseo_author_metakey']) ? $_POST['wpseo_author_metakey'] : '' ) );
 		}
 		
 	} // end class WPSEO_Admin

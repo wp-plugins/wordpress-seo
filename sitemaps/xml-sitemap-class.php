@@ -336,8 +336,15 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		if ( $this->gzip_sitemap( $filename, file_get_contents( WPSEO_UPLOAD_DIR.$filename ) ) & $echo )
 			echo date('H:i:s').': <a href="'.get_bloginfo('url').'/'.$filename.'.gz">Sitemap</a> successfully gzipped.<br/>';
 			
-		if ( file_exists( ABSPATH.'/'.$filename ) )
-			unlink( ABSPATH.'/'.$filename );
+		if ( file_exists( ABSPATH.$filename ) ) {
+			$return = @unlink( ABSPATH.$filename );
+			
+			if (!$return) {
+				$options = get_option('wpseo');
+				$options['blocking_files'][] = ABSPATH.$filename;
+				update_option( 'wpseo', $options );
+			}
+		}
 	}
 } 
 

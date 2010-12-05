@@ -11,6 +11,7 @@ class WPSEO_Taxonomy {
 	}
 	
 	function form_row( $id, $label, $desc, $tax_meta, $type = 'text', $options = '' ) {
+		$val = '';
 		if ( isset($tax_meta[$id]) )
 			$val = stripslashes($tax_meta[$id]);
 		
@@ -19,7 +20,7 @@ class WPSEO_Taxonomy {
 		echo "\t".'<td>'."\n";
 		if ($type == 'text') {
 ?>
-			<input name="<?php echo $id; ?>" id="<?php echo $id; ?>" type="text" value="<?php if (isset($val)) echo $val; ?>" size="40"/>
+			<input name="<?php echo $id; ?>" id="<?php echo $id; ?>" type="text" value="<?php echo $val; ?>" size="40"/>
 			<p class="description"><?php echo $desc; ?></p>
 <?php	
 		} else if ($type == 'checkbox') {
@@ -45,7 +46,9 @@ class WPSEO_Taxonomy {
 	
 	function term_additions_form( $term, $taxonomy ) {
 		$tax_meta = get_option('wpseo_taxonomy_meta');
-		if (isset($tax_meta[$taxonomy][$term->term_id]))
+		$options = get_wpseo_options();
+		
+		if ( isset($tax_meta[$taxonomy][$term->term_id]) )
 			$tax_meta = $tax_meta[$taxonomy][$term->term_id];
 
 		echo '<h3>Yoast WordPress SEO Settings</h3>';
@@ -53,6 +56,8 @@ class WPSEO_Taxonomy {
 
 		$this->form_row( 'wpseo_title', 'SEO Title', 'The SEO title is used on the archive page for this term.', $tax_meta );
 		$this->form_row( 'wpseo_desc', 'SEO Description', 'The SEO description is used for the meta description on the archive page for this term.', $tax_meta );
+		if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+			$this->form_row( 'wpseo_metakey', 'Meta Keywords', 'Meta keywords used on the archive page for this term.', $tax_meta );
 		$this->form_row( 'wpseo_canonical', 'Canonical', 'The canonical link is shown on the archive page for this term.', $tax_meta );
 		$this->form_row( 'wpseo_bctitle', 'Breadcrumbs Title', 'The Breadcrumbs title is used in the breadcrumbs where this '.$taxonomy.' appears.', $tax_meta );
 
@@ -71,8 +76,9 @@ class WPSEO_Taxonomy {
 	function update_term( $term_id, $tt_id, $taxonomy ) {
 		$tax_meta = get_option( 'wpseo_taxonomy_meta' );
 
-		foreach (array('title', 'desc', 'bctitle', 'canonical', 'sitemap_include') as $key) {
-			$tax_meta[$taxonomy][$term_id]['wpseo_'.$key] 	= $_POST['wpseo_'.$key];
+		foreach (array('title', 'desc', 'metakey', 'bctitle', 'canonical', 'sitemap_include') as $key) {
+			if ( isset($_POST['wpseo_'.$key]) )
+				$tax_meta[$taxonomy][$term_id]['wpseo_'.$key] 	= $_POST['wpseo_'.$key];
 		}
 
 		foreach (array('noindex', 'nofollow') as $key) {

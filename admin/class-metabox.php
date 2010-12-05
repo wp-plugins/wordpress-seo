@@ -67,6 +67,16 @@ class WPSEO_Metabox {
 			"richedit" => false,
 			"description" => "The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
 		);
+		if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] ) {
+			$mbs['metakeywords'] = array(
+				"name" => "metakeywords",
+				"std" => "",
+				"class" => "metakeywords",
+				"type" => "text",
+				"title" => __("Meta Keywords"),
+				"description" => "If you type something above it will override your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta keywords template</a>."
+			);
+		}
 		$mbs['focuskw'] = array(
 			"name" => "focuskw",
 			"std" => "",
@@ -79,121 +89,125 @@ class WPSEO_Metabox {
 		
 		// Apply filters before entering the advanced section
 		$mbs = apply_filters('wpseo_metabox_entries', $mbs);
+
+		if ( ! isset($options['disableadvanced_meta']) || !$options['disableadvanced_meta'] ) {
 		
-		$mbs['advancedopen'] = array(
-			"type" => "div",
-			"id" => "advancedseo",
-		);
-		$mbs['meta-robots-noindex'] = array(
-			"name" => "meta-robots-noindex",
-			"std" => "index",
-			"title" => __("Meta Robots Index"),
-			"type" => "radio",
-			"options" => array(
-				"0" => __("Index"),
-				"1" => __("Noindex"),
-			),
-		);
-		$mbs['meta-robots-nofollow'] = array(
-			"name" => "meta-robots-nofollow",
-			"std" => "follow",
-			"title" => __("Meta Robots Follow"),
-			"type" => "radio",
-			"options" => array(
-				"0" => __("Follow"),
-				"1" => __("Nofollow"),
-			),
-		);
-		$mbs['meta-robots-adv'] = array(
-			"name" => "meta-robots-adv",
-			"std" => "none",
-			"type" => "multiselect",
-			"title" => __("Meta Robots Advanced"),
-			"description" => __("Advanced <code>meta</code> robots settings for this page."),
-			"options" => array(
-				"noodp" => "NO ODP",
-				"noydir" => "NO YDIR",
-				"noarchive" => __("No Archive"),
-				"nosnippet" => __("No Snippet"),
-			),
-		);
-		if (isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable']) {
-			$mbs['bctitle'] = array(
-				"name" => "bctitle",
+			$mbs['advancedopen'] = array(
+				"type" => "div",
+				"id" => "advancedseo",
+			);
+			$mbs['meta-robots-noindex'] = array(
+				"name" => "meta-robots-noindex",
+				"std" => "index",
+				"title" => __("Meta Robots Index"),
+				"type" => "radio",
+				"options" => array(
+					"0" => __("Index"),
+					"1" => __("Noindex"),
+				),
+			);
+			$mbs['meta-robots-nofollow'] = array(
+				"name" => "meta-robots-nofollow",
+				"std" => "follow",
+				"title" => __("Meta Robots Follow"),
+				"type" => "radio",
+				"options" => array(
+					"0" => __("Follow"),
+					"1" => __("Nofollow"),
+				),
+			);
+			$mbs['meta-robots-adv'] = array(
+				"name" => "meta-robots-adv",
+				"std" => "none",
+				"type" => "multiselect",
+				"title" => __("Meta Robots Advanced"),
+				"description" => __("Advanced <code>meta</code> robots settings for this page."),
+				"options" => array(
+					"noodp" => "NO ODP",
+					"noydir" => "NO YDIR",
+					"noarchive" => __("No Archive"),
+					"nosnippet" => __("No Snippet"),
+				),
+			);
+			if (isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable']) {
+				$mbs['bctitle'] = array(
+					"name" => "bctitle",
+					"std" => "",
+					"type" => "text",
+					"title" => __("Breadcrumbs title"),
+					"description" => __("Title to use for this page in breadcrumb paths"),
+				);
+			}
+			if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {		
+				$mbs['sitemap-include'] = array(
+					"name" => "sitemap-include",
+					"std" => "-",
+					"type" => "select",
+					"title" => __("Include in Sitemap"),
+					"description" => __("Should this page be in the XML Sitemap at all times, regardless of Robots Meta settings?"),
+					"options" => array(
+						"-" => __("Auto detect"),
+						"always" => __("Always include"),
+						"never" => __("Never include"),
+					),
+				);
+				$mbs['sitemap-prio'] = array(
+					"name" => "sitemap-prio",
+					"std" => "-",
+					"type" => "select",
+					"title" => __("Sitemap Priority"),
+					"description" => __("The priority given to this page in the XML sitemap."),
+					"options" => array(
+						"-" => __("Automatic prioritization"),
+						"1" => __("1 - Highest priority"),
+						"0.9" => "0.9",
+						"0.8" => "0.8 - ".__("Default for first tier pages"),
+						"0.7" => "0.7",
+						"0.6" => "0.6 - ".__("Default for second tier pages and posts"),
+						"0.5" => "0.5 - ".__("Medium priority"),
+						"0.4" => "0.4",
+						"0.3" => "0.3",
+						"0.2" => "0.2",
+						"0.1" => "0.1 - ".__("Lowest priority"),
+					),
+				);
+			}
+			$mbs['canonical'] = array(
+				"name" => "canonical",
 				"std" => "",
 				"type" => "text",
-				"title" => __("Breadcrumbs title"),
-				"description" => __("Title to use for this page in breadcrumb paths"),
+				"title" => "Canonical URL",
+				"description" => "The canonical URL that this page should point to, leave empty to default to permalink. <a target='_blank' href='http://googlewebmastercentral.blogspot.com/2009/12/handling-legitimate-cross-domain.html'>Cross domain canonical</a> supported too."
+			);
+			$mbs['redirect'] = array(
+				"name" => "redirect",
+				"std" => "",
+				"type" => "text",
+				"title" => "301 Redirect",
+				"description" => "The URL that this page should redirect to."
+			);
+		
+			// Apply filters for in advanced section
+			$mbs = apply_filters('wpseo_metabox_entries_advanced', $mbs);
+		
+			$mbs['advancedclose'] = array(
+				"type" => "divclose",
+				"id" => "advancedseo",
+				"label" => "Advanced",
 			);
 		}
-		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {		
-			$mbs['sitemap-include'] = array(
-				"name" => "sitemap-include",
-				"std" => "-",
-				"type" => "select",
-				"title" => __("Include in Sitemap"),
-				"description" => __("Should this page be in the XML Sitemap at all times, regardless of Robots Meta settings?"),
-				"options" => array(
-					"-" => __("Auto detect"),
-					"always" => __("Always include"),
-					"never" => __("Never include"),
-				),
-			);
-			$mbs['sitemap-prio'] = array(
-				"name" => "sitemap-prio",
-				"std" => "-",
-				"type" => "select",
-				"title" => __("Sitemap Priority"),
-				"description" => __("The priority given to this page in the XML sitemap."),
-				"options" => array(
-					"-" => __("Automatic prioritization"),
-					"1" => __("1 - Highest priority"),
-					"0.9" => "0.9",
-					"0.8" => "0.8 - ".__("Default for first tier pages"),
-					"0.7" => "0.7",
-					"0.6" => "0.6 - ".__("Default for second tier pages and posts"),
-					"0.5" => "0.5 - ".__("Medium priority"),
-					"0.4" => "0.4",
-					"0.3" => "0.3",
-					"0.2" => "0.2",
-					"0.1" => "0.1 - ".__("Lowest priority"),
-				),
-			);
-		}
-		$mbs['canonical'] = array(
-			"name" => "canonical",
-			"std" => "",
-			"type" => "text",
-			"title" => "Canonical URL",
-			"description" => "The canonical URL that this page should point to, leave empty to default to permalink. <a target='_blank' href='http://googlewebmastercentral.blogspot.com/2009/12/handling-legitimate-cross-domain.html'>Cross domain canonical</a> supported too."
-		);
-		$mbs['redirect'] = array(
-			"name" => "redirect",
-			"std" => "",
-			"type" => "text",
-			"title" => "301 Redirect",
-			"description" => "The URL that this page should redirect to."
-		);
-		
-		// Apply filters for in advanced section
-		$mbs = apply_filters('wpseo_metabox_entries_advanced', $mbs);
-		
-		$mbs['advancedclose'] = array(
-			"type" => "divclose",
-			"id" => "advancedseo",
-			"label" => "Advanced",
-		);
-		
 		return $mbs;
 	}
 
 	function meta_boxes() {
 		global $post;
 
+		$options = get_wpseo_options();
+		
 		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', 155);
 		
 		$date = '';
-		if ($post->post_type == 'post') {
+		if ( $post->post_type == 'post' && !$options['disabledatesnippet'] ) {
 			if ( isset($post->post_date) )
 				$date = date('M j, Y', strtotime($post->post_date));
 			else 
@@ -262,10 +276,13 @@ class WPSEO_Metabox {
 		echo '</table>';
 	}
 
-	function create_meta_box() {  
+	function create_meta_box() {
+		$options = get_wpseo_options();
 		if ( function_exists('add_meta_box') ) {  
 			foreach ( get_post_types() as $posttype ) {
 				if ( in_array( $posttype, array('revision','nav_menu_item','post_format','attachment') ) )
+					continue;
+				if ( isset($options['hideeditbox-'.$posttype]) && $options['hideeditbox-'.$posttype] )
 					continue;
 				add_meta_box( 'yoast-wpseo-meta-box', 'WordPress SEO', array(&$this, 'meta_boxes'), $posttype, 'normal', 'high' );  
 			}

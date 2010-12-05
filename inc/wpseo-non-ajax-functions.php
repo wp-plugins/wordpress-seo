@@ -57,11 +57,11 @@ function wpseo_activate() {
 	delete_option('rewrite_rules');
 }
 
-function wpseo_export_settings() {
+function wpseo_export_settings( $include_taxonomy ) {
     $content = "; This is a settings export file for the WordPress SEO plugin by Yoast.com - http://yoast.com/wordpress/seo/\r\n"; 
 
 	$optarr = get_wpseo_options_arr();
-
+	
 	foreach ($optarr as $optgroup) {
 		$content .= "\n".'['.$optgroup.']'."\n";
 		$options = get_option($optgroup);
@@ -81,6 +81,11 @@ function wpseo_export_settings() {
 	        else 
 				$content .= $key." = \"".$elem."\"\n"; 
 	    }		
+	}
+
+	if ( $include_taxonomy ) {
+		$content .= "\r\n\r\n[wpseo_taxonomy_meta]\r\n";
+		$content .= "wpseo_taxonomy_meta = \"".urlencode( json_encode( get_option('wpseo_taxonomy_meta') ) )."\"";
 	}
 
     if ( !$handle = fopen( WPSEO_UPLOAD_DIR.'settings.ini', 'w' ) )
