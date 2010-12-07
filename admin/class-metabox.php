@@ -207,7 +207,7 @@ class WPSEO_Metabox {
 		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', 155);
 		
 		$date = '';
-		if ( $post->post_type == 'post' && !$options['disabledatesnippet'] ) {
+		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) ) {
 			if ( isset($post->post_date) )
 				$date = date('M j, Y', strtotime($post->post_date));
 			else 
@@ -225,8 +225,8 @@ class WPSEO_Metabox {
 		
 		echo '<table class="yoasttable">';
 		
-		$title = yoast_get_value('title');
-		$desc = yoast_get_value('metadesc');
+		$title = wpseo_get_value('title');
+		$desc = wpseo_get_value('metadesc');
 			
 		$slug = $post->post_name;
 		if (empty($slug))
@@ -237,10 +237,10 @@ class WPSEO_Metabox {
 		<th><label>Snippet Preview:</label></th>
 		<td>
 <?php 
-		$video = yoast_get_value('video_meta',$post->ID);
+		$video = wpseo_get_value('video_meta',$post->ID);
 		if ( $video && $video != 'none' ) {
 			// TODO: improve snippet display of video duration to include seconds for shorter video's
-			// echo '<pre>'.print_r(yoast_get_value('video_meta'),1).'</pre>';
+			// echo '<pre>'.print_r(wpseo_get_value('video_meta'),1).'</pre>';
 ?>
 			<div id="snippet" class="video">
 				<h4 style="margin:0;font-weight:normal;"><a class="title" href="#"><?php echo $title; ?></a></h4>
@@ -365,9 +365,9 @@ class WPSEO_Metabox {
 			$robots['index'] 	= 'Index';
 			$robots['follow'] 	= 'Follow';
 
-			if ( yoast_get_value('meta-robots-noindex') )
+			if ( wpseo_get_value('meta-robots-noindex') )
 				$robots['index'] = 'Noindex';
-			if ( yoast_get_value('meta-robots-nofollow') )
+			if ( wpseo_get_value('meta-robots-nofollow') )
 				$robots['follow'] = 'Nofollow';
 			
 			echo $robots['index'].', '.$robots['follow'];
@@ -379,7 +379,7 @@ class WPSEO_Metabox {
 		if (!isset($meta_box['name'])) {
 			$meta_box['name'] = '';
 		} else {
-			$meta_box_value = yoast_get_value($meta_box['name']);
+			$meta_box_value = wpseo_get_value($meta_box['name']);
 		}
 	
 		$class = '';
@@ -474,7 +474,7 @@ class WPSEO_Metabox {
 	}
 	
 	function page_title( $postid ) {
-		$fixed_title = yoast_get_value('title', $postid );
+		$fixed_title = wpseo_get_value('title', $postid );
 		if ($fixed_title) {
 			return $fixed_title;
 		} else {

@@ -77,7 +77,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
 			echo "<div id='message' class='error'>";
-			echo '<pre>'.print_r($options,1).'</pre>';
 			echo "<p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
 		}
 		
@@ -88,13 +87,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					<div class="meta-box-sortables">
 						<?php
 							$this->plugin_like();
-							$this->plugin_support();
-							$this->postbox('donate','<strong class="red">Donate $10, $20 or $50!</strong>','<p>This plugin has cost me countless hours of work, if it helps you make money, please donate a token of your appreciation!</p><br/><form style="margin-left:30px;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+							$this->postbox('donate','<strong class="red">Donate $10, $20 or $50!</strong>','<p>This plugin has cost me countless hours of work, if you use it, please donate a token of your appreciation!</p><br/><form style="margin-left:30px;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
 							<input type="hidden" name="cmd" value="_s-xclick">
 							<input type="hidden" name="hosted_button_id" value="83KQ269Q2SR82">
 							<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 							<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 							</form>');
+							$this->plugin_support();
 							$this->news(); 
 						?>
 					</div>
@@ -108,7 +107,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			?>
 			<div class="wrap">
 				<?php 
-				if (isset($_GET['updated']) && $_GET['updated'] == 'true') {
+				if ( (isset($_GET['updated']) && $_GET['updated'] == 'true') || (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true') ) {
 					$msg = __('Settings updated');
 
 					if ( function_exists('w3tc_pgcache_flush') ) {
@@ -249,28 +248,16 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				if (isset($_POST['wpseo']['deleteolddata']) && $_POST['wpseo']['deleteolddata'] == 'on') {
 					$replace = true;
 				}
-				if (isset($_POST['wpseo']['deletekeywords']) && $_POST['wpseo']['deletekeywords'] == 'on') {
-					$deletekw = true;
-				}
 				if ( isset($_POST['wpseo']['importheadspace']) ) {
 					$this->replace_meta('_headspace_description', '_yoast_wpseo_metadesc', $replace);
+					$this->replace_meta('_headspace_keywords', '_yoast_wpseo_metakey', $replace);
 					$this->replace_meta('_headspace_page_title', '_yoast_wpseo_title', $replace);
+					$this->replace_meta('_headspace_noindex', '_yoast_wpseo_meta-robots-noindex', $replace);
+					$this->replace_meta('_headspace_nofollow', '_yoast_wpseo_meta-robots-nofollow', $replace);
+
 					$posts = $wpdb->get_results("SELECT ID FROM $wpdb->posts");
 					foreach ($posts as $post) {
 						$custom = get_post_custom($post->ID);
-						if (isset($custom['_headspace_noindex'])) {
-							$robotsmeta = 'noindex';
-						} else {
-							$robotsmeta = 'index';
-						}
-							
-						if (isset($custom['_headspace_nofollow'])) {
-							$robotsmeta .= ',nofollow';
-						} else {
-							$robotsmeta .= ',follow';
-						}
-						yoast_set_value('meta-robots', $robotsmeta, $post->ID);
-
 						$robotsmeta_adv = '';
 						if (isset($custom['_headspace_noarchive'])) {
 							$robotsmeta_adv .= 'noarchive,';
@@ -282,7 +269,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							$robotsmeta_adv .= 'noydir';
 						}
 						$robotsmeta_adv = preg_replace('/,$/','',$robotsmeta_adv);
-						yoast_set_value('meta-robots-adv', $robotsmeta_adv, $post->ID);
+						wpseo_set_value('meta-robots-adv', $robotsmeta_adv, $post->ID);
 						
 						if ($replace) {
 							foreach (array('noindex','nofollow','noarchive','noodp','noydir') as $meta) {
@@ -294,26 +281,24 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				} 
 				if ( isset($_POST['wpseo']['importaioseo']) ) {
 					$this->replace_meta('_aioseop_description', '_yoast_wpseo_metadesc', $replace);
+					$this->replace_meta('_aioseop_keywords', '_yoast_wpseo_metakey', $replace);
 					$this->replace_meta('_aioseop_title', '_yoast_wpseo_title', $replace);
-					if ($deletekw)
-						$this->delete_meta('_aioseop_keywords');
 					$msg .= '<p>All in One SEO data successfully imported.</p>';
 				}
 				if ( isset($_POST['wpseo']['importaioseoold']) ) {
 					$this->replace_meta('description', '_yoast_wpseo_metadesc', $replace);
+					$this->replace_meta('keywords', '_yoast_wpseo_metakey', $replace);
 					$this->replace_meta('title', '_yoast_wpseo_title', $replace);
-					if ($deletekw)
-						$this->delete_meta('keywords');
 					$msg .= '<p>'.__('All in One SEO (Old version) data successfully imported.').'</p>';
 				}
 				if ( isset($_POST['wpseo']['importrobotsmeta']) ) {
 					$posts = $wpdb->get_results("SELECT ID, robotsmeta FROM $wpdb->posts");
-					$i = 0;
 					foreach ($posts as $post) {
-						if ($post->robotsmeta != '') {
-							yoast_set_value('meta-robots', $post->robotsmeta, $post->ID);
-							$i++;
-						}
+						if ( strpos($post->robotsmeta, 'noindex') !== false )
+							wpseo_set_value('meta-robots-noindex', true, $post->ID);
+
+						if ( strpos($post->robotsmeta, 'nofollow') !== false )
+							wpseo_set_value('meta-robots-nofollow', true, $post->ID);
 					}
 					$msg .= '<p>'.__('Robots Meta values imported.').'</p>';
 				}
@@ -358,14 +343,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				echo '<div id="message" class="message updated" style="width:94%;">'.$msg.'</div>';
 				
 			$content = "<p>".__("No doubt you've used an SEO plugin before if this site isn't new. Let's make it easy on you, you can import the data below. If you want, you can import first, check if it was imported correctly, and then import &amp; delete. No duplicate data will be imported.")."</p>";
-			$content .= '<p>A note on meta keywords data: it can be safely deleted: no search engine uses the meta keywords for any real ranking. Don\'t believe me? Read <a target="_blank" href="http://searchengineland.com/yahoo-search-no-longer-uses-meta-keywords-tag-27303">this article</a>, and then <a target="_blank" href="http://searchengineland.com/sorry-yahoo-you-do-index-the-meta-keywords-tag-27743">this article</a>.</p>';
+			$content .= '<p>'.__("If you've used another SEO plugin, try the <a href='http://wordpress.org/extend/plugins/seo-data-transporter/'>SEO Data Transporter</a> plugin to move your data into this plugin, it rocks!").'</p>';
 			$content .= '<form action="" method="post">';
 			$content .= $this->checkbox('importheadspace',__('Import from HeadSpace2?','yoast-wpseo'));
 			$content .= $this->checkbox('importaioseo',__('Import from All-in-One SEO?','yoast-wpseo'));
 			$content .= $this->checkbox('importaioseoold',__('Import from OLD All-in-One SEO?','yoast-wpseo'));
 			$content .= '<br/>';
 			$content .= $this->checkbox('deleteolddata',__('Delete the old data after import? (recommended)','yoast-wpseo'));
-			$content .= $this->checkbox('deletekeywords',__('Delete meta keywords data? (recommended)','yoast-wpseo'));
 			$content .= '<input type="submit" class="button-primary" name="import" value="Import" />';
 			$content .= '<br/><br/>';
 			$content .= '<form action="" method="post">';
@@ -377,9 +361,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '</form>';			
 			
 			$this->postbox('import',__('Import', 'yoast-wpseo'),$content); 
-			
-			// echo '<h2>Ini file</h2>';
-			// echo '<pre>'.print_r(parse_ini_file(WPSEO_UPLOAD_DIR.'settings.ini'),1).'</pre>';
 			
 			do_action('wpseo_import', $this);
 
@@ -426,7 +407,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							if ($name != 'wpseo_taxonomy_meta') {
 								update_option($name, $optgroup);
 							} else {
-								// echo '<textarea>'.print_r( json_decode( urldecode( $optgroup['wpseo_taxonomy_meta'] ) ) ).'</textarea>';
 								update_option($name, json_decode( urldecode( $optgroup['wpseo_taxonomy_meta'] ), true ) );
 							}
 						}
@@ -629,8 +609,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 		
 		function permalinks_page() {
+			if ( isset( $_GET['settings-updated'] ) ) {
+				delete_option('rewrite_rules');
+			}
+			
 			$this->admin_header('Permalinks', true, true, 'yoast_wpseo_permalinks_options', 'wpseo_permalinks');
-			$content = $this->checkbox('trailingslash',__('Enforce a trailing slash on all category and tag URL\'s'));
+			$content = $this->checkbox('stripcategorybase',__('Strip the category base (usually <code>/category/</code>) from the category URL.'));
+			$content .= $this->checkbox('trailingslash',__('Enforce a trailing slash on all category and tag URL\'s'));
 			$content .= '<p class="desc">'.__('If you choose a permalink for your posts with <code>.html</code>, or anything else but a / on the end, this will force WordPress to add a trailing slash to non-post pages nonetheless.', 'yoast-wpseo').'</p>';
 
 			$content .= $this->checkbox('redirectattachment',__('Redirect attachment URL\'s to parent post URL.'));
@@ -944,8 +929,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			ksort($options);
 			$content = '';
 			
-			if ( !WPSEO_UPLOAD_DIR ) {
-				$content .= '<p class="wrong">WordPress SEO can\'t write to the directory <code>'.WPSEO_UPLOAD_NOTDIR.'</code>, XML Sitemap creation will not work, please make sure the directory is writable.</p>';
+			if ( defined('WPSEO_UPLOAD_ERROR') ) {
+				$content .= '<p class="wrong">'.WPSEO_UPLOAD_ERROR.'</p>';
 				$wpseodir = false;
 			}
 						

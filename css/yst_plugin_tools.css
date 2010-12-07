@@ -146,3 +146,8 @@ strong.red {
 	font-weight: bold;
 	font-size: 105%;
 }
+
+.postbox#donate {
+	border-color: green;
+	border-width: 2px;
+}

@@ -38,6 +38,30 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.1 =
+
+* Bugs fixed:
+	* Plugin frontend URL should now be properly defined for sites with https admin.
+	* Manually entered category title now actually works.
+	* Import now works properly again for HeadSpace and AIOSEO, even for meta keywords.
+	* Fixed typo in *wpseo-functions.php*, apparently `udpate_option` is not the same as `update_option`.
+	* Fixed a notice about date snippet.
+	* Fixed a notice about empty canonical.
+	* Prevent cleaning out the WP Subscription managers interface for everyone.
+	* Meta keywords are now properly comma separated.
+	* Year archives now give proper breadcrumb.
+	* Nofollowed meta widget actually works now.
+	* %%date%% replacement in templates improved significantly.
+	* Shortcodes stripped out in generation of title & description templates.
+
+* Changes:
+	* Moved all rewrites to their own class, *inc/class-rewrite.php*.
+	* Further improved error handling when *uploads/wpseo* dir creation fails.
+	
+* New features:
+	* Remove category base, removes `/category/` from category URL's. Find it under Permalinks. Props to [WP No Category Base](http://wordpresssupplies.com/wordpress-plugins/no-category-base/) for having the cleanest code I could find in this area, which I reused and modified.
+	* Admin bar goodness: an SEO menu! Try it if you're on 3.1 already, it allows you to perform several SEO actions!
+	
 = 0.2 =
 
 * Bugs fixed:
@@ -286,8 +310,8 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Upgrade Notice ==
 
-= 0.2 =
-Upgrade to 0.2 now to get: MultiSite compatibility. Meta Keywords added. Several bugs fixed, speed optimizations and the option to disable the WP SEO edit boxes on specific post types & more.
+= 0.1.9 =
+Several bugs fixed, speed optimizations and the option to disable the WP SEO edit boxes on specific post types.
 
 = 0.1.8 =
 Several fixes to how SEO title is handled and generated to make editor faster and more intuitive.

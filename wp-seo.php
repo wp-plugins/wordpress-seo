@@ -10,7 +10,7 @@ Author URI: http://yoast.com/
 
 $pluginurl = plugin_dir_url(__FILE__);
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
-	$pluginurl = preg_replace( '/^https', 'http', $pluginurl );
+	$pluginurl = preg_replace( '/^https/', 'http', $pluginurl );
 define( 'WPSEO_FRONT_URL', $pluginurl );
 
 define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
@@ -20,6 +20,9 @@ define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
 define( 'WPSEO_VERSION', '0.2' );
 
 require_once 'inc/wpseo-functions.php';
+require_once 'inc/class-rewrite.php';
+require_once 'inc/class-widgets.php';
+
 if ( !defined('DOING_AJAX') || !DOING_AJAX )
 	require_once 'inc/wpseo-non-ajax-functions.php';
 	
@@ -54,5 +57,3 @@ if ( !class_exists('All_in_One_SEO_Pack') ) {
 		}
 	}
 }
-
-register_activation_hook( __FILE__, 'wpseo_activate' );

@@ -7,7 +7,7 @@ class WPSEO_Breadcrumbs {
 
 		if (isset($options['trytheme']) && $options['trytheme']) {
 			// Thesis
-			add_action('thesis_hook_before_content', array(&$this, 'breadcrumb_output'),10,1);
+			add_action('thesis_hook_before_headline', array(&$this, 'breadcrumb_output'),10,1);
 
 			// Hybrid
 			remove_action( 'hybrid_before_content', 'hybrid_breadcrumb' );
@@ -36,7 +36,7 @@ class WPSEO_Breadcrumbs {
 	}		
 	
 	function get_bc_title( $id_or_name, $type = 'post_type' ) {
-		$bctitle = yoast_get_value( 'bctitle', $id_or_name );
+		$bctitle = wpseo_get_value( 'bctitle', $id_or_name );
 		return ( !empty($bctitle) ) ? $bctitle : strip_tags( get_the_title( $id_or_name ) );
 	}
 	
@@ -83,14 +83,14 @@ class WPSEO_Breadcrumbs {
 					if (is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0) {
 						$parents = $this->get_term_parents($terms[0], $main_tax);
 						foreach($parents as $parent) {
-							$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'wpseo_bctitle' );
+							$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'bctitle' );
 							if (!$bctitle)
 								$bctitle = $parent->name;
 							$output .= '<a href="'.get_term_link( $parent, $main_tax ).'">'.$bctitle.'</a> '.$sep.' ';
 						}
 					}
 					if ( count($terms) > 0 ) {
-						$bctitle = wpseo_get_term_meta( $terms[0], $main_tax, 'wpseo_bctitle' );
+						$bctitle = wpseo_get_term_meta( $terms[0], $main_tax, 'bctitle' );
 						if (!$bctitle)
 							$bctitle = $terms[0]->name;
 						$output .= '<a href="'.get_term_link($terms[0], $main_tax).'">'.$bctitle.'</a> '.$sep.' ';
@@ -141,14 +141,14 @@ class WPSEO_Breadcrumbs {
 					$parents = $this->get_term_parents($term, $term->taxonomy);
 
 					foreach($parents as $parent) {
-						$bctitle = wpseo_get_term_meta( $parent, $term->taxonomy, 'wpseo_bctitle' );
+						$bctitle = wpseo_get_term_meta( $parent, $term->taxonomy, 'bctitle' );
 						if (!$bctitle)
 							$bctitle = $parent->name;
 						$output .= '<a href="'.get_term_link( $parent, $term->taxonomy ).'">'.$bctitle.'</a> '.$sep.' ';
 					}
 				}
 
-				$bctitle = wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_bctitle' );
+				$bctitle = wpseo_get_term_meta( $term, $term->taxonomy, 'bctitle' );
 				if (!$bctitle)
 					$bctitle = $term->name;
 				
@@ -165,8 +165,10 @@ class WPSEO_Breadcrumbs {
 					global $wp_locale;
 					$output .= '<a href="'.get_month_link( get_query_var('year'), get_query_var('monthnum') ).'">'.$wp_locale->get_month( get_query_var('monthnum') ).' '.get_query_var('year').'</a> '.$sep.' ';
 					$output .= $this->bold_or_not( $bc." ".get_the_date() );
-				} else {
-					$output .= $this->bold_or_not($bc." ".single_month_title(' ',false));
+				} else if ( is_month() ) {
+					$output .= $this->bold_or_not( $bc." ".single_month_title(' ',false) );
+				} else if ( is_year() ) {
+					$output .= $this->bold_or_not( $bc." ".get_query_var('year') );
 				}
 			} elseif ( is_author() ) {
 				if ( isset($opt['breadcrumbs-archiveprefix']) )

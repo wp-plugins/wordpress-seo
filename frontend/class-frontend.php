@@ -51,9 +51,7 @@ class WPSEO_Frontend {
 			remove_action('wp_head', 'feed_links', 2);
 			remove_action('wp_head', 'feed_links_extra', 3);
 		}
-		if (isset($options['replacemetawidget']) && $options['replacemetawidget'])
-			add_action('plugins_loaded', array(&$this, 'widget_yoast_wpseo_meta_init') );
-
+		
 		if ( (isset($options['disabledate']) && $options['disabledate']) || 
 			 (isset($options['disableauthor']) && $options['disableauthor']) )
 			add_action('wp', array(&$this, 'archive_redirect') );
@@ -97,7 +95,7 @@ class WPSEO_Frontend {
 				$title = get_bloginfo('name').' '.$sep.' '.get_bloginfo('description');
 		} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
 			$post = get_post( get_option( 'page_for_posts' ) );
-			$fixed_title = yoast_get_value('title');
+			$fixed_title = wpseo_get_value('title');
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
 			} else {
@@ -107,7 +105,7 @@ class WPSEO_Frontend {
 					$title = get_bloginfo('name').' '.$sep.' '.get_bloginfo('description');
 			}
 		} else if ( is_singular() ) {
-			$fixed_title = yoast_get_value('title');
+			$fixed_title = wpseo_get_value('title');
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
 			} else {
@@ -185,56 +183,46 @@ class WPSEO_Frontend {
 
 		global $wp_query, $paged;
 		
-		$robots = '';
-
-		echo "\t<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
+		echo "\n\t<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
 		$this->metadesc();
 		$this->metakeywords();
+		$this->canonical();
+		$this->robots();
 		
-		// Set decent canonicals for homepage, singulars and taxonomy pages
-		if ( yoast_get_value('canonical') && yoast_get_value('canonical') != '' ) { 
-			echo "\t".'<link rel="canonical" href="'.yoast_get_value('canonical').'" />'."\n";
-		} else {
-			if ( is_singular() ) {
-				global $post;
-				$canonical = get_permalink( $post->ID );
-				// Fix paginated pages
-				$page = get_query_var('page');
-				if ( $page && $page != 1 ) {
-					// If below doesn't return true, there actually aren't that much pages in the post.
-					if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
-						$canonical = user_trailingslashit( trailingslashit($properurl) . get_query_var('page') );
+		if ( is_front_page() ) {
+			if (!empty($options['googleverify'])) {
+				$google_meta = $options['googleverify'];
+				if ( strpos($google_meta, 'content') ) {
+					preg_match('/content="([^"]+)"/', $google_meta, $match);
+					$google_meta = $match[1];
 				}
-			} else {
-				if ( is_front_page() ) {
-					$canonical = get_bloginfo('url').'/';
-				} else if (is_home() && get_option('show_on_front') == "page") {
-					$canonical = get_permalink( get_option( 'page_for_posts' ) );
-				} else if ( is_tax() || is_tag() || is_category() ) {
-					$term = $wp_query->get_queried_object();
-					
-					$canonical = wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_canonical' );
-					if ( !$canonical )
-						$canonical = get_term_link( $term, $term->taxonomy );
-				} else if ( is_archive() ) {
-					if ( is_date() ) {
-						if ( is_day() ) {
-							$canonical = get_day_link( get_query_var('year'), get_query_var('monthnum'), get_query_var('day') );
-						} else if ( is_month() ) {
-							$canonical = get_month_link( get_query_var('year'), get_query_var('monthnum') );
-						} else if ( is_year() ) {
-							$canonical = get_year_link( get_query_var('year') );
-						}						
-					}
-				}
-				
-				if ($paged)
-					$canonical = user_trailingslashit( trailingslashit( $canonical ) . 'page/' . $paged );
-					
+				echo "\t<meta name='google-site-verification' content='$google_meta' />\n";
 			}
-			if ( !empty($canonical) )
-				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
+			if (!empty($options['yahooverify'])) {
+				$yahoo_meta = $options['yahooverify'];
+				if ( strpos($yahoo_meta, 'content') ) {
+					preg_match('/content="([^"]+)"/', $yahoo_meta, $match);
+					$yahoo_meta = $match[1];
+				}				
+				echo "\t<meta name='y_key' content='$yahoo_meta' />\n";
+			}
+				
+			if (!empty($options['msverify'])) {
+				$bing_meta = $options['msverify'];
+				if ( strpos($bing_meta, 'content') ) {
+					preg_match('/content="([^"]+)"/', $bing_meta, $match);
+					$bing_meta = $match[1];
+				}								
+				echo "\t".'<meta name="msvalidate.01" content="'.$bing_meta.'" />'."\n";
+			}
+				
 		}
+		
+		echo "\t<!-- / Yoast WordPress SEO plugin. -->\n\n";
+	}
+
+	function robots() {
+		global $wp_query;
 		
 		$robots 			= array();
 		$robots['index'] 	= 'index';
@@ -242,22 +230,23 @@ class WPSEO_Frontend {
 		$robots['other'] 	= array();
 		
 		if (is_singular()) {
-			if ( yoast_get_value('meta-robots-noindex') )
+			if ( wpseo_get_value('meta-robots-noindex') )
 				$robots['index'] = 'noindex';
-			if ( yoast_get_value('meta-robots-nofollow') )
+			if ( wpseo_get_value('meta-robots-nofollow') )
 				$robots['follow'] = 'nofollow';
-			if ( yoast_get_value('meta-robots-adv') && yoast_get_value('meta-robots-adv') != 'none' ) { 
-				foreach ( explode( ',', yoast_get_value('meta-robots-adv') ) as $r ) {
+			if ( wpseo_get_value('meta-robots-adv') && wpseo_get_value('meta-robots-adv') != 'none' ) { 
+				foreach ( explode( ',', wpseo_get_value('meta-robots-adv') ) as $r ) {
 					$robots['other'][] = $r;
 				}
 			}
 		} else {
-			if ( isset($term) && is_object($term) ) {
-				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_noindex' ) )
+			if ( is_tax() || is_tag() || is_category() ) {
+				$term = $wp_query->get_queried_object();
+				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' ) )
 					$robots['index'] = 'noindex';
-				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_nofollow' ) )
+				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'nofollow' ) )
 					$robots['follow'] = 'nofollow';
-			} 
+			}
 			if ( 
 				(is_author() 	&& isset($options['noindexauthor']) && $options['noindexauthor']) || 
 				(is_category() 	&& isset($options['noindexcat']) && $options['noindexcat']) || 
@@ -289,39 +278,61 @@ class WPSEO_Frontend {
 		if ($robotsstr != '') {
 			echo "\t<meta name='robots' content='".$robotsstr."'/>\n";
 		}
+	}
+	
+	function canonical( $echo = true ) {
+		global $wp_query, $paged;
 		
-		if ( is_front_page() ) {
-			if (!empty($options['googleverify'])) {
-				$google_meta = $options['googleverify'];
-				if ( strpos($google_meta, 'content') ) {
-					preg_match('/content="([^"]+)"/', $google_meta, $match);
-					$google_meta = $match[1];
+		// Set decent canonicals for homepage, singulars and taxonomy pages
+		if ( wpseo_get_value('canonical') && wpseo_get_value('canonical') != '' ) { 
+			$canonical = wpseo_get_value('canonical');
+		} else {
+			if ( is_singular() ) {
+				global $post;
+				$canonical = get_permalink( $post->ID );
+				// Fix paginated pages
+				$page = get_query_var('page');
+				if ( $page && $page != 1 ) {
+					// If below doesn't return true, there actually aren't that much pages in the post.
+					if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
+						$canonical = user_trailingslashit( trailingslashit($properurl) . get_query_var('page') );
 				}
-				echo "\t<meta name='google-site-verification' content='$google_meta' />\n";
-			}
-			if (!empty($options['yahooverify'])) {
-				$yahoo_meta = $options['yahooverify'];
-				if ( strpos($yahoo_meta, 'content') ) {
-					preg_match('/content="([^"]+)"/', $yahoo_meta, $match);
-					$yahoo_meta = $match[1];
-				}				
-				echo "\t<meta name='y_key' content='$yahoo_meta' />\n";
-			}
+			} else {
+				if ( is_front_page() ) {
+					$canonical = get_bloginfo('url').'/';
+				} else if (is_home() && get_option('show_on_front') == "page") {
+					$canonical = get_permalink( get_option( 'page_for_posts' ) );
+				} else if ( is_tax() || is_tag() || is_category() ) {
+					$term = $wp_query->get_queried_object();
+					
+					$canonical = wpseo_get_term_meta( $term, $term->taxonomy, 'canonical' );
+					if ( !$canonical )
+						$canonical = get_term_link( $term, $term->taxonomy );
+				} else if ( is_archive() ) {
+					if ( is_date() ) {
+						if ( is_day() ) {
+							$canonical = get_day_link( get_query_var('year'), get_query_var('monthnum'), get_query_var('day') );
+						} else if ( is_month() ) {
+							$canonical = get_month_link( get_query_var('year'), get_query_var('monthnum') );
+						} else if ( is_year() ) {
+							$canonical = get_year_link( get_query_var('year') );
+						}						
+					}
+				}
 				
-			if (!empty($options['msverify'])) {
-				$bing_meta = $options['msverify'];
-				if ( strpos($bing_meta, 'content') ) {
-					preg_match('/content="([^"]+)"/', $bing_meta, $match);
-					$bing_meta = $match[1];
-				}								
-				echo "\t".'<meta name="msvalidate.01" content="'.$bing_meta.'" />'."\n";
+				if ( isset( $paged ) && $paged && !empty( $canonical ) )
+					$canonical = user_trailingslashit( trailingslashit( $canonical ) . 'page/' . $paged );
 			}
 				
 		}
-		
-		echo "\t<!-- / Yoast WordPress SEO plugin. -->\n";
+		if ( !empty($canonical) ) {
+			if ( $echo )
+				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
+			else
+				return $canonical;
+		}
 	}
-
+	
 	function metakeywords() {
 		global $wp_query;
 		
@@ -331,7 +342,7 @@ class WPSEO_Frontend {
 			
 		if ( is_singular() ) { 
 			global $post;
-			$metakey = yoast_get_value('metakeywords');
+			$metakey = wpseo_get_value('metakeywords');
 			if ( !$metakey || empty($metakey) ) {
 				$metakey = wpseo_replace_vars($options['metakey-'.$post->post_type], (array) $post );
 			}
@@ -340,13 +351,13 @@ class WPSEO_Frontend {
 				$metakey = wpseo_replace_vars($options['metakey-home'], array() );
 			} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
 				$post = get_post( get_option('page_for_posts') );
-				$metakey = yoast_get_value('metakey');
+				$metakey = wpseo_get_value('metakey');
 				if ( ($metakey == '' || !$metakey) && isset($options['metakey-'.$post->post_type]) )
 					$metakey = wpseo_replace_vars($options['metakey-'.$post->post_type], (array) $post );
 			} else if ( is_category() || is_tag() || is_tax() ) {
 				$term = $wp_query->get_queried_object();
 
-				$metakey = wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_metakey' );
+				$metakey = wpseo_get_term_meta( $term, $term->taxonomy, 'metakey' );
 				if ( !$metakey && isset($options['metakey-'.$term->taxonomy]))
 					$metakey = wpseo_replace_vars($options['metakey-'.$term->taxonomy], (array) $term );
 			} else if ( is_author() ) {
@@ -373,7 +384,7 @@ class WPSEO_Frontend {
 
 		$metadesc = '';
 		if (is_singular()) { 
-			$metadesc = yoast_get_value('metadesc');
+			$metadesc = wpseo_get_value('metadesc');
 			if ($metadesc == '' || !$metadesc) {
 				if ( isset($options['metadesc-'.$post->post_type]) && $options['metadesc-'.$post->post_type] != '' )
 					$metadesc = wpseo_replace_vars($options['metadesc-'.$post->post_type], (array) $post );
@@ -383,13 +394,13 @@ class WPSEO_Frontend {
 				$metadesc = wpseo_replace_vars($options['metadesc-home'], array() );
 			} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
 				$post = get_post( get_option('page_for_posts') );
-				$metadesc = yoast_get_value('metadesc');
+				$metadesc = wpseo_get_value('metadesc');
 				if ( ($metadesc == '' || !$metadesc) && isset($options['metadesc-'.$post->post_type]) )
 					$metadesc = wpseo_replace_vars($options['metadesc-'.$post->post_type], (array) $post );
 			} else if ( is_category() || is_tag() || is_tax() ) {
 				$term = $wp_query->get_queried_object();
 
-				$metadesc = wpseo_get_term_meta( $term, $term->taxonomy, 'wpseo_desc' );
+				$metadesc = wpseo_get_term_meta( $term, $term->taxonomy, 'desc' );
 				if ( !$metadesc && isset($options['metadesc-'.$term->taxonomy]))
 					$metadesc = wpseo_replace_vars($options['metadesc-'.$term->taxonomy], (array) $term );
 			} else if ( is_author() ) {
@@ -412,7 +423,7 @@ class WPSEO_Frontend {
 		global $post;
 		if ( !isset($post) )
 			return;
-		$redir = yoast_get_value('redirect', $post->ID);
+		$redir = wpseo_get_value('redirect', $post->ID);
 		if (!empty($redir)) {
 			wp_redirect($redir, 301);
 			exit;
@@ -434,29 +445,6 @@ class WPSEO_Frontend {
 
 	function echo_nofollow() {
 		return ' rel="nofollow"';
-	}
-
-	function widget_yoast_wpseo_meta_init() {
-		function yoast_wpseo_meta($args) {
-			extract($args);
-			$options = get_option('widget_meta');
-			$title = empty($options['title']) ? __('Meta', 'robots-meta') : $options['title'];
-		?>
-				<?php echo $before_widget; ?>
-					<?php echo $before_title . $title . $after_title; ?>
-					<ul>
-					<?php wp_register(); ?>
-					<li><?php wp_loginout(); ?></li>
-					<li><a rel="nofollow" href="<?php bloginfo('rss2_url'); ?>" title="<?php echo attribute_escape(__('Syndicate this site using RSS 2.0', 'robots-meta')); ?>"><?php _e('Entries <abbr title="Really Simple Syndication">RSS</abbr>', 'robots-meta'); ?></a></li>
-					<li><a rel="nofollow"href="<?php bloginfo('comments_rss2_url'); ?>" title="<?php echo attribute_escape(__('The latest comments to all posts in RSS', 'robots-meta')); ?>"><?php _e('Comments <abbr title="Really Simple Syndication">RSS</abbr>', 'robots-meta'); ?></a></li>
-					<li><a rel="nofollow" href="http://wordpress.org/" title="<?php echo attribute_escape(__('Powered by WordPress, state-of-the-art semantic personal publishing platform.', 'robots-meta')); ?>">WordPress.org</a></li>
-					<?php wp_meta(); ?>
-					</ul>
-				<?php echo $after_widget; ?>
-		<?php
-		}
-
-		wp_register_sidebar_widget('meta','meta','yoast_wpseo_meta');
 	}
 
 	function archive_redirect() {
@@ -542,6 +530,14 @@ class WPSEO_Frontend {
 				$properurl = user_trailingslashit( trailingslashit($properurl). 'page/' . $wp_query->query_vars['paged'] );
 			}
 		}
+		
+		// Prevent cleaning out the WP Subscription managers interface for everyone
+		foreach (array('wp-subscription-manager') as $get) {
+			if ( isset($_GET[$get]) ) {
+				$properurl = '';
+			}		
+		}		
+		
 		// TODO: add option to edit the array below through admin.
 		if (isset($options['cleanpermalink-googlesitesearch']) && $options['cleanpermalink-googlesitesearch']) {
 			// Prevent cleaning out Google Site searches

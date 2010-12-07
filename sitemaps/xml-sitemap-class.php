@@ -124,11 +124,11 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 					if ( $p->ID == get_option('page_on_front') )
 						continue;
 						
-					if ( yoast_get_value('meta-robots-noindex', $p->ID) && yoast_get_value('sitemap-include', $p->ID) != 'always' )
+					if ( wpseo_get_value('meta-robots-noindex', $p->ID) && wpseo_get_value('sitemap-include', $p->ID) != 'always' )
 						continue;
-					if ( yoast_get_value('sitemap-include', $p->ID) == 'never' )
+					if ( wpseo_get_value('sitemap-include', $p->ID) == 'never' )
 						continue;
-					if ( yoast_get_value('redirect', $p->ID) && strlen( yoast_get_value('redirect', $p->ID) ) > 0 )
+					if ( wpseo_get_value('redirect', $p->ID) && strlen( wpseo_get_value('redirect', $p->ID) ) > 0 )
 						continue;	
 
 					// If a post has just been updated, make sure you scan the *new* content for images, not the old one.
@@ -142,8 +142,8 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 					$url['mod']	= ( isset( $p->post_modified_gmt ) && $p->post_modified_gmt != '0000-00-00 00:00:00' ) ? $p->post_modified_gmt : $p->post_date_gmt ;
 					$url['chf'] = 'weekly';
 
-					if ( yoast_get_value('canonical', $p->ID) && yoast_get_value('canonical', $p->ID) != '' && yoast_get_value('canonical', $p->ID) != $link ) {
-						$url['loc'] = yoast_get_value('canonical', $p->ID);
+					if ( wpseo_get_value('canonical', $p->ID) && wpseo_get_value('canonical', $p->ID) != '' && wpseo_get_value('canonical', $p->ID) != $link ) {
+						$url['loc'] = wpseo_get_value('canonical', $p->ID);
 					} else { 
 						$url['loc'] = get_permalink( $p->ID );
 
@@ -151,7 +151,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 							$url['loc'] = trailingslashit( $url['loc'] );
 					}
 
-					$pri = yoast_get_value('sitemap-prio', $p->ID);
+					$pri = wpseo_get_value('sitemap-prio', $p->ID);
 					if (is_numeric($pri))
 						$url['pri'] = $pri;
 					elseif ($p->post_parent == 0 && $p->post_type = 'page')
@@ -236,14 +236,14 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 			foreach( $terms as $c ) {
 				$url = array();
 
-				if ( wpseo_get_term_meta( $c, $c->taxonomy, 'wpseo_noindex' ) 
-					&& wpseo_get_term_meta( $c, $c->taxonomy, 'wpseo_sitemap_include' ) != 'always' )
+				if ( wpseo_get_term_meta( $c, $c->taxonomy, 'noindex' ) 
+					&& wpseo_get_term_meta( $c, $c->taxonomy, 'sitemap_include' ) != 'always' )
 					continue;
 
-				if ( wpseo_get_term_meta( $c, $c->taxonomy, 'wpseo_sitemap_include' ) == 'never' )
+				if ( wpseo_get_term_meta( $c, $c->taxonomy, 'sitemap_include' ) == 'never' )
 					continue;
 
-				$url['loc'] = wpseo_get_term_meta( $c, $c->taxonomy, 'wpseo_canonical' );
+				$url['loc'] = wpseo_get_term_meta( $c, $c->taxonomy, 'canonical' );
 				if ( !$url['loc'] ) {
 					$url['loc'] = get_term_link( $c, $c->taxonomy );
 					if ( isset($options['trailingslash']) && $options['trailingslash'] )

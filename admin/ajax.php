@@ -40,7 +40,7 @@ function wpseo_autogen_metadesc_callback() {
 		$p->post_content = trim( stripslashes( $_POST['post_content'] ) );
 	if ( isset( $_POST['post_excerpt'] ) )
 		$p->post_excerpt = trim( stripslashes( $_POST['post_excerpt'] ) );
-		
+	
 	if ( isset($options['metadesc-'.$_POST['post_type']]) && $options['metadesc-'.$_POST['post_type']] != '' )
 		echo wpseo_replace_vars($options['metadesc-'.$_POST['post_type']], $p );
 	die();

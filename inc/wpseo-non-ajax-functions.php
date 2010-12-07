@@ -34,28 +34,20 @@ function wpseo_get_country_arr(){
 	return $countries;
 }
 
-function wpseo_add_rewrite_rules( $rewrite ) { 
-	$options = get_wpseo_options();
-	if ( !isset($options['enablexmlsitemap']) || !$options['enablexmlsitemap'] )
-		return;
-	$new_rules = array(
-		'((news)?_?sitemap\.xml)(\.gz)?$' => 'index.php?robots=1&wpseo_sitemap='.$rewrite->preg_index(1).'&wpseo_sitemap_gz='.$rewrite->preg_index(3),
-	);
-	$rewrite->rules = $new_rules + $rewrite->rules;
-} 
-add_action('generate_rewrite_rules', 'wpseo_add_rewrite_rules' );
-
-function wpseo_add_sitemap_query_var( $query_vars ) {
-	$query_vars[] = 'wpseo_sitemap';
-	$query_vars[] = 'wpseo_sitemap_gz';
-	return $query_vars;
+function wpseo_flush_rules() {
+	global $wpseo_rewrite;
+	$wpseo_rewrite->flush_rules();
 }
-add_filter('query_vars', 'wpseo_add_sitemap_query_var');
+
+function wpseo_deactivate() {
+	wpseo_flush_rules();
+}
+register_deactivation_hook(__FILE__,'wpseo_deactivate');
 
 function wpseo_activate() {
-	// Force a flush of rewrite rules
-	delete_option('rewrite_rules');
+	wpseo_flush_rules();
 }
+register_activation_hook( __FILE__, 'wpseo_activate' );
 
 function wpseo_export_settings( $include_taxonomy ) {
     $content = "; This is a settings export file for the WordPress SEO plugin by Yoast.com - http://yoast.com/wordpress/seo/\r\n"; 
@@ -105,3 +97,47 @@ function wpseo_export_settings( $include_taxonomy ) {
 	
 	return WPSEO_UPLOAD_URL.'settings.zip'; 
 }
+
+function wpseo_admin_bar_menu() {
+	global $wp_admin_bar, $wpseo_front, $post;
+
+	if ( is_object($wpseo_front) ) {
+		$url = $wpseo_front->canonical( false );
+	} else {
+		$url = '';
+	}
+	
+	if ( isset($post) && is_object($post) ) {
+		$focuskw 	= wpseo_get_value('focuskw', $post->ID);
+	} else {
+		$focuskw = '';
+	}
+
+	$wp_admin_bar->add_menu( array( 'id' => 'wpseo-menu', 'title' => __( 'SEO' ), 'href' => get_admin_url('admin.php?page=wpseo_dashboard'), ) );
+
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-kwresearch', 'title' => __( 'Keyword Research' ), '#', ) );
+
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-adwordsexternal', 'title' => __( 'AdWords External' ), 'href' => 'https://adwords.google.com/select/KeywordToolExternal', 'meta' => array('target' => '_blank') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-googleinsights', 'title' => __( 'Google Insights' ), 'href' => 'http://www.google.com/insights/search/#q='.urlencode($focuskw).'&cmpt=q', 'meta' => array('target' => '_blank') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-wordtracker', 'title' => __( 'SEO Book' ), 'href' => 'http://tools.seobook.com/keyword-tools/seobook/?keyword='.urlencode($focuskw), 'meta' => array('target' => '_blank') ) );
+
+	if ( !is_admin() ) {
+		$cleanurl = preg_replace('/^https?%3A%2F%2F/','', urlencode($url));
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-analysis', 'title' => __( 'Analyze this page' ), '#', ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-y', 'title' => __( 'Check Inlinks (Yahoo!)' ), 'href' => 'https://siteexplorer.search.yahoo.com/search?p='.$cleanurl.'&bwm=i&bwmo=d&bwmf=u', 'meta' => array('target' => '_blank') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-ose', 'title' => __( 'Check Inlinks (OSE)' ), 'href' => 'http://www.opensiteexplorer.org/'.str_replace('/','%252F',preg_replace('/^https?:\/\//','',$url)).'/a!links', 'meta' => array('target' => '_blank') ) );	
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-kwdensity', 'title' => __( 'Check Keyword Density' ), 'href' => 'http://tools.davidnaylor.co.uk/keyworddensity/index.php?url='.$url.'&keyword='.urlencode($focuskw), 'meta' => array('target' => '_blank') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-cache', 'title' => __( 'Check Google Cache' ), 'href' => 'http://webcache.googleusercontent.com/search?strip=1&q=cache:'.$url, 'meta' => array('target' => '_blank') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-header', 'title' => __( 'Check Headers' ), 'href' => 'http://quixapp.com/headers/?r='.urlencode($url), 'meta' => array('target' => '_blank') ) );
+	}
+
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-settings', 'title' => __( 'SEO Settings' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Titles' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-indexation', 'title' => __( 'Indexation' ), 'href' => admin_url('admin.php?page=wpseo_indexation'), ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks' ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-internallinks', 'title' => __( 'Internal Links' ), 'href' => admin_url('admin.php?page=wpseo_internallinks'), ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-rss', 'title' => __( 'RSS' ), 'href' => admin_url('admin.php?page=wpseo_rss'), ) );
+	
+}
+add_action( 'admin_bar_menu', 'wpseo_admin_bar_menu', 95 );

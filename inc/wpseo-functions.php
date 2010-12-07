@@ -1,6 +1,6 @@
 <?php
 
-function yoast_get_value( $val, $postid = '' ) {
+function wpseo_get_value( $val, $postid = '' ) {
 	if ( empty($postid) ) {
 		global $post;
 		if (isset($post))
@@ -15,7 +15,7 @@ function yoast_get_value( $val, $postid = '' ) {
 		return false;
 }
 
-function yoast_set_value( $meta, $val, $postid ) {
+function wpseo_set_value( $meta, $val, $postid ) {
 	$oldmeta = get_post_meta($postid, '_yoast_wpseo_'.$meta, true);
 	if (!empty($oldmeta)) {
 		delete_post_meta($postid, '_yoast_wpseo_'.$meta, $oldmeta );
@@ -37,6 +37,9 @@ function get_wpseo_options() {
 }
 
 function wpseo_replace_vars($string, $args) {
+	
+	$args = (array) $args;
+	
 	// Let's see if we can bail super early.
 	if ( strpos( $string, '%%' ) === false )
 		return trim( preg_replace('/\s+/',' ', $string) );
@@ -81,17 +84,37 @@ function wpseo_replace_vars($string, $args) {
 		else
 			$pagenum = '';
 	}
-	
+
+	// Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.
+	$args['post_content'] = preg_replace('/(.?)\[([a-zA-Z_-]+)\b(.*?)(?:(\/))?\](?:(.+?)\[\/\2\])?(.?)/s', '$1$6', $args['post_content'] );
+	$args['post_excerpt'] = preg_replace('/(.?)\[([a-zA-Z_-]+)\b(.*?)(?:(\/))?\](?:(.+?)\[\/\2\])?(.?)/s', '$1$6', $args['post_excerpt'] );
+		
 	$r = (object) wp_parse_args($args, $defaults);
 
 	// Only global $post on single's, otherwise some expressions will return wrong results.
-	if ( is_singular() ) {
+	if ( is_singular() || ( is_front_page() && 'posts' != get_option('show_on_front') ) ) {
 		global $post;
-		$post = $r;
+	}
+	
+	// Let's do date first as it's a bit more work to get right.
+	if ( $r->post_date != '' ) {
+		$date = mysql2date( get_option('date_format'), $r->post_date );
+	} else {
+		if ( get_query_var('day') && get_query_var('day') != '' ) {
+			$date = get_the_date();
+		} else {
+			if ( single_month_title(' ', false) && single_month_title(' ', false) != '' ) {
+				$date = single_month_title(' ', false);
+			} else if ( get_query_var('year') != '' ){
+				$date = get_query_var('year');
+			} else {
+				$date = '';
+			}
+		}
 	}
 	
 	$replacements = array(
-		'%%date%%' 					=> ( get_query_var('day') != '' ) ? get_the_date() : ( ( single_month_title(' ', false) != '' ) ? single_month_title(' ', false) : get_query_var('year') ),
+		'%%date%%'					=> $date,
 		'%%title%%'					=> stripslashes( $r->post_title ),
 		'%%excerpt%%'				=> ( !empty($r->post_excerpt) ) ? strip_tags( $r->post_excerpt ) : substr( strip_shortcodes( strip_tags( $r->post_content ) ), 0, 155 ),
 		'%%excerpt_only%%'			=> strip_tags( $r->post_excerpt ),
@@ -100,9 +123,9 @@ function wpseo_replace_vars($string, $args) {
 		'%%tag_description%%'		=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
 		'%%term_description%%'		=> !empty($r->taxonomy) ? trim(strip_tags(get_term_field( 'description', $r->term_id, $r->taxonomy ))) : '',
 		'%%term_title%%'			=> $r->name,
-		'%%focuskw%%'				=> yoast_get_value('focuskw', $r->ID),
+		'%%focuskw%%'				=> wpseo_get_value('focuskw', $r->ID),
 		'%%tag%%'					=> wpseo_get_terms($r->ID, 'post_tag'),
-		'%%modified%%'				=> $r->post_modified,
+		'%%modified%%'				=> mysql2date( get_option('date_format'), $r->post_modified ),
 		'%%id%%'					=> $r->ID,
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
 		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
@@ -122,13 +145,20 @@ function wpseo_replace_vars($string, $args) {
 }
 
 function wpseo_get_terms($id, $taxonomy) {
+	// If we're on a specific tag, category or taxonomy page, return that and bail.
+	if ( is_category() || is_tag() || is_tax() ) {
+		global $wp_query;
+		$term = $wp_query->get_queried_object();
+		return $term->name;
+	}
+	
 	$output = '';
 	$terms = get_the_terms($id, $taxonomy);
 	if ( $terms ) {
 		foreach ($terms as $term) {
-			$output .= $term->name.' ';
+			$output .= $term->name.', ';
 		}
-		return trim($output);
+		return rtrim( trim($output), ',' );
 	}
 	return '';
 }
@@ -141,8 +171,12 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 		$term = $term->term_id;
 	
 	$tax_meta = get_option( 'wpseo_taxonomy_meta' );
-
-	return (isset($tax_meta[$taxonomy][$term][$meta])) ? $tax_meta[$taxonomy][$term][$meta] : false;
+	if ( isset($tax_meta[$taxonomy][$term]) )
+		$tax_meta = $tax_meta[$taxonomy][$term];
+	else
+		return false;
+	
+	return (isset($tax_meta['wpseo_'.$meta])) ? $tax_meta['wpseo_'.$meta] : false;
 }
 
 function wpseo_dir_setup() {
@@ -151,18 +185,24 @@ function wpseo_dir_setup() {
 	if ( !is_array($options) )
 		$options = array();
 		
-	if ( isset( $options['wpseodir'] ) && strlen( $options['wpseodir'] ) > 1 ) {
+	if ( isset( $options['wpseodir'] ) ) {
 		if ( @is_writable( $options['wpseodir'] ) ) {
 			$wpseodir = $options['wpseodir'];
 			$wpseourl = $options['wpseourl'];
 		} else {
 			unset($options['wpseodir']);
 			unset($options['wpseourl']);
-			udpate_option('wpseo', $options);
+			update_option('wpseo', $options);
 		}
-	} else {
+	} 
+	
+	if ( !isset( $wpseodir ) ) {
 		$dir = wp_upload_dir();
 		if ( is_wp_error($dir) ) {
+			$error = __('Trying to get the upload dir gave the following error:').'<br/>';
+			foreach ( $dir->get_error_messages() as $msg ) {
+				$error .= $msg.'<br/>';
+			}
 			$wpseodir = false;
 		} else if ( !file_exists( $dir['basedir'].'/wpseo/' ) ) {
 			$dircreated = @mkdir( $dir['basedir'].'/wpseo/' );
@@ -176,6 +216,7 @@ function wpseo_dir_setup() {
 				$wpseourl = $options['wpseourl'] = $dir['baseurl'].'/wpseo/';
 				update_option( 'wpseo' , $options );
 			} else {
+				$error = '<code>'.$dir['basedir'].'/wpseo/</code> could not be created';
 				$wpseodir = false;
 			}
 		} else {
@@ -190,6 +231,7 @@ function wpseo_dir_setup() {
 		define( 'WPSEO_UPLOAD_URL', $wpseourl );
 	} else {
 		define( 'WPSEO_UPLOAD_DIR', false );
-		define( 'WPSEO_UPLOAD_NOTDIR', $wpseodir );
+		define( 'WPSEO_UPLOAD_URL', false );
+		define( 'WPSEO_UPLOAD_ERROR', $error );
 	}
 }
