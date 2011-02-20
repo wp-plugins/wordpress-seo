@@ -50,6 +50,58 @@ class WPSEO_Breadcrumbs {
 		}
 		return $parents;
 	}
+
+	function get_menu_trail($menu = '', $parent = false, $trail = array()) {
+		global $post, $wpdb;
+		// No parent is set so we start by getting the parent of the current post
+		if ( !$parent ) {
+			$query = "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key='_menu_item_menu_item_parent' AND post_id = (SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_menu_item_object_id' AND meta_value=$post->ID)";
+			$result = $wpdb->get_results( $query );
+			if( count($result) > 0 ) {
+				$parent = $result[0]->meta_value;
+			}
+		// A parent is set and we want to get the grandparent.
+		} else {
+			$query = "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key='_menu_item_menu_item_parent' AND post_id = $parent";
+			$result = $wpdb->get_results( $query );
+			if( count($result) > 0 ) {
+				$parent = $result[0]->meta_value;
+			} else {
+				$parent = 0;
+			}
+		}
+		// The parent is the root of the menu let's return the trail
+		if ( $parent == 0) {
+			return $trail;
+		// There still are grandparents to discover
+		} else {
+			$trail[] = $parent;
+			$temptrail = $this->get_menu_trail('', $parent, $trail);
+			return $temptrail;
+		}
+	}
+
+	function in_menu( $selectedmenu ) {
+		global $wpdb, $post;
+		$query = "SELECT * FROM $wpdb->term_relationships WHERE term_taxonomy_id = $selectedmenu AND object_id IN (SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_menu_item_object_id' AND meta_value=$post->ID)";
+		$result = $wpdb->get_results( $query );
+		if( count($result) > 0 ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function get_post_for_menunode( $node_id ) {
+		global $wpdb;
+		$query = "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key='_menu_item_object_id' AND post_id = $node_id";
+		$result = $wpdb->get_results( $query );
+		if( count($result) > 0 ) {
+			return $result[0]->meta_value;
+		} else {
+			return 0;
+		}
+	}
 	
 	function breadcrumb($prefix = '', $suffix = '', $display = true) {
 		global $wp_query, $post, $paged;
@@ -59,6 +111,7 @@ class WPSEO_Breadcrumbs {
 		$blog_page 	= get_option('page_for_posts');
 		$sep		= ( isset($opt['breadcrumbs-sep']) && $opt['breadcrumbs-sep'] != '' ) ? $opt['breadcrumbs-sep'] : '&raquo;';
 		$home		= ( isset($opt['breadcrumbs-home']) && $opt['breadcrumbs-home'] != '' ) ? $opt['breadcrumbs-home'] : __('Home');
+		$selmenu	= ( isset($opt['breadcrumbs-selectedmenu']) && $opt['breadcrumbs-selectedmenu'] != '' ) ? $opt['breadcrumbs-selectedmenu'] : 0;
 		
 		if ($on_front == "page") {
 			$homelink = '<a href="'.get_permalink(get_option('page_on_front')).'">'.$home.'</a>';
@@ -76,54 +129,71 @@ class WPSEO_Breadcrumbs {
 			$output = $homelink.' '.$sep.' '.$this->bold_or_not( $this->get_bc_title($blog_page) );
 		} else if ( is_singular() ) {
 			$output = $bloglink.' '.$sep.' ';
-			if ( 0 == $post->post_parent ) {
-				if ( isset( $opt['post_types-'.$post->post_type.'-maintax'] ) && $opt['post_types-'.$post->post_type.'-maintax'] != '0' ) {
-					$main_tax = $opt['post_types-'.$post->post_type.'-maintax'];
-					$terms = wp_get_object_terms( $post->ID, $main_tax );
-					if (is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0) {
-						$parents = $this->get_term_parents($terms[0], $main_tax);
-						foreach($parents as $parent) {
-							$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'bctitle' );
-							if (!$bctitle)
-								$bctitle = $parent->name;
-							$output .= '<a href="'.get_term_link( $parent, $main_tax ).'">'.$bctitle.'</a> '.$sep.' ';
-						}
-					}
-					if ( count($terms) > 0 ) {
-						$bctitle = wpseo_get_term_meta( $terms[0], $main_tax, 'bctitle' );
-						if (!$bctitle)
-							$bctitle = $terms[0]->name;
-						$output .= '<a href="'.get_term_link($terms[0], $main_tax).'">'.$bctitle.'</a> '.$sep.' ';
-					}
+			if( isset($opt['breadcrumbs-menus']) && $opt['breadcrumbs-menus'] = 'on'){
+				$use_menu = $this->in_menu( $selmenu );
+			}
+			if( $use_menu ){
+				$trail = $this->get_menu_trail();
+				$trail = array_reverse ( $trail );
+				$trailposts = array();
+				for($t = 0; $t < count($trail); $t++){
+					$trailposts[] = $this->get_post_for_menunode($trail[$t]);
+				}
+				for($t = 0; $t < count($trail); $t++){
+					$bctitle = ( get_the_title( $trail[$t] ) == '' ) ? get_the_title( $trailposts[$t] ) : get_the_title( $trail[$t] );
+					$output .= '<a href="' . get_permalink( $trailposts[$t] ) . '">' . $bctitle .'</a> ' . $sep . ' ';
 				}
 				$output .= $this->bold_or_not( $this->get_bc_title( $post->ID ) );
 			} else {
 				if ( 0 == $post->post_parent ) {
-					$output = $homelink." ".$sep." ".$this->bold_or_not( $this->get_bc_title() );
-				} else {
-					if (isset($post->ancestors)) {
-						if (is_array($post->ancestors))
-							$ancestors = array_values($post->ancestors);
-						else 
-							$ancestors = array($post->ancestors);				
-					} else {
-						$ancestors = array($post->post_parent);
+					if ( isset( $opt['post_types-'.$post->post_type.'-maintax'] ) && $opt['post_types-'.$post->post_type.'-maintax'] != '0' ) {
+						$main_tax = $opt['post_types-'.$post->post_type.'-maintax'];
+						$terms = wp_get_object_terms( $post->ID, $main_tax );
+						if (is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0) {
+							$parents = $this->get_term_parents($terms[0], $main_tax);
+							foreach($parents as $parent) {
+								$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'bctitle' );
+								if (!$bctitle)
+									$bctitle = $parent->name;
+								$output .= '<a href="'.get_term_link( $parent, $main_tax ).'">'.$bctitle.'</a> '.$sep.' ';
+							}
+						}
+						if ( count($terms) > 0 ) {
+							$bctitle = wpseo_get_term_meta( $terms[0], $main_tax, 'bctitle' );
+							if (!$bctitle)
+								$bctitle = $terms[0]->name;
+								$output .= '<a href="'.get_term_link($terms[0], $main_tax).'">'.$bctitle.'</a> '.$sep.' ';
+						}
 					}
-
-					// Reverse the order so it's oldest to newest
-					$ancestors = array_reverse($ancestors);
-
-					// Add the current Page to the ancestors list (as we need it's title too)
-					$ancestors[] = $post->ID;
-
-					$output = $homelink;
-
-					foreach ( $ancestors as $ancestor ) {
-						$output .= ' '.$sep.' ';
-						if ($ancestor != $post->ID)
-							$output .= '<a href="'.get_permalink($ancestor).'">'.$this->get_bc_title( $ancestor ).'</a>';
-						else
-							$output .= $this->bold_or_not( $this->get_bc_title( $ancestor ) );
+					$output .= $this->bold_or_not( $this->get_bc_title( $post->ID ) );
+				} else {
+					if ( 0 == $post->post_parent ) {
+						$output = $homelink." ".$sep." ".$this->bold_or_not( $this->get_bc_title() );
+					} else {
+						if (isset($post->ancestors)) {
+							if (is_array($post->ancestors))
+								$ancestors = array_values($post->ancestors);
+							else 
+								$ancestors = array($post->ancestors);				
+						} else {
+							$ancestors = array($post->post_parent);
+						}
+	
+						// Reverse the order so it's oldest to newest
+						$ancestors = array_reverse($ancestors);
+	
+						// Add the current Page to the ancestors list (as we need it's title too)
+						$ancestors[] = $post->ID;
+	
+						$output = $homelink;
+	
+						foreach ( $ancestors as $ancestor ) {
+							$output .= ' '.$sep.' ';
+							if ($ancestor != $post->ID)
+								$output .= '<a href="'.get_permalink($ancestor).'">'.$this->get_bc_title( $ancestor ).'</a>';
+							else
+								$output .= $this->bold_or_not( $this->get_bc_title( $ancestor ) );
+						}
 					}
 				}
 			}

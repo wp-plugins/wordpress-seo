@@ -81,6 +81,10 @@ class WPSEO_Frontend {
 	}
 
 	function title( $title, $sep = '-', $seplocation = '', $postid = '' ) {
+		if ( trim($sep) == '' )
+			$sep = '-';
+		$sep = $sep;
+		
 		global $post, $wp_query;
 		if ( empty($post) && is_singular() ) {
 			$post = $wp_query->get_queried_object();
@@ -92,9 +96,13 @@ class WPSEO_Frontend {
 			if ( isset($options['title-home']) && $options['title-home'] != '' )
 				$title = wpseo_replace_vars( $options['title-home'], array() );
 			else
-				$title = get_bloginfo('name').' '.$sep.' '.get_bloginfo('description');
+				$title = get_bloginfo('name').$sep.get_bloginfo('description');
 		} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
-			$post = get_post( get_option( 'page_for_posts' ) );
+			// For some reason, in some instances is_home returns true for the front page when page_for_posts is not set.
+			if ( get_option('page_for_posts') == 0 )
+				$post = get_post( get_option( 'page_on_front') );
+			else
+				$post = get_post( get_option( 'page_for_posts' ) );
 			$fixed_title = wpseo_get_value('title');
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
@@ -102,7 +110,7 @@ class WPSEO_Frontend {
 				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
 					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
 				else
-					$title = get_bloginfo('name').' '.$sep.' '.get_bloginfo('description');
+					$title = get_bloginfo('name').$sep.get_bloginfo('description');
 			}
 		} else if ( is_singular() ) {
 			$fixed_title = wpseo_get_value('title');
@@ -112,7 +120,7 @@ class WPSEO_Frontend {
 				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
 					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
 				else
-					$title = $post->post_title.' '.$sep.' '.get_bloginfo('name'); 
+					$title = $post->post_title.$sep.get_bloginfo('name'); 
 			}
 		} else if ( is_category() || is_tag() || is_tax() ) {
 			$term = $wp_query->get_queried_object();
@@ -135,14 +143,14 @@ class WPSEO_Frontend {
 					}
 						
 						
-					$title .= ' '.$sep.' '.get_bloginfo('name'); 
+					$title .= $sep.get_bloginfo('name'); 
 				}
 			}
 		} else if ( is_search() ) {
 			if ( isset($options['title-search']) && !empty($options['title-search']) )
 				$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );	
 			else
-				$title = __('Search for "').get_search_query().'" '.$sep.' '.get_bloginfo('name');
+				$title = __('Search for "').get_search_query().'"'.$sep.get_bloginfo('name');
 		} else if ( is_author() ) {
 			$author_id = get_query_var('author');
 			$title = get_the_author_meta('title', $author_id);
@@ -150,22 +158,22 @@ class WPSEO_Frontend {
 				if ( isset($options['title-author']) && !empty($options['title-author']) )
 					$title = wpseo_replace_vars($options['title-author'], array() );
 				else
-					$title = get_the_author_meta('display_name', $author_id).' '.$sep.' '.get_bloginfo('name'); 
+					$title = get_the_author_meta('display_name', $author_id).$sep.get_bloginfo('name'); 
 			}
 		} else if ( is_archive() ) {
 		 	if ( isset($options['title-archive']) && !empty($options['title-archive']) )
 				$title = wpseo_replace_vars($options['title-archive'], array('post_title' => $title) );
 			else {
 				if ( is_month() )
-					$title = single_month_title(' ', false).' '.__('Archives').' '.$sep.' '.get_bloginfo('name'); 
+					$title = single_month_title(' ', false).' '.__('Archives').$sep.get_bloginfo('name'); 
 				else if ( is_year() )
-					$title = get_query_var('year').' '.__('Archives').' '.$sep.' '.get_bloginfo('name'); 
+					$title = get_query_var('year').' '.__('Archives').$sep.get_bloginfo('name'); 
 			}
 		} else if ( is_404() ) {
 		 	if ( isset($options['title-404']) && !empty($options['title-404']) )
 				$title = wpseo_replace_vars($options['title-404'], array('post_title' => $title) );
 			else
-				$title = __('Page not found').' '.$sep.' '.get_bloginfo('name');
+				$title = __('Page not found').$sep.get_bloginfo('name');
 		} 
 		return esc_html( stripslashes( $title ) );
 	}
@@ -213,7 +221,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $bing_meta, $match);
 					$bing_meta = $match[1];
 				}								
-				echo "\t".'<meta name="msvalidate.01" content="'.$bing_meta.'" />'."\n";
+				echo "\t<meta name='msvalidate.01' content='$bing_meta' />\n";
 			}
 				
 		}
@@ -223,6 +231,8 @@ class WPSEO_Frontend {
 
 	function robots() {
 		global $wp_query;
+		
+		$options = get_wpseo_options();
 		
 		$robots 			= array();
 		$robots['index'] 	= 'index';
@@ -283,6 +293,8 @@ class WPSEO_Frontend {
 	function canonical( $echo = true ) {
 		global $wp_query, $paged;
 		
+		$options = get_wpseo_options();
+		
 		// Set decent canonicals for homepage, singulars and taxonomy pages
 		if ( wpseo_get_value('canonical') && wpseo_get_value('canonical') != '' ) { 
 			$canonical = wpseo_get_value('canonical');
@@ -325,6 +337,10 @@ class WPSEO_Frontend {
 			}
 				
 		}
+		
+		if ( isset($options['force_transport']) && $options['force_transport'] != 'default' )
+			$canonical = preg_replace( '/https?/', $options['force_transport'], $canonical );
+			
 		if ( !empty($canonical) ) {
 			if ( $echo )
 				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
@@ -522,7 +538,30 @@ class WPSEO_Frontend {
 		} else if ( is_search() ) {
 			$s = preg_replace( '/(%20|\+)/', ' ', get_search_query() );
 			$properurl = get_bloginfo('url').'/?s=' . rawurlencode( $s );
+		} else if ( is_404() ) {
+			if ( function_exists('is_multisite') && is_multisite() && !is_subdomain_install() && is_main_site() ) {
+				if ($cururl == get_bloginfo('url').'/blog/' || $cururl == get_bloginfo('url').'/blog' ) {
+					if ( get_option('show_on_front') == 'page' && get_option('page_for_posts') != 0 )
+						$properurl = get_permalink( get_option('page_for_posts') );
+					else
+						$properurl = get_bloginfo('url').'/';
+				}
+			} 
+			
+			add_filter('posts_where', array(&$this, 'filter_where_404') );
+			$posts = query_posts('type=any');
+			remove_filter('posts_where', array(&$this, 'filter_where_404') );
+
+			if ( count($posts) == 1 ) {
+				wp_redirect( get_permalink($posts[0]->ID), 301 );
+				exit;
+			} else {
+				unset( $posts );
+				wp_reset_query();
+			}
+			
 		}
+		
 		if ( !empty($properurl) && $wp_query->query_vars['paged'] != 0 && $wp_query->post_count != 0 ) {
 			if ( is_search() ) {
 				$properurl = get_bloginfo('url').'/page/' . $wp_query->query_vars['paged'] . '/?s=' . rawurlencode( $s );
@@ -571,6 +610,14 @@ class WPSEO_Frontend {
 		}
 	}
 
+	function filter_where_404($where = '') {
+		global $wp_query;
+		
+		$str = preg_replace("/(.*)[\.-](html|htm|php|asp|aspx)$/","$1",$wp_query->query_vars['name']);
+		$where .= " AND post_name LIKE '".$str."%'";
+		return $where;
+	}
+	
 	function rss_replace_vars($temp) {
 		$postlink = '<a href="'.get_permalink().'">'.get_the_title()."</a>";
 		$bloglink = '<a href="'.get_bloginfo('url').'">'.get_bloginfo('name').'</a>';

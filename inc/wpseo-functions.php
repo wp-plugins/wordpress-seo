@@ -85,9 +85,13 @@ function wpseo_replace_vars($string, $args) {
 			$pagenum = '';
 	}
 
+	$regex = '(.?)\[([a-zA-Z_-]+)\b(.*?)(?:(\/))?\](?:(.+?)\[\/\2\])?(.?)';
 	// Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.
-	$args['post_content'] = preg_replace('/(.?)\[([a-zA-Z_-]+)\b(.*?)(?:(\/))?\](?:(.+?)\[\/\2\])?(.?)/s', '$1$6', $args['post_content'] );
-	$args['post_excerpt'] = preg_replace('/(.?)\[([a-zA-Z_-]+)\b(.*?)(?:(\/))?\](?:(.+?)\[\/\2\])?(.?)/s', '$1$6', $args['post_excerpt'] );
+	if ( isset( $args['post_content'] ) )
+		$args['post_content'] = preg_replace('/'.$regex.'/s', '$1$6', $args['post_content'] );
+
+	if ( isset( $args['post_excerpt'] ) )
+		$args['post_excerpt'] = preg_replace('/'.$regex.'/s', '$1$6', $args['post_excerpt'] );
 		
 	$r = (object) wp_parse_args($args, $defaults);
 

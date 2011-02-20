@@ -6,16 +6,20 @@ class WPSEO_Metabox {
 	var $wpseo_meta_length_reason = '';
 	
 	function WPSEO_Metabox() {
+		$options = get_wpseo_options();
+		
 		add_action('admin_print_scripts', array(&$this,'scripts'));
 		add_action('admin_print_styles', array(&$this,'styles'));	
 		
-		// WPSC integration
-		add_action('wpsc_edit_product', array(&$this,'rebuild_sitemap'));
-		add_action('wpsc_rate_product', array(&$this,'rebuild_sitemap'));
+		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
+			// WPSC integration
+			add_action('wpsc_edit_product', array(&$this,'rebuild_sitemap'));
+			add_action('wpsc_rate_product', array(&$this,'rebuild_sitemap'));
 
-		// When permalink structure is changed, sitemap should be regenerated
-		add_action('permalink_structure_changed', array(&$this,'rebuild_sitemap') );
-		add_action('publish_post', array(&$this,'rebuild_sitemap') );
+			// When permalink structure is changed, sitemap should be regenerated
+			add_action('permalink_structure_changed', array(&$this,'rebuild_sitemap') );
+			add_action('publish_post', array(&$this,'rebuild_sitemap') );
+		}
 
 		add_action('admin_menu', array(&$this,'create_meta_box') );
 		add_action('save_post', array(&$this,'save_postdata') );

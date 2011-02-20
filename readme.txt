@@ -38,6 +38,16 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.2 =
+
+* Bugs fixed:
+	* Disabling sitemaps now properly does what it says on the tin: disable sitemaps.
+	* Properly return title for homepage in rare instances where `is_home` returns true for front page even when front page is set to static page (yes, that's a WordPress bug I had to work around).
+	* An empty title separator will now be changed to ' - ' so titles don't get all borked.
+	* Several fixes in rewrites for MultiSite instances.
+	* Option to force http or https on canonical URLs.
+	* Several other bugfixes.
+	
 = 0.2.1 =
 
 * Bugs fixed:

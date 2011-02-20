@@ -37,7 +37,11 @@ class WPSEO_Rewrite {
 		elseif ($category->parent != 0 )
 			$category_nicename = get_category_parents( $category->parent, false, '/', true ) . $category_nicename;
 
-		$catlink = trailingslashit(get_option( 'home' )) . user_trailingslashit( $category_nicename, 'category' );
+		$blog_prefix = '';
+		if ( function_exists('is_multisite') && is_multisite() && !is_subdomain_install() && is_main_site() )
+			$blog_prefix = 'blog/';
+
+		$catlink = trailingslashit(get_option( 'home' )) . $blog_prefix . user_trailingslashit( $category_nicename, 'category' );
 		return $catlink;
 	}
 		
@@ -74,15 +78,19 @@ class WPSEO_Rewrite {
 		$category_rewrite = array();
 		$categories = get_categories(array('hide_empty'=>false));
 
+		$blog_prefix = '';
+		if ( function_exists('is_multisite') && is_multisite() && !is_subdomain_install() && is_main_site() )
+			$blog_prefix = 'blog/';
+
 		foreach($categories as $category) {
 			$category_nicename = $category->slug;
 			if ( $category->parent == $category->cat_ID ) // recursive recursion
 				$category->parent = 0;
 			elseif ($category->parent != 0 )
 				$category_nicename = get_category_parents( $category->parent, false, '/', true ) . $category_nicename;
-			$category_rewrite['('.$category_nicename.')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$'] = 'index.php?category_name=$matches[1]&feed=$matches[2]';
-			$category_rewrite['('.$category_nicename.')/page/?([0-9]{1,})/?$'] = 'index.php?category_name=$matches[1]&paged=$matches[2]';
-			$category_rewrite['('.$category_nicename.')/?$'] = 'index.php?category_name=$matches[1]';
+			$category_rewrite[$blog_prefix.'('.$category_nicename.')/(?:feed/)?(feed|rdf|rss|rss2|atom)/?$'] = 'index.php?category_name=$matches[1]&feed=$matches[2]';
+			$category_rewrite[$blog_prefix.'('.$category_nicename.')/page/?([0-9]{1,})/?$'] = 'index.php?category_name=$matches[1]&paged=$matches[2]';
+			$category_rewrite[$blog_prefix.'('.$category_nicename.')/?$'] = 'index.php?category_name=$matches[1]';
 		}
 
 		// Redirect support from Old Category Base

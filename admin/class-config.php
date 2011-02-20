@@ -625,6 +625,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<p class="desc">'.__('People make mistakes in their links towards you sometimes, or unwanted parameters are added to the end of your URLs, this allows you to redirect them all away.', 'yoast-wpseo').'</p>';
 
 			$this->postbox('permalinks',__('Permalink Settings', 'yoast-wpseo'),$content); 
+			
+			$content = $this->select('force_transport', 'Force Transport', array('default' => 'Leave default', 'http' => 'Force http', 'https' => 'Force https'));			
+			$content .= '<p class="desc">'.__('Force the canonical to either http or https, when your blog runs under both.', 'yoast-wpseo').'</p>';
+
+			$this->postbox('canonical',__('Canonical Settings', 'yoast-wpseo'),$content); 
 
 			$content = $this->checkbox('cleanpermalink-googlesitesearch',__('Prevent cleaning out Google Site Search URL\'s.'));
 			$content .= '<p class="desc">'.__('Google Site Search URL\'s look weird, and ugly, but if you\'re using Google Site Search, you probably do not want them cleaned out.', 'yoast-wpseo').'</p>';
