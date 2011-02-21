@@ -312,7 +312,7 @@ class WPSEO_Metabox {
 			// 	return $post;
 			// }  
 
-			if ( 'page' == $_POST['post_type'] ) {  
+			if ( isset( $_POST['post_type'] ) && 'page' == $_POST['post_type'] ) {  
 				if ( !current_user_can( 'edit_page', $post_id ))  
 					return $post_id;  
 			} else {  
@@ -357,13 +357,13 @@ class WPSEO_Metabox {
 	}
 
 	function page_title_column_heading( $columns ) {
-		return array_merge(array_slice($columns, 0, 2), array('page-title' => 'WP SEO Title'), array_slice($columns, 2, 6), array('page-meta-robots' => 'Robots Meta'));
+		return array_merge(array_slice($columns, 0, 6), array('page-meta-robots' => 'Robots Meta'), array_slice($columns, 6, count($columns)));
 	}
 
 	function page_title_column_content( $column_name, $id ) {
-		if ( $column_name == 'page-title' ) {
-			echo esc_html( $this->page_title($id) );
-		}
+		// if ( $column_name == 'page-title' ) {
+		// 	echo esc_html( $this->page_title($id) );
+		// }
 		if ( $column_name == 'page-meta-robots' ) {
 			$robots 			= array();
 			$robots['index'] 	= 'Index';

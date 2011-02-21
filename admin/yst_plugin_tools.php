@@ -395,10 +395,10 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 
 			if (isset($_POST['yoast_removedbwidget'])) {
 				$options['removedbwidget'.$network] = true;
-				update_option('yoastdbwidget',$options);
+				update_option('wpseo_yoastdbwidget',$options);
 			}			
 			if ( isset($options['removedbwidget'.$network]) && $options['removedbwidget'.$network] ) {
-				echo "If you reload, this widget will be gone and never appear again, unless you decide to delete the database option 'yoastdbwidget'.";
+				echo "If you reload, this widget will be gone and never appear again, unless you decide to delete the database option 'wpseo_yoastdbwidget'.";
 				return;
 			}
 

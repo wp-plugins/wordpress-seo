@@ -38,6 +38,28 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.3 =
+
+* New features:
+	* First stab at (Facebook) OpenGraph implementation.
+	* Meta Description can now be returned, using `$wpseo_front->metadesc( false );` for use elsewhere.
+	* Plugins can now register their own variables to not be cleaned out when permalink redirect is enabled.
+	
+* Bugs fixed:
+	* Deleting the dashboard widget will now really delete it.
+	* Some fixes for notices.
+	* Strip tags out of titles.
+	* Use blog charset for XML Sitemap instead of UTF-8.
+	* Import of Meta Keywords fixed.
+	* Small fix for possible error in AJAX routines.
+	* Breadcrumb now actually returns when you ask it to.
+	* Fixed some errors in JavaScript of title generation within snippet preview.
+	* Removed SEO title from post edit overview as you couldn't edit it there anyway.
+	
+* Documentation fixes:
+	* Added an extra notice to clean permalink to let people know they're playing with fire.
+	* Small improvement to error handling for upload path.
+	
 = 0.2.2 =
 
 * Bugs fixed:

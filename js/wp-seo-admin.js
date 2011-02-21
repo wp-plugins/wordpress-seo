@@ -39,9 +39,11 @@ jQuery(document).ready(function () {
 function wpseo_exportSettings() {
 	jQuery.post(ajaxurl, { 
 			action: 'wpseo_export_settings', 
-		}, function(response) { 
-			jQuery('#exportbutton').attr('href', response);
-			jQuery('#exportbutton').text('Download export file');
+		}, function(data) { 
+			if (data) {
+				jQuery('#exportbutton').attr('href', data);
+				jQuery('#exportbutton').text('Download export file');
+			}
 		}
 	);
 }
@@ -51,8 +53,8 @@ function setWPOption( option, newval, hide ) {
 			action: 'wpseo_set_option', 
 			option: option,
 			newval: newval 
-		}, function(response) { 
-			if (response)
+		}, function(data) { 
+			if (data)
 				jQuery('#'+hide).hide();
 		}
 	);
@@ -63,8 +65,9 @@ function rebuildSitemap( baseurl, type ) {
 	jQuery.post(ajaxurl, { 
 			action: 'wpseo_generate_sitemap', 
 			type: type, 
-		}, function(response) { 
-			jQuery('#'+type+'sitemapgeneration').html(response); 
+		}, function(data) { 
+			if (data)
+				jQuery('#'+type+'sitemapgeneration').html(data); 
 		}
 	);
 }
@@ -74,9 +77,11 @@ function rebuildKml( baseurl ) {
 	jQuery.post(ajaxurl, { 
 			action: 'wpseo_generate_sitemap', 
 			type: 'kml', 
-		}, function(response) { 
-			jQuery('#kmlgeneration').html(response); 
-			rebuildSitemap(baseurl, 'geo');
+		}, function(data) { 
+			if (data) {
+				jQuery('#kmlgeneration').html(data); 
+				rebuildSitemap(baseurl, 'geo');
+			}
 		}
 	);
 }

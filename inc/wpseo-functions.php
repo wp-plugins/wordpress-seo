@@ -40,6 +40,8 @@ function wpseo_replace_vars($string, $args) {
 	
 	$args = (array) $args;
 	
+	$string = strip_tags( $string );
+	
 	// Let's see if we can bail super early.
 	if ( strpos( $string, '%%' ) === false )
 		return trim( preg_replace('/\s+/',' ', $string) );
@@ -207,6 +209,9 @@ function wpseo_dir_setup() {
 			foreach ( $dir->get_error_messages() as $msg ) {
 				$error .= $msg.'<br/>';
 			}
+			$wpseodir = false;
+		} else if ( $dir['basedir'] == '' ) { 
+			$error = __('WordPress didn\'t return a valid path to your upload directory, please make sure your upload path is set correctly');
 			$wpseodir = false;
 		} else if ( !file_exists( $dir['basedir'].'/wpseo/' ) ) {
 			$dircreated = @mkdir( $dir['basedir'].'/wpseo/' );

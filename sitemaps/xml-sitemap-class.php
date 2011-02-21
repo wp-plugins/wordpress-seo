@@ -58,7 +58,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		if ( isset($options['xml_include_images']) && $options['xml_include_images'] )
 			$images_in_sitemap = true;
 			
-		$output = '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="'.WPSEO_FRONT_URL.'css/xml-sitemap.xsl"?>'."\n";
+		$output = '<?xml version="1.0" encoding="'.get_bloginfo('charset').'"?><?xml-stylesheet type="text/xsl" href="'.WPSEO_FRONT_URL.'css/xml-sitemap.xsl"?>'."\n";
 		$output .= '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
 		if ( $images_in_sitemap )
 			$output .= 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ';

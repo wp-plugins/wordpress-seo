@@ -130,9 +130,17 @@ function getAutogenTitle( force ) {
 
 	if ( force != 1 )
 		force = false;
-	if ( jQuery('#yoast_wpseo_title').val() != '' && !force ) {
-		return false;
+	else
+		force = true;
+	
+	if ( !force ) {
+		title = jQuery.trim( jQuery('#yoast_wpseo_title').val() );	
+		if ( title != '' && title != null ) {
+			wpseo_doing_title = false;
+			return false;
+		}
 	}
+	
 	title =jQuery('#title').val();
 	var data = {
 		action: 'wpseo_autogen_title',
@@ -153,9 +161,12 @@ function getAutogenTitle( force ) {
 
 		if ( redo_title )
 			getAutogenTitle();
+
 	});	
-	if ( title && title != '' )
+	if ( title && title != '' ) {
+		wpseo_doing_title = false;
 		return title;
+	}
 	return false;
 }
 
@@ -261,8 +272,10 @@ jQuery(document).ready(function(){
 	jQuery('#related_keywords_heading').hide();
 	
 	jQuery('#yoast_wpseo_title').keyup(function() {
-		if ( jQuery(this).val() == '' )
+		var title = jQuery.trim( jQuery('#yoast_wpseo_title').val() );
+		if ( title == '' || title == null ) {
 			getAutogenTitle();
+		}
 		updateTitleLength();
 		testfocuskw();
 	});

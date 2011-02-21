@@ -267,6 +267,7 @@ class WPSEO_Breadcrumbs {
 		}
 		if ($display) {
 			echo $prefix.$output.$suffix;
+			return true;
 		} else {
 			return $prefix.$output.$suffix;
 		}
@@ -276,7 +277,7 @@ class WPSEO_Breadcrumbs {
 if (!function_exists('yoast_breadcrumb')) {
 	function yoast_breadcrumb($prefix = '', $suffix = '', $display = true) {
 		$wpseo_bc = new WPSEO_Breadcrumbs();
-		$wpseo_bc->breadcrumb($prefix, $suffix, $display);
+		return $wpseo_bc->breadcrumb($prefix, $suffix, $display);
 	}	
 }
 

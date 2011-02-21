@@ -250,7 +250,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}
 				if ( isset($_POST['wpseo']['importheadspace']) ) {
 					$this->replace_meta('_headspace_description', '_yoast_wpseo_metadesc', $replace);
-					$this->replace_meta('_headspace_keywords', '_yoast_wpseo_metakey', $replace);
+					$this->replace_meta('_headspace_keywords', '_yoast_wpseo_metakeywords', $replace);
 					$this->replace_meta('_headspace_page_title', '_yoast_wpseo_title', $replace);
 					$this->replace_meta('_headspace_noindex', '_yoast_wpseo_meta-robots-noindex', $replace);
 					$this->replace_meta('_headspace_nofollow', '_yoast_wpseo_meta-robots-nofollow', $replace);
@@ -281,13 +281,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				} 
 				if ( isset($_POST['wpseo']['importaioseo']) ) {
 					$this->replace_meta('_aioseop_description', '_yoast_wpseo_metadesc', $replace);
-					$this->replace_meta('_aioseop_keywords', '_yoast_wpseo_metakey', $replace);
+					$this->replace_meta('_aioseop_keywords', '_yoast_wpseo_metakeywords', $replace);
 					$this->replace_meta('_aioseop_title', '_yoast_wpseo_title', $replace);
 					$msg .= '<p>All in One SEO data successfully imported.</p>';
 				}
 				if ( isset($_POST['wpseo']['importaioseoold']) ) {
 					$this->replace_meta('description', '_yoast_wpseo_metadesc', $replace);
-					$this->replace_meta('keywords', '_yoast_wpseo_metakey', $replace);
+					$this->replace_meta('keywords', '_yoast_wpseo_metakeywords', $replace);
 					$this->replace_meta('title', '_yoast_wpseo_title', $replace);
 					$msg .= '<p>'.__('All in One SEO (Old version) data successfully imported.').'</p>';
 				}
@@ -621,8 +621,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->checkbox('redirectattachment',__('Redirect attachment URL\'s to parent post URL.'));
 			$content .= '<p class="desc">'.__('Attachments to posts are stored in the database as posts, this means they\'re accessible under their own URL\'s if you do not redirect them, enabling this will redirect them to the post they were attached to.', 'yoast-wpseo').'</p>';
 
-			$content .= $this->checkbox('cleanpermalinks',__('Redirect ugly URL\'s to clean permalinks.'));
-			$content .= '<p class="desc">'.__('People make mistakes in their links towards you sometimes, or unwanted parameters are added to the end of your URLs, this allows you to redirect them all away.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('cleanpermalinks',__('Redirect ugly URL\'s to clean permalinks. (Not recommended in many cases!)'));
+			$content .= '<p class="desc">'.__('People make mistakes in their links towards you sometimes, or unwanted parameters are added to the end of your URLs, this allows you to redirect them all away. Please note that while this is a feature that is actively maintained, it is known to break several plugins, and should for that reason be the first feature you disable when you encounter issues after installing this plugin.', 'yoast-wpseo').'</p>';
 
 			$this->postbox('permalinks',__('Permalink Settings', 'yoast-wpseo'),$content); 
 			
@@ -804,6 +804,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		
 		function indexation_page() {
 			$this->admin_header('Indexation', true, true, 'yoast_wpseo_indexation_options', 'wpseo_indexation');
+
+			$content = $this->checkbox('opengraph',__('Add OpenGraph meta data', 'yoast-wpseo') );
+			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. (very experimental)', 'yoast-wpseo').'</p>';
+
+			$this->postbox('opengraph',__('OpenGraph (Facebook)', 'yoast-wpseo'),$content);
 					
 			$content = '<p>'.__("Below you'll find checkboxes for each of the sections of your site that you might want to disallow the search engines from indexing. Be aware that this is a powerful tool, blocking category archives, for instance, really blocks all category archives from showing up in the index.").'</p>';
 			$content .= $this->checkbox('search',__('This site\'s search result pages', 'yoast-wpseo'));
