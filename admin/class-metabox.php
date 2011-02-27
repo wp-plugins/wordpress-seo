@@ -328,7 +328,7 @@ class WPSEO_Metabox {
 				if (isset($_POST['yoast_wpseo_'.$meta_box['name']]))
 					$data = true;
 				else
-					$date = false;
+					$data = false;
 			} elseif ($meta_box['type'] == 'multiselect') {
 				if (is_array($_POST['yoast_wpseo_'.$meta_box['name']]))
 					$data = implode( ",", $_POST['yoast_wpseo_'.$meta_box['name']] );

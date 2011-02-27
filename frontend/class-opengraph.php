@@ -60,6 +60,7 @@ class WPSEO_OpenGraph {
 				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) ) {
 					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
 				} else {
+					$title = '';
 					$title = apply_filters('single_post_title', $title);
 				}
 			}
@@ -135,7 +136,7 @@ class WPSEO_OpenGraph {
 	function image( $image = '' ) {
 		global $post;
 		// Grab the featured image
-		if ( is_singular() && empty( $image ) && has_post_thumbnail( $post->ID ) ) {
+		if ( is_singular() && empty( $image ) && function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
 			$thumbnail = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'post-thumbnail' );
 			if ( $thumbnail )
 				$image = $thumbnail[0];

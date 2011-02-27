@@ -132,7 +132,7 @@ class WPSEO_Breadcrumbs {
 			if( isset($opt['breadcrumbs-menus']) && $opt['breadcrumbs-menus'] = 'on'){
 				$use_menu = $this->in_menu( $selmenu );
 			}
-			if( $use_menu ){
+			if( isset( $use_menu ) && $use_menu ){
 				$trail = $this->get_menu_trail();
 				$trail = array_reverse ( $trail );
 				$trailposts = array();
@@ -280,5 +280,3 @@ if (!function_exists('yoast_breadcrumb')) {
 		return $wpseo_bc->breadcrumb($prefix, $suffix, $display);
 	}	
 }
-
-?>

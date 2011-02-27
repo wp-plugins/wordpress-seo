@@ -38,6 +38,15 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.3.1 =
+
+* Bugs fixed:
+	* Error in saving certain data when it was a checkbox.
+	* Fixed notice for non-existing title and for empty metakey.
+	* Fix for an error that could occur when the post thumbnail functionality is not active.
+* Changes:
+	* Added page numbers to default titles for taxonomies and archives.
+	
 = 0.2.3 =
 
 * New features:
@@ -347,3 +356,13 @@ Several bugs fixed, speed optimizations and the option to disable the WP SEO edi
 
 = 0.1.8 =
 Several fixes to how SEO title is handled and generated to make editor faster and more intuitive.
+
+== Other Notes ==
+
+= Usage guides =
+
+* WP Beginner has written a good guide on [http://www.wpbeginner.com/plugins/how-to-install-and-setup-wordpress-seo-plugin-by-yoast/](how to install and setup WordPress SEO)
+
+= Press Mentions =
+
+* I was recently [http://mashable.com/2011/02/17/wordpress-seo-interview/](interview by Mashable) about this plugin.
