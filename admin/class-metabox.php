@@ -262,7 +262,7 @@ class WPSEO_Metabox {
 <?php
 		} else {
 			if (!empty($date))
-				$date .= ' ... ';
+				$date .= ' <strong>...</strong> ';
 ?>
 			<div id="snippet">
 				<a class="title" href="#"><?php echo $title; ?></a>

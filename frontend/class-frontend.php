@@ -693,11 +693,15 @@ class WPSEO_Frontend {
 	function sitemap_output( $robots, $public ) {
 		if ( !get_query_var('wpseo_sitemap') )
 			return $robots;
-
-		if ( !WPSEO_UPLOAD_DIR )
+		
+		$options = get_option('wpseo');
+		
+		if ( !$options['wpseodir'] ) {
+			$robots .= '# Your WP SEO upload dir could not be found.';
 			return $robots;
+		}
 
-		$file = WPSEO_UPLOAD_DIR . get_query_var('wpseo_sitemap') . get_query_var('wpseo_sitemap_gz');
+		$file = $options['wpseodir'] . get_query_var('wpseo_sitemap') . get_query_var('wpseo_sitemap_gz');
 
 		if ( file_exists( $file ) ) 
 			$robots = file_get_contents( $file );
@@ -709,6 +713,8 @@ class WPSEO_Frontend {
 	
 	function sitemap_header() {
 		if ( get_query_var('wpseo_sitemap') ) {
+			wpseo_dir_setup();
+
 			if ( get_query_var('wpseo_sitemap_gz') )
 				header( 'Content-Type: application/x-gzip; charset='.get_bloginfo('charset') );
 			else

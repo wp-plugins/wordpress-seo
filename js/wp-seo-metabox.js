@@ -119,15 +119,20 @@ function updateDescLength() {
 }
 
 function getAutogenTitle( force ) {
-	redo_title = false;
-	
+
 	if ( wpseo_doing_title ) {
-		redo_title = true;
+		if ( !autoGenTitleTimeoutId ) {
+			autoGenTitleTimeoutId = window.setTimeout(function() {
+				wpseo_doing_title = false;
+				getAutogenTitle();
+			}, 5000);
+		}
 		return;
 	}
 	
+	autoGenTitleTimeoutId = false;
 	wpseo_doing_title = true;
-
+	
 	if ( force != 1 )
 		force = false;
 	else
@@ -175,13 +180,18 @@ function getAutogenDesc() {
 	jQuery("#snippet .desc span").css('color','#000000');
 	
 	if ( !desc || desc == '' ) {
-		redo_desc = false;
 
 		if ( wpseo_doing_desc ) {
-			redo_desc = true;
+			if ( !autoGenDescTimeoutId ) {
+				autoGenDescTimeoutId = window.setTimeout(function() {
+					wpseo_doing_desc = false;
+					getAutogenDesc();
+				}, 10000);
+			}
 			return;
 		}
-
+		
+		autoGenDescTimeoutId = false;
 		wpseo_doing_desc = true;
 
 		var data = {
@@ -205,13 +215,8 @@ function getAutogenDesc() {
 				testfocuskw();
 				updateSnippet();
 			}
-			wpseo_doing_desc = false;
 			updateDescLength();
 			testfocuskw();
-
-			if ( redo_desc ) {
-				getAutogenDesc();
-			} 
 		});
 	} else {
 		jQuery('#snippet .desc span').text( desc );

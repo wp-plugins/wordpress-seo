@@ -38,6 +38,13 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.3.2 =
+
+* Bugs fixed:
+	* Fixed race condition where sitemap wouldn't load sometimes.
+	* ... in snippet preview are now bold as they should be.
+	* Desc and Title in snippet preview should now update less frequently to prevent crashing low mem browsers.
+	
 = 0.2.3.1 =
 
 * Bugs fixed:
