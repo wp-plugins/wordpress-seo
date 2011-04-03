@@ -38,6 +38,16 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.3.3 =
+
+* Bugs fixed:
+	* Comma in priority in sitemap which should be dot. I hate European servers.
+	* Fixed a notice in generating a path to the wpseo directory in the uploads dir.
+	* Fixed a rather annoying XML Sitemap date issue, props to [Staze in wp.org forums](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-sitemapxml-wrong-date-for-blog?replies=8).
+	
+* Feature enhancement:
+	* Breadcrumbs now output links to post type archives too.
+	
 = 0.2.3.2 =
 
 * Bugs fixed:

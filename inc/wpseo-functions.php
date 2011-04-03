@@ -188,6 +188,8 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 function wpseo_dir_setup() {
 	$options = get_option('wpseo');
 	
+	$error = __('An error occurred while trying to create or find the <code>/wpseo/</code> folder in your uploads directory.');
+	
 	if ( !is_array($options) )
 		$options = array();
 		

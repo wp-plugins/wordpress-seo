@@ -30,7 +30,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		$output .= "\t\t<loc>".$url['loc']."</loc>\n";
 		$output .= "\t\t<lastmod>".$this->w3c_date($url['mod'])."</lastmod>\n";
 		$output .= "\t\t<changefreq>".$url['chf']."</changefreq>\n";
-		$output .= "\t\t<priority>".$url['pri']."</priority>\n";
+		$output .= "\t\t<priority>".str_replace(',','.',$url['pri'])."</priority>\n";
 		if ( isset($url['images']) && count($url['images']) > 0 ) {
 			foreach($url['images'] as $img) {
 				$output .= "\t\t<image:image>\n";

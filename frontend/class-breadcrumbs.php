@@ -129,6 +129,12 @@ class WPSEO_Breadcrumbs {
 			$output = $homelink.' '.$sep.' '.$this->bold_or_not( $this->get_bc_title($blog_page) );
 		} else if ( is_singular() ) {
 			$output = $bloglink.' '.$sep.' ';
+			
+			if ( function_exists('get_post_type_archive_link') && get_post_type_archive_link( get_post_type() ) ) {
+				$post_type_obj = get_post_type_object( get_post_type() );
+				$output .= '<a href="'.get_post_type_archive_link( get_post_type() ).'">'.$post_type_obj->labels->menu_name.'</a> ' . $sep . ' ';
+			}
+				
 			if( isset($opt['breadcrumbs-menus']) && $opt['breadcrumbs-menus'] = 'on'){
 				$use_menu = $this->in_menu( $selmenu );
 			}
@@ -149,7 +155,7 @@ class WPSEO_Breadcrumbs {
 					if ( isset( $opt['post_types-'.$post->post_type.'-maintax'] ) && $opt['post_types-'.$post->post_type.'-maintax'] != '0' ) {
 						$main_tax = $opt['post_types-'.$post->post_type.'-maintax'];
 						$terms = wp_get_object_terms( $post->ID, $main_tax );
-						if (is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0) {
+						if ( is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0 ) {
 							$parents = $this->get_term_parents($terms[0], $main_tax);
 							foreach($parents as $parent) {
 								$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'bctitle' );
@@ -204,7 +210,11 @@ class WPSEO_Breadcrumbs {
 				$output = $homelink.' '.$sep.' ';
 			}
 			
-			if ( is_tax() || is_tag() || is_category() ) {
+			if ( is_post_type_archive() ) {
+				$post_type_obj = get_post_type_object( get_post_type() );
+				$archive_title = $post_type_obj->labels->menu_name;
+				$output .= $this->bold_or_not( $archive_title );
+			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
 			
 				if ( is_taxonomy_hierarchical($term->taxonomy) && $term->parent != 0 ) {

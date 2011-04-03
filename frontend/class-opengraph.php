@@ -58,9 +58,9 @@ class WPSEO_OpenGraph {
 				$title = $fixed_title; 
 			} else {
 				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) ) {
-					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
+					$title = wpseo_replace_vars( $options['title-'.$post->post_type], (array) $post );
 				} else {
-					$title = '';
+					$title = get_the_title();
 					$title = apply_filters('single_post_title', $title);
 				}
 			}

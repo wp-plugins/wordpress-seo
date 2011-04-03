@@ -93,7 +93,7 @@ class WPSEO_XML_Sitemap_Base {
 
 	function w3c_date( $time = '' ) { 
 	    if ( empty( $time ) ) 
-	        $time = time();
+	        $time = 'time()';
 		return mysql2date( "Y-m-d\TH:i:s+00:00", $time );
 	}
 
