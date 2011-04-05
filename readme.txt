@@ -38,6 +38,10 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.3.4 =
+
+* Added WPML config file
+
 = 0.2.3.3 =
 
 * Bugs fixed:
@@ -368,11 +372,8 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Upgrade Notice ==
 
-= 0.1.9 =
-Several bugs fixed, speed optimizations and the option to disable the WP SEO edit boxes on specific post types.
-
-= 0.1.8 =
-Several fixes to how SEO title is handled and generated to make editor faster and more intuitive.
+= 0.2.3.4 =
+Added config file for WPML.
 
 == Other Notes ==
 
