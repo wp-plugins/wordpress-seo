@@ -8,9 +8,6 @@ class WPSEO_Metabox {
 	function WPSEO_Metabox() {
 		$options = get_wpseo_options();
 		
-		add_action('admin_print_scripts', array(&$this,'scripts'));
-		add_action('admin_print_styles', array(&$this,'styles'));	
-		
 		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
 			// WPSC integration
 			add_action('wpsc_edit_product', array(&$this,'rebuild_sitemap'));
@@ -21,7 +18,11 @@ class WPSEO_Metabox {
 			add_action('publish_post', array(&$this,'rebuild_sitemap') );
 		}
 
-		add_action('admin_menu', array(&$this,'create_meta_box') );
+		add_action( 'add_meta_boxes',                  array( $this, 'add_meta_box' ) );
+		add_action( 'admin_print_styles-post-new.php', array( $this, 'enqueue'      ) );
+		add_action( 'admin_print_styles-post.php',     array( $this, 'enqueue'      ) );
+
+		// add_action('admin_menu', array(&$this,'create_meta_box') );
 		add_action('save_post', array(&$this,'save_postdata') );
 		
 		add_filter('manage_page_posts_columns',array(&$this,'page_title_column_heading'),10,1);
@@ -31,36 +32,63 @@ class WPSEO_Metabox {
 
 		add_action('get_inline_data',array(&$this,'yoast_wpseo_inline_edit'));
 	}
-	
-	function scripts() {
-		global $pagenow;
+
+	public function add_meta_box() {
+		$options = get_wpseo_options();
 		
-		if (in_array($pagenow, array('post.php', 'page.php', 'post-new.php'))) {
-			wp_enqueue_script('jquery-bgiframe', WPSEO_URL.'js/jquery.bgiframe.min.js', array('jquery'));
-			wp_enqueue_script('jquery-autocomplete', WPSEO_URL.'js/jquery.autocomplete.min.js', array('jquery'));
-			wp_enqueue_script('wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-bgiframe','jquery-autocomplete'));
-		} elseif ($pagenow == 'edit.php') {
-			wp_enqueue_script('jquery-bgiframe', WPSEO_URL.'js/inline-edit.js',array('jquery'));
+		foreach ( get_post_types() as $posttype ) {
+			if ( in_array( $posttype, array('revision','nav_menu_item','post_format','attachment') ) )
+				continue;
+			if ( isset($options['hideeditbox-'.$posttype]) && $options['hideeditbox-'.$posttype] )
+				continue;
+			add_meta_box( 'wpseo_meta', 'WordPress SEO by Yoast', array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
 		}
 	}
 	
-	function styles() {
-		global $pagenow;
-		
-		if (in_array($pagenow, array('post.php', 'page.php', 'post-new.php'))) {
-			wp_enqueue_style('wp-seo-metabox', WPSEO_URL.'css/wp-seo-metabox.css');
-		}
+	public function do_tab( $id, $heading, $content ) {
+?>
+	<div class="<?php echo $id ?>">
+		<h4 class="heading"><?php echo $heading ?></h4>
+		<div class="tab-content">
+			<table class="form-table">
+				<?php echo $content ?>
+			</table>
+		</div>
+	</div>
+<?php		
 	}
 	
-	function get_meta_boxes( $post_type = 'post' ) {
+	public function get_meta_boxes( $post_type = 'post' ) {
+		global $post;
+		
 		$options = get_wpseo_options();
 		$mbs = array();
+		$mbs['snippetpreview'] = array(
+			"name" => "snippetpreview",
+			"type" => "snippetpreview",
+			"title" => __("Snippet Preview"),
+		);
+		$mbs['focuskw'] = array(
+			"name" => "focuskw",
+			"std" => "",
+			"type" => "text",
+			"title" => __("Focus Keyword"),
+			"description" => "<div class='alignright' style='width: 300px;'>"
+			."<a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a> "
+			."<p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
+		);
 		$mbs['title'] = array(
 			"name" => "title",
 			"std" => "",
 			"type" => "text",
 			"title" => __("SEO Title"),
-			"description" => __('<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title').'</a></div><p>'."Title display in search engines is limited to 70 chars, <span id='yoast_wpseo_title-length'></span> chars left.<br/>If the SEO Title is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>title template</a>.".'</p>'));
+			// Template below is used for snippet generation
+			"description" => '<div class="wpseo_hidden" id="wpseo_title_template">'.wpseo_replace_vars( $options['title-'.$post->post_type], $post, array( '%%title%%') ).'</div>'
+				.'<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title').'</a></div><p>'
+				.__("Title display in search engines is limited to 70 chars").", <span id='yoast_wpseo_title-length'></span> ".__("chars left.")."<br/>"
+				.__("If the SEO Title is empty, the preview shows what the plugin generates based on your ")
+				."<a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>".__("title template")."</a>.".'</p>',
+		);
 		$mbs['metadesc'] = array(
 			"name" => "metadesc",
 			"std" => "",
@@ -69,7 +97,8 @@ class WPSEO_Metabox {
 			"title" => __("Meta Description"),
 			"rows" => 2,
 			"richedit" => false,
-			"description" => "The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
+			"description" => '<div class="wpseo_hidden" id="wpseo_metadesc_template">'.wpseo_replace_vars( $options['metadesc-'.$post->post_type], $post, array( '%%excerpt%%', '%%excerpt_only%%' ) ).'</div>'
+				."The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
 		);
 		if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] ) {
 			$mbs['metakeywords'] = array(
@@ -81,134 +110,243 @@ class WPSEO_Metabox {
 				"description" => "If you type something above it will override your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta keywords template</a>."
 			);
 		}
-		$mbs['focuskw'] = array(
-			"name" => "focuskw",
-			"std" => "",
-			"type" => "text",
-			"title" => __("Focus Keyword"),
-			"description" => "<div class='alignright' style='width: 300px;'>"
-			."<a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a> "
-			."<p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
-		);
 		
 		// Apply filters before entering the advanced section
 		$mbs = apply_filters('wpseo_metabox_entries', $mbs);
 
-		if ( ! isset($options['disableadvanced_meta']) || !$options['disableadvanced_meta'] ) {
+		return $mbs;
+	}
+	
+	function get_advanced_meta_boxes() {
+		$options = get_wpseo_options();
 		
-			$mbs['advancedopen'] = array(
-				"type" => "div",
-				"id" => "advancedseo",
-			);
-			$mbs['meta-robots-noindex'] = array(
-				"name" => "meta-robots-noindex",
-				"std" => "index",
-				"title" => __("Meta Robots Index"),
-				"type" => "radio",
-				"options" => array(
-					"0" => __("Index"),
-					"1" => __("Noindex"),
-				),
-			);
-			$mbs['meta-robots-nofollow'] = array(
-				"name" => "meta-robots-nofollow",
-				"std" => "follow",
-				"title" => __("Meta Robots Follow"),
-				"type" => "radio",
-				"options" => array(
-					"0" => __("Follow"),
-					"1" => __("Nofollow"),
-				),
-			);
-			$mbs['meta-robots-adv'] = array(
-				"name" => "meta-robots-adv",
-				"std" => "none",
-				"type" => "multiselect",
-				"title" => __("Meta Robots Advanced"),
-				"description" => __("Advanced <code>meta</code> robots settings for this page."),
-				"options" => array(
-					"noodp" => "NO ODP",
-					"noydir" => "NO YDIR",
-					"noarchive" => __("No Archive"),
-					"nosnippet" => __("No Snippet"),
-				),
-			);
-			if (isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable']) {
-				$mbs['bctitle'] = array(
-					"name" => "bctitle",
-					"std" => "",
-					"type" => "text",
-					"title" => __("Breadcrumbs title"),
-					"description" => __("Title to use for this page in breadcrumb paths"),
-				);
-			}
-			if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {		
-				$mbs['sitemap-include'] = array(
-					"name" => "sitemap-include",
-					"std" => "-",
-					"type" => "select",
-					"title" => __("Include in Sitemap"),
-					"description" => __("Should this page be in the XML Sitemap at all times, regardless of Robots Meta settings?"),
-					"options" => array(
-						"-" => __("Auto detect"),
-						"always" => __("Always include"),
-						"never" => __("Never include"),
-					),
-				);
-				$mbs['sitemap-prio'] = array(
-					"name" => "sitemap-prio",
-					"std" => "-",
-					"type" => "select",
-					"title" => __("Sitemap Priority"),
-					"description" => __("The priority given to this page in the XML sitemap."),
-					"options" => array(
-						"-" => __("Automatic prioritization"),
-						"1" => __("1 - Highest priority"),
-						"0.9" => "0.9",
-						"0.8" => "0.8 - ".__("Default for first tier pages"),
-						"0.7" => "0.7",
-						"0.6" => "0.6 - ".__("Default for second tier pages and posts"),
-						"0.5" => "0.5 - ".__("Medium priority"),
-						"0.4" => "0.4",
-						"0.3" => "0.3",
-						"0.2" => "0.2",
-						"0.1" => "0.1 - ".__("Lowest priority"),
-					),
-				);
-			}
-			$mbs['canonical'] = array(
-				"name" => "canonical",
+		$mbs = array();
+		
+		$mbs['meta-robots-noindex'] = array(
+			"name" => "meta-robots-noindex",
+			"std" => "index",
+			"title" => __("Meta Robots Index"),
+			"type" => "radio",
+			"options" => array(
+				"0" => __("Index"),
+				"1" => __("Noindex"),
+			),
+		);
+		$mbs['meta-robots-nofollow'] = array(
+			"name" => "meta-robots-nofollow",
+			"std" => "follow",
+			"title" => __("Meta Robots Follow"),
+			"type" => "radio",
+			"options" => array(
+				"0" => __("Follow"),
+				"1" => __("Nofollow"),
+			),
+		);
+		$mbs['meta-robots-adv'] = array(
+			"name" => "meta-robots-adv",
+			"std" => "none",
+			"type" => "multiselect",
+			"title" => __("Meta Robots Advanced"),
+			"description" => __("Advanced <code>meta</code> robots settings for this page."),
+			"options" => array(
+				"noodp" => "NO ODP",
+				"noydir" => "NO YDIR",
+				"noarchive" => __("No Archive"),
+				"nosnippet" => __("No Snippet"),
+			),
+		);
+		if (isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable']) {
+			$mbs['bctitle'] = array(
+				"name" => "bctitle",
 				"std" => "",
 				"type" => "text",
-				"title" => "Canonical URL",
-				"description" => "The canonical URL that this page should point to, leave empty to default to permalink. <a target='_blank' href='http://googlewebmastercentral.blogspot.com/2009/12/handling-legitimate-cross-domain.html'>Cross domain canonical</a> supported too."
-			);
-			$mbs['redirect'] = array(
-				"name" => "redirect",
-				"std" => "",
-				"type" => "text",
-				"title" => "301 Redirect",
-				"description" => "The URL that this page should redirect to."
-			);
-		
-			// Apply filters for in advanced section
-			$mbs = apply_filters('wpseo_metabox_entries_advanced', $mbs);
-		
-			$mbs['advancedclose'] = array(
-				"type" => "divclose",
-				"id" => "advancedseo",
-				"label" => "Advanced",
+				"title" => __("Breadcrumbs title"),
+				"description" => __("Title to use for this page in breadcrumb paths"),
 			);
 		}
+		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {		
+			$mbs['sitemap-include'] = array(
+				"name" => "sitemap-include",
+				"std" => "-",
+				"type" => "select",
+				"title" => __("Include in Sitemap"),
+				"description" => __("Should this page be in the XML Sitemap at all times, regardless of Robots Meta settings?"),
+				"options" => array(
+					"-" => __("Auto detect"),
+					"always" => __("Always include"),
+					"never" => __("Never include"),
+				),
+			);
+			$mbs['sitemap-prio'] = array(
+				"name" => "sitemap-prio",
+				"std" => "-",
+				"type" => "select",
+				"title" => __("Sitemap Priority"),
+				"description" => __("The priority given to this page in the XML sitemap."),
+				"options" => array(
+					"-" => __("Automatic prioritization"),
+					"1" => __("1 - Highest priority"),
+					"0.9" => "0.9",
+					"0.8" => "0.8 - ".__("Default for first tier pages"),
+					"0.7" => "0.7",
+					"0.6" => "0.6 - ".__("Default for second tier pages and posts"),
+					"0.5" => "0.5 - ".__("Medium priority"),
+					"0.4" => "0.4",
+					"0.3" => "0.3",
+					"0.2" => "0.2",
+					"0.1" => "0.1 - ".__("Lowest priority"),
+				),
+			);
+		}
+		$mbs['canonical'] = array(
+			"name" => "canonical",
+			"std" => "",
+			"type" => "text",
+			"title" => "Canonical URL",
+			"description" => "The canonical URL that this page should point to, leave empty to default to permalink. <a target='_blank' href='http://googlewebmastercentral.blogspot.com/2009/12/handling-legitimate-cross-domain.html'>Cross domain canonical</a> supported too."
+		);
+		$mbs['redirect'] = array(
+			"name" => "redirect",
+			"std" => "",
+			"type" => "text",
+			"title" => "301 Redirect",
+			"description" => "The URL that this page should redirect to."
+		);
+	
+		// Apply filters for in advanced section
+		$mbs = apply_filters('wpseo_metabox_entries_advanced', $mbs);
+
 		return $mbs;
 	}
 
-	function meta_boxes() {
+	function meta_box() {
 		global $post;
 
 		$options = get_wpseo_options();
 		
 		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', 155);
+
+?>
+		<ul class="metabox-tabs">
+			<li class="tab general"><a class="active" href="javascript:void(null);">General</a></li>
+			<li class="tab advanced"><a href="javascript:void(null);">Advanced</a></li>
+<?php do_action('wpseo_tab_header'); ?>
+		</ul>
+<?php		
+		$content = '';
+		foreach( $this->get_meta_boxes($post->post_type) as $meta_box) {
+			$content .= $this->do_meta_box( $meta_box );
+		}
+		$this->do_tab( 'general', 'General', $content );
+		
+		if ( ! isset($options['disableadvanced_meta']) || !$options['disableadvanced_meta'] ) {
+			$content = '';
+			foreach( $this->get_advanced_meta_boxes() as $meta_box ) {
+				$content .= $this->do_meta_box( $meta_box );
+			}
+			$this->do_tab( 'advanced', 'Advanced', $content );
+		}
+		
+		do_action('wpseo_tab_content');
+	}
+
+	function do_meta_box( $meta_box ) {
+		global $post;
+
+		$content = '';
+
+		if (!isset($meta_box['name'])) {
+			$meta_box['name'] = '';
+		} else {
+			$meta_box_value = wpseo_get_value($meta_box['name']);
+		}
+	
+		$class = '';
+		if (!empty($meta_box['class']))
+			$class = ' '.$meta_box['class'];
+
+		if( ( !isset($meta_box_value) || empty($meta_box_value) ) && isset($meta_box['std']) )  
+			$meta_box_value = $meta_box['std'];  
+
+		$content .= '<tr>';
+		$content .= '<th scope="row"><label for="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box['title'].':</label></th>';  
+		$content .= '<td>';		
+
+		switch($meta_box['type']) { 
+			case "snippetpreview":
+				$content .= $this->snippet();
+				break;
+			case "text":
+				$content .= '<input type="text" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'" value="'.$meta_box_value.'" class="large-text"/><br />';  
+				break;
+			case "textarea":
+				$rows = 5;
+				if (isset($meta_box['rows']))
+					$rows = $meta_box['rows'];
+				if (!isset($meta_box['richedit']) || $meta_box['richedit'] == true) {
+					$content .= '<div class="editor_container">';
+					wp_tiny_mce( true, array( "editor_selector" => $meta_box['name'].'_class' ) );
+					$content .= '<textarea class="large-text '.$meta_box['name'].'_class" rows="'.$rows.'" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box_value.'</textarea>';
+					$content .= '</div>';
+				} else {
+					$content .= '<textarea class="large-text" rows="3" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box_value.'</textarea>';
+				}
+				break;
+			case "select":
+				$content .= '<select name="yoast_wpseo_'.$meta_box['name'].'" id="yoast_wpseo_'.$meta_box['name'].'" class="yoast'.$class.'">';
+				foreach ($meta_box['options'] as $val => $option) {
+					$selected = '';
+					if ($meta_box_value == $val)
+						$selected = 'selected="selected"';
+					$content .= '<option '.$selected.' value="'.$val.'">'.$option.'</option>';
+				}
+				$content .= '</select>';
+				break;
+			case "multiselect":
+				$selectedarr = explode(',',$meta_box_value);
+				$meta_box['options'] = array('none' => 'None') + $meta_box['options'];
+				$content .= '<select multiple="multiple" size="'.count($meta_box['options']).'" style="height: '.(count($meta_box['options'])*16).'px;" name="yoast_wpseo_'.$meta_box['name'].'[]" id="yoast_wpseo_'.$meta_box['name'].'" class="yoast'.$class.'">';
+				foreach ($meta_box['options'] as $val => $option) {
+					$selected = '';
+					if (in_array($val, $selectedarr))
+						$selected = 'selected="selected"';
+					$content .= '<option '.$selected.' value="'.$val.'">'.$option.'</option>';
+				}
+				$content .= '</select>';
+				break;
+			case "checkbox":
+				$checked = '';
+				if ($meta_box_value != 'off')
+					$checked = 'checked="checked"';
+				$content .= '<input type="checkbox" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'" '.$checked.' class="yoast'.$class.'"/><br />';
+				break;
+			case "radio":
+				if ($meta_box_value == '')
+					$meta_box_value = $meta_box['std'];
+				foreach ($meta_box['options'] as $val => $option) {
+					$selected = '';
+					if ($meta_box_value == $val)
+						$selected = 'checked="checked"';
+					$content .= '<input type="radio" '.$selected.' id="yoast_wpseo_'.$meta_box['name'].'_'.$val.'" name="yoast_wpseo_'.$meta_box['name'].'" value="'.$val.'"/> <label for="yoast_wpseo_'.$meta_box['name'].'_'.$val.'">'.$option.'</label> ';
+				}
+				break;
+			case "divtext":
+				$content .= '<p>' . $meta_box['description'] . '</p>';
+		}
+		
+		if ( isset($meta_box['description']) )
+			$content .= '<p>'.$meta_box['description'].'</p>';
+	
+		$content .= '</td>';  
+		$content .= '</tr>';	
+		
+		return $content;
+	}
+	
+	function snippet() {
+		global $post;
+		
+		$options = get_wpseo_options();
 		
 		$date = '';
 		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) ) {
@@ -221,132 +359,114 @@ class WPSEO_Metabox {
 			$this->wpseo_meta_length_reason = ' (because of date display)';
 		}
 		
-		echo '<script type="text/javascript">
+		$content = '';
+
+		$content .= '<script type="text/javascript">
 			var wpseo_lang = "'.substr(get_locale(),0,2).'";
 			var wpseo_meta_desc_length = '.$this->wpseo_meta_length.';
-		</script>
-		<div class="hidden" id="wpseo_hidden_metadesc"></div>';
-		
-		echo '<table class="yoasttable">';
-		
+		</script>';
+
 		$title = wpseo_get_value('title');
 		$desc = wpseo_get_value('metadesc');
-			
+
 		$slug = $post->post_name;
 		if (empty($slug))
 			$slug = sanitize_title($title);
-		
-?>
-	<tr id="snippetpreview">
-		<th><label>Snippet Preview:</label></th>
-		<td>
-<?php 
+
 		$video = wpseo_get_value('video_meta',$post->ID);
 		if ( $video && $video != 'none' ) {
 			// TODO: improve snippet display of video duration to include seconds for shorter video's
 			// echo '<pre>'.print_r(wpseo_get_value('video_meta'),1).'</pre>';
-?>
-			<div id="snippet" class="video">
+		
+		$content .= '<div id="snippet" class="video">
 				<h4 style="margin:0;font-weight:normal;"><a class="title" href="#"><?php echo $title; ?></a></h4>
 				<div style="margin:5px 10px 10px 0;width:82px;height:62px;float:left;">
-					<img style="border: 1px solid blue;padding: 1px;width:80px;height:60px;" src="<?php echo $video['thumbnail_loc']; ?>"/>
+					<img style="border: 1px solid blue;padding: 1px;width:80px;height:60px;" src="'.$video['thumbnail_loc'].'"/>
 					<div style="margin-top:-23px;margin-right:4px;text-align:right"><img src="http://www.google.com/images/icons/sectionized_ui/play_c.gif" alt="" border="0" height="20" style="-moz-opacity:.88;filter:alpha(opacity=88);opacity:.88" width="20"></div>
 				</div>
 				<div style="float:left;width:440px;">
-					<p style="color:#767676;font-size:13px;line-height:15px;"><?php echo number_format($video['duration']/60); ?> mins - <?php echo $date; ?></p>
-					<p style="color:#000;font-size:13px;line-height:15px;" class="desc"><span><?php echo $desc; ?></span></p>
-					<a href="#" class="url"><?php echo str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/'; ?></a> - <a href="#" class="util">More videos &raquo;</a>
+					<p style="color:#767676;font-size:13px;line-height:15px;">'.number_format($video['duration']/60).' mins - '.$date.'</p>
+					<p style="color:#000;font-size:13px;line-height:15px;" class="desc"><span>'.$desc.'</span></p>
+					<a href="#" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">More videos &raquo;</a>
 				</div>
-			</div>
-			
-<?php
+			</div>';
 		} else {
 			if (!empty($date))
 				$date .= ' <strong>...</strong> ';
-?>
-			<div id="snippet">
-				<a class="title" href="#"><?php echo $title; ?></a>
-				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;"><?php echo $date; ?><span><?php echo $desc ?></span></p>
-				<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url"><?php echo str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/'; ?></a> - <a href="#" class="util">Cached</a> - <a href="#" class="util">Similar</a>
-			</div>
-<?php } ?>
-		</td>
-	</tr>
-<?php
-	
-		foreach($this->get_meta_boxes($post->post_type) as $meta_box) {
-			$this->do_meta_box( $meta_box );
-		}  
-		echo '</table>';
-	}
-
-	function create_meta_box() {
-		$options = get_wpseo_options();
-		if ( function_exists('add_meta_box') ) {  
-			foreach ( get_post_types() as $posttype ) {
-				if ( in_array( $posttype, array('revision','nav_menu_item','post_format','attachment') ) )
-					continue;
-				if ( isset($options['hideeditbox-'.$posttype]) && $options['hideeditbox-'.$posttype] )
-					continue;
-				add_meta_box( 'yoast-wpseo-meta-box', 'WordPress SEO', array(&$this, 'meta_boxes'), $posttype, 'normal', 'high' );  
-			}
-		}  
+				$content .= '<div id="snippet">
+				<a class="title" href="#">'.$title.'</a>
+				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span>'.$desc.'</span></p>
+				<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a> - <a href="#" class="util">Similar</a>
+			</div>';
+		} 
+		return $content;
 	}
 
 	function save_postdata( $post_id ) {  
-		if ($post_id == null || empty($_POST))
+		
+		if ( $post_id == null || empty($_POST) )
 			return;
 
+		// echo '<pre>'.print_r($_POST,1).'</pre>';
+		// die();
+		
 		if ( wp_is_post_revision( $post_id ) )
 			$post_id = wp_is_post_revision( $post_id );
 			
+		if ( isset( $_POST['post_type'] ) ) {  
+			if ( !current_user_can( 'edit_'.$_POST['post_type'], $post_id ))  
+				return $post_id;  
+		} else {  
+			if ( !current_user_can( 'edit_post', $post_id ))  
+				return $post_id;  
+		}  
+
 		global $post;  
 		if ( empty( $post ) )
 			$post = get_post($post_id);
 
-		foreach($this->get_meta_boxes($post->post_type) as $meta_box) {  
+		$metaboxes = array_merge( $this->get_meta_boxes( $post->post_type ), $this->get_advanced_meta_boxes() );
+		
+		$metaboxes = apply_filters( 'wpseo_save_metaboxes', $metaboxes );
+		
+		foreach( $metaboxes as $meta_box ) {  
 			if ( !isset($meta_box['name']) )
 				continue;
-			// // Verify  
-			// if ( !wp_verify_nonce( $_POST['yoast_wpseo_nonce'], 'yoast-wpseo-form-submit' )) {  
-			// 	return $post;
-			// }  
 
-			if ( isset( $_POST['post_type'] ) && 'page' == $_POST['post_type'] ) {  
-				if ( !current_user_can( 'edit_page', $post_id ))  
-					return $post_id;  
-			} else {  
-				if ( !current_user_can( 'edit_post', $post_id ))  
-					return $post_id;  
-			}  
-
-			if ( isset($_POST['yoast_wpseo_'.$meta_box['name']]) )
-				$data = $_POST['yoast_wpseo_'.$meta_box['name']];  
-			else 
-				continue;
-			if ($meta_box['type'] == 'checkbox') {
-				if (isset($_POST['yoast_wpseo_'.$meta_box['name']]))
-					$data = true;
+			if ( 'checkbox' == $meta_box['type'] ) {
+				if ( isset( $_POST['yoast_wpseo_'.$meta_box['name']] ) )
+					$data = 'on';
 				else
-					$data = false;
-			} elseif ($meta_box['type'] == 'multiselect') {
+					$data = 'off';
+			} elseif ( 'multiselect' == $meta_box['type'] ) {
 				if (is_array($_POST['yoast_wpseo_'.$meta_box['name']]))
 					$data = implode( ",", $_POST['yoast_wpseo_'.$meta_box['name']] );
 				else
 					$data = $_POST['yoast_wpseo_'.$meta_box['name']];
+			} else {
+				if ( isset($_POST['yoast_wpseo_'.$meta_box['name']]) )
+					$data = $_POST['yoast_wpseo_'.$meta_box['name']];  
+				else 
+					continue;
 			}
 
 			$option = '_yoast_wpseo_'.$meta_box['name'];
-			$oldval = get_post_meta($post_id, $option);
+			$oldval = get_post_meta($post_id, $option, true);
 
-			if($oldval == "")  
-				add_post_meta($post_id, $option, $data, true);  
-			elseif($data != $oldval)  
-				update_post_meta($post_id, $option, $data);  
-			elseif($data == "")  
-				delete_post_meta($post_id, $option, $oldval);  
+			update_post_meta($post_id, $option, $data, $oldval);  
 		}  
 		do_action('wpseo_saved_postdata');
+	}
+
+	public function enqueue() {
+		$color = get_user_meta( get_current_user_id(), 'admin_color', true );
+
+		wp_enqueue_style(  'metabox-tabs', WPSEO_URL.'css/metabox-tabs.css' 					);
+		wp_enqueue_style(  "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css'				);
+		
+		wp_enqueue_script( 'jquery-bgiframe', WPSEO_URL.'js/jquery.bgiframe.min.js', array('jquery'));
+		wp_enqueue_script( 'jquery-autocomplete', WPSEO_URL.'js/jquery.autocomplete.min.js', array('jquery'));
+		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-bgiframe','jquery-autocomplete'));
 	}
 
 	function rebuild_sitemap( $post ) {
@@ -376,107 +496,7 @@ class WPSEO_Metabox {
 			
 			echo $robots['index'].', '.$robots['follow'];
 		}
-	}
-
-	function do_meta_box( $meta_box ) {
-		global $post;
-		if (!isset($meta_box['name'])) {
-			$meta_box['name'] = '';
-		} else {
-			$meta_box_value = wpseo_get_value($meta_box['name']);
-		}
-	
-		$class = '';
-		if (!empty($meta_box['class']))
-			$class = ' '.$meta_box['class'];
-
-		if( ( !isset($meta_box_value) || empty($meta_box_value) ) && isset($meta_box['std']) )  
-			$meta_box_value = $meta_box['std'];  
-
-		if ($meta_box['type'] != 'div' && $meta_box['type'] != 'divclose') {
-			echo '<tr>';
-			echo '<th><label for="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box['title'].':</label></th>';  
-			echo '<td>';		
-		}
-		switch($meta_box['type']) { 
-			case "text":
-				echo '<input type="text" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'" value="'.$meta_box_value.'" class="yoast'.$class.'"/><br />';  
-				break;
-			case "textarea":
-				$rows = 5;
-				if (isset($meta_box['rows']))
-					$rows = $meta_box['rows'];
-				if (!isset($meta_box['richedit']) || $meta_box['richedit'] == true) {
-					echo '<div class="editor_container">';
-					wp_tiny_mce( true, array( "editor_selector" => $meta_box['name'].'_class' ) );
-					echo '<textarea class="yoast'.$class.' '.$meta_box['name'].'_class" rows="'.$rows.'" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box_value.'</textarea>';
-					echo '</div>';
-				} else {
-					echo '<textarea class="yoast'.$class.'" rows="5" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box_value.'</textarea>';
-				}
-				break;
-			case "select":
-				echo '<select name="yoast_wpseo_'.$meta_box['name'].'" id="yoast_wpseo_'.$meta_box['name'].'" class="yoast'.$class.'">';
-				foreach ($meta_box['options'] as $val => $option) {
-					$selected = '';
-					if ($meta_box_value == $val)
-						$selected = 'selected="selected"';
-					echo '<option '.$selected.' value="'.$val.'">'.$option.'</option>';
-				}
-				echo '</select>';
-				break;
-			case "multiselect":
-				$selectedarr = explode(',',$meta_box_value);
-				$meta_box['options'] = array('none' => 'None') + $meta_box['options'];
-				echo '<select multiple="multiple" size="'.count($meta_box['options']).'" style="height: '.(count($meta_box['options'])*16).'px;" name="yoast_wpseo_'.$meta_box['name'].'[]" id="yoast_wpseo_'.$meta_box['name'].'" class="yoast'.$class.'">';
-				foreach ($meta_box['options'] as $val => $option) {
-					$selected = '';
-					if (in_array($val, $selectedarr))
-						$selected = 'selected="selected"';
-					echo '<option '.$selected.' value="'.$val.'">'.$option.'</option>';
-				}
-				echo '</select>';
-				break;
-			case "checkbox":
-				$checked = '';
-				if ($meta_box_value != false)
-					$checked = 'checked="checked"';
-				echo '<input type="checkbox" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'" '.$checked.' class="yoast'.$class.'"/><br />';
-				break;
-			case "radio":
-				if ($meta_box_value == '')
-					$meta_box_value = $meta_box['std'];
-				foreach ($meta_box['options'] as $val => $option) {
-					$selected = '';
-					if ($meta_box_value == $val)
-						$selected = 'checked="checked"';
-					echo '<input type="radio" '.$selected.' id="yoast_wpseo_'.$meta_box['name'].'_'.$val.'" name="yoast_wpseo_'.$meta_box['name'].'" value="'.$val.'"/> <label for="yoast_wpseo_'.$meta_box['name'].'_'.$val.'">'.$option.'</label> ';
-				}
-				break;
-			case "div":
-				echo '</table>';
-				echo '<br class="clear"/>';
-				echo '<div id="'.$meta_box['id'].'">';
-				echo '<table class="yoasttable">';
-				break;
-			case "divclose":
-				$tableopen = false;
-				echo '</table>';
-				echo '</div>';
-				echo '<div class="divtoggle"><small><a class="button" href="" id="'.$meta_box['id'].'_open">'.$meta_box['label'].' &darr;</a></small></div>';
-				break;
-			case "divtext":
-				echo '<p>' . $meta_box['description'] . '</p>';
-		}
-		
-		if ($meta_box['type'] != 'div' && $meta_box['type'] != 'divclose' && $meta_box['type'] != 'divtext') {
-			if ( isset($meta_box['description']) )
-				echo '<p>'.$meta_box['description'].'</p>';
-			echo '</td>';  
-			echo '</tr>';	
-		}
-	}
-	
+	}	
 	function page_title( $postid ) {
 		$fixed_title = wpseo_get_value('title', $postid );
 		if ($fixed_title) {

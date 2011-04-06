@@ -85,7 +85,7 @@ function testfocuskw() {
 		html += 'Page title: ' + ptest( jQuery('#snippet .title').text(), p ) + '<br/>';
 		html += 'Page URL: ' + ptest( jQuery('#snippet .url').text(), p2 ) + '<br/>';
 		html += 'Content: ' + ptest( jQuery('#content').val(), p ) + '<br/>';
-		html += 'Meta description: ' + ptest( jQuery('#wpseo_hidden_metadesc').text(), p );
+		html += 'Meta description: ' + ptest( jQuery('#yoast_wpseo_metadesc').text(), p );
 		html += '</p>';
 		jQuery('#focuskwresults').html(html);
 	}
@@ -119,112 +119,50 @@ function updateDescLength() {
 }
 
 function getAutogenTitle( force ) {
-
-	if ( wpseo_doing_title ) {
-		if ( !autoGenTitleTimeoutId ) {
-			autoGenTitleTimeoutId = window.setTimeout(function() {
-				wpseo_doing_title = false;
-				getAutogenTitle();
-			}, 5000);
-		}
-		return;
-	}
+	var template = jQuery('#wpseo_title_template').text();
+	var title = template.replace('%%title%%', jQuery('#title').val() );
 	
-	autoGenTitleTimeoutId = false;
-	wpseo_doing_title = true;
-	
-	if ( force != 1 )
-		force = false;
-	else
-		force = true;
-	
-	if ( !force ) {
-		title = jQuery.trim( jQuery('#yoast_wpseo_title').val() );	
-		if ( title != '' && title != null ) {
-			wpseo_doing_title = false;
-			return false;
-		}
-	}
-	
-	title =jQuery('#title').val();
-	var data = {
-		action: 'wpseo_autogen_title',
-		curtitle: title,
-		post_type: jQuery('#post_type').val(),
-		postid: jQuery('#post_ID').val()
-	}
-	jQuery.post(ajaxurl, data, function( response ) {
-		var title = response;
-		if ( force ) {
-			jQuery('#yoast_wpseo_title').val( title );
-		}
-		jQuery('#snippet .title').text( title );
-		updateTitleLength();
-		testfocuskw();
+	if ( force ) 
+		jQuery('#yoast_wpseo_title').val( title );
 
-		wpseo_doing_title = false;
-
-		if ( redo_title )
-			getAutogenTitle();
-
-	});	
-	if ( title && title != '' ) {
-		wpseo_doing_title = false;
-		return title;
-	}
-	return false;
+	jQuery('#snippet .title').text( title );
+	updateTitleLength();
+	testfocuskw();
 }
 
 function getAutogenDesc() {
 	var desc = jQuery("#yoast_wpseo_metadesc").val();
-	jQuery("#snippet .desc span").css('color','#000000');
-	
-	if ( !desc || desc == '' ) {
-
-		if ( wpseo_doing_desc ) {
-			if ( !autoGenDescTimeoutId ) {
-				autoGenDescTimeoutId = window.setTimeout(function() {
-					wpseo_doing_desc = false;
-					getAutogenDesc();
-				}, 10000);
-			}
-			return;
-		}
-		
-		autoGenDescTimeoutId = false;
-		wpseo_doing_desc = true;
-
-		var data = {
-			action: 'wpseo_autogen_metadesc',
-			post_content: jQuery('#content').val(),
-			post_excerpt: jQuery('#excerpt').val(),
-			post_type: jQuery('#post_type').val(),
-			postid: jQuery('#post_ID').val()
-		}
-		jQuery.post(ajaxurl, data, function( response ) {
-			if ( response.length > 0 && response != '' ) {
-				jQuery('#snippet .desc span').text( response );
-				jQuery('#wpseo_hidden_metadesc').text( response );
-				updateDescLength();
-				testfocuskw();
-				updateSnippet();
-			} else {
-				jQuery('#snippet .desc span').text( '' );
-				jQuery('#wpseo_hidden_metadesc').text( '' );
-				updateDescLength();
-				testfocuskw();
-				updateSnippet();
-			}
-			updateDescLength();
-			testfocuskw();
-		});
-	} else {
+	if ( desc != '' ) {
+		jQuery("#snippet .desc span").css('color','#000000');
 		jQuery('#snippet .desc span').text( desc );
-		jQuery('#wpseo_hidden_metadesc').text( desc );
 		updateDescLength();
 		testfocuskw();
-		updateSnippet();
+		return;
+	} else {
+		jQuery('#snippet .desc span').text( '' );
 	}
+	
+	var template = jQuery('#wpseo_metadesc_template').text();
+
+	if ( template == '' ) {
+		updateSnippet();
+		return;
+	}
+		
+	var excerpt = jQuery("#excerpt").val();
+	
+	desc = template.replace('%%excerpt_only%%', excerpt);
+	desc = template.replace('%%excerpt%%', excerpt);
+
+	if ( desc != '' ) {
+		jQuery('#snippet .desc span').text( desc );
+		jQuery("#snippet .desc span").css('color','#000000');
+		updateDescLength();
+		testfocuskw();
+		return;
+	}	
+	updateSnippet();
+	return;
 }
 
 function updateSnippet( focuskw ) {
@@ -271,6 +209,29 @@ function updateSnippet( focuskw ) {
 }
 
 jQuery(document).ready(function(){	
+	// Tabs, based on code by Pete Mall - https://github.com/PeteMall/Metabox-Tabs
+	jQuery('.metabox-tabs li.tab a').each(function(i) {
+		var thisTab = jQuery(this).parent().attr('class').replace(/tab /, '');
+		if ( 'active' != jQuery(this).attr('class') )
+			jQuery('div.' + thisTab).hide();
+ 
+		jQuery(this).click(function(){
+ 
+			// hide all child content
+			jQuery(this).parent().parent().parent().children('div').hide();
+ 
+			// remove all active tabs
+			jQuery(this).parent().parent('ul').find('li a.active').removeClass('active');
+ 
+			// show selected content
+			jQuery(this).parent().parent().parent().find('div.'+thisTab).show();
+			jQuery(this).parent().parent().parent().find('li.'+thisTab+' a').addClass('active');
+		});
+
+		jQuery('.heading').hide();
+		jQuery('.metabox-tabs').show();
+	});
+	
 	wpseo_doing_title = false;
 	wpseo_doing_desc = false;
 	

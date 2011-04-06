@@ -36,7 +36,7 @@ function get_wpseo_options() {
 	return $options;
 }
 
-function wpseo_replace_vars($string, $args) {
+function wpseo_replace_vars($string, $args, $omit = array() ) {
 	
 	$args = (array) $args;
 	
@@ -143,7 +143,8 @@ function wpseo_replace_vars($string, $args) {
 	);
 	
 	foreach ($replacements as $var => $repl) {
-		$string = str_replace($var, $repl, $string);
+		if ( !in_array($var, $omit) )
+			$string = str_replace($var, $repl, $string);
 	}
 	
 	$string = preg_replace( '/\s\s+/',' ', $string );

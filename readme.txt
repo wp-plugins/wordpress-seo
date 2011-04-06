@@ -38,9 +38,21 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.5 =
+
+* Bugs fixed:
+	* Snippet preview quicker than ever and it no longer blows up some browsers: all AJAX calls have been removed and the entire process is done with JavaScript within the browser.
+	
+* Feature enhancements:
+	* The meta box on the edit posts page now features tabs, thanks to Pete Mall (even works nicely in the blue theme).
+	* Advanced features moved to their own tab instead of button.
+	* Focus keyword now shown straight below snippet preview.
+	
+* Other news: The Google News module almost ready for mass-deployment. Stay tuned.
+	
 = 0.2.3.4 =
 
-* Added WPML config file
+* Added WPML config file.
 
 = 0.2.3.3 =
 

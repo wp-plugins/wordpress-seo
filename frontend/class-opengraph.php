@@ -2,13 +2,13 @@
 
 class WPSEO_OpenGraph {
 
-	function WPSEO_OpenGraph() {
+	public function __construct() {
 		$options = get_wpseo_options();
 
-		$this->opengraph();
+		add_action( 'wpseo_head', array(&$this, 'opengraph') );
 	}
 
-	function opengraph() {
+	public function opengraph() {
 		$options = get_wpseo_options();
 
 		global $wp_query, $paged;
@@ -24,7 +24,7 @@ class WPSEO_OpenGraph {
 		echo "\n";
 	}
 	
-	function title( ) {
+	private function title( ) {
 		global $post, $wp_query;
 		if ( empty($post) && is_singular() ) {
 			$post = $wp_query->get_queried_object();
@@ -117,12 +117,12 @@ class WPSEO_OpenGraph {
 		echo "\t<meta property='og:title' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
 	}
 		
-	function url() {
+	public function url() {
 		$url = WPSEO_Frontend::canonical( false );
 		echo "\t<meta property='og:url' content='".esc_attr( $url )."'/>\n";
 	}
 	
-	function type() {
+	public function type() {
 		if ( is_singular() ) {
 			$type = wpseo_get_value('og_type');
 			if (!$type || $type == '')
@@ -133,7 +133,7 @@ class WPSEO_OpenGraph {
 		echo "\t<meta property='og:type' content='".esc_attr( $type )."'/>\n";
 	}
 		
-	function image( $image = '' ) {
+	public function image( $image = '' ) {
 		global $post;
 		// Grab the featured image
 		if ( is_singular() && empty( $image ) && function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
@@ -159,13 +159,17 @@ class WPSEO_OpenGraph {
 			echo "\t<meta property='og:image' content='".esc_attr( $image )."'/>\n";
 	}
 		
-	function description() {
-		$desc = WPSEO_Frontend::metadesc( false );
-		if ( $desc != '' )
+	public function description() {
+		$desc = wpseo_get_value('opengraph-description');
+		
+		if ( !$desc )
+			$desc = WPSEO_Frontend::metadesc( false );
+
+		if ( $desc && $desc != '' )
 			echo "\t<meta property='og:description' content='".esc_attr( $desc )."'/>\n";
 	}
 
-	function site_name() {
+	public function site_name() {
 		echo "\t<meta property='og:site_name' content='".esc_attr( get_bloginfo('name') )."'/>\n";
 	}
 }

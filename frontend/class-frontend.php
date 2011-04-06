@@ -254,8 +254,7 @@ class WPSEO_Frontend {
 				
 		}
 
-		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
-			require_once 'class-opengraph.php';
+		do_action( 'wpseo_head' );
 		
 		echo "\t<!-- / Yoast WordPress SEO plugin. -->\n\n";
 	}
