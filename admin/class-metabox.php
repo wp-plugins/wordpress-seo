@@ -10,29 +10,37 @@ class WPSEO_Metabox {
 		
 		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
 			// WPSC integration
-			add_action('wpsc_edit_product', array(&$this,'rebuild_sitemap'));
-			add_action('wpsc_rate_product', array(&$this,'rebuild_sitemap'));
+			add_action('wpsc_edit_product', array($this,'rebuild_sitemap'));
+			add_action('wpsc_rate_product', array($this,'rebuild_sitemap'));
 
 			// When permalink structure is changed, sitemap should be regenerated
 			add_action('permalink_structure_changed', array(&$this,'rebuild_sitemap') );
-			add_action('publish_post', array(&$this,'rebuild_sitemap') );
+			add_action('publish_post', array($this,'rebuild_sitemap') );
 		}
 
 		add_action( 'add_meta_boxes',                  array( $this, 'add_meta_box' ) );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'enqueue'      ) );
 		add_action( 'admin_print_styles-post.php',     array( $this, 'enqueue'      ) );
 
-		// add_action('admin_menu', array(&$this,'create_meta_box') );
-		add_action('save_post', array(&$this,'save_postdata') );
-		
-		add_filter('manage_page_posts_columns',array(&$this,'page_title_column_heading'),10,1);
-		add_filter('manage_post_posts_columns',array(&$this,'page_title_column_heading'),10,1);
-		add_action('manage_pages_custom_column',array(&$this,'page_title_column_content'), 10, 2);
-		add_action('manage_posts_custom_column',array(&$this,'page_title_column_content'), 10, 2);
+		add_action( 'admin_head', array( $this, 'script') );
 
-		add_action('get_inline_data',array(&$this,'yoast_wpseo_inline_edit'));
+		add_action('save_post', array($this,'save_postdata') );
+		
+		add_filter('manage_page_posts_columns',array($this,'page_title_column_heading'),10,1);
+		add_filter('manage_post_posts_columns',array($this,'page_title_column_heading'),10,1);
+		add_action('manage_pages_custom_column',array($this,'page_title_column_content'), 10, 2);
+		add_action('manage_posts_custom_column',array($this,'page_title_column_content'), 10, 2);
 	}
 
+	public function script() {
+		?>
+		<script type="text/javascript">
+			var wpseo_lang ='<?php echo substr(get_locale(),0,2); ?>';
+			var wpseo_meta_desc_length = '<?php echo $this->wpseo_meta_length; ?>';
+		</script>
+		<?php
+	}
+	
 	public function add_meta_box() {
 		$options = get_wpseo_options();
 		
@@ -62,6 +70,15 @@ class WPSEO_Metabox {
 		global $post;
 		
 		$options = get_wpseo_options();
+
+		$title_template = $options['title-'.$post->post_type];
+		// If there's no title template set, use the default, otherwise title preview won't work.
+		if ( $title_template == '' )
+			$title_template = '%%title%% - %%sitename%';
+		$title_template = wpseo_replace_vars( $title_template, $post, array('%%title%%') );
+
+		$metadesc_template = wpseo_replace_vars( $options['metadesc-'.$post->post_type], $post, array( '%%excerpt%%', '%%excerpt_only%%' ) );
+			
 		$mbs = array();
 		$mbs['snippetpreview'] = array(
 			"name" => "snippetpreview",
@@ -83,7 +100,7 @@ class WPSEO_Metabox {
 			"type" => "text",
 			"title" => __("SEO Title"),
 			// Template below is used for snippet generation
-			"description" => '<div class="wpseo_hidden" id="wpseo_title_template">'.wpseo_replace_vars( $options['title-'.$post->post_type], $post, array( '%%title%%') ).'</div>'
+			"description" => '<div class="wpseo_hidden" id="wpseo_title_template">'.$title_template.'</div>'
 				.'<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title').'</a></div><p>'
 				.__("Title display in search engines is limited to 70 chars").", <span id='yoast_wpseo_title-length'></span> ".__("chars left.")."<br/>"
 				.__("If the SEO Title is empty, the preview shows what the plugin generates based on your ")
@@ -97,7 +114,7 @@ class WPSEO_Metabox {
 			"title" => __("Meta Description"),
 			"rows" => 2,
 			"richedit" => false,
-			"description" => '<div class="wpseo_hidden" id="wpseo_metadesc_template">'.wpseo_replace_vars( $options['metadesc-'.$post->post_type], $post, array( '%%excerpt%%', '%%excerpt_only%%' ) ).'</div>'
+			"description" => '<div class="wpseo_hidden" id="wpseo_metadesc_template">'.$metadesc_template.'</div>'
 				."The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
 		);
 		if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] ) {
@@ -360,11 +377,6 @@ class WPSEO_Metabox {
 		}
 		
 		$content = '';
-
-		$content .= '<script type="text/javascript">
-			var wpseo_lang = "'.substr(get_locale(),0,2).'";
-			var wpseo_meta_desc_length = '.$this->wpseo_meta_length.';
-		</script>';
 
 		$title = wpseo_get_value('title');
 		$desc = wpseo_get_value('metadesc');

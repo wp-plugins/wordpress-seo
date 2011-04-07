@@ -448,7 +448,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$content .= '<p>'.__('You can determine the title and description for the blog page by').' <a href="'.get_edit_post_link( get_option('page_for_posts') ).'">'.__('editing the blog page itself').' &raquo;</a>.</p>';
 			}
 			foreach (get_post_types() as $posttype) {
-				if ( in_array($posttype, array('revision','nav_menu_item','post_format') ) )
+				if ( in_array($posttype, array('revision','nav_menu_item') ) )
 					continue;
 				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
 					continue;
@@ -462,7 +462,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br/>';
 			$content .= '<h4 class="big">Taxonomies</h4>';
 			foreach (get_taxonomies() as $taxonomy) {
-				if ( in_array($taxonomy, array('link_category','nav_menu') ) )
+				if ( in_array($taxonomy, array('link_category','nav_menu','post_format') ) )
 					continue;				
 				$content .= '<h4>'.ucfirst($taxonomy).'</h4>';
 				$content .= $this->textinput('title-'.$taxonomy,'Title template');
@@ -694,6 +694,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($_POST['submitrobots']) ) {
 				if (!current_user_can('manage_options')) die(__('You cannot edit the robots.txt file.', 'yoast-wpseo'));
 				
+				check_admin_referer('wpseo-robotstxt');
+				
 				if (file_exists( get_home_path()."robots.txt") ) {
 					$robots_file = get_home_path()."robots.txt";
 					$robotsnew = stripslashes($_POST['robotsnew']);
@@ -709,6 +711,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($_POST['submithtaccess']) ) {
 				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', 'yoast-wpseo'));
 
+				check_admin_referer('wpseo-htaccess');
+
 				if (file_exists( get_home_path().".htaccess" ) ) {
 					$htaccess_file = get_home_path().".htaccess";
 					$htaccessnew = stripslashes($_POST['htaccessnew']);
@@ -722,6 +726,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 			if ( isset($_POST['submitcachehtaccess']) ) {
 				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', 'yoast-wpseo'));
+
+				check_admin_referer('wpseo-htaccess-cache');
 
 				if (file_exists(WP_CONTENT_DIR."/cache/.htaccess")) {
 					$htaccess_file = WP_CONTENT_DIR."/cache/.htaccess";
@@ -753,6 +759,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$content .= '<textarea disabled="disabled" style="width: 90%;" rows="15" name="robotsnew">'.$robotstxtcontent.'</textarea><br/>';
 				} else {
 					$content = '<form action="" method="post" id="robotstxtform">';
+					$content .= wp_nonce_field('wpseo-robotstxt', '_wpnonce', true, false);
 					$content .= "<p>".__("Edit the content of your robots.txt:", 'yoast-wpseo')."</p>";
 					$content .= '<textarea style="width: 90%;" rows="15" name="robotsnew">'.$robotstxtcontent.'</textarea><br/>';
 					$content .= '<div class="submit"><input class="button" type="submit" name="submitrobots" value="'.__("Save changes to Robots.txt", 'yoast-wpseo').'" /></div>';
@@ -772,6 +779,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$content .= '<textarea disabled="disabled" style="width: 90%;" rows="15" name="robotsnew">'.$contentht.'</textarea><br/>';
 				} else {
 					$content = '<form action="" method="post" id="htaccessform">';
+					$content .= wp_nonce_field('wpseo-htaccess', '_wpnonce', true, false);
 					$content .=  "<p>Edit the content of your .htaccess:</p>";
 					$content .= '<textarea style="width: 90%;" rows="15" name="htaccessnew">'.$contentht.'</textarea><br/>';
 					$content .= '<div class="submit"><input class="button" type="submit" name="submithtaccess" value="'.__('Save changes to .htaccess', 'yoast-wpseo').'" /></div>';
@@ -791,6 +799,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$content .= '<textarea disabled="disabled" style="width: 90%;" rows="15" name="robotsnew">'.$cacheht.'</textarea><br/>';
 				} else {
 					$content = '<form action="" method="post" id="htaccessform">';
+					$content .= wp_nonce_field('wpseo-htaccess-cache', '_wpnonce', true, false);
 					$content .=  "<p>".__("Edit the content of your cache directory's .htaccess:", 'yoast-wpseo')."</p>";
 					$content .= '<textarea style="width: 90%;" rows="15" name="cachehtaccessnew">'.$cacheht.'</textarea><br/>';
 					$content .= '<div class="submit"><input class="button" type="submit" name="submitcachehtaccess" value="'.__('Save changes to .htaccess', 'yoast-wpseo').'" /></div>';
@@ -998,10 +1007,19 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following post types:').'</strong></p>';
 			foreach ( get_post_types() as $posttype ) {
-				if ( in_array( $posttype, array('revision','nav_menu_item','post_format') ) )
+				if ( in_array( $posttype, array('revision','nav_menu_item') ) )
 					continue;
 				$content .= $this->checkbox('hideeditbox-'.$posttype, $posttype);
 			}	
+
+			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following taxonomies:').'</strong></p>';
+			foreach (get_taxonomies() as $taxonomy) {
+				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
+					$tax = get_taxonomy($taxonomy);
+					if ( isset( $tax->labels->name ) && trim($tax->labels->name) != '' )
+						$content .= $this->checkbox('tax-hideeditbox-'.$taxonomy, $tax->labels->name);
+				}
+			}
 			$this->postbox('general-settings',__('General Settings', 'yoast-wpseo'),$content); 
 			
 					

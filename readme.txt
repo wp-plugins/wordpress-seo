@@ -38,6 +38,21 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.5.1 =
+
+* Security fixes:
+	* Added nonces for security to htaccess and robots.txt file editing to prevent possible XSS.
+
+* Bugs fixed:
+	* Prevent JS error when WP SEO Meta box was hidden on edit pages.
+	* Fix for title in snippet preview not showing when no title template was set for the post type.
+	* Fix for focus keyword count, would give wrong return on slugs that were too long.
+	* Removed post_format from list of taxonomies you can edit title and meta desc template for as it's of no use.
+	* Removed post_format from list of taxonomies to exclude for XML Sitemap, it was already excluded by default.
+
+* New features:
+	* Option to disable WP SEO meta data box on (custom) taxonomies.
+	
 = 0.2.5 =
 
 * Bugs fixed:

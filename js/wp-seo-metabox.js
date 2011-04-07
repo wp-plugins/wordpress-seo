@@ -83,7 +83,7 @@ function testfocuskw() {
 		var html = '<p>Your focus keyword was found in:<br/>';
 		html += 'Article Heading: ' + ptest( jQuery('#title').val(), p ) + '<br/>';
 		html += 'Page title: ' + ptest( jQuery('#snippet .title').text(), p ) + '<br/>';
-		html += 'Page URL: ' + ptest( jQuery('#snippet .url').text(), p2 ) + '<br/>';
+		html += 'Page URL: ' + ptest( jQuery('#editable-post-name-full').text(), p2 ) + '<br/>';
 		html += 'Content: ' + ptest( jQuery('#content').val(), p ) + '<br/>';
 		html += 'Meta description: ' + ptest( jQuery('#yoast_wpseo_metadesc').text(), p );
 		html += '</p>';

@@ -3,8 +3,10 @@
 class WPSEO_Taxonomy {
 	
 	function WPSEO_Taxonomy() {
+		$options = get_wpseo_options();
 		
-		if (is_admin() && isset($_GET['taxonomy']))
+		if (is_admin() && isset($_GET['taxonomy']) && 
+			( !isset($options['tax-hideeditbox-'.$_GET['taxonomy']]) || !$options['tax-hideeditbox-'.$_GET['taxonomy']]) )
 			add_action($_GET['taxonomy'] . '_edit_form', array(&$this,'term_additions_form'), 10, 2 );
 		
 		add_action('edit_term', array(&$this,'update_term'), 10, 3 );
