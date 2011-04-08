@@ -37,6 +37,26 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Configure the plugin by going to the `SEO` menu that appears in your admin menu
 
+== Frequently Asked Questions ==
+
+= The SEO title output for the plugin doesn't work as expected =
+
+You've set up a template for your titles, but things get added to it when they're output? You can do two things: either enable "Force rewrite titles" on the SEO -> Titles settings page, or go into your header.php and change the title element to just this: 
+
+`<title><?php wp_title(''); ?></title>`
+
+= Page X, Y, Z for plugin X doesn't work with your plugin enabled =
+
+Disable the clean permalinks feature on the SEO -> Permalinks settings page.
+
+= Why is WordPress SEO better than All In One SEO Pack? =
+
+It's not a secret that the author of this plugin, Joost de Valk, aka Yoast, doesn't really like All In One SEO Pack. The main reason is that All in One SEO pack has a default option for auto generating meta descriptions that is actually making it harder for people to rank well in a lot of cases, giving them a false sense of security.
+
+Once you'll start using this plugin, you won't ask that question anymore, you'll just ask yourself "why does anyone still use All In One SEO"? There's several things this plugin does better: it has a snippet preview in the write post screen that'll help you optimize your titles, meta descriptions and copy instantly while working on your posts and pages.
+
+Also, other than All In One SEO Pack, this plugin has a completely working canonical implementation for all pages within your site, whereas the one in All In One SEO pack is broken, it was originally written by the author of this plugin, so he knows. It comes with XML Sitemaps, an XML News sitemap module, loads and loads of robots meta options and other options to improve your SEO.
+
 == Changelog ==
 
 = 0.2.5.2 =
@@ -297,7 +317,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Implemented a hook that would make the title work with Thematic based themes properly.
 	* Added option to remove "start" rel link from head section.
 	* Several style sheet changes to make backend styling easier and more robust.
-	* Added option to force rewrite titles for people that can't adapt their theme.
+	* Added option to force rewrite titles for people that can't adapt their theme, it's ugly but not as ugly as how All In One SEO handles it.
 	* If title templates aren't set, the plugin now generates proper default titles.
 	* The News module has moved to a separate directory, where all other modules will reside too, so they can be updated individually later. Download link for the news module will appear on yoast.com shortly.
 	
@@ -338,7 +358,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 * New features:
 	* Added option to regenerate SEO title (just click the button).
 	* Advanced button now looks cooler (hey even little changes deserve a changelog line!).
-	* Now pinging Ask.com too for updated sitemaps.
+	* Now pinging Ask.com too for updated sitemaps, for those of you caring about SEO for Ask.
 	* Added plugin version number to "branding" comment to help in bug fixing.
 	
 = 0.1.2.1 =
@@ -387,7 +407,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Made sure %%tag%% works too in title templates.
 	
 * (Inline) Documentation fixes:	
-	* Added this readme.txt file.
+	* Added this readme.txt file describing all the SEO functionality, and why this is _the_ All in one SEO plugin.
 	* MS Webmaster Central renamed to Bing Webmaster Tools.
 	* Added links to Bing Webmaster Tools and Yahoo! Site explorer to meta values box, as well as an explanation that you do not need to use those values if your site is already verified.
 	* Changed wording on description of clean permalinks.
@@ -410,7 +430,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Added experimental "Find related keywords" feature that'll return keywords that are related to your focus keyword.
 	
 * Issues currently in progress:
-	* WPML compatibility.
+	* WPML compatibility for the multilingual SEO's.
 	* XML Sitemap errors in Bing Webmaster Tools (due to use of "caption" for images).
 	
 
@@ -434,4 +454,4 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 = Press Mentions =
 
-* I was recently [interview by Mashable](http://mashable.com/2011/02/17/wordpress-seo-interview/) about this plugin.
+* I was recently [interview by Mashable](http://mashable.com/2011/02/17/wordpress-seo-interview/) about this plugin, talking about what the plugin does and why I think my plugin is superior to All in One SEO.
