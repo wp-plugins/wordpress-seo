@@ -660,7 +660,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br/><br/>';
 			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:').'</strong><br/>';
 			foreach (get_post_types() as $pt) {
-				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item', 'post_format')))
+				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
 					continue;
 
 				$taxonomies = get_object_taxonomies($pt);
@@ -1043,7 +1043,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_post_types() as $post_type) {
-				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment','post_format') ) ) {
+				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
 					$pt = get_post_type_object($post_type);
 					$content .= $this->checkbox('post_types-'.$post_type.'-not_in_sitemap', $pt->labels->name);
 				}
@@ -1053,7 +1053,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<strong>'.__('Exclude taxonomies').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_taxonomies() as $taxonomy) {
-				if ( !in_array( $taxonomy, array('nav_menu','link_category') ) ) {
+				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
 					$tax = get_taxonomy($taxonomy);
 					if ( isset( $tax->labels->name ) && trim($tax->labels->name) != '' )
 						$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->name);

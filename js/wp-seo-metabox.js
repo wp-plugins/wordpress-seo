@@ -62,7 +62,9 @@ function asort (inputArr, sort_flags) {
 }
 
 function yst_strip_tags( str ) { 
-	return str.replace(/<\/?[^>]+>/gi, ''); 
+	if ( str != '' )
+		return str.replace(/<\/?[^>]+>/gi, ''); 
+	return '';
 }
 
 function ptest(str, p) {
@@ -210,30 +212,30 @@ function updateSnippet( focuskw ) {
 
 jQuery(document).ready(function(){	
 	// Tabs, based on code by Pete Mall - https://github.com/PeteMall/Metabox-Tabs
-	jQuery('.metabox-tabs li.tab a').each(function(i) {
-		var thisTab = jQuery(this).parent().attr('class').replace(/tab /, '');
+	jQuery('.metabox-tabs li a').each(function(i) {
+		var thisTab = jQuery(this).parent().attr('class').replace(/active /, '');
+
 		if ( 'active' != jQuery(this).attr('class') )
 			jQuery('div.' + thisTab).hide();
- 
+
+		jQuery('div.' + thisTab).addClass('tab-content');
+
 		jQuery(this).click(function(){
- 
 			// hide all child content
 			jQuery(this).parent().parent().parent().children('div').hide();
- 
+
 			// remove all active tabs
-			jQuery(this).parent().parent('ul').find('li a.active').removeClass('active');
- 
+			jQuery(this).parent().parent('ul').find('li.active').removeClass('active');
+
 			// show selected content
 			jQuery(this).parent().parent().parent().find('div.'+thisTab).show();
-			jQuery(this).parent().parent().parent().find('li.'+thisTab+' a').addClass('active');
+			jQuery(this).parent().parent().parent().find('li.'+thisTab).addClass('active');
 		});
-
-		jQuery('.heading').hide();
-		jQuery('.metabox-tabs').show();
 	});
-	
-	wpseo_doing_title = false;
-	wpseo_doing_desc = false;
+
+	jQuery('.heading').hide();
+	jQuery('.metabox-tabs').show();
+	// End Tabs code
 	
 	jQuery('#related_keywords_heading').hide();
 	

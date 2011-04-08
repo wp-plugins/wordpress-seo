@@ -5,7 +5,7 @@ class WPSEO_Metabox {
 	var $wpseo_meta_length = 155;
 	var $wpseo_meta_length_reason = '';
 	
-	function WPSEO_Metabox() {
+	function __construct() {
 		$options = get_wpseo_options();
 		
 		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
@@ -24,6 +24,8 @@ class WPSEO_Metabox {
 
 		add_action( 'admin_head', array( $this, 'script') );
 
+		add_action('add_meta_boxes', array(&$this, 'add_custom_box') );
+
 		add_action('save_post', array($this,'save_postdata') );
 		
 		add_filter('manage_page_posts_columns',array($this,'page_title_column_heading'),10,1);
@@ -32,6 +34,18 @@ class WPSEO_Metabox {
 		add_action('manage_posts_custom_column',array($this,'page_title_column_content'), 10, 2);
 	}
 
+	public function add_custom_box() {
+		$options = get_wpseo_options();
+
+		foreach ( get_post_types() as $posttype ) {
+			if ( in_array( $posttype, array('revision','nav_menu_item','attachment') ) )
+				continue;
+			if ( isset($options['hideeditbox-'.$posttype]) && $options['hideeditbox-'.$posttype] )
+				continue;
+			add_meta_box( 'wpseo_meta', 'WordPress SEO by Yoast', array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
+		}
+	}
+	
 	public function script() {
 		?>
 		<script type="text/javascript">
@@ -57,11 +71,9 @@ class WPSEO_Metabox {
 ?>
 	<div class="<?php echo $id ?>">
 		<h4 class="heading"><?php echo $heading ?></h4>
-		<div class="tab-content">
-			<table class="form-table">
-				<?php echo $content ?>
-			</table>
-		</div>
+		<table class="form-table">
+			<?php echo $content ?>
+		</table>
 	</div>
 <?php		
 	}
@@ -74,7 +86,7 @@ class WPSEO_Metabox {
 		$title_template = $options['title-'.$post->post_type];
 		// If there's no title template set, use the default, otherwise title preview won't work.
 		if ( $title_template == '' )
-			$title_template = '%%title%% - %%sitename%';
+			$title_template = '%%title%% - %%sitename%%';
 		$title_template = wpseo_replace_vars( $title_template, $post, array('%%title%%') );
 
 		$metadesc_template = wpseo_replace_vars( $options['metadesc-'.$post->post_type], $post, array( '%%excerpt%%', '%%excerpt_only%%' ) );
@@ -244,10 +256,11 @@ class WPSEO_Metabox {
 		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', 155);
 
 ?>
-		<ul class="metabox-tabs">
-			<li class="tab general"><a class="active" href="javascript:void(null);">General</a></li>
-			<li class="tab advanced"><a href="javascript:void(null);">Advanced</a></li>
-<?php do_action('wpseo_tab_header'); ?>
+	<div class="metabox-tabs-div">
+		<ul class="metabox-tabs" id="metabox-tabs">
+			<li class="active general"><a class="active" href="javascript:void(null);">General</a></li>
+			<li class="advanced"><a href="javascript:void(null);">Advanced</a></li>
+			<?php do_action('wpseo_tab_header'); ?>
 		</ul>
 <?php		
 		$content = '';
@@ -265,6 +278,8 @@ class WPSEO_Metabox {
 		}
 		
 		do_action('wpseo_tab_content');
+		
+		echo '</div>';
 	}
 
 	function do_meta_box( $meta_box ) {
@@ -419,15 +434,13 @@ class WPSEO_Metabox {
 		if ( $post_id == null || empty($_POST) )
 			return;
 
-		// echo '<pre>'.print_r($_POST,1).'</pre>';
-		// die();
-		
 		if ( wp_is_post_revision( $post_id ) )
 			$post_id = wp_is_post_revision( $post_id );
 			
 		if ( isset( $_POST['post_type'] ) ) {  
-			if ( !current_user_can( 'edit_'.$_POST['post_type'], $post_id ))  
+			if ( !current_user_can( 'edit_posts', $post_id ) )  {
 				return $post_id;  
+			}
 		} else {  
 			if ( !current_user_can( 'edit_post', $post_id ))  
 				return $post_id;  
@@ -473,12 +486,12 @@ class WPSEO_Metabox {
 	public function enqueue() {
 		$color = get_user_meta( get_current_user_id(), 'admin_color', true );
 
-		wp_enqueue_style(  'metabox-tabs', WPSEO_URL.'css/metabox-tabs.css' 					);
-		wp_enqueue_style(  "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css'				);
+		wp_enqueue_style(  'metabox-tabs', WPSEO_URL.'css/metabox-tabs.css', WPSEO_VERSION );
+		wp_enqueue_style(  "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css', WPSEO_VERSION	);
 		
-		wp_enqueue_script( 'jquery-bgiframe', WPSEO_URL.'js/jquery.bgiframe.min.js', array('jquery'));
-		wp_enqueue_script( 'jquery-autocomplete', WPSEO_URL.'js/jquery.autocomplete.min.js', array('jquery'));
-		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-bgiframe','jquery-autocomplete'));
+		wp_enqueue_script( 'jquery-bgiframe', WPSEO_URL.'js/jquery.bgiframe.min.js', array('jquery'), WPSEO_VERSION, true );
+		wp_enqueue_script( 'jquery-autocomplete', WPSEO_URL.'js/jquery.autocomplete.min.js', array('jquery'), WPSEO_VERSION, true );
+		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-bgiframe','jquery-autocomplete'), WPSEO_VERSION, true );
 	}
 
 	function rebuild_sitemap( $post ) {

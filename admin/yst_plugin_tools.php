@@ -19,7 +19,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		var $accesslvl	= 'manage_options';
 		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles');
 		
-		function Yoast_WPSEO_Plugin_Admin() {
+		function __construct() {
 		}
 		
 		function add_ozh_adminmenu_icon( $hook ) {
@@ -35,7 +35,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				wp_enqueue_style('thickbox');
 				wp_enqueue_style('global');
 				wp_enqueue_style('wp-admin');
-				wp_enqueue_style('yoast-admin-css', WPSEO_URL . 'css/yst_plugin_tools.css');
+				wp_enqueue_style('yoast-admin-css', WPSEO_URL . 'css/yst_plugin_tools.css', WPSEO_VERSION );
 			}
 		}
 
@@ -86,14 +86,13 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		
 		function config_page_scripts() {
 			global $pagenow;
-			wp_enqueue_script('wpseo-admin-global-script', WPSEO_URL.'js/wp-seo-admin-global.js',array('jquery'));
+			wp_enqueue_script( 'wpseo-admin-global-script', WPSEO_URL.'js/wp-seo-admin-global.js', array('jquery'), WPSEO_VERSION, true );
 
 			if ( $pagenow == 'admin.php' && isset($_GET['page']) && in_array($_GET['page'], $this->adminpages) ) {
-				wp_enqueue_script('wpseo-admin-script', WPSEO_URL.'js/wp-seo-admin.js',array('jquery'));
-				wp_enqueue_script('postbox');
-				wp_enqueue_script('dashboard');
-				wp_enqueue_script('thickbox');
-				wp_enqueue_script('media-upload');
+				wp_enqueue_script( 'wpseo-admin-script', WPSEO_URL.'js/wp-seo-admin.js', array('jquery'), WPSEO_VERSION, true );
+				wp_enqueue_script( 'postbox' );
+				wp_enqueue_script( 'dashboard' );
+				wp_enqueue_script( 'thickbox' );
 			}
 		}
 

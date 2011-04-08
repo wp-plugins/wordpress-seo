@@ -2,7 +2,10 @@
 
 class WPSEO_Frontend {
 
-	function WPSEO_Frontend() {
+	function __construct() {
+		
+		wp_reset_query();
+		
 		$options = get_wpseo_options();
 
 		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
@@ -88,10 +91,7 @@ class WPSEO_Frontend {
 			$sep = '-';
 		$sep = ' '.$sep.' ';
 		
-		global $post, $wp_query;
-		if ( empty($post) && is_singular() ) {
-			$post = $wp_query->get_queried_object();
-		}
+		global $wp_query;
 
 		$options = get_wpseo_options();
 
@@ -124,6 +124,10 @@ class WPSEO_Frontend {
 				}
 			}
 		} else if ( is_singular() ) {
+			global $post;
+			if ( empty($post) ) {
+				$post = $wp_query->get_queried_object();
+			}
 			$fixed_title = wpseo_get_value('title');
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
@@ -372,7 +376,7 @@ class WPSEO_Frontend {
 			$canonical = preg_replace( '/https?/', $options['force_transport'], $canonical );
 			
 		if ( !empty($canonical) ) {
-			if ( $echo )
+			if ( $echo ) 
 				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
 			else
 				return $canonical;
@@ -690,7 +694,7 @@ class WPSEO_Frontend {
 	}
 	
 	function sitemap_output( $robots, $public ) {
-		if ( !get_query_var('wpseo_sitemap') )
+		if ( !get_query_var('wpseo_sitemap') || get_query_var('wpseo_sitemap') == '' )
 			return $robots;
 		
 		$options = get_option('wpseo');
@@ -711,7 +715,7 @@ class WPSEO_Frontend {
 	}
 	
 	function sitemap_header() {
-		if ( get_query_var('wpseo_sitemap') ) {
+		if ( get_query_var('wpseo_sitemap') && get_query_var('wpseo_sitemap') != '' ) {
 			wpseo_dir_setup();
 
 			if ( get_query_var('wpseo_sitemap_gz') )

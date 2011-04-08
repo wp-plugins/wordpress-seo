@@ -38,10 +38,30 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Changelog ==
 
+= 0.2.5.2 =
+
+* This plugin now officially requires PHP5. WordPress version 3.2 will also require it, so you'd better upgrade now. If you're on any version lower than PHP 5.2, this plugin will deactivate itself. You can then use SEO Data Transporter to migrate your data to another plugin, or you could do the more sensible thing and get your hosting upgraded to PHP 5.2 ASAP.
+
+* Bugs fixed:
+	* Attempted compatibility fix with other plugins that hook into robots.txt functionality.
+	* Issue with not loading meta box for some custom post types.
+	* Issue where SEO data for custom post types would not save.
+	* Issue where post title in snippet preview would show %%sitename% instead of your site's name when no title template for post type was set.
+	* Issue with removing tags when string was empty in JavaScript.
+	* Hiding the post_format taxonomy on the right places.
+	* Should now work better with crappy themes that do weird things in header.php.
+	
+* Design fixes:
+	* Updated tabs in meta boxes to reflect Core UI, for more info see [this post](http://developersmind.com/tabbed-meta-box-in-wordpress/) by Pete Mall.
+	
+* Enhancements:
+	* Now using plugin version number to enqueue files so browser cache isn't in the way when upgrading.
+	* Loading scripts in footer now when possible.
+
 = 0.2.5.1 =
 
 * Security fixes:
-	* Added nonces for security to htaccess and robots.txt file editing to prevent possible XSS.
+	* Added nonces for security to htaccess and robots.txt file editing to prevent possible CSRF.
 
 * Bugs fixed:
 	* Prevent JS error when WP SEO Meta box was hidden on edit pages.
