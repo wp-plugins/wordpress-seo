@@ -1,7 +1,7 @@
 === WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
-Tags: seo, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer
+Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.0
 Tested up to: 3.1
 
@@ -11,21 +11,22 @@ Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descri
 
 The most complete all in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
 
-* Post title and meta description meta box to change these on a per post basis.
+* Post title and meta description meta box to change these on a per post basis for ultimate SEO.
 * Taxonomy (tag, category & custom taxonomy) title and meta description support.
-* Google search result snippet previews.
+* Google search result snippet previews, let your editors improve your SEO!
 * Focus keyword testing.
 * Meta Robots configuration:
 	* Easily add noodp, noydir meta tags.
 	* Easily noindex, or nofollow pages, taxonomies or entire archives.
 * Improved canonical support, adding canonical to taxonomy archives, single posts and pages and the front page.
-* RSS footer / header configuration.
+* RSS footer / header configuration, improve your SEO by getting links from scrapers.
 * Permalink clean ups, while still allowing for, for instance, Google Custom Search.
 * Breadcrumbs support, with configurable breadcrumbs titles.
-* XML Sitemaps with:
+* The ultimate XML Sitemaps for your SEO with:
  	* Images
 	* Configurable removal of post types and taxonomies
 	* Pages or posts that have been noindexed will not show in XML sitemap (but can if you want them too).
+	* Custom post type support.
 * XML News Sitemaps.
 * .htaccess and robots.txt editor.
 * Basic import functionality for HeadSpace2 and All in One SEO.
@@ -40,7 +41,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 = 0.2.5.2 =
 
-* This plugin now officially requires PHP5. WordPress version 3.2 will also require it, so you'd better upgrade now. If you're on any version lower than PHP 5.2, this plugin will deactivate itself. You can then use SEO Data Transporter to migrate your data to another plugin, or you could do the more sensible thing and get your hosting upgraded to PHP 5.2 ASAP.
+* This WordPress SEO plugin now officially requires PHP5. WordPress version 3.2 will also require it, so you'd better upgrade now. If you're on any version lower than PHP 5.2, this plugin will deactivate itself. You can then use SEO Data Transporter to migrate your data to another plugin, or you could do the more sensible thing and get your hosting upgraded to PHP 5.2 ASAP.
 
 * Bugs fixed:
 	* Attempted compatibility fix with other plugins that hook into robots.txt functionality.
@@ -64,14 +65,14 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Added nonces for security to htaccess and robots.txt file editing to prevent possible CSRF.
 
 * Bugs fixed:
-	* Prevent JS error when WP SEO Meta box was hidden on edit pages.
+	* Prevent JS error when WordPress SEO Meta box was hidden on edit pages.
 	* Fix for title in snippet preview not showing when no title template was set for the post type.
 	* Fix for focus keyword count, would give wrong return on slugs that were too long.
 	* Removed post_format from list of taxonomies you can edit title and meta desc template for as it's of no use.
 	* Removed post_format from list of taxonomies to exclude for XML Sitemap, it was already excluded by default.
 
 * New features:
-	* Option to disable WP SEO meta data box on (custom) taxonomies.
+	* Option to disable WordPress SEO meta data box on (custom) taxonomies.
 	
 = 0.2.5 =
 
@@ -87,7 +88,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	
 = 0.2.3.4 =
 
-* Added WPML config file.
+* Added WPML config file, so you can SEO in multiple languages.
 
 = 0.2.3.3 =
 
@@ -416,6 +417,14 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 = 0.1 =
 
 * Initial beta release.
+
+== Screenshots ==
+
+1. The WordPress SEO plugin general meta box. You'll see this on edit post pages, for posts, pages and custom post types.
+2. The advanced section of the WordPress SEO meta box.
+3. The WordPress SEO settings for a taxonomy.
+4. The fully configurable XML sitemap for WordPress SEO.
+5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
 
 == Upgrade Notice ==
 
