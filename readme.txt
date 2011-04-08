@@ -426,17 +426,12 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 4. The fully configurable XML sitemap for WordPress SEO.
 5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
 
-== Upgrade Notice ==
-
-= 0.2.3.4 =
-Added config file for WPML.
-
 == Other Notes ==
 
 = Usage guides =
 
-* WP Beginner has written a good guide on [http://www.wpbeginner.com/plugins/how-to-install-and-setup-wordpress-seo-plugin-by-yoast/](how to install and setup WordPress SEO)
+* WP Beginner has written a good guide on [how to install and setup WordPress SEO](http://www.wpbeginner.com/plugins/how-to-install-and-setup-wordpress-seo-plugin-by-yoast/)
 
 = Press Mentions =
 
-* I was recently [http://mashable.com/2011/02/17/wordpress-seo-interview/](interview by Mashable) about this plugin.
+* I was recently [interview by Mashable](http://mashable.com/2011/02/17/wordpress-seo-interview/) about this plugin.
