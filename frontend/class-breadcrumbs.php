@@ -2,7 +2,7 @@
 
 class WPSEO_Breadcrumbs {
 
-	function WPSEO_Breadcrumbs() {
+	function __construct() {
 		$options = get_option("wpseo_internallinks");
 
 		if (isset($options['trytheme']) && $options['trytheme']) {
@@ -157,6 +157,7 @@ class WPSEO_Breadcrumbs {
 						$terms = wp_get_object_terms( $post->ID, $main_tax );
 						if ( is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0 ) {
 							$parents = $this->get_term_parents($terms[0], $main_tax);
+							$parents = array_reverse($parents);
 							foreach($parents as $parent) {
 								$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'bctitle' );
 								if (!$bctitle)

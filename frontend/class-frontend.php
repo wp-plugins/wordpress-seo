@@ -341,7 +341,7 @@ class WPSEO_Frontend {
 				if ( $page && $page != 1 ) {
 					// If below doesn't return true, there actually aren't that much pages in the post.
 					if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
-						$canonical = user_trailingslashit( trailingslashit($properurl) . get_query_var('page') );
+						$canonical = user_trailingslashit( trailingslashit($canonical) . get_query_var('page') );
 				}
 			} else {
 				if ( is_front_page() ) {
@@ -375,7 +375,7 @@ class WPSEO_Frontend {
 		if ( isset($options['force_transport']) && $options['force_transport'] != 'default' )
 			$canonical = preg_replace( '/https?/', $options['force_transport'], $canonical );
 			
-		if ( !empty($canonical) ) {
+		if ( !empty($canonical) && !is_wp_error($canonical) ) {
 			if ( $echo ) 
 				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
 			else
@@ -530,7 +530,7 @@ class WPSEO_Frontend {
 		}
 	}
 
-	function clean_permalink( $headers ) {
+	public function clean_permalink( $headers ) {
 		if ( is_robots() )
 			return;
 
@@ -552,20 +552,30 @@ class WPSEO_Frontend {
 		$properurl = '';
 		
 		if ( is_singular() ) {
-			$properurl = get_permalink($wp_query->post->ID);
+			global $post;
+			if ( empty($post) )
+				$post = $wp_query->get_queried_object();
+
+			$properurl = get_permalink($post->ID);
 			
-			// Fixed paginated pages
 			$page = get_query_var('page');
 			if ( $page && $page != 1 ) {
-				// If below doesn't return true, there actually aren't that much pages in the post.
-				if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
-					$properurl = user_trailingslashit( trailingslashit($properurl) . get_query_var('page') );
+				$post = get_post($post->ID);
+				$page_count = substr_count($post->post_content, '<!--nextpage-->');
+				if ( $page > ($page_count+1) )
+					$properurl = user_trailingslashit( trailingslashit( $properurl ) . ( $page_count + 1 ) );
+				else
+					$properurl = user_trailingslashit( trailingslashit( $properurl ) . $page );
 			}
 				
 			// Fix reply to comment links, whoever decided this should be a GET variable?
 			$result = preg_match('/(\?replytocom=[^&]+)/', $_SERVER["REQUEST_URI"], $matches);
 			if ( $result )
 				$properurl .= str_replace('?replytocom=','#comment-',$matches[0]);
+
+			// Prevent cleaning out posts & page previews for people capable of viewing them
+			if ( isset($_GET['preview']) && isset($_GET['preview_nonce']) && current_user_can('edit_post') )
+				$properurl = '';
 		} else if ( is_front_page() ) {
 			if ( 'posts' == get_option('show_on_front') && is_home() ) {
 				$properurl = get_bloginfo('url').'/';

@@ -87,7 +87,7 @@ function testfocuskw() {
 		html += 'Page title: ' + ptest( jQuery('#snippet .title').text(), p ) + '<br/>';
 		html += 'Page URL: ' + ptest( jQuery('#editable-post-name-full').text(), p2 ) + '<br/>';
 		html += 'Content: ' + ptest( jQuery('#content').val(), p ) + '<br/>';
-		html += 'Meta description: ' + ptest( jQuery('#yoast_wpseo_metadesc').text(), p );
+		html += 'Meta description: ' + ptest( jQuery('#yoast_wpseo_metadesc').val(), p );
 		html += '</p>';
 		jQuery('#focuskwresults').html(html);
 	}
@@ -197,8 +197,9 @@ function updateSnippet( focuskw ) {
 	}
 	
 	for (var i in keywords) {
-		var urlfocuskw 	= keywords[i].replace(' ','-').toLowerCase();
-		focuskwregex 	= new RegExp( '('+keywords[i]+')', 'gim');
+		var kw			= yst_strip_tags( keywords[i] );
+		var urlfocuskw 	= kw.replace(' ','-').toLowerCase();
+		focuskwregex 	= new RegExp( '('+kw+')', 'gim');
 		urlfocuskwregex = new RegExp( '('+urlfocuskw+')', 'gim' );
 		desc 			= desc.replace( focuskwregex, '<strong>'+"$1"+'</strong>' );
 		title 			= title.replace( focuskwregex, '<strong>'+"$1"+'</strong>' );

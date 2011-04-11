@@ -9,9 +9,16 @@ Author URI: http://yoast.com/
 */
 
 if ( version_compare(PHP_VERSION, '5.2', '<') ) {
-	deactivate_plugins( __FILE__ );
-    wp_die( __('WordPress SEO requires PHP 5.2 or higher, it has now disabled itself.') );
+	if ( is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX) ) {
+		require_once ABSPATH.'/wp-admin/includes/plugin.php';
+		deactivate_plugins( __FILE__ );
+	    wp_die( __('WordPress SEO requires PHP 5.2 or higher, as will WordPress 3.2 and higher. The plugin has now disabled itself. For more info, <a href="http://yoast.com/requires-php-52/">see this post</a>.') );
+	} else {
+		return;
+	}
 }
+
+define( 'WPSEO_VERSION', '0.2.5.2' );
 
 $pluginurl = plugin_dir_url(__FILE__);
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
@@ -21,8 +28,6 @@ define( 'WPSEO_FRONT_URL', $pluginurl );
 define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
 define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
 define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
-
-define( 'WPSEO_VERSION', '0.2.5.2' );
 
 require_once 'inc/wpseo-functions.php';
 require_once 'inc/class-rewrite.php';

@@ -438,7 +438,7 @@ class WPSEO_Metabox {
 			$post_id = wp_is_post_revision( $post_id );
 			
 		if ( isset( $_POST['post_type'] ) ) {  
-			if ( !current_user_can( 'edit_posts', $post_id ) )  {
+			if ( !current_user_can( 'edit_post', $post_id ) )  {
 				return $post_id;  
 			}
 		} else {  

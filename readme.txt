@@ -33,8 +33,8 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 == Installation ==
 
-1. Upload the `plugin` folder to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
+1. Upload the `wordress-seo` folder to the `/wp-content/plugins/` directory
+1. Activate the WordPress SEO plugin through the 'Plugins' menu in WordPress
 1. Configure the plugin by going to the `SEO` menu that appears in your admin menu
 
 == Frequently Asked Questions ==
@@ -44,6 +44,17 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 You've set up a template for your titles, but things get added to it when they're output? You can do two things: either enable "Force rewrite titles" on the SEO -> Titles settings page, or go into your header.php and change the title element to just this: 
 
 `<title><?php wp_title(''); ?></title>`
+
+= I'm not seeing a meta description in my `<head>` section? =
+
+Check whether your theme's `header.php` file contains a call to [wp_head()](http://codex.wordpress.org/Function_Reference/wp_head).
+
+= My meta descriptions aren't showing up in the search result pages =
+
+There are two possible issues with a meta description:
+
+1. You're putting out more than one of them due to multiple plugins adding a description, for instance the WordBooker plugin adds a description too but has an option to disable it, other SEO plugins running might be another cause.
+1. You're not seeing your meta description show up in the search result pages. Google will not alway show your meta description, the likelihood of your meta description appearing in the search results increases incredibly when your meta description contains the sought for keyword though, which is why the focus keyword functionality checks for the appearance of the focus keyword in the description.
 
 = Page X, Y, Z for plugin X doesn't work with your plugin enabled =
 
@@ -57,7 +68,29 @@ Once you'll start using this plugin, you won't ask that question anymore, you'll
 
 Also, other than All In One SEO Pack, this plugin has a completely working canonical implementation for all pages within your site, whereas the one in All In One SEO pack is broken, it was originally written by the author of this plugin, so he knows. It comes with XML Sitemaps, an XML News sitemap module, loads and loads of robots meta options and other options to improve your SEO.
 
+== Screenshots ==
+
+1. The WordPress SEO plugin general meta box. You'll see this on edit post pages, for posts, pages and custom post types.
+2. The advanced section of the WordPress SEO meta box.
+3. The WordPress SEO settings for a taxonomy.
+4. The fully configurable XML sitemap for WordPress SEO.
+5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
+
 == Changelog ==
+
+= 0.2.5.3 =
+
+* Bugs fixed:
+	* `edit_posts` is not the same as `edit_post`, what a difference an s makes, thanks to nacin.
+	* preview URLs now work again with clean permalinks on, but only for those with the actual rights to view them.
+	* Fix for catchable fatal error in canonical function.
+	* First stab at fix for errors with focus keyword check and keywords filled with HTML tags.
+	* canonical links for paginated posts are now set correctly.
+	* Issue where parent taxonomy items would display in the reverse order in breadcrumbs.
+	* Improved error handling for non PHP 5.2+ installs and also made automatic deactivation work properly.
+
+* Documentation fixes:
+	* Added screenshot and a FAQ with several items to this plugin's page.
 
 = 0.2.5.2 =
 
@@ -437,14 +470,6 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 = 0.1 =
 
 * Initial beta release.
-
-== Screenshots ==
-
-1. The WordPress SEO plugin general meta box. You'll see this on edit post pages, for posts, pages and custom post types.
-2. The advanced section of the WordPress SEO meta box.
-3. The WordPress SEO settings for a taxonomy.
-4. The fully configurable XML sitemap for WordPress SEO.
-5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
 
 == Other Notes ==
 
