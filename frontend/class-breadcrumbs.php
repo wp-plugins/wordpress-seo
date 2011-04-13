@@ -104,6 +104,8 @@ class WPSEO_Breadcrumbs {
 	}
 	
 	function breadcrumb($prefix = '', $suffix = '', $display = true) {
+		$options = get_option("wpseo_titles");
+
 		global $wp_query, $post, $paged;
 
 		$opt 		= get_option("wpseo_internallinks");
@@ -130,11 +132,6 @@ class WPSEO_Breadcrumbs {
 		} else if ( is_singular() ) {
 			$output = $bloglink.' '.$sep.' ';
 			
-			if ( function_exists('get_post_type_archive_link') && get_post_type_archive_link( get_post_type() ) ) {
-				$post_type_obj = get_post_type_object( get_post_type() );
-				$output .= '<a href="'.get_post_type_archive_link( get_post_type() ).'">'.$post_type_obj->labels->menu_name.'</a> ' . $sep . ' ';
-			}
-				
 			if( isset($opt['breadcrumbs-menus']) && $opt['breadcrumbs-menus'] = 'on'){
 				$use_menu = $this->in_menu( $selmenu );
 			}
@@ -151,6 +148,17 @@ class WPSEO_Breadcrumbs {
 				}
 				$output .= $this->bold_or_not( $this->get_bc_title( $post->ID ) );
 			} else {
+				$post_type = get_post_type();
+				if ( function_exists('get_post_type_archive_link') && get_post_type_archive_link( $post_type ) ) {
+					if ( isset($options['bctitle-ptarchive-'.$post_type]) && '' != $options['bctitle-ptarchive-'.$post_type] ) {
+						$archive_title = $options['bctitle-ptarchive-'.$post_type];
+					} else {
+						$post_type_obj = get_post_type_object( $post_type );
+						$archive_title = $post_type_obj->labels->menu_name;
+					}
+					$output .= '<a href="'.get_post_type_archive_link( $post_type ).'">'.$archive_title.'</a> ' . $sep . ' ';
+				}
+
 				if ( 0 == $post->post_parent ) {
 					if ( isset( $opt['post_types-'.$post->post_type.'-maintax'] ) && $opt['post_types-'.$post->post_type.'-maintax'] != '0' ) {
 						$main_tax = $opt['post_types-'.$post->post_type.'-maintax'];
@@ -212,8 +220,13 @@ class WPSEO_Breadcrumbs {
 			}
 			
 			if ( is_post_type_archive() ) {
-				$post_type_obj = get_post_type_object( get_post_type() );
-				$archive_title = $post_type_obj->labels->menu_name;
+				$post_type = get_post_type();
+				if ( isset($options['bctitle-ptarchive-'.$post_type]) && '' != $options['bctitle-ptarchive-'.$post_type] ) {
+					$archive_title = $options['bctitle-ptarchive-'.$post_type];
+				} else {
+					$post_type_obj = get_post_type_object( $post_type );
+					$archive_title = $post_type_obj->labels->menu_name;
+				}
 				$output .= $this->bold_or_not( $archive_title );
 			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();

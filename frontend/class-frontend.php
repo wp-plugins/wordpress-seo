@@ -188,6 +188,14 @@ class WPSEO_Frontend {
 					$title .= $sep.get_bloginfo('name'); 		
 				}
 			}
+		} else if ( is_post_type_archive() ) {
+			$post_type = get_post_type();
+			if ( isset($options['title-ptarchive-'.$post_type]) && '' != $options['title-ptarchive-'.$post_type] ) {
+				$title = $options['title-ptarchive-'.$post_type];
+			} else {
+				$post_type_obj = get_post_type_object( $post_type );
+				$title = $post_type_obj->labels->menu_name.$sep.get_bloginfo('name');
+			}
 		} else if ( is_archive() ) {
 		 	if ( isset($options['title-archive']) && !empty($options['title-archive']) )
 				$title = wpseo_replace_vars($options['title-archive'], array('post_title' => $title) );
@@ -354,6 +362,9 @@ class WPSEO_Frontend {
 					$canonical = wpseo_get_term_meta( $term, $term->taxonomy, 'canonical' );
 					if ( !$canonical )
 						$canonical = get_term_link( $term, $term->taxonomy );
+				} else if ( is_post_type_archive() ) {
+					if ( function_exists('get_post_type_archive_link') )
+						$canonical = get_post_type_archive_link( get_post_type() );
 				} else if ( is_archive() ) {
 					if ( is_date() ) {
 						if ( is_day() ) {
@@ -460,7 +471,12 @@ class WPSEO_Frontend {
 				$metadesc = get_the_author_meta('metadesc', $author_id);
 				if ( !$metadesc && isset($options['metadesc-author']))
 					$metadesc = wpseo_replace_vars($options['metadesc-author'], (array) $wp_query->get_queried_object() );
-			} 
+			} else if ( is_post_type_archive() ) {
+				$post_type = get_post_type();
+				if ( isset($options['metadesc-ptarchive-'.$post_type]) && '' != $options['metadesc-ptarchive-'.$post_type] ) {
+					$metadesc = $options['metadesc-ptarchive-'.$post_type];
+				} 
+			}
 		}
 	
 		$metadesc = trim( $metadesc );
@@ -506,7 +522,7 @@ class WPSEO_Frontend {
 	function archive_redirect() {
 		global $wp_query;
 		$options  = get_wpseo_options();
-		if ( ($options['disabledate'] && $wp_query->is_date) || ($options['disableauthor'] && $wp_query->is_author) ) {
+		if ( (isset($options['disabledate']) && $options['disabledate'] && $wp_query->is_date) || (isset($options['disableauthor']) && $options['disableauthor'] && $wp_query->is_author) ) {
 			wp_redirect(get_bloginfo('url'),301);
 			exit;
 		}

@@ -99,15 +99,21 @@ class WPSEO_OpenGraph {
 				else
 					$title = get_the_author_meta('display_name', $author_id); 
 			}
+		} else if ( is_post_type_archive() ) {
+			$post_type = get_post_type();
+			if ( isset($options['title-ptarchive-'.$post_type]) && '' != $options['title-ptarchive-'.$post_type] ) {
+				return $options['title-ptarchive-'.$post_type];
+			} else {
+				$post_type_obj = get_post_type_object( $post_type );
+				$title = $post_type_obj->labels->menu_name;
+			}
 		} else if ( is_archive() ) {
 		 	if ( isset($options['title-archive']) && !empty($options['title-archive']) )
 				$title = wpseo_replace_vars($options['title-archive'], array('post_title' => $title) );
-			else {
-				if ( is_month() )
-					$title = single_month_title(' ', false).' '.__('Archives'); 
-				else if ( is_year() )
-					$title = get_query_var('year').' '.__('Archives'); 
-			}
+			else if ( is_month() ) 
+				$title = single_month_title(' ', false).' '.__('Archives'); 
+			else if ( is_year() )
+				$title = get_query_var('year').' '.__('Archives'); 
 		} else if ( is_404() ) {
 		 	if ( isset($options['title-404']) && !empty($options['title-404']) )
 				$title = wpseo_replace_vars($options['title-404'], array('post_title' => $title) );

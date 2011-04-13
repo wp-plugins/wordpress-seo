@@ -427,22 +427,22 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 
 		function titles_page() {
-			$this->admin_header('Titles', false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
+			$this->admin_header(__('Titles'), false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
 			$options = get_wpseo_options();
 			$content = '<p>'.__('Be aware that for WordPress SEO to be able to modify your page titles, the title section of your header.php file should look like this:').'</p>';
 			$content .= '<pre>&lt;title&gt;&lt;?php wp_title(&#x27;&#x27;); ?&gt;&lt;/title&gt;</pre>';
 			$content .= '<p>'.__('If you can\'t modify or don\'t know how to modify your template, check the box below. Be aware that changing your template will be faster.').'</p>';
 			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles','yoast-wpseo'));
-			$content .= '<h4 class="big">Singular pages</h4>';
+			$content .= '<h4 class="big">'.__('Singular pages').'</h4>';
 			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.").'</p>';
 			if ( 'posts' == get_option('show_on_front') ) {
-				$content .= '<h4>Homepage</h4>';
-				$content .= $this->textinput('title-home','Title template');
-				$content .= $this->textinput('metadesc-home','Meta description template');
+				$content .= '<h4>'.__('Homepage').'</h4>';
+				$content .= $this->textinput('title-home',__('Title template'));
+				$content .= $this->textarea('metadesc-home',__('Meta description template'), '', 'metadesc');
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-home','Meta keywords template');
+					$content .= $this->textinput('metakey-home',__('Meta keywords template'));
 			} else {
-				$content .= '<h4>Homepage &amp; Front page</h4>';
+				$content .= '<h4>'.__('Homepage &amp; Front page').'</h4>';
 				$content .= '<p>'.__('You can determine the title and description for the front page by').' <a href="'.get_edit_post_link( get_option('page_on_front') ).'">'.__('editing the front page itself').' &raquo;</a>.</p>';
 				if ( is_numeric( get_option('page_for_posts') ) )
 				$content .= '<p>'.__('You can determine the title and description for the blog page by').' <a href="'.get_edit_post_link( get_option('page_for_posts') ).'">'.__('editing the blog page itself').' &raquo;</a>.</p>';
@@ -453,41 +453,63 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
 					continue;
 				$content .= '<h4 id="'.$posttype.'">'.ucfirst($posttype).'</h4>';
-				$content .= $this->textinput('title-'.$posttype,'Title template');
-				$content .= $this->textinput('metadesc-'.$posttype,'Meta description template');
+				$content .= $this->textinput('title-'.$posttype,__('Title template'));
+				$content .= $this->textarea('metadesc-'.$posttype,__('Meta description template'), '', 'metadesc');
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$posttype,'Meta keywords template');
+					$content .= $this->textinput('metakey-'.$posttype,__('Meta keywords template'));
 				$content .= '<br/>';
 			}
 			$content .= '<br/>';
-			$content .= '<h4 class="big">Taxonomies</h4>';
+			$content .= '<h4 class="big">'.__('Taxonomies').'</h4>';
 			foreach (get_taxonomies() as $taxonomy) {
 				if ( in_array($taxonomy, array('link_category','nav_menu','post_format') ) )
 					continue;				
 				$content .= '<h4>'.ucfirst($taxonomy).'</h4>';
-				$content .= $this->textinput('title-'.$taxonomy,'Title template');
-				$content .= $this->textinput('metadesc-'.$taxonomy,'Meta description template');
+				$content .= $this->textinput('title-'.$taxonomy,__('Title template'));
+				$content .= $this->textarea('metadesc-'.$taxonomy,__('Meta description template'), '', 'metadesc' );
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$taxonomy,'Meta keywords template');
+					$content .= $this->textinput('metakey-'.$taxonomy,__('Meta keywords template'));
 				$content .= '<br/>';				
 			}
 			$content .= '<br/>';
-			$content .= '<h4 class="big">Special pages</h4>';
-			$content .= '<h4>Author Archives</h4>';
-			$content .= $this->textinput('title-author','Title template');
-			$content .= $this->textinput('metadesc-author','Meta description template');
+			$content .= '<h4 class="big">'.__('Special pages').'</h4>';
+			$content .= '<h4>'.__('Author Archives').'</h4>';
+			$content .= $this->textinput('title-author',__('Title template'));
+			$content .= $this->textarea('metadesc-author',__('Meta description template'), '', 'metadesc' );
 			if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-				$content .= $this->textinput('metakey-author','Meta keywords template');
+				$content .= $this->textinput('metakey-author',__('Meta keywords template'));
 			$content .= '<br/>';
-			$content .= '<h4>Date Archives</h4>';
-			$content .= $this->textinput('title-archive','Title template');
-			$content .= $this->textinput('metadesc-archive','Meta description template');
+			$content .= '<h4>'.__('Date Archives').'</h4>';
+			$content .= $this->textinput('title-archive',__('Title template'));
+			$content .= $this->textarea('metadesc-archive',__('Meta description template'), '', 'metadesc' );
 			$content .= '<br/>';
-			$content .= '<h4>Search pages</h4>';
+			$content .= '<h4>'.__('Search pages').'</h4>';
 			$content .= $this->textinput('title-search','Title template');
-			$content .= '<h4>404 pages</h4>';
-			$content .= $this->textinput('title-404','Title template');
+			$content .= '<h4>'.__('404 pages').'</h4>';
+			$content .= $this->textinput('title-404',__('Title template'));
 			$content .= '<br class="clear"/>';
+			
+			$i = 1;
+			foreach ( get_post_types() as $post_type ) {
+				if ( in_array($post_type, array('post','page','attachment','revision','nav_menu_item') ) )
+					continue;
+				$pt = get_post_type_object($post_type);
+				if ( !$pt->has_archive )
+					continue;
+
+				if ( $i == 1 ) {
+					$content .= '<h4 class="big">'.__('Custom Post Type Archives').'</h4>';
+					$content .= '<p>'.__('Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.').'</p>';
+				}
+				
+				$content .= '<h4>'.$pt->labels->name.'</h4>';
+				$content .= $this->textinput( 'title-ptarchive-' . $post_type, __('Title') );
+				$content .= $this->textarea( 'metadesc-ptarchive-' . $post_type, __('Meta description'), '', 'metadesc' );
+				if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
+					$content .= $this->textinput( 'bctitle-ptarchive-' . $post_type, __('Breadcrumbs Title') );
+				$i++;
+			}
+			unset($i, $pt, $post_type);
 			
 			$this->postbox('titles',__('Title Settings', 'yoast-wpseo'), $content); 
 			

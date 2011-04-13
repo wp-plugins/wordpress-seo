@@ -148,6 +148,28 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		}
 		
 		/**
+		 * Create a small textarea
+		 */
+		function textarea($id, $label, $option = '', $class = '') {
+			if ( $option == '') {
+				$options = get_wpseo_options();
+				$option = !empty($option) ? $option : $this->currentoption;
+			} else {
+				if ( function_exists('is_network_admin') && is_network_admin() ) {
+					$options = get_site_option($option);
+				} else {
+					$options = get_option($option);
+				}
+			}
+			
+			$val = '';
+			if (isset($options[$id]))
+				$val = esc_html($options[$id]);
+			
+			return '<label class="textinput" for="'.$id.'">'.$label.':</label><textarea class="textinput '.$class.'" id="'.$id.'" name="'.$option.'['.$id.']">' . $val . '</textarea>' . '<br class="clear" />';
+		}
+		
+		/**
 		 * Create a Hidden input field
 		 */
 		function hiddeninput($id, $option = '') {

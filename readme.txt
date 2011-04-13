@@ -78,6 +78,17 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 0.2.5.4 =
+
+* Custom post type archives update:
+	* You can now set a title, meta description and breadcrumbs title for custom post type archives on the Titles page
+	* Custom post type archives now have a correct canonical
+* Other fixes:
+	* Fixed a notice for an uninitialized setting
+	* Slightly changed the CSS for the admin area
+	* Changed input fields for meta descriptions on titles page from text input to textarea
+	* More preparations for allowing the plugin to be fully translated
+
 = 0.2.5.3 =
 
 * Bugs fixed:
