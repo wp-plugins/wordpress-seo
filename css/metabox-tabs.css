@@ -1,107 +1,138 @@
 /**
  * Metabox Tabs
  */
+
 ul.metabox-tabs {
-display: none;
-margin-top: 12px;
-margin-bottom: 3px;
+	display: none;
+	margin-top: 12px;
+	margin-bottom: 3px;
 }
+
 .metabox-tabs-div ul {
-list-style: none;
+	list-style: none;
 }
+
 .metabox-tabs li {
-display: inline;
+	display: inline;
 }
+
 ul.metabox-tabs li.active {
-border-style: solid solid none;
-border-width: 1px 1px 0;
+	border-style: solid solid none;
+	border-width: 1px 1px 0;
 }
+
 ul.metabox-tabs li {
-padding: 5px;
--moz-border-radius: 3px 3px 0 0;
--webkit-border-top-left-radius: 3px;
--webkit-border-top-right-radius: 3px;
--khtml-border-top-left-radius: 3px;
--khtml-border-top-right-radius: 3px;
-border-top-left-radius: 3px;
-border-top-right-radius: 3px;
+	padding: 5px;
+	-moz-border-radius: 3px 3px 0 0;
+	-webkit-border-top-left-radius: 3px;
+	-webkit-border-top-right-radius: 3px;
+	-khtml-border-top-left-radius: 3px;
+	-khtml-border-top-right-radius: 3px;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
 }
+
 .metabox-tabs a {
-text-decoration: none;
+	text-decoration: none;
 }
+
 .metabox-tabs-div div.tabs-panel {
-overflow: auto;
-padding: 0.5em 0.9em;
-border-style: solid;
-border-width: 1px;
+	overflow: auto;
+	padding: 0.5em 0.9em;
+	border-style: solid;
+	border-width: 1px;
 }
+
 .heading {
-padding-left:10px;
+	padding-left: 10px;
 }
-.tab-content{
-overflow: auto;
-padding: 0.5em 0.9em;
-border-style: solid;
-border-width: 1px;
+
+.tab-content {
+	overflow: auto;
+	padding: 0.5em 0.9em;
+	border-style: solid;
+	border-width: 1px;
 }
-.metabox-tabs .form-table th {
+
+#wpwrap #postsstuff .postbox .inside .tab-content {
+	font-size: 13px !important;
+}
+
+.inside .tab-content .form-table th {
 	font-size: 13px;
+	width: 140px !important;
 }
+
 .good, .warn, .wrong {
 	font-weight: bold;
 }
+
 .good {
 	color: green;
 }
+
 .warn {
 	color: maroon;
 }
+
 .wrong {
 	color: red;
 }
+
 #current_seo_title span {
 	background-color: lightyellow;
 	padding: 2px 5px;
 }
+
 #snippet {
 	margin: 0 0 10px 0;
 	padding: 0 5px;
 	font-family: Arial, sans-serif;
-	max-width: 540px;
-	line-height: 15px;
+	line-height: 15px !important;
 	font-size: 13px !important;
 	font-style: normal;
-} 
+	width: 540px !important;
+}
+
 #snippet a {
 	text-decoration: none;
 }
+
 #snippet .title {
 	color: #11c;
 	font-size: 16px !important;
 	line-height: 19px;
 	text-decoration: underline;
 }
+
 #snippet .desc {
 	color: #000;
 }
+
 #snippet .url {
 	color: #282;
 }
+
 #snippet .meta {
 	color: #767676;
 }
+
 #snippet .util {
 	color: #4272DB;
 }
+
 #snippet p {
 	margin: 0 !important;
 }
+
 #snippet a:hover {
 	text-decoration: underline;
 }
+
 #snippet {
 	margin-bottom: 10px;
 }
+
 .wpseo_yahoo_kw {
 	display: block;
 	float: left;
@@ -112,6 +143,35 @@ border-width: 1px;
 	margin: 3px 8px 3px 0;
 	padding: 3px;
 }
+
 .wpseo_hidden {
 	display: none;
+}
+
+/* Linkdex analysis block */
+table.analysis th {
+	text-align: left;
+	font-weight: 14px;
+	padding: 15px 0 5px 0;
+}
+
+table.analysis th.first {
+	padding-top: 0;
+}
+
+table.analysis td {
+	font-weight: 13px;
+	line-height: 16px;
+	margin: 5px 0;
+}
+table.analysis td.score {
+	width: 40px;
+	height: 30px;
+	padding-left: 10px;
+}
+
+.wpseo_msg {
+	border: 1px solid #E6DB55;
+	background-color: lightYellow;
+	margin: 5px 0 10px 0;
 }

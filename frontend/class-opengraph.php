@@ -13,6 +13,8 @@ class WPSEO_OpenGraph {
 
 		global $wp_query, $paged;
 		
+		wp_reset_query();
+		
 		echo "\n";
 		$this->title();
 		$this->description();
@@ -92,7 +94,7 @@ class WPSEO_OpenGraph {
 				$title = __('Search for "').get_search_query().'"';
 		} else if ( is_author() ) {
 			$author_id = get_query_var('author');
-			$title = get_the_author_meta('title', $author_id);
+			$title = get_the_author_meta('wpseo_title', $author_id);
 			if ( empty($title) ) {
 				if ( isset($options['title-author']) && !empty($options['title-author']) )
 					$title = wpseo_replace_vars($options['title-author'], array() );
@@ -142,25 +144,27 @@ class WPSEO_OpenGraph {
 	public function image( $image = '' ) {
 		global $post;
 		// Grab the featured image
-		if ( is_singular() && empty( $image ) && function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
-			$thumbnail = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'post-thumbnail' );
-			if ( $thumbnail )
-				$image = $thumbnail[0];
-		// If that's not there, grab the first attached image
-		} else {
-			$files = get_children( 
-						array( 
-						'post_parent' => $post->ID,
-						'post_type' => 'attachment',
-						'post_mime_type' => 'image',
-						) 
-					);
-		    if ( $files ) {
-		        $keys = array_reverse( array_keys( $files ) );
-		        $image = image_downsize( $keys[0], 'thumbnail' );
-		        $image = $image[0];
-		    }
-		}
+		if ( is_singular() ) {
+			if ( empty( $image ) && function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
+				$thumbnail = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'post-thumbnail' );
+				if ( $thumbnail )
+					$image = $thumbnail[0];
+			// If that's not there, grab the first attached image
+			} else {
+				$files = get_children( 
+							array( 
+							'post_parent' => $post->ID,
+							'post_type' => 'attachment',
+							'post_mime_type' => 'image',
+							) 
+						);
+			    if ( $files ) {
+			        $keys = array_reverse( array_keys( $files ) );
+			        $image = image_downsize( $keys[0], 'thumbnail' );
+			        $image = $image[0];
+			    }
+			}	
+		} 
 		if ( $image != '' )
 			echo "\t<meta property='og:image' content='".esc_attr( $image )."'/>\n";
 	}

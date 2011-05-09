@@ -104,7 +104,7 @@ class WPSEO_Breadcrumbs {
 	}
 	
 	function breadcrumb($prefix = '', $suffix = '', $display = true) {
-		$options = get_option("wpseo_titles");
+		$options = get_wpseo_options();
 
 		global $wp_query, $post, $paged;
 
@@ -219,7 +219,7 @@ class WPSEO_Breadcrumbs {
 				$output = $homelink.' '.$sep.' ';
 			}
 			
-			if ( is_post_type_archive() ) {
+			if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
 				$post_type = get_post_type();
 				if ( isset($options['bctitle-ptarchive-'.$post_type]) && '' != $options['bctitle-ptarchive-'.$post_type] ) {
 					$archive_title = $options['bctitle-ptarchive-'.$post_type];
@@ -231,6 +231,25 @@ class WPSEO_Breadcrumbs {
 			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
 			
+				if ( isset($options['taxonomy-'.$term->taxonomy.'-ptparent']) && $options['taxonomy-'.$term->taxonomy.'-ptparent'] != '' ) {
+					$post_type = $options['taxonomy-'.$term->taxonomy.'-ptparent'];
+					if ( 'post' == $post_type && get_option('show_on_front') == 'page' ) {
+						$posts_page = get_option('page_for_posts');
+						if ( $posts_page ) {
+							$output .= '<a href="'.get_permalink( $posts_page ).'">'.$this->get_bc_title( $posts_page ).'</a> '.$sep.' ';
+							$output .= '<pre>'.var_dump($posts_page).'</pre>';
+						}
+					} else {
+						if ( isset($options['bctitle-ptarchive-'.$post_type]) && '' != $options['bctitle-ptarchive-'.$post_type] ) {
+							$archive_title = $options['bctitle-ptarchive-'.$post_type];
+						} else {
+							$post_type_obj = get_post_type_object( $post_type );
+							$archive_title = $post_type_obj->labels->menu_name;
+						}
+						$output .= '<a href="'.get_post_type_archive_link( $post_type ).'">'.$archive_title.'</a> '.$sep.' ';
+					}
+				}
+					
 				if ( is_taxonomy_hierarchical($term->taxonomy) && $term->parent != 0 ) {
 					$parents = $this->get_term_parents($term, $term->taxonomy);
 
@@ -249,7 +268,7 @@ class WPSEO_Breadcrumbs {
 				if ($paged)
 					$output .= $this->bold_or_not('<a href="'.get_term_link( $term, $term->taxonomy ).'">'.$bctitle.'</a>');
 				else
-					$output .= $bctitle;
+					$output .= $this->bold_or_not($bctitle);
 			} else if ( is_date() ) { 
 				if ( isset($opt['breadcrumbs-archiveprefix']) )
 					$bc = $opt['breadcrumbs-archiveprefix'];

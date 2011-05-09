@@ -106,6 +106,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function admin_header($title, $expl = true, $form = true, $option = 'yoast_wpseo_options', $optionshort = 'wpseo', $contains_files = false) {
 			?>
 			<div class="wrap">
+				<?php settings_errors(); ?>
 				<?php 
 				if ( (isset($_GET['updated']) && $_GET['updated'] == 'true') || (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true') ) {
 					$msg = __('Settings updated');
@@ -697,6 +698,26 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}
 			}
 			$content .= '<br/>';
+			
+			$content .= '<strong>'.__('Post type archive to show in breadcrumbs for:').'</strong><br/>';
+			foreach (get_taxonomies() as $taxonomy) {
+				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format', 'category', 'post_tag') ) ) {
+					$tax = get_taxonomy($taxonomy);
+					$values = array( '' => 'None' );
+					if ( get_option('show_on_front') == 'page' )
+						$values['post'] = 'Blog';
+					
+					foreach (get_post_types() as $pt) {
+						if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
+							continue;
+						$ptobj = get_post_type_object($pt);
+						if ($ptobj->has_archive)
+							$values[$pt] = $ptobj->labels->name;
+					}
+					$content .= $this->select('taxonomy-'.$taxonomy.'-ptparent', $tax->labels->singular_name, $values);					
+				}
+			}
+			
 			$content .= $this->checkbox('breadcrumbs-boldlast',__('Bold the last page in the breadcrumb'));
 			$content .= $this->checkbox('breadcrumbs-trytheme',__('Try to add automatically'));
 			$content .= '<p class="desc">'.__('If you\'re using Hybrid, Thesis or Thematic, check this box for some lovely simple action').'.</p>';
@@ -850,6 +871,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<p class="desc">'.__('The above two options prevent the search engines from indexing your login, register and admin pages.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('pagedhome',__('Subpages of the homepage', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('Prevent the search engines from indexing your subpages, if you want them to only index your category and / or tag archives.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('noindexsubpages',__('Subpages of archives and taxonomies', 'yoast-wpseo') );
+			$content .= '<p class="desc">'.__('Prevent the search engines from indexing (not from crawling and following the links) your taxonomies & archives subpages.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('noindexauthor',__('Author archives', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('By default, WordPress creates author archives for each user, usually available under <code>/author/username</code>. If you have sufficient other archives, or yours is a one person blog, there\'s no need and you can best disable them or prevent search engines from indexing them.', 'yoast-wpseo').'</p>';
 			

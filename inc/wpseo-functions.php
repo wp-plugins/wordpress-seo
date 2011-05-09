@@ -86,14 +86,11 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		else
 			$pagenum = '';
 	}
-
-	$regex = '(.?)\[([a-zA-Z_-]+)\b(.*?)(?:(\/))?\](?:(.+?)\[\/\2\])?(.?)';
-	// Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.
+	
 	if ( isset( $args['post_content'] ) )
-		$args['post_content'] = preg_replace('/'.$regex.'/s', '$1$6', $args['post_content'] );
-
+		$args['post_content'] = wpseo_strip_shortcode( $args['post_content'] );
 	if ( isset( $args['post_excerpt'] ) )
-		$args['post_excerpt'] = preg_replace('/'.$regex.'/s', '$1$6', $args['post_excerpt'] );
+		$args['post_excerpt'] = wpseo_strip_shortcode( $args['post_excerpt'] );
 		
 	$r = (object) wp_parse_args($args, $defaults);
 
@@ -246,4 +243,20 @@ function wpseo_dir_setup() {
 		define( 'WPSEO_UPLOAD_URL', false );
 		define( 'WPSEO_UPLOAD_ERROR', $error );
 	}
+}
+
+// Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.
+function wpseo_strip_shortcode( $text ) {
+	return preg_replace( '|\[(.+?)\](.+?\[/\\1\])?|s', '', $text );
+}
+
+function wpseo_limit_words( $text, $limit = 30 ) {
+	$explode = explode(' ',$text);
+    $string  = '';	
+	$i = 0;
+    while ( $limit > $i ) {
+        $string .= $explode[$i]." ";
+		$i++;
+    }
+    return $string;
 }

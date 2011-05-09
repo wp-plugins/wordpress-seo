@@ -78,6 +78,32 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 0.3 =
+
+* Major new feature: Linkdex Page Analysis has been integrated into WordPress SEO.
+
+* Other new features:
+	* You can now noindex, follow all sub pages of archives, taxonomies and categories.
+	
+* Fixes / Updates:
+	* Snippet will now use ellipsis when post title or meta description is too long.
+	* Various JS optimizations in snippet preview generation.
+	* Snippet length will once again correctly correct for date inclusion.
+	* Date in snippet will be the current date when post is an unpublished draft.
+	* Preventing some errors when there's no focus keyword.
+	* Keyword detection in the URL now works correctly.
+	* URLs are no longer (incorrectly) "shortened".
+	* Fixed possible infinite loop in editor when adding focus keyword, which was causing FF crashes.
+	* Fixed count of keyword in content by removing tags properly.
+	* Fixed issues with HTML tags appearing in snippet inappropriately.
+	* Switched Google Suggest autocompletion for focus keyword to use [Google Suggest jQuery](http://code.google.com/p/googlesuggest-jquery/).
+	* No longer relies on `is_post_type_archive` to work, so compatible with WP 3.0 again.
+	* On themes that badly include $post in the head a redirect no longer occurs if the last post was redirected.
+	* SEO Settings menu in Admin Bar will no longer show for people that don't have the rights needed to use it.
+	* No longer wrongly showing image for last post in OpenGraph when on front page.
+	* No longer redirecting taxonomy feeds wrongly under some conditions with clean permalinks enabled.
+	* Fixed wrong titles for feeds.
+
 = 0.2.5.4 =
 
 * Custom post type archives update:

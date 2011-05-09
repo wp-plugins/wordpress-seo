@@ -11,7 +11,7 @@ class WPSEO_Frontend {
 		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
 			add_filter('language_attributes', array(&$this, 'add_opengraph_namespace'));
 
-		add_action('wp_head', array(&$this, 'head'), 10, 1);
+		add_action('wp_head', array(&$this, 'head'), 1, 1);
 		remove_action('wp_head', 'rel_canonical');
 
 		add_filter( 'wp_title', array(&$this, 'title'), 10, 3);
@@ -93,6 +93,11 @@ class WPSEO_Frontend {
 		
 		global $wp_query;
 
+		wp_reset_query();
+
+		if ( is_feed() )
+			return $title;
+			
 		$options = get_wpseo_options();
 
 		if ( is_home() && 'posts' == get_option('show_on_front') ) {
@@ -176,7 +181,7 @@ class WPSEO_Frontend {
 			}
 		} else if ( is_author() ) {
 			$author_id = get_query_var('author');
-			$title = get_the_author_meta('title', $author_id);
+			$title = get_the_author_meta('wpseo_title', $author_id);
 			if ( empty($title) ) {
 				if ( isset($options['title-author']) && !empty($options['title-author']) )
 					$title = wpseo_replace_vars($options['title-author'], array() );
@@ -188,7 +193,7 @@ class WPSEO_Frontend {
 					$title .= $sep.get_bloginfo('name'); 		
 				}
 			}
-		} else if ( is_post_type_archive() ) {
+		} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
 			$post_type = get_post_type();
 			if ( isset($options['title-ptarchive-'.$post_type]) && '' != $options['title-ptarchive-'.$post_type] ) {
 				$title = $options['title-ptarchive-'.$post_type];
@@ -310,6 +315,11 @@ class WPSEO_Frontend {
 				$robots['index']  = 'noindex';
 				$robots['follow'] = 'follow';
 			}
+
+			if ( $wp_query->query_vars['paged'] && $wp_query->query_vars['paged'] > 1 && isset($options['noindexsubpages']) && $options['noindexsubpages'] ) {
+				$robots['index']  = 'noindex';
+				$robots['follow'] = 'follow';
+			}
 		}
 		
 		foreach ( array('noodp','noydir','noarchive','nosnippet') as $robot ) {
@@ -362,7 +372,7 @@ class WPSEO_Frontend {
 					$canonical = wpseo_get_term_meta( $term, $term->taxonomy, 'canonical' );
 					if ( !$canonical )
 						$canonical = get_term_link( $term, $term->taxonomy );
-				} else if ( is_post_type_archive() ) {
+				} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
 					if ( function_exists('get_post_type_archive_link') )
 						$canonical = get_post_type_archive_link( get_post_type() );
 				} else if ( is_archive() ) {
@@ -468,10 +478,10 @@ class WPSEO_Frontend {
 					$metadesc = wpseo_replace_vars($options['metadesc-'.$term->taxonomy], (array) $term );
 			} else if ( is_author() ) {
 				$author_id = get_query_var('author');
-				$metadesc = get_the_author_meta('metadesc', $author_id);
+				$metadesc = get_the_author_meta('wpseo_metadesc', $author_id);
 				if ( !$metadesc && isset($options['metadesc-author']))
 					$metadesc = wpseo_replace_vars($options['metadesc-author'], (array) $wp_query->get_queried_object() );
-			} else if ( is_post_type_archive() ) {
+			} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
 				$post_type = get_post_type();
 				if ( isset($options['metadesc-ptarchive-'.$post_type]) && '' != $options['metadesc-ptarchive-'.$post_type] ) {
 					$metadesc = $options['metadesc-ptarchive-'.$post_type];
@@ -492,13 +502,15 @@ class WPSEO_Frontend {
 	}
 
 	function page_redirect( $input ) {
-		global $post;
-		if ( !isset($post) )
-			return;
-		$redir = wpseo_get_value('redirect', $post->ID);
-		if (!empty($redir)) {
-			wp_redirect($redir, 301);
-			exit;
+		if ( is_singular() ) {
+			global $post;
+			if ( !isset($post) )
+				return;
+			$redir = wpseo_get_value('redirect', $post->ID);
+			if (!empty($redir)) {
+				wp_redirect($redir, 301);
+				exit;
+			}
 		}
 	}
 	
@@ -600,7 +612,10 @@ class WPSEO_Frontend {
 			}
 		} else if ( is_category() || is_tag() || is_tax() ) {
 			$term = $wp_query->get_queried_object();
-			$properurl = get_term_link( $term, $term->taxonomy );
+			if ( is_feed() )
+				$properurl = get_term_feed_link( $term, $term->taxonomy );
+			else
+				$properurl = get_term_link( $term, $term->taxonomy );
 		} else if ( is_search() ) {
 			$s = preg_replace( '/(%20|\+)/', ' ', get_search_query() );
 			$properurl = get_bloginfo('url').'/?s=' . rawurlencode( $s );

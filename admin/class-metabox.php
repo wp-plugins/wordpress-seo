@@ -2,7 +2,7 @@
 
 class WPSEO_Metabox {
 	
-	var $wpseo_meta_length = 155;
+	var $wpseo_meta_length = 156;
 	var $wpseo_meta_length_reason = '';
 	
 	function __construct() {
@@ -47,10 +47,45 @@ class WPSEO_Metabox {
 	}
 	
 	public function script() {
+		global $post;
+		if ( !isset($post) )
+			return;
+			
+		$options = get_wpseo_options();
+		
+		$date = '';
+		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) ) {
+			$date = $this->get_post_date( $post );
+
+			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
+			$this->wpseo_meta_length_reason = ' (because of date display)';
+		}
+		unset($date);
+		
+		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', $this->wpseo_meta_length );
+
+		$title_template = '';
+		if ( isset( $options['title-'.$post->post_type] ) )
+			$title_template = $options['title-'.$post->post_type];
+			
+		// If there's no title template set, use the default, otherwise title preview won't work.
+		if ( $title_template == '' )
+			$title_template = '%%title%% - %%sitename%%';
+		$title_template = wpseo_replace_vars( $title_template, $post, array('%%title%%') );
+
+		$metadesc_template = '';
+		if ( isset( $options['metadesc-'.$post->post_type] ) )
+			$metadesc_template = wpseo_replace_vars( $options['metadesc-'.$post->post_type], $post, array( '%%excerpt%%', '%%excerpt_only%%' ) );
+		
+		$sample_permalink = get_sample_permalink( $post->ID );
+		$sample_permalink = str_replace('%page','%post',$sample_permalink[0]);
 		?>
 		<script type="text/javascript">
 			var wpseo_lang ='<?php echo substr(get_locale(),0,2); ?>';
 			var wpseo_meta_desc_length = '<?php echo $this->wpseo_meta_length; ?>';
+			var wpseo_title_template = '<?php echo $title_template; ?>';
+			var wpseo_metadesc_template = '<?php echo $metadesc_template; ?>';
+			var wpseo_permalink_template = '<?php echo $sample_permalink; ?>'
 		</script>
 		<?php
 	}
@@ -83,14 +118,6 @@ class WPSEO_Metabox {
 		
 		$options = get_wpseo_options();
 
-		$title_template = $options['title-'.$post->post_type];
-		// If there's no title template set, use the default, otherwise title preview won't work.
-		if ( $title_template == '' )
-			$title_template = '%%title%% - %%sitename%%';
-		$title_template = wpseo_replace_vars( $title_template, $post, array('%%title%%') );
-
-		$metadesc_template = wpseo_replace_vars( $options['metadesc-'.$post->post_type], $post, array( '%%excerpt%%', '%%excerpt_only%%' ) );
-			
 		$mbs = array();
 		$mbs['snippetpreview'] = array(
 			"name" => "snippetpreview",
@@ -105,15 +132,14 @@ class WPSEO_Metabox {
 			"description" => "<div class='alignright' style='width: 300px;'>"
 			."<a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a> "
 			."<p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
+			"autocomplete" => "off",
 		);
 		$mbs['title'] = array(
 			"name" => "title",
 			"std" => "",
 			"type" => "text",
 			"title" => __("SEO Title"),
-			// Template below is used for snippet generation
-			"description" => '<div class="wpseo_hidden" id="wpseo_title_template">'.$title_template.'</div>'
-				.'<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title').'</a></div><p>'
+			"description" => '<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title').'</a></div><p>'
 				.__("Title display in search engines is limited to 70 chars").", <span id='yoast_wpseo_title-length'></span> ".__("chars left.")."<br/>"
 				.__("If the SEO Title is empty, the preview shows what the plugin generates based on your ")
 				."<a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>".__("title template")."</a>.".'</p>',
@@ -126,8 +152,7 @@ class WPSEO_Metabox {
 			"title" => __("Meta Description"),
 			"rows" => 2,
 			"richedit" => false,
-			"description" => '<div class="wpseo_hidden" id="wpseo_metadesc_template">'.$metadesc_template.'</div>'
-				."The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
+			"description" => "The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
 		);
 		if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] ) {
 			$mbs['metakeywords'] = array(
@@ -253,12 +278,11 @@ class WPSEO_Metabox {
 
 		$options = get_wpseo_options();
 		
-		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', 155);
-
 ?>
 	<div class="metabox-tabs-div">
 		<ul class="metabox-tabs" id="metabox-tabs">
 			<li class="active general"><a class="active" href="javascript:void(null);">General</a></li>
+			<li class="linkdex"><a href="javascript:void(null);">Page Analysis</a></li>
 			<li class="advanced"><a href="javascript:void(null);">Advanced</a></li>
 			<?php do_action('wpseo_tab_header'); ?>
 		</ul>
@@ -268,6 +292,12 @@ class WPSEO_Metabox {
 			$content .= $this->do_meta_box( $meta_box );
 		}
 		$this->do_tab( 'general', 'General', $content );
+
+		require_once WPSEO_PATH.'/admin/linkdex/linkdex.php';
+		
+		$linkdex = new Linkdex();
+		$this->do_tab( 'linkdex', 'Page Analysis', $linkdex->output( $post ) );
+		unset($linkdex);
 		
 		if ( ! isset($options['disableadvanced_meta']) || !$options['disableadvanced_meta'] ) {
 			$content = '';
@@ -309,7 +339,10 @@ class WPSEO_Metabox {
 				$content .= $this->snippet();
 				break;
 			case "text":
-				$content .= '<input type="text" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'" value="'.$meta_box_value.'" class="large-text"/><br />';  
+				$ac = '';
+				if ( isset( $meta_box['autocomplete']) && $meta_box['autocomplete'] == 'off' )
+					$ac = 'autocomplete="off" ';
+				$content .= '<input type="text" id="yoast_wpseo_'.$meta_box['name'].'" '.$ac.'name="yoast_wpseo_'.$meta_box['name'].'" value="'.$meta_box_value.'" class="large-text"/><br />';  
 				break;
 			case "textarea":
 				$rows = 5;
@@ -375,24 +408,26 @@ class WPSEO_Metabox {
 		return $content;
 	}
 	
+	function get_post_date( $post ) {
+		if ( isset($post->post_date) && $post->post_status == 'publish' )
+			$date = date('M j, Y', strtotime($post->post_date) );
+		else 
+			$date = date('M j, Y');
+		return $date;
+	}
+	
 	function snippet() {
 		global $post;
 		
 		$options = get_wpseo_options();
 		
-		$date = '';
-		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) ) {
-			if ( isset($post->post_date) )
-				$date = date('M j, Y', strtotime($post->post_date));
-			else 
-				$date = date('M j, Y');
-
-			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
-			$this->wpseo_meta_length_reason = ' (because of date display)';
-		}
-		
 		$content = '';
-
+		
+		// TODO: make this configurable per post type.
+		$date = '';
+		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) )
+			$date = $this->get_post_date( $post );
+		
 		$title = wpseo_get_value('title');
 		$desc = wpseo_get_value('metadesc');
 
@@ -418,9 +453,9 @@ class WPSEO_Metabox {
 				</div>
 			</div>';
 		} else {
-			if (!empty($date))
+			if ( !empty($date) )
 				$date .= ' <strong>...</strong> ';
-				$content .= '<div id="snippet">
+			$content .= '<div id="snippet">
 				<a class="title" href="#">'.$title.'</a>
 				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span>'.$desc.'</span></p>
 				<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a> - <a href="#" class="util">Similar</a>
@@ -486,12 +521,21 @@ class WPSEO_Metabox {
 	public function enqueue() {
 		$color = get_user_meta( get_current_user_id(), 'admin_color', true );
 
-		wp_enqueue_style(  'metabox-tabs', WPSEO_URL.'css/metabox-tabs.css', WPSEO_VERSION );
-		wp_enqueue_style(  "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css', WPSEO_VERSION	);
+		wp_enqueue_style( 'metabox-tabs', WPSEO_URL.'css/metabox-tabs.css', WPSEO_VERSION );
+		wp_enqueue_style( "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css', WPSEO_VERSION	);
+		switch ($color) {
+			case 'classic':
+				$jqueryuicss = 'cupertino';
+				break;
+			case 'fresh':
+			default:
+				$jqueryuicss = 'smoothness';
+				break;
+		}
+		wp_enqueue_style( 'jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jqueryuicss.'/jquery-ui.css', false, WPSEO_VERSION, 'screen' );
 		
-		wp_enqueue_script( 'jquery-bgiframe', WPSEO_URL.'js/jquery.bgiframe.min.js', array('jquery'), WPSEO_VERSION, true );
-		wp_enqueue_script( 'jquery-autocomplete', WPSEO_URL.'js/jquery.autocomplete.min.js', array('jquery'), WPSEO_VERSION, true );
-		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-bgiframe','jquery-autocomplete'), WPSEO_VERSION, true );
+		wp_enqueue_script( 'jquery-ui', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js', false, '1.8.6', true );
+		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-ui'), WPSEO_VERSION, true );
 	}
 
 	function rebuild_sitemap( $post ) {
