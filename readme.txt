@@ -78,6 +78,13 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 0.3.1 =
+
+* Fixes:
+	* Bug in meta box JS code causing annoying issues in Firefox and Internet Explorer.
+	* Issue with outbound anchor text detection in Linkdex Page Analysis.
+	* Small bug in detection of keyword in Title when keyword contained dashes or other non alphanumeric chars.
+
 = 0.3 =
 
 * Major new feature: Linkdex Page Analysis has been integrated into WordPress SEO.

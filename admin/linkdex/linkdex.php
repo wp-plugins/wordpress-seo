@@ -214,7 +214,7 @@ class Linkdex {
 		$scoreTitleCorrectLength 	 = __("The page title is more than 40 characters and less than the recommended 70 character limit.");
 		$scoreTitleTooShort 		 = __("The page title contains %d characters, which is less than the recommended minimum of 40 characters. Use the space to add keyword variations or create compelling call-to-action copy.");
 		$scoreTitleTooLong 			 = __("The page title contains %d characters, which is more than the viewable limit of 70 characters; some words will not be visible to users in your listing.");
-		$scoreTitleKeywordMissing 	 = __("The keyword / phrase does not appear in the page title.");
+		$scoreTitleKeywordMissing 	 = __("The keyword / phrase %s does not appear in the page title.");
 		$scoreTitleKeywordBeginning  = __("The page title contains keyword / phrase, at the beginning which is considered to improve rankings.");
 		$scoreTitleKeywordEnd 		 = __("The page title contains keyword / phrase, but it does not appear at the beginning; try and move it to the beginning.");
 		$scoreTitleKeywordIn 		 = __("The page title contains keyword / phrase.");
@@ -234,7 +234,10 @@ class Linkdex {
 			$needle_position = stripos( $title, $job["keyword_folded"] );
 
 			if ( $needle_position === false )
-				$this->SaveScoreResult( $results, 2, $scoreTitleKeywordMissing );
+				$needle_position = stripos( $title, $job["keyword"] );
+
+			if ( $needle_position === false )
+				$this->SaveScoreResult( $results, 2, sprintf( $scoreTitleKeywordMissing, $job["keyword_folded"] ) );
 
 			if ( $needle_position <= $scoreTitleKeywordLimit )
 				$this->SaveScoreResult( $results, 9, $scoreTitleKeywordBeginning );
@@ -280,7 +283,7 @@ class Linkdex {
 		foreach ($dom_objects as $dom_object) {
 			if ( $dom_object->attributes->getNamedItem('href') ) {
 				$href = $dom_object->attributes->getNamedItem('href')->textContent;
-				if ( substr( 0, 4, $href ) == 'http' )
+				if ( substr( $href, 0, 4 ) == 'http' )
 					$anchor_texts['external'] = $dom_object->textContent;
 			}
 		}
@@ -304,6 +307,11 @@ class Linkdex {
 								) 
 							);
 		foreach ($dom_objects as $dom_object) {
+			$count = array( 
+				'internal' => array( 'nofollow' => 0, 'dofollow' => 0 ), 
+				'external' => array( 'nofollow' => 0, 'dofollow' => 0 ), 
+				'other' => array( 'nofollow' => 0, 'dofollow' => 0 ) 
+			);
 			if ( $dom_object->attributes->getNamedItem('href') ) {
 				$href 	= $dom_object->attributes->getNamedItem('href')->textContent;
 				$wpurl	= get_bloginfo('url'); 

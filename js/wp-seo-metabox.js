@@ -94,7 +94,7 @@ function yst_strip_tags( str ) {
 		return '';
 	
 	str = str.replace(/<\/?[^>]+>/gi, ''); 
-	str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/s, '');
+	str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
 	return str;
 }
 
