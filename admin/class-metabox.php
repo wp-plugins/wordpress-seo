@@ -498,11 +498,15 @@ class WPSEO_Metabox {
 					$data = 'on';
 				else
 					$data = 'off';
-			} elseif ( 'multiselect' == $meta_box['type'] ) {
-				if (is_array($_POST['yoast_wpseo_'.$meta_box['name']]))
-					$data = implode( ",", $_POST['yoast_wpseo_'.$meta_box['name']] );
-				else
-					$data = $_POST['yoast_wpseo_'.$meta_box['name']];
+			} else if ( 'multiselect' == $meta_box['type'] ) {
+				if ( isset( $_POST['yoast_wpseo_'.$meta_box['name']] ) ) {
+					if (is_array($_POST['yoast_wpseo_'.$meta_box['name']]))
+						$data = implode( ",", $_POST['yoast_wpseo_'.$meta_box['name']] );
+					else
+						$data = $_POST['yoast_wpseo_'.$meta_box['name']];
+				} else {
+					continue;
+				}
 			} else {
 				if ( isset($_POST['yoast_wpseo_'.$meta_box['name']]) )
 					$data = $_POST['yoast_wpseo_'.$meta_box['name']];  

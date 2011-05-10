@@ -75,8 +75,8 @@ class Linkdex {
 		unset($description);
 	
 		// Body
-		$body 	= $this->GetBody($post->post_content);	
-		$firstp = $this->GetFirstParagraph($body);
+		$body 	= $this->GetBody( $post );	
+		$firstp = $this->GetFirstParagraph( $post );
 		$this->ScoreBody($job, $results, $body, $firstp);
 		unset($body);
 		unset($firstp);
@@ -157,14 +157,13 @@ class Linkdex {
 		// standardise whitespace
 		$inputString = preg_replace('/\s+/',' ',$inputString);
 
-		// remove word separators with a space
-		$inputString = str_replace($keywordWordsRemoved, ' ', $inputString);
-
 		// deal with the separators that can be either removed or replaced by space
 		if ($removeOptionalCharacters) {
+			// remove word separators with a space
+			$inputString = str_replace($keywordWordsRemoved, ' ', $inputString);
+
 			$inputString = str_replace($keywordCharactersRemovedOrReplaced, '', $inputString);				
-		}
-		else {
+		} else {
 			$inputString = str_replace($keywordCharactersRemovedOrReplaced, ' ', $inputString);		
 		}
 		
@@ -175,7 +174,7 @@ class Linkdex {
 	}
 	
 	function ScoreKeyword($job, &$results) {
-		$keywordStopWord = __("The keyword for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them. Found %s.");
+		$keywordStopWord = __("The keyword for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them. Found '%s'.");
 		
 		if ( wpseo_stopwords_check( $job["keyword"] ) !== false )
 			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, wpseo_stopwords_check( $job["keyword"] ) ) );
@@ -434,11 +433,11 @@ class Linkdex {
 		if ($maxlength != 155)
 			$metaShorter				= __("The available space is shorter than the usual 155 characters because Google will also include the publication date in the snippet.");
 		
-		if ($description=="") {
+		if ( $description == "" ) {
 			$this->SaveScoreResult($results,1,$scoreDescriptionMissing);
 		}
 		else {
-			$length=strlen($description);
+			$length = strlen( $description );
 			if ($length < $scoreDescriptionMinLength)
 				$this->SaveScoreResult( $results, 6, sprintf($scoreDescriptionTooShort, $maxlength, $metaShorter) );
 			else if ($length <= $maxlength)
@@ -447,8 +446,8 @@ class Linkdex {
 				$this->SaveScoreResult( $results, 6, sprintf($scoreDescriptionTooLong, $maxlength, $metaShorter) );
 
 			// TODO MA Keyword/Title matching is exact match with separators removed, but should extend to distributed match
-			$haystack1=$this->strip_separators_and_fold($description,true);
-			$haystack2=$this->strip_separators_and_fold($description,false);
+			$haystack1 = $this->strip_separators_and_fold($description,true);
+			$haystack2 = $this->strip_separators_and_fold($description,false);
 			if (strrpos($haystack1,$job["keyword_folded"])===false && strrpos($haystack2,$job["keyword_folded"])===false)
 				$this->SaveScoreResult($results,3,$scoreDescriptionKeywordMissing);
 			else 
@@ -500,7 +499,7 @@ class Linkdex {
 		}
 
 		// First Paragraph Test
-		if ( stripos( $firstp, $job["keyword"] ) === false ) {
+		if ( stripos( $firstp, $job["keyword"] ) === false && stripos( $firstp, $job["keyword_folded"] ) === false ) {
 			$this->SaveScoreResult( $results, 3, $scoreFirstParagraphLow );
 		} else {
 			$this->SaveScoreResult( $results, 9, $scoreFirstParagraphHigh );		
@@ -539,9 +538,9 @@ class Linkdex {
 		$this->SaveScoreResult( $results, $score, sprintf( $scoreFlesch, $flesch, $fleschurl, $level, $note ) );
 	}
 
-	function GetBody($origHtml) {
+	function GetBody( $post ) {		
 		// Strip shortcodes, for obvious reasons
-		$origHtml = wpseo_strip_shortcode($origHtml);
+		$origHtml = wpseo_strip_shortcode( $post->post_content );
 		if ( trim( $origHtml ) == '' )
 			return '';
 
@@ -554,40 +553,16 @@ class Linkdex {
 			$htmdata3 = $htmdata2;
 		}
 		$htmdata4 = preg_replace("/<!--.*?-->/","",$htmdata3);
-		if ($htmdata4==null) {
+		if ($htmdata4 == null) {
 			$htmdata4 = $htmdata3;
 		}
 
-		$dom = new domDocument; 
-		$dom->strictErrorChecking = false; 
-		$dom->preserveWhiteSpace = false; 
-		@$dom->loadHTML($htmdata4); 
-		$xpath = new DOMXPath($dom);
-
-		$query="//body";
-		$dom_objects = $xpath->query($query);
-
-		$body=$dom_objects->item(0)->textContent;
-		$body = preg_replace("/(\t)+/"," ",$body);
-
-		unset($xpath);
-		unset($dom);
-
-		return $body;
+		return $htmdata4;
 	}
 
-	function GetFirstParagraph($body) {
-		$dom = new domDocument; 
-		$dom->strictErrorChecking = false; 
-		$dom->preserveWhiteSpace = false; 
-		@$dom->loadHTML($body); 
-		$xpath = new DOMXPath($dom);
-
-		$query 			= "//p|//P";
-		$dom_objects 	= $xpath->query($query);
-		foreach ($dom_objects as $dom_object) {
-			if ( trim( $dom_object->textContent ) != '' )
-				return $dom_object->textContent;
-		}
+	function GetFirstParagraph( $post ) {
+		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.
+		preg_match( '/<p>(.*)<\/p>/', wpautop( nl2br( $post->post_content ) ), $matches );
+		return $matches[1];
 	}
 }

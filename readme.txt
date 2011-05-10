@@ -78,6 +78,22 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 0.3.2 =
+
+* Fixes:
+	* Instant update of snippet preview now also works when editing post excerpt.
+	* Bugs with non-ASCII characters in the focus keyword and keyword recognition.
+	* Issues with themes using `cat` in search, most specifically the ClassiPress themes.
+	* The snippet preview no longer crashes when you use "on", "strong" or any other term contained in "strong" in your focus keyword.
+	* Made the Linkdex check for keyword in URL work in all occasions.
+	* Notices on XML import.
+	* Issue with title of blog page on paginated pages.
+
+* Also:
+	* Removed 3 no longer needed JavaScript files.
+	* Added the new bug tracker to the plugins sidebar notice under support.
+	* Canonical now has a filter (`wpseo_canonical`) so you can remove it or change it.
+	
 = 0.3.1 =
 
 * Fixes:

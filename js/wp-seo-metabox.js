@@ -230,14 +230,14 @@ function boldKeywords( str, url ) {
 	if ( focuskw.search(' ') != -1 ) {
 		var keywords 	= focuskw.split(' ');
 	} else {
-		var keywords	= new Array(focuskw);
+		var keywords	= new Array( focuskw );
 	}
 	for (var i in keywords) {
 		var kw		= yst_strip_tags( keywords[i] );
 		if ( url )
 			var kw 		= kw.replace(' ','-').toLowerCase();
 
-		kwregex = new RegExp( '('+kw+')', 'gim' );
+		kwregex = new RegExp( '\\b('+kw+')\\b', 'gim' );
 		str 	= str.replace( kwregex, '<strong>'+"$1"+'</strong>' );
 	}
 	return str;
@@ -285,6 +285,9 @@ jQuery(document).ready(function(){
 		updateTitle();		
 	});
 	jQuery('#yoast_wpseo_metadesc').keyup( function() {
+		updateDesc();
+	});
+	jQuery('#excerpt').keyup( function() {
 		updateDesc();
 	});
 	
