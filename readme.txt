@@ -1,9 +1,10 @@
 === WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
-Tags: seo, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer
-Requires at least: 3.0
+Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
+Requires at least: 3.1
 Tested up to: 3.1
+Stable tag: 0.3.4
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -11,47 +12,207 @@ Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descri
 
 The most complete all in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
 
-* Post title and meta description meta box to change these on a per post basis.
+* Post title and meta description meta box to change these on a per post basis for ultimate SEO.
+* On page SEO Analysis using the Linkdex page analysis library.
 * Taxonomy (tag, category & custom taxonomy) title and meta description support.
-* Google search result snippet previews.
+* Google search result snippet previews, let your editors improve your SEO!
 * Focus keyword testing.
 * Meta Robots configuration:
 	* Easily add noodp, noydir meta tags.
 	* Easily noindex, or nofollow pages, taxonomies or entire archives.
 * Improved canonical support, adding canonical to taxonomy archives, single posts and pages and the front page.
-* RSS footer / header configuration.
+* RSS footer / header configuration, improve your SEO by getting links from scrapers.
 * Permalink clean ups, while still allowing for, for instance, Google Custom Search.
 * Breadcrumbs support, with configurable breadcrumbs titles.
-* XML Sitemaps with:
+* The ultimate XML Sitemaps for your SEO with:
  	* Images
 	* Configurable removal of post types and taxonomies
 	* Pages or posts that have been noindexed will not show in XML sitemap (but can if you want them too).
+	* Custom post type support.
 * XML News Sitemaps.
 * .htaccess and robots.txt editor.
 * Basic import functionality for HeadSpace2 and All in One SEO.
 
 == Installation ==
 
-1. Upload the `plugin` folder to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
+1. Upload the `wordress-seo` folder to the `/wp-content/plugins/` directory
+1. Activate the WordPress SEO plugin through the 'Plugins' menu in WordPress
 1. Configure the plugin by going to the `SEO` menu that appears in your admin menu
 
+== Frequently Asked Questions ==
+
+= The SEO title output for the plugin doesn't work as expected =
+
+You've set up a template for your titles, but things get added to it when they're output? You can do two things: either enable "Force rewrite titles" on the SEO -> Titles settings page, or go into your header.php and change the title element to just this: 
+
+`<title><?php wp_title(''); ?></title>`
+
+= I'm not seeing a meta description in my `<head>` section? =
+
+Check whether your theme's `header.php` file contains a call to [wp_head()](http://codex.wordpress.org/Function_Reference/wp_head).
+
+= My meta descriptions aren't showing up in the search result pages =
+
+There are two possible issues with a meta description:
+
+1. You're putting out more than one of them due to multiple plugins adding a description, for instance the WordBooker plugin adds a description too but has an option to disable it, other SEO plugins running might be another cause.
+1. You're not seeing your meta description show up in the search result pages. Google will not alway show your meta description, the likelihood of your meta description appearing in the search results increases incredibly when your meta description contains the sought for keyword though, which is why the focus keyword functionality checks for the appearance of the focus keyword in the description.
+
+= Page X, Y, Z for plugin X doesn't work with your plugin enabled =
+
+Disable the clean permalinks feature on the SEO -> Permalinks settings page.
+
+= Why is WordPress SEO better than All In One SEO Pack? =
+
+It's not a secret that the author of this plugin, Joost de Valk, aka Yoast, doesn't really like All In One SEO Pack. The main reason is that All in One SEO pack has a default option for auto generating meta descriptions that is actually making it harder for people to rank well in a lot of cases, giving them a false sense of security.
+
+Once you'll start using this plugin, you won't ask that question anymore, you'll just ask yourself "why does anyone still use All In One SEO"? There's several things this plugin does better: it has a snippet preview in the write post screen that'll help you optimize your titles, meta descriptions and copy instantly while working on your posts and pages.
+
+Also, other than All In One SEO Pack, this plugin has a completely working canonical implementation for all pages within your site, whereas the one in All In One SEO pack is broken, it was originally written by the author of this plugin, so he knows. It comes with XML Sitemaps, an XML News sitemap module, loads and loads of robots meta options and other options to improve your SEO.
+
+== Screenshots ==
+
+1. The WordPress SEO plugin general meta box. You'll see this on edit post pages, for posts, pages and custom post types.
+2. The advanced section of the WordPress SEO meta box.
+3. The WordPress SEO settings for a taxonomy.
+4. The fully configurable XML sitemap for WordPress SEO.
+5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
+
 == Changelog ==
+
+= 0.3.4 =
+
+* Fixes:
+	* CSS issue caused by 0.3.3.
+	* Some security issues, thanks Jon Cave and Andrew Nacin for pointing them out and helping to fix!
+	
+= 0.3.3 =
+
+* Fixes:
+	* CSS collisions due to too generic class names.
+	* Issue with outbound link recognition caused in 0.3.2.
+	* Improved first paragraph detection.
+	* Word count is now correct for non western european languages too.
+	* Keyword detection in content and first paragraph in Cyrillic, Russian and other languages.
+	* Handling of UTF-8 slugs.
+	* Proper detection of keywords underneath the focus keyword input field by using word boundaries.
+	* Proper keyword bolding and counting in snippet preview for Cyrillic, Russian and other languages.
+	* Proper counting of length of description and title for strings with accents or non-ASCII characters.
+	* No longer calculating Flesch score for non-English, as it's not correct.
+	* Related keywords button works again.
+	* Several performance improvements to edit post page JavaScript.
+
+* Also:
+	* Notice now properly tells you to save as draft or update a post to see new Linkdex analysis. No, it's not going to be AJAX, ever, for performance reasons.
+	
+= 0.3.2 =
+
+* Fixes:
+	* Instant update of snippet preview now also works when editing post excerpt.
+	* Bugs with non-ASCII characters in the focus keyword and keyword recognition.
+	* Issues with themes using `cat` in search, most specifically the ClassiPress themes.
+	* The snippet preview no longer crashes when you use "on", "strong" or any other term contained in "strong" in your focus keyword.
+	* Made the Linkdex check for keyword in URL work in all occasions.
+	* Notices on XML import.
+	* Issue with title of blog page on paginated pages.
+
+* Also:
+	* Removed 3 no longer needed JavaScript files.
+	* Added the new bug tracker to the plugins sidebar notice under support.
+	* Canonical now has a filter (`wpseo_canonical`) so you can remove it or change it.
+	
+= 0.3.1 =
+
+* Fixes:
+	* Bug in meta box JS code causing annoying issues in Firefox and Internet Explorer.
+	* Issue with outbound anchor text detection in Linkdex Page Analysis.
+	* Small bug in detection of keyword in Title when keyword contained dashes or other non alphanumeric chars.
+
+= 0.3 =
+
+* Major new feature: Linkdex Page Analysis has been integrated into WordPress SEO.
+
+* Other new features:
+	* You can now noindex, follow all sub pages of archives, taxonomies and categories.
+	
+* Fixes / Updates:
+	* Snippet will now use ellipsis when post title or meta description is too long.
+	* Various JS optimizations in snippet preview generation.
+	* Snippet length will once again correctly correct for date inclusion.
+	* Date in snippet will be the current date when post is an unpublished draft.
+	* Preventing some errors when there's no focus keyword.
+	* Keyword detection in the URL now works correctly.
+	* URLs are no longer (incorrectly) "shortened".
+	* Fixed possible infinite loop in editor when adding focus keyword, which was causing FF crashes.
+	* Fixed count of keyword in content by removing tags properly.
+	* Fixed issues with HTML tags appearing in snippet inappropriately.
+	* Switched Google Suggest autocompletion for focus keyword to use [Google Suggest jQuery](http://code.google.com/p/googlesuggest-jquery/).
+	* No longer relies on `is_post_type_archive` to work, so compatible with WP 3.0 again.
+	* On themes that badly include $post in the head a redirect no longer occurs if the last post was redirected.
+	* SEO Settings menu in Admin Bar will no longer show for people that don't have the rights needed to use it.
+	* No longer wrongly showing image for last post in OpenGraph when on front page.
+	* No longer redirecting taxonomy feeds wrongly under some conditions with clean permalinks enabled.
+	* Fixed wrong titles for feeds.
+
+= 0.2.5.4 =
+
+* Custom post type archives update:
+	* You can now set a title, meta description and breadcrumbs title for custom post type archives on the Titles page
+	* Custom post type archives now have a correct canonical
+* Other fixes:
+	* Fixed a notice for an uninitialized setting
+	* Slightly changed the CSS for the admin area
+	* Changed input fields for meta descriptions on titles page from text input to textarea
+	* More preparations for allowing the plugin to be fully translated
+
+= 0.2.5.3 =
+
+* Bugs fixed:
+	* `edit_posts` is not the same as `edit_post`, what a difference an s makes, thanks to nacin.
+	* preview URLs now work again with clean permalinks on, but only for those with the actual rights to view them.
+	* Fix for catchable fatal error in canonical function.
+	* First stab at fix for errors with focus keyword check and keywords filled with HTML tags.
+	* canonical links for paginated posts are now set correctly.
+	* Issue where parent taxonomy items would display in the reverse order in breadcrumbs.
+	* Improved error handling for non PHP 5.2+ installs and also made automatic deactivation work properly.
+
+* Documentation fixes:
+	* Added screenshot and a FAQ with several items to this plugin's page.
+
+= 0.2.5.2 =
+
+* This WordPress SEO plugin now officially requires PHP5. WordPress version 3.2 will also require it, so you'd better upgrade now. If you're on any version lower than PHP 5.2, this plugin will deactivate itself. You can then use SEO Data Transporter to migrate your data to another plugin, or you could do the more sensible thing and get your hosting upgraded to PHP 5.2 ASAP.
+
+* Bugs fixed:
+	* Attempted compatibility fix with other plugins that hook into robots.txt functionality.
+	* Issue with not loading meta box for some custom post types.
+	* Issue where SEO data for custom post types would not save.
+	* Issue where post title in snippet preview would show %%sitename% instead of your site's name when no title template for post type was set.
+	* Issue with removing tags when string was empty in JavaScript.
+	* Hiding the post_format taxonomy on the right places.
+	* Should now work better with crappy themes that do weird things in header.php.
+	
+* Design fixes:
+	* Updated tabs in meta boxes to reflect Core UI, for more info see [this post](http://developersmind.com/tabbed-meta-box-in-wordpress/) by Pete Mall.
+	
+* Enhancements:
+	* Now using plugin version number to enqueue files so browser cache isn't in the way when upgrading.
+	* Loading scripts in footer now when possible.
 
 = 0.2.5.1 =
 
 * Security fixes:
-	* Added nonces for security to htaccess and robots.txt file editing to prevent possible XSS.
+	* Added nonces for security to htaccess and robots.txt file editing to prevent possible CSRF.
 
 * Bugs fixed:
-	* Prevent JS error when WP SEO Meta box was hidden on edit pages.
+	* Prevent JS error when WordPress SEO Meta box was hidden on edit pages.
 	* Fix for title in snippet preview not showing when no title template was set for the post type.
 	* Fix for focus keyword count, would give wrong return on slugs that were too long.
 	* Removed post_format from list of taxonomies you can edit title and meta desc template for as it's of no use.
 	* Removed post_format from list of taxonomies to exclude for XML Sitemap, it was already excluded by default.
 
 * New features:
-	* Option to disable WP SEO meta data box on (custom) taxonomies.
+	* Option to disable WordPress SEO meta data box on (custom) taxonomies.
 	
 = 0.2.5 =
 
@@ -67,7 +228,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	
 = 0.2.3.4 =
 
-* Added WPML config file.
+* Added WPML config file, so you can SEO in multiple languages.
 
 = 0.2.3.3 =
 
@@ -276,7 +437,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Implemented a hook that would make the title work with Thematic based themes properly.
 	* Added option to remove "start" rel link from head section.
 	* Several style sheet changes to make backend styling easier and more robust.
-	* Added option to force rewrite titles for people that can't adapt their theme.
+	* Added option to force rewrite titles for people that can't adapt their theme, it's ugly but not as ugly as how All In One SEO handles it.
 	* If title templates aren't set, the plugin now generates proper default titles.
 	* The News module has moved to a separate directory, where all other modules will reside too, so they can be updated individually later. Download link for the news module will appear on yoast.com shortly.
 	
@@ -317,7 +478,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 * New features:
 	* Added option to regenerate SEO title (just click the button).
 	* Advanced button now looks cooler (hey even little changes deserve a changelog line!).
-	* Now pinging Ask.com too for updated sitemaps.
+	* Now pinging Ask.com too for updated sitemaps, for those of you caring about SEO for Ask.
 	* Added plugin version number to "branding" comment to help in bug fixing.
 	
 = 0.1.2.1 =
@@ -366,7 +527,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Made sure %%tag%% works too in title templates.
 	
 * (Inline) Documentation fixes:	
-	* Added this readme.txt file.
+	* Added this readme.txt file describing all the SEO functionality, and why this is _the_ All in one SEO plugin.
 	* MS Webmaster Central renamed to Bing Webmaster Tools.
 	* Added links to Bing Webmaster Tools and Yahoo! Site explorer to meta values box, as well as an explanation that you do not need to use those values if your site is already verified.
 	* Changed wording on description of clean permalinks.
@@ -389,7 +550,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Added experimental "Find related keywords" feature that'll return keywords that are related to your focus keyword.
 	
 * Issues currently in progress:
-	* WPML compatibility.
+	* WPML compatibility for the multilingual SEO's.
 	* XML Sitemap errors in Bing Webmaster Tools (due to use of "caption" for images).
 	
 
@@ -397,17 +558,17 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 
 * Initial beta release.
 
-== Upgrade Notice ==
-
-= 0.2.3.4 =
-Added config file for WPML.
-
 == Other Notes ==
 
 = Usage guides =
 
-* WP Beginner has written a good guide on [http://www.wpbeginner.com/plugins/how-to-install-and-setup-wordpress-seo-plugin-by-yoast/](how to install and setup WordPress SEO)
+* WP Beginner has written a good guide on [how to install and setup WordPress SEO](http://www.wpbeginner.com/plugins/how-to-install-and-setup-wordpress-seo-plugin-by-yoast/)
 
 = Press Mentions =
 
-* I was recently [http://mashable.com/2011/02/17/wordpress-seo-interview/](interview by Mashable) about this plugin.
+* I was recently [interview by Mashable](http://mashable.com/2011/02/17/wordpress-seo-interview/) about this plugin, talking about what the plugin does and why I think my plugin is superior to All in One SEO.
+
+== Upgrade Notice ==
+
+= 0.3.4 =
+Upgrade immediately to make sure your WordPress install is secure.

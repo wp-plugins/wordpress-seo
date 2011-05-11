@@ -1,18 +1,28 @@
 <?php
 
 function wpseo_set_option() {
-	update_option($_POST['option'], $_POST['newval']);
-	return 1;
-	die();
+	if ( ! current_user_can('manage_options') )
+		die('-1');
+	check_ajax_referer('wpseo-setoption');
+
+	$option = $_POST['option'];
+	if ( $option != 'page_comments' )
+		die('-1');
+
+	update_option( $option, 0 );
+	die('1');
 }
 add_action('wp_ajax_wpseo_set_option', 'wpseo_set_option');
 
 function wpseo_set_ignore() {
+	if ( ! current_user_can('manage_options') )
+		die('-1');
+	check_ajax_referer('wpseo-ignore');
+
 	$options = get_option('wpseo');
 	$options['ignore_'.$_POST['option']] = 'ignore';
 	update_option('wpseo', $options);
-	return 1;
-	die();
+	die('1');
 }
 add_action('wp_ajax_wpseo_set_ignore', 'wpseo_set_ignore');
 
