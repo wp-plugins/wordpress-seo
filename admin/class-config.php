@@ -77,7 +77,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
 			echo "<div id='message' class='error'>";
-			echo "<p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
+			echo "<p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\",\"".wp_create_nonce('wpseo-ignore')."\");' class='button'>I know, don't bug me.</a></p></div>";
 		}
 		
 		function admin_sidebar() {
@@ -1025,13 +1025,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
 				$content .= '<p id="wrong_permalink" class="wrong">'
 				.'<a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\');" class="button fixit">'.__('Ignore.').'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.').'</a>'
 				.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.').'</p>';
 
 			if ( get_option('page_comments') && !isset( $options['ignore_page_comments'] ) )
 				$content .= '<p id="wrong_page_comments" class="wrong">'
-				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\');" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\');" class="button fixit">'.__('Ignore.').'</a>'
+				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-setoption').'\');" class="button fixit">'.__('Fix it.').'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.').'</a>'
 				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
 
 			if ($content != '')

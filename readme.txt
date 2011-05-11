@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.1
 Tested up to: 3.1
-Stable tag: 0.3.3
+Stable tag: 0.3.4
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -80,6 +80,12 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 0.3.4 =
+
+* Fixes:
+	* CSS issue caused by 0.3.3.
+	* Some security issues, thanks Jon Cave and Andrew Nacin for pointing them out and helping to fix!
+	
 = 0.3.3 =
 
 * Fixes:
@@ -561,3 +567,8 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 = Press Mentions =
 
 * I was recently [interview by Mashable](http://mashable.com/2011/02/17/wordpress-seo-interview/) about this plugin, talking about what the plugin does and why I think my plugin is superior to All in One SEO.
+
+== Upgrade Notice ==
+
+= 0.3.4 =
+Upgrade immediately to make sure your WordPress install is secure.

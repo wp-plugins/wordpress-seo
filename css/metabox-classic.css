@@ -1,12 +1,12 @@
 /**
  * Metabox Tabs
  */
-ul.metabox-tabs li.active {
+ul.wpseo-metabox-tabs li.active {
 background-color: #EFF8FF;
 }
-ul.metabox-tabs li.active, div.tab-content {
+ul.wpseo-metabox-tabs li.active, div.wpseo-tab-content {
 border-color: #D1E5EE;
 }
-.metabox-tabs .active a {
+.wpseo-metabox-tabs .active a {
 color: #333;
 }

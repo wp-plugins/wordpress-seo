@@ -2,26 +2,26 @@
  * Metabox Tabs
  */
 
-ul.metabox-tabs {
+ul.wpseo-metabox-tabs {
 	display: none;
 	margin-top: 12px;
 	margin-bottom: 3px;
 }
 
-.metabox-tabs-div ul {
+.wpseo-metabox-tabs-div ul {
 	list-style: none;
 }
 
-.metabox-tabs li {
+.wpseo-metabox-tabs li {
 	display: inline;
 }
 
-ul.metabox-tabs li.active {
+ul.wpseo-metabox-tabs li.active {
 	border-style: solid solid none;
 	border-width: 1px 1px 0;
 }
 
-ul.metabox-tabs li {
+ul.wpseo-metabox-tabs li {
 	padding: 5px;
 	-moz-border-radius: 3px 3px 0 0;
 	-webkit-border-top-left-radius: 3px;
@@ -32,33 +32,33 @@ ul.metabox-tabs li {
 	border-top-right-radius: 3px;
 }
 
-.metabox-tabs a {
+.wpseo-metabox-tabs a {
 	text-decoration: none;
 }
 
-.metabox-tabs-div div.tabs-panel {
+.wpseo-metabox-tabs-div div.wpseo-tabs-panel {
 	overflow: auto;
 	padding: 0.5em 0.9em;
 	border-style: solid;
 	border-width: 1px;
 }
 
-.heading {
+.wpseo-heading {
 	padding-left: 10px;
 }
 
-.tab-content {
+.wpseo-tab-content {
 	overflow: auto;
 	padding: 0.5em 0.9em;
 	border-style: solid;
 	border-width: 1px;
 }
 
-#wpwrap #postsstuff .postbox .inside .tab-content {
+#wpwrap #postsstuff .postbox .inside .wpseo-tab-content {
 	font-size: 13px !important;
 }
 
-.inside .tab-content .form-table th {
+.inside .wpseo-tab-content .form-table th {
 	font-size: 13px;
 	width: 140px !important;
 }
