@@ -17,29 +17,25 @@ class Linkdex {
 			return; 
 
 		if ( !class_exists('DOMDocument') ) {
-			$content = '<div class="wpseo_msg"><p><strong>'.__('Error').':</strong> '.sprintf(__("your hosting environment does not support PHP's %sDocument Object Model%s."), '<a href="http://php.net/manual/en/book.dom.php">','</a>').' '.__("To enjoy all the benefits of the page analysis feature, you'll need to (get your host to) install it.").'</p></div>';
-			return $content;
+			$output = '<div class="wpseo_msg"><p><strong>'.__('Error').':</strong> '.sprintf(__("your hosting environment does not support PHP's %sDocument Object Model%s."), '<a href="http://php.net/manual/en/book.dom.php">','</a>').' '.__("To enjoy all the benefits of the page analysis feature, you'll need to (get your host to) install it.").'</p></div>';
+			return $output;
 		}
 		
 		if ( !wpseo_get_value('focuskw') ) {
-			$content = '<div class="wpseo_msg"><p><strong>'.__('Error').':</strong> '.__('you have not specified a focus keyword, you\'ll have to do that before this report works.').'</p></div>';
-			return $content;
+			$output = '<div class="wpseo_msg"><p><strong>'.__('Error').':</strong> '.__("you have not specified a focus keyword, you'll have to enter one, then save or update this post, before this report works.").'</p></div>';
+			return $output;
 		}
 	
-		$content = '<div class="wpseo_msg"><p><strong>'.__('Note').':</strong>'.__('to update this page analysis, save as draft or update and check this tab again').'.</p></div>';
+		$output = '<div class="wpseo_msg"><p><strong>'.__('Note').':</strong> '.__('to update this page analysis, save as draft or update and check this tab again').'.</p></div>';
 		
 		$results	= '';
 		$job 		= array();
 
-		if ($post->post_status != 'publish') {
-			$sampleurl = get_sample_permalink($post->ID);
-			$job["pageUrl"] = str_replace( '%postname%', $sampleurl[1], $sampleurl[0] );
-		} else {
-			$job["pageUrl"]	= get_permalink($post->ID);	
-		}
-		$job["pageSlug"] = $post->post_name;
+		$sampleurl = get_sample_permalink($post->ID);
+		$job["pageUrl"] = str_replace( '%postname%', $sampleurl[1], $sampleurl[0] );
+		$job["pageSlug"] = urldecode( $post->post_name );
 		$job["keyword"]	= wpseo_get_value('focuskw');
-		$job["keyword_folded"] = $this->strip_separators_and_fold($job["keyword"]);
+		$job["keyword_folded"] = $this->strip_separators_and_fold( $job["keyword"] );
 
 		$dom = new domDocument; 
 		$dom->strictErrorChecking = false; 
@@ -47,6 +43,8 @@ class Linkdex {
 		@$dom->loadHTML($post->post_content);
 		$xpath = new DOMXPath($dom);
 
+		$statistics = new TextStatistics;
+		
 		// Keyword
 		$this->ScoreKeyword($job, $results);
 		
@@ -60,7 +58,7 @@ class Linkdex {
 				$title_template = '%%title%% - %%sitename%%';
 			$title = wpseo_replace_vars($title_template, (array) $post );		
 		}
-		$this->ScoreTitle($job, $results, $title);
+		$this->ScoreTitle($job, $results, $title, $statistics);
 		unset($title);
 
 		// Meta description
@@ -71,26 +69,26 @@ class Linkdex {
 			if ( isset( $options['metadesc-'.$post->post_type] ) && $options['metadesc-'.$post->post_type] != '' )
 				$description = wpseo_replace_vars( $options['metadesc-'.$post->post_type], (array) $post );
 		}
-		$this->ScoreDescription($job, $results, $description, $wpseo_metabox->wpseo_meta_length);
+		$this->ScoreDescription($job, $results, $description, $wpseo_metabox->wpseo_meta_length, $statistics);
 		unset($description);
 	
 		// Body
 		$body 	= $this->GetBody( $post );	
 		$firstp = $this->GetFirstParagraph( $post );
-		$this->ScoreBody($job, $results, $body, $firstp);
+		$this->ScoreBody($job, $results, $body, $firstp, $statistics);
 		unset($body);
 		unset($firstp);
 
 		// URL
-		$this->ScoreUrl($job, $results);	
+		$this->ScoreUrl($job, $results, $statistics);	
 
 		// Headings
-		$headings = $this->GetHeadings($dom, $xpath);
+		$headings = $this->GetHeadings($post->post_content);
 		$this->ScoreHeadings($job, $results, $headings);
 		unset($headings);
 
 		// Images
-		$alts = $this->GetImagesAltText($dom, $xpath);
+		$alts = $this->GetImagesAltText($post->post_content);
 		$imgs = $this->GetImageCount($dom, $xpath);
 		$this->ScoreImagesAltText($job, $results, $alts, $imgs);
 		unset($alts);
@@ -102,10 +100,11 @@ class Linkdex {
 		$this->ScoreAnchorTexts($job, $results, $anchors, $count);
 		unset($anchors);
 		unset($count);
+		unset($dom);
 
 		asort($results);
 
-		$output = '<table class="analysis">';	
+		$output .= '<table class="wpseoanalysis">';	
 		foreach ($results as $result) {
 			$scoreval = substr( $result, 0, 1 );
 			switch ( $scoreval ) {
@@ -133,7 +132,6 @@ class Linkdex {
 		$output .= '<p style="font-size: 13px;"><a href="http://yoa.st/linkdex"><img class="alignleft" style="margin: 0 10px 5px 0;" src="'.WPSEO_URL.'images/linkdex-logo.png" alt="Linkdex"/></a>'.'This page analysis brought to you by the collaboration of Yoast and <a href="http://yoa.st/linkdex">Linkdex</a>. <a href="http://yoa.st/linkdex">Linkdex</a> is an SEO suite that helps you optimize your site and offers you all the SEO tools you\'ll need. Yoast uses <a href="http://yoa.st/linkdex">Linkdex</a> and highly recommends you do too!'.'</p>';
 	
 		unset($results);
-		unset($dom);
 		unset($job);
 
 		return $output;
@@ -149,7 +147,7 @@ class Linkdex {
 		$keywordWordsRemoved = array(" a ", " in ", " an ", " on ", " for ", " the ", " and ");
 
 		// lower
-		$inputString = strtolower($inputString);
+		$inputString = wpseo_strtolower_utf8($inputString);
 
 		// default characters replaced by space
 		$inputString = str_replace($keywordCharactersAlwaysReplacedBySpace, ' ', $inputString);
@@ -180,7 +178,7 @@ class Linkdex {
 			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, wpseo_stopwords_check( $job["keyword"] ) ) );
 	}
 	
-	function ScoreUrl($job, &$results) {
+	function ScoreUrl($job, &$results, $statistics) {
 		$urlGood 		= __("The keyword / phrase appears in the URL for this page.");
 		$urlMedium 		= __("The keyword / phrase does not appear in the URL for this page. If you decide to rename the URL be sure to check the old URL 301 redirects to the new one!");
 		$urlStopWords	= __("The slug for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them.");
@@ -200,11 +198,11 @@ class Linkdex {
 			$this->SaveScoreResult( $results, 5, $urlStopWords );
 
 		// Check if the slug isn't too long relative to the length of the keyword
-		if ( ( strlen( $job["keyword"] ) + 20 ) < strlen( $job["pageSlug"] ) && 40 < strlen( $job["pageSlug"] ) )
+		if ( ( $statistics->text_length( $job["keyword"] ) + 20 ) < $statistics->text_length( $job["pageSlug"] ) && 40 < $statistics->text_length( $job["pageSlug"] ) )
 			$this->SaveScoreResult( $results, 5, $longSlug );
 	}
 
-	function ScoreTitle($job, &$results, $title) {
+	function ScoreTitle($job, &$results, $title, $statistics) {		
 		$scoreTitleMinLength 		 = 40;
 		$scoreTitleMaxLength 		 = 70;
 		$scoreTitleKeywordLimit		 = 0;
@@ -221,7 +219,7 @@ class Linkdex {
 		if ( $title == "" ) {
 			$this->SaveScoreResult($results, 1, $scoreTitleMissing);
 		} else {	
-			$length = strlen($title);
+			$length = $statistics->text_length( $title );
 			if ($length < $scoreTitleMinLength)
 				$this->SaveScoreResult( $results, 6, sprintf($scoreTitleTooShort, $length) );
 			else if ($length > $scoreTitleMaxLength)
@@ -258,7 +256,7 @@ class Linkdex {
 		} else {
 			$found = false;
 			foreach ($anchor_texts as $anchor_text) {
-				if ( strtolower( $anchor_text ) == $job["keyword_folded"] )
+				if ( wpseo_strtolower_utf8( $anchor_text ) == $job["keyword_folded"] )
 					$found = true;
 			}
 			if ( $found )
@@ -293,24 +291,15 @@ class Linkdex {
 	function GetAnchorCount(&$dom, &$xpath) {
 		$query 			= "//a|//A";
 		$dom_objects 	= $xpath->query($query);
-		$count 			= array( 
-							'internal' => 
-								array( 
-									'dofollow' => 0, 
-									'nofollow' => 0
-								),
-							'external' => 
-								array( 
-									'dofollow' => 0, 
-									'nofollow' => 0 
-								) 
-							);
+		$count = array( 
+			'total' => 0,
+			'internal' => array( 'nofollow' => 0, 'dofollow' => 0 ), 
+			'external' => array( 'nofollow' => 0, 'dofollow' => 0 ), 
+			'other' => array( 'nofollow' => 0, 'dofollow' => 0 ) 
+		);
+		
 		foreach ($dom_objects as $dom_object) {
-			$count = array( 
-				'internal' => array( 'nofollow' => 0, 'dofollow' => 0 ), 
-				'external' => array( 'nofollow' => 0, 'dofollow' => 0 ), 
-				'other' => array( 'nofollow' => 0, 'dofollow' => 0 ) 
-			);
+			$count['total']++;
 			if ( $dom_object->attributes->getNamedItem('href') ) {
 				$href 	= $dom_object->attributes->getNamedItem('href')->textContent;
 				$wpurl	= get_bloginfo('url'); 
@@ -362,13 +351,12 @@ class Linkdex {
 
 	}
 
-	function GetImagesAltText(&$dom, &$xpath) {
-		$query 			= "//img|//IMG";
-		$dom_objects 	= $xpath->query($query);
-		$alts			= array();
-		foreach ($dom_objects as $dom_object)
-			$alts[] = $dom_object->attributes->getNamedItem('alt')->textContent;
-		unset($dom_objects);
+	function GetImagesAltText($postcontent) {
+		preg_match_all( '/<img [^>]+ alt=(["\'])([^\\1]+)\\1[^>]+>/im', $postcontent, $matches );
+		$alts = array();
+		foreach ( $matches[2] as $alt ) {
+			$alts[] = wpseo_strtolower_utf8( $alt );
+		}
 		return $alts;
 	}
 
@@ -408,19 +396,15 @@ class Linkdex {
 	}
 
 	// Currently just returns an array of the text content
-	function GetHeadings(&$dom, &$xpath) {
-		$query="//h1|//h2|//h3|//h4|//H1|//H2|//H3|//H4";
-		$dom_objects = $xpath->query($query);
-		$headings=array();
-		foreach ($dom_objects as $dom_object)
-			$headings[] = $dom_object->textContent;
-		unset($dom_objects);
-
+	function GetHeadings( $postcontent ) {
+		preg_match_all('/<h([1-6])>(.*)?<\/h\\1>/i', $postcontent, $matches);
+		foreach ($matches[2] as $heading) {
+			$headings[] = wpseo_strtolower_utf8( $heading );
+		}
 		return $headings;
-	}
+	}	
 	
-	
-	function ScoreDescription($job, &$results, $description, $maxlength = 155) {
+	function ScoreDescription($job, &$results, $description, $maxlength = 155, $statistics) {
 		$scoreDescriptionMinLength = 120;
 		$scoreDescriptionCorrectLength	= __("In the specified meta description, consider: How does it compare to the competition? Could it be made more appealing?");
 		$scoreDescriptionTooShort 		= __("The meta description is under 120 characters, however up to %s characters are available. %s");
@@ -435,9 +419,9 @@ class Linkdex {
 		
 		if ( $description == "" ) {
 			$this->SaveScoreResult($results,1,$scoreDescriptionMissing);
-		}
-		else {
-			$length = strlen( $description );
+		} else {
+			$length = $statistics->text_length( $description );
+			
 			if ($length < $scoreDescriptionMinLength)
 				$this->SaveScoreResult( $results, 6, sprintf($scoreDescriptionTooShort, $maxlength, $metaShorter) );
 			else if ($length <= $maxlength)
@@ -456,7 +440,7 @@ class Linkdex {
 	}
 
 
-	function ScoreBody($job, &$results, $body, $firstp) {
+	function ScoreBody($job, &$results, $body, $firstp, $statistics) {		
 		$scoreBodyGoodLimit 	= 300;
 		$scoreBodyPoorLimit 	= 100;
 
@@ -473,9 +457,10 @@ class Linkdex {
 
 		$fleschurl					= '<a href="http://en.wikipedia.org/wiki/Flesch-Kincaid_readability_test#Flesch_Reading_Ease">'.__('Flesch Reading Ease').'</a>';
 		$scoreFlesch				= __("The copy scores %s in the %s test, which is considered %s to read. %s");
-
+		
 		// Copy length check
-		$wordCount = str_word_count($body);
+		$wordCount = $statistics->word_count( $body );
+		
 		if ( $wordCount < $scoreBodyPoorLimit )
 			$this->SaveScoreResult( $results, 1, sprintf( $scoreBodyBadLength, $wordCount ) );
 		else if ( $wordCount < $scoreBodyGoodLimit )
@@ -483,6 +468,8 @@ class Linkdex {
 		else
 			$this->SaveScoreResult( $results, 9, sprintf( $scoreBodyGoodLength, $wordCount ) );
 
+		$body = wpseo_strtolower_utf8( $body );
+		
 		// Keyword Density check
 		if ( $wordCount > 0 ) {
 			$keywordCount 		= preg_match_all("/".$job["keyword"]."/msiU", $body, $res);
@@ -498,44 +485,48 @@ class Linkdex {
 			$this->SaveScoreResult( $results, 9, sprintf( $scoreKeywordDensityGood, $keywordDensity, $keywordCount ) );		
 		}
 
+		$firstp = wpseo_strtolower_utf8( $firstp );
+		
 		// First Paragraph Test
-		if ( stripos( $firstp, $job["keyword"] ) === false && stripos( $firstp, $job["keyword_folded"] ) === false ) {
+		if ( stripos( $firstp, $job["keyword"] ) === false && strpos( $firstp, $job["keyword_folded"] ) === false ) {
 			$this->SaveScoreResult( $results, 3, $scoreFirstParagraphLow );
 		} else {
 			$this->SaveScoreResult( $results, 9, $scoreFirstParagraphHigh );		
 		}
 
-		$stats = new TextStatistics;
-		// Flesch Reading Ease check
-		$flesch = $stats->flesch_kincaid_reading_ease($body);
+		$lang = get_bloginfo('language');
+		if ( substr($lang, 0, 2) == 'en' ) {
+			// Flesch Reading Ease check
+			$flesch = $statistics->flesch_kincaid_reading_ease($body);
 
-		$note = '';
-		if ( $flesch >= 90 ) {
-			$level = __('very easy');
-			$score = 9;
-		} else if ( $flesch >= 80 ) {
-			$level = __('easy');
-			$score = 8;
-		} else if ( $flesch >= 70 ) {
-			$level = __('fairly easy');
-			$score = 7;
-		} else if ( $flesch >= 60 ) {
-			$level = __('OK');
-			$score = 7;
-		} else if ( $flesch >= 50 ) {
-			$level = __('fairly difficult');
-			$note = __('Try to make shorter sentences to improve readability.');
-			$score = 6;
-		} else if ( $flesch >= 30 ) {
-			$level = __('difficult');
-			$note = __('Try to make shorter sentences, using less difficult words to improve readability.');
-			$score = 5;
-		} else if ( $flesch >= 0 ) {
-			$level = __('very difficult');
-			$note = __('Try to make shorter sentences, using less difficult words to improve readability.');
-			$score = 4;
+			$note = '';
+			if ( $flesch >= 90 ) {
+				$level = __('very easy');
+				$score = 9;
+			} else if ( $flesch >= 80 ) {
+				$level = __('easy');
+				$score = 8;
+			} else if ( $flesch >= 70 ) {
+				$level = __('fairly easy');
+				$score = 7;
+			} else if ( $flesch >= 60 ) {
+				$level = __('OK');
+				$score = 7;
+			} else if ( $flesch >= 50 ) {
+				$level = __('fairly difficult');
+				$note = __('Try to make shorter sentences to improve readability.');
+				$score = 6;
+			} else if ( $flesch >= 30 ) {
+				$level = __('difficult');
+				$note = __('Try to make shorter sentences, using less difficult words to improve readability.');
+				$score = 5;
+			} else if ( $flesch >= 0 ) {
+				$level = __('very difficult');
+				$note = __('Try to make shorter sentences, using less difficult words to improve readability.');
+				$score = 4;
+			}
+			$this->SaveScoreResult( $results, $score, sprintf( $scoreFlesch, $flesch, $fleschurl, $level, $note ) );	
 		}
-		$this->SaveScoreResult( $results, $score, sprintf( $scoreFlesch, $flesch, $fleschurl, $level, $note ) );
 	}
 
 	function GetBody( $post ) {		
@@ -544,25 +535,36 @@ class Linkdex {
 		if ( trim( $origHtml ) == '' )
 			return '';
 
-		$htmdata2 = preg_replace("/\n|\r/"," ",$origHtml);
-		if ($htmdata2==null) {
+		$htmdata2 = preg_replace( "/\n|\r/"," ",$origHtml );
+		if ( $htmdata2 == null )
 			$htmdata2 = $origHtml;
-		}
-		$htmdata3 = preg_replace("/<(\x20*script|script).*?(\/>|\/script>)/","",$htmdata2);
-		if ($htmdata3==null) {
-			$htmdata3 = $htmdata2;
-		}
-		$htmdata4 = preg_replace("/<!--.*?-->/","",$htmdata3);
-		if ($htmdata4 == null) {
-			$htmdata4 = $htmdata3;
-		}
+		else
+			unset( $origHtml );
 
-		return $htmdata4;
+		$htmdata3 = preg_replace( "/<(\x20*script|script).*?(\/>|\/script>)/", "", $htmdata2 );
+		if ( $htmdata3 == null)
+			$htmdata3 = $htmdata2;
+		else
+			unset( $htmdata2 );
+
+		$htmdata4 = preg_replace( "/<!--.*?-->/", "", $htmdata3 );
+		if ( $htmdata4 == null )
+			$htmdata4 = $htmdata3;
+		else
+			unset( $htmdata3 );
+
+		$htmdata5 = preg_replace( "/<(\x20*style|style).*?(\/>|\/style>)/", "", $htmdata4 );
+		if ( $htmdata5 == null)
+			$htmdata5 = $htmdata4;
+		else
+			unset( $htmdata4 );			
+
+		return $htmdata5;
 	}
 
 	function GetFirstParagraph( $post ) {
-		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.
-		preg_match( '/<p>(.*)<\/p>/', wpautop( nl2br( $post->post_content ) ), $matches );
+		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.		
+		preg_match( '/<p>(.*)<\/p>/', wpautop( $post->post_content ), $matches );
 		return $matches[1];
 	}
 }

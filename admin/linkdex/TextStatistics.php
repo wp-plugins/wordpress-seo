@@ -112,7 +112,7 @@
          * @param   strText      Text to be measured
          */
         public function text_length($strText) {
-            return strlen($strText);
+            return strlen( utf8_decode( $strText ) );
         }
 
         /**

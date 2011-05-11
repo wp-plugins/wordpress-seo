@@ -2,8 +2,9 @@
 Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
-Requires at least: 3.0
+Requires at least: 3.1
 Tested up to: 3.1
+Stable tag: 0.3.3
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -12,6 +13,7 @@ Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descri
 The most complete all in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
 
 * Post title and meta description meta box to change these on a per post basis for ultimate SEO.
+* On page SEO Analysis using the Linkdex page analysis library.
 * Taxonomy (tag, category & custom taxonomy) title and meta description support.
 * Google search result snippet previews, let your editors improve your SEO!
 * Focus keyword testing.
@@ -78,6 +80,25 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 0.3.3 =
+
+* Fixes:
+	* CSS collisions due to too generic class names.
+	* Issue with outbound link recognition caused in 0.3.2.
+	* Improved first paragraph detection.
+	* Word count is now correct for non western european languages too.
+	* Keyword detection in content and first paragraph in Cyrillic, Russian and other languages.
+	* Handling of UTF-8 slugs.
+	* Proper detection of keywords underneath the focus keyword input field by using word boundaries.
+	* Proper keyword bolding and counting in snippet preview for Cyrillic, Russian and other languages.
+	* Proper counting of length of description and title for strings with accents or non-ASCII characters.
+	* No longer calculating Flesch score for non-English, as it's not correct.
+	* Related keywords button works again.
+	* Several performance improvements to edit post page JavaScript.
+
+* Also:
+	* Notice now properly tells you to save as draft or update a post to see new Linkdex analysis. No, it's not going to be AJAX, ever, for performance reasons.
+	
 = 0.3.2 =
 
 * Fixes:

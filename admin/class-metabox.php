@@ -105,7 +105,7 @@ class WPSEO_Metabox {
 	public function do_tab( $id, $heading, $content ) {
 ?>
 	<div class="<?php echo $id ?>">
-		<h4 class="heading"><?php echo $heading ?></h4>
+		<h4 class="wpseo-heading"><?php echo $heading ?></h4>
 		<table class="form-table">
 			<?php echo $content ?>
 		</table>
@@ -279,8 +279,8 @@ class WPSEO_Metabox {
 		$options = get_wpseo_options();
 		
 ?>
-	<div class="metabox-tabs-div">
-		<ul class="metabox-tabs" id="metabox-tabs">
+	<div class="wpseo-metabox-tabs-div">
+		<ul class="wpseo-metabox-tabs" id="wpseo-metabox-tabs">
 			<li class="active general"><a class="active" href="javascript:void(null);">General</a></li>
 			<li class="linkdex"><a href="javascript:void(null);">Page Analysis</a></li>
 			<li class="advanced"><a href="javascript:void(null);">Advanced</a></li>
@@ -440,7 +440,7 @@ class WPSEO_Metabox {
 			// TODO: improve snippet display of video duration to include seconds for shorter video's
 			// echo '<pre>'.print_r(wpseo_get_value('video_meta'),1).'</pre>';
 		
-		$content .= '<div id="snippet" class="video">
+		$content .= '<div id="wpseosnippet" class="video">
 				<h4 style="margin:0;font-weight:normal;"><a class="title" href="#"><?php echo $title; ?></a></h4>
 				<div style="margin:5px 10px 10px 0;width:82px;height:62px;float:left;">
 					<img style="border: 1px solid blue;padding: 1px;width:80px;height:60px;" src="'.$video['thumbnail_loc'].'"/>
@@ -455,7 +455,7 @@ class WPSEO_Metabox {
 		} else {
 			if ( !empty($date) )
 				$date .= ' <strong>...</strong> ';
-			$content .= '<div id="snippet">
+			$content .= '<div id="wpseosnippet">
 				<a class="title" href="#">'.$title.'</a>
 				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span>'.$desc.'</span></p>
 				<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a> - <a href="#" class="util">Similar</a>

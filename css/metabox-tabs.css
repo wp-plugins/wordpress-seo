@@ -84,7 +84,7 @@ ul.metabox-tabs li {
 	padding: 2px 5px;
 }
 
-#snippet {
+#wpseosnippet {
 	margin: 0 0 10px 0;
 	padding: 0 5px;
 	font-family: Arial, sans-serif;
@@ -94,42 +94,42 @@ ul.metabox-tabs li {
 	width: 540px !important;
 }
 
-#snippet a {
+#wpseosnippet a {
 	text-decoration: none;
 }
 
-#snippet .title {
+#wpseosnippet .title {
 	color: #11c;
 	font-size: 16px !important;
 	line-height: 19px;
 	text-decoration: underline;
 }
 
-#snippet .desc {
+#wpseosnippet .desc {
 	color: #000;
 }
 
-#snippet .url {
+#wpseosnippet .url {
 	color: #282;
 }
 
-#snippet .meta {
+#wpseosnippet .meta {
 	color: #767676;
 }
 
-#snippet .util {
+#wpseosnippet .util {
 	color: #4272DB;
 }
 
-#snippet p {
+#wpseosnippet p {
 	margin: 0 !important;
 }
 
-#snippet a:hover {
+#wpseosnippet a:hover {
 	text-decoration: underline;
 }
 
-#snippet {
+#wpseosnippet {
 	margin-bottom: 10px;
 }
 
@@ -149,22 +149,22 @@ ul.metabox-tabs li {
 }
 
 /* Linkdex analysis block */
-table.analysis th {
+table.wpseoanalysis th {
 	text-align: left;
 	font-weight: 14px;
 	padding: 15px 0 5px 0;
 }
 
-table.analysis th.first {
+table.wpseoanalysis th.first {
 	padding-top: 0;
 }
 
-table.analysis td {
+table.wpseoanalysis td {
 	font-weight: 13px;
 	line-height: 16px;
 	margin: 5px 0;
 }
-table.analysis td.score {
+table.wpseoanalysis td.score {
 	width: 40px;
 	height: 30px;
 	padding-left: 10px;

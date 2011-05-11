@@ -26,69 +26,6 @@ jQuery.fn.googleSuggest = function(opts){
 }
 // End Google Suggest library
 
-// Taken and slightly modified from http://phpjs.org/functions/asort:351
-function asort (inputArr, sort_flags) {
-    var valArr=[], keyArr=[], k, i, ret, sorter, that = this, strictForIn = false, populateArr = {};
-
-    switch (sort_flags) {
-        case 'SORT_NUMERIC': // compare items numerically
-            sorter = function (a, b) {
-                return (b - a);
-            };
-            break;
-    }
-
-    var bubbleSort = function (keyArr, inputArr) {
-        var i, j, tempValue, tempKeyVal;
-        for (i = inputArr.length-2; i >= 0; i--) {
-            for (j = 0; j <= i; j++) {
-                ret = sorter(inputArr[j+1], inputArr[j]);
-                if (ret < 0) {
-                    tempValue = inputArr[j];
-                    inputArr[j] = inputArr[j+1];
-                    inputArr[j+1] = tempValue;
-                    tempKeyVal = keyArr[j];
-                    keyArr[j] = keyArr[j+1];
-                    keyArr[j+1] = tempKeyVal;
-                }
-            }
-        }
-    };
-
-    // BEGIN REDUNDANT
-    this.php_js = this.php_js || {};
-    this.php_js.ini = this.php_js.ini || {};
-    // END REDUNDANT
-
-    strictForIn = this.php_js.ini['phpjs.strictForIn'] && this.php_js.ini['phpjs.strictForIn'].local_value && 
-                    this.php_js.ini['phpjs.strictForIn'].local_value !== 'off';
-    populateArr = strictForIn ? inputArr : populateArr;
-
-    // Get key and value arrays
-    for (k in inputArr) {
-        if (inputArr.hasOwnProperty(k)) {
-            valArr.push(inputArr[k]);
-            keyArr.push(k);
-            if (strictForIn) {
-                delete inputArr[k];
-            }
-        }
-    }
-    try {
-        // Sort our new temporary arrays
-        bubbleSort(keyArr, valArr);
-    } catch (e) {
-        return false;
-    }
-
-    // Repopulate the old array
-    for (i = 0; i < valArr.length; i++) {
-        populateArr[keyArr[i]] = valArr[i];
-    }
-
-    return strictForIn || populateArr;
-}
-
 function yst_strip_tags( str ) { 
 	if ( str == '' )
 		return '';
@@ -100,6 +37,7 @@ function yst_strip_tags( str ) {
 
 function ptest(str, p) {
 	str = yst_strip_tags( str );
+	str = str.toLowerCase();
 	var r = str.match(p);
 	if (r != null)
 		return '<span class="good">Yes ('+r.length+')</span>';
@@ -110,16 +48,17 @@ function ptest(str, p) {
 function testFocusKw() {
 	// Retrieve focus keyword and trim
 	var focuskw = jQuery.trim( jQuery('#yoast_wpseo_focuskw').val() );
-
+	focuskw = focuskw.toLowerCase();
+	
 	var postname = jQuery('#editable-post-name-full').text();
 	var url	= wpseo_permalink_template.replace('%postname%', postname).replace('http://','');
 
-	var p = new RegExp(focuskw,'gim');
+	var p = new RegExp("(^\|[ \n\r\t.,'\"\+!?-]+)"+focuskw+"($\|[ \n\r\t.,'\"\+!?-]+)",'gim');
 	var p2 = new RegExp(focuskw.replace(/\s+/g,"[-_\\\//]"),'gim');
 	if (focuskw != '') {
 		var html = '<p>Your focus keyword was found in:<br/>';
 		html += 'Article Heading: ' + ptest( jQuery('#title').val(), p ) + '<br/>';
-		html += 'Page title: ' + ptest( jQuery('#snippet .title').text(), p ) + '<br/>';
+		html += 'Page title: ' + ptest( jQuery('#wpseosnippet .title').text(), p ) + '<br/>';
 		html += 'Page URL: ' + ptest( url, p2 ) + '<br/>';
 		html += 'Content: ' + ptest( jQuery('#content').val(), p ) + '<br/>';
 		html += 'Meta description: ' + ptest( jQuery('#yoast_wpseo_metadesc').val(), p );
@@ -155,8 +94,9 @@ function updateTitle( force ) {
 
 	title = boldKeywords( title, false );
 
-	jQuery('#snippet .title').html( title );
+	jQuery('#wpseosnippet .title').html( title );
 	jQuery('#yoast_wpseo_title-length').html( len );
+	testFocusKw();
 }
 
 function updateDesc( desc ) {
@@ -210,15 +150,17 @@ function updateDesc( desc ) {
 	desc = boldKeywords( desc, false );
 
 	jQuery('#yoast_wpseo_metadesc-length').html(len);
-	jQuery("#snippet .desc span").css( 'color', color );
-	jQuery("#snippet .desc span").html( desc );
+	jQuery("#wpseosnippet .desc span").css( 'color', color );
+	jQuery("#wpseosnippet .desc span").html( desc );
+	testFocusKw();
 }
 
 function updateURL() {
 	var name = jQuery('#editable-post-name-full').text();
 	var url	= wpseo_permalink_template.replace('%postname%', name).replace('http://','');
 	url = boldKeywords( url, true );
-	jQuery("#snippet .url").html( url );
+	jQuery("#wpseosnippet .url").html( url );
+	testFocusKw();
 }
 
 function boldKeywords( str, url ) {
@@ -234,11 +176,13 @@ function boldKeywords( str, url ) {
 	}
 	for (var i in keywords) {
 		var kw		= yst_strip_tags( keywords[i] );
-		if ( url )
-			var kw 		= kw.replace(' ','-').toLowerCase();
-
-		kwregex = new RegExp( '\\b('+kw+')\\b', 'gim' );
-		str 	= str.replace( kwregex, '<strong>'+"$1"+'</strong>' );
+		if ( url ) {
+			var kw 	= kw.replace(' ','-').toLowerCase();
+			kwregex = new RegExp( "([-/])("+kw+")([-/])?" );
+		} else {
+			kwregex = new RegExp( "(^\|[ \n\r\t.,'\"\+!?-]+)("+kw+")($\|[ \n\r\t.,'\"\+!?-]+)", 'gim' );
+		}
+		str 	= str.replace( kwregex, "$1<strong>$2</strong>$3" );
 	}
 	return str;
 }
@@ -247,18 +191,17 @@ function updateSnippet() {
 	updateURL();
 	updateTitle();
 	updateDesc();
-	testFocusKw();
 }
 
 jQuery(document).ready(function(){	
 	// Tabs, based on code by Pete Mall - https://github.com/PeteMall/Metabox-Tabs
-	jQuery('.metabox-tabs li a').each(function(i) {
+	jQuery('.wpseo-metabox-tabs li a').each(function(i) {
 		var thisTab = jQuery(this).parent().attr('class').replace(/active /, '');
 
 		if ( 'active' != jQuery(this).attr('class') )
 			jQuery('div.' + thisTab).hide();
 
-		jQuery('div.' + thisTab).addClass('tab-content');
+		jQuery('div.' + thisTab).addClass('wpseo-tab-content');
 
 		jQuery(this).click(function(){
 			// hide all child content
@@ -273,8 +216,8 @@ jQuery(document).ready(function(){
 		});
 	});
 
-	jQuery('.heading').hide();
-	jQuery('.metabox-tabs').show();
+	jQuery('.wpseo-heading').hide();
+	jQuery('.wpseo-metabox-tabs').show();
 	// End Tabs code
 	
 	jQuery('#related_keywords_heading').hide();
@@ -293,37 +236,29 @@ jQuery(document).ready(function(){
 	
 	jQuery('#yoast_wpseo_title').live('change', function() {
 		updateTitle();
-		testFocusKw();
 	});
 	jQuery('#yoast_wpseo_metadesc').live('change', function() {
 		updateDesc();
-		testFocusKw();
 	});
 	jQuery('#yoast_wpseo_focuskw').live('change', function() {
 		jQuery('#wpseo_relatedkeywords').show();
 		jQuery('#wpseo_tag_suggestions').hide();
 		jQuery('#related_keywords_heading').hide();
-		testFocusKw();
 	});
 	jQuery('#excerpt').live('change', function() {
 		updateDesc();
-		testFocusKw();
 	});
 	jQuery('#content').live('change', function() {
 		updateDesc();
-		testFocusKw();
 	});
 	jQuery('#tinymce').live('change', function() {
 		updateDesc();
-		testFocusKw();
 	});
 	jQuery('#titlewrap #title').live('change', function() {
 		updateTitle();
-		testFocusKw();
 	});
 	jQuery('#wpseo_regen_title').click(function() {
 		updateTitle(1);
-		testFocusKw();
 		return false;
 	});
 
@@ -339,28 +274,32 @@ jQuery(document).ready(function(){
 			+"&callback=?",
 			function (data) {
 				var keywords = new Array();
-//				console.log('Related Keyword Data: ', data);
-				jQuery.each(data['ysearchresponse']['resultset_web'], function(i,item) {
-					jQuery.each(item['keyterms']['terms'], function(i,kw) {
-						key = kw.toLowerCase();
+				
+				if ( data['ysearchresponse']['resultset_web'] != undefined ) {
+					jQuery.each(data['ysearchresponse']['resultset_web'], function(i,item) {
+						if ( item['keyterms']['terms'] != undefined ) {
+							jQuery.each(item['keyterms']['terms'], function(i,kw) {
+								key = kw.toLowerCase();
 
-						if (keywords[key] == undefined)
-							keywords[key] = 1;
-						else
-							keywords[key] = (keywords[key] + 1);										
+								if ( key != undefined ) {
+									if (keywords[key] == undefined)
+										keywords[key] = 1;
+									else
+										keywords[key]++;
+								}
+							});
+						}
 					});
-				});
 
-				keywords = asort(keywords, 'SORT_NUMERIC');
-
-				var result = '<p class="clear">';
-				for (key in keywords) {
-					if (keywords[key] > 5)
-						result += '<span class="wpseo_yahoo_kw">' + key + '</span>';
+					var result = '<p class="clear">';
+					for (key in keywords) {
+						if (keywords[key] > 5)
+							result += '<span class="wpseo_yahoo_kw">' + key + '</span>';
+					}
+					result += '</p>';
+					jQuery('#wpseo_tag_suggestions').html( result );
+					jQuery('#related_keywords_heading').show();
 				}
-				result += '</p>';
-				jQuery('#wpseo_tag_suggestions').html( result );
-				jQuery('#related_keywords_heading').show();
 			});	
 		jQuery(this).hide();
 		return false;
