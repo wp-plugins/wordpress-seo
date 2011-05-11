@@ -55,7 +55,6 @@ function setWPOption( option, newval, hide, nonce ) {
 			newval: newval,
 			_wpnonce: nonce 
 		}, function(data) {
-			alert(data);
 			if (data)
 				jQuery('#'+hide).hide();
 		}
