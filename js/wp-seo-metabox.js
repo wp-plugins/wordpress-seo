@@ -27,7 +27,7 @@ jQuery.fn.googleSuggest = function(opts){
 // End Google Suggest library
 
 function yst_strip_tags( str ) { 
-	if ( str == '' )
+	if ( str == '' || str == undefined )
 		return '';
 	
 	str = str.replace(/<\/?[^>]+>/gi, ''); 

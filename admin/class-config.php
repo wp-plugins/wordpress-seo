@@ -34,10 +34,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_filter( 'wp_dashboard_widgets', array(&$this, 'widget_order'));
 			add_filter( 'wp_network_dashboard_widgets', array(&$this, 'widget_order'));
 			
-			add_action('show_user_profile', array(&$this,'wpseo_user_profile'));
-			add_action('edit_user_profile', array(&$this,'wpseo_user_profile'));
-			add_action('personal_options_update', array(&$this,'wpseo_process_user_option_update'));
-			add_action('edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
+			add_action( 'show_user_profile', array(&$this,'wpseo_user_profile'));
+			add_action( 'edit_user_profile', array(&$this,'wpseo_user_profile'));
+			add_action( 'personal_options_update', array(&$this,'wpseo_process_user_option_update'));
+			add_action( 'edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
 
 			if ( '0' == get_option('blog_public') )
 				add_action('admin_footer', array(&$this,'blog_public_warning'));
@@ -65,7 +65,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					}
 				}
 				$option['ms_defaults_set'] = true;
-				update_option('wpseo', $option);
+				update_option( 'wpseo', $option );
 			}
 		}
 		

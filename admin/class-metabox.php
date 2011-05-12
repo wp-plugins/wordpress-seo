@@ -15,7 +15,17 @@ class WPSEO_Metabox {
 
 			// When permalink structure is changed, sitemap should be regenerated
 			add_action('permalink_structure_changed', array(&$this,'rebuild_sitemap') );
-			add_action('publish_post', array($this,'rebuild_sitemap') );
+			
+			// Rebuild the sitemap for all post types that are supposed to be in the sitemap
+			foreach ( get_post_types() as $post_type ) {
+
+				if ( ! in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
+
+					if ( ! $options['post_types-'.$post_type.'-not_in_sitemap'] )
+						add_action( 'publish_'.$post_type, array( $this, 'rebuild_sitemap' ) );
+				}
+				
+			}
 		}
 
 		add_action( 'add_meta_boxes',                  array( $this, 'add_meta_box' ) );
@@ -526,20 +536,10 @@ class WPSEO_Metabox {
 		$color = get_user_meta( get_current_user_id(), 'admin_color', true );
 
 		wp_enqueue_style( 'metabox-tabs', WPSEO_URL.'css/metabox-tabs.css', WPSEO_VERSION );
-		wp_enqueue_style( "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css', WPSEO_VERSION	);
-		switch ($color) {
-			case 'classic':
-				$jqueryuicss = 'cupertino';
-				break;
-			case 'fresh':
-			default:
-				$jqueryuicss = 'smoothness';
-				break;
-		}
-		wp_enqueue_style( 'jquery-ui-css', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jqueryuicss.'/jquery-ui.css', false, WPSEO_VERSION, 'screen' );
-		
-		wp_enqueue_script( 'jquery-ui', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.min.js', false, '1.8.6', true );
-		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array('jquery','jquery-ui'), WPSEO_VERSION, true );
+		wp_enqueue_style( "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css', WPSEO_VERSION );
+
+		wp_enqueue_script( 'jquery-ui-autocomplete', WPSEO_URL.'js/jquery-ui-autocomplete.min.js', array( 'jquery', 'jquery-ui-core' ), WPSEO_VERSION, true );		
+		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-autocomplete' ), WPSEO_VERSION, true );
 	}
 
 	function rebuild_sitemap( $post ) {

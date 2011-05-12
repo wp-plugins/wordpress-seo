@@ -80,6 +80,16 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 0.3.5 =
+
+* Fixes:
+	* Issue in post / page editor with link dialog and other plugins using jQuery UI.
+	* No longer uses Google JS API for jQuery UI, but just include jQuery UI autocomplete library and uses the rest from WP core.
+	* No longer uses Google JS API for jQuery UI CSS, but included the needed classes in the plugins CSS files.
+	* Properly update sitemap for custom post types on publication.
+	* Fixed a notice in heading detection when no headings were found.
+	* Fixed a typo in Linkdex messages.
+
 = 0.3.4 =
 
 * Fixes:
