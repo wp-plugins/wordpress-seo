@@ -34,10 +34,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_filter( 'wp_dashboard_widgets', array(&$this, 'widget_order'));
 			add_filter( 'wp_network_dashboard_widgets', array(&$this, 'widget_order'));
 			
-			add_action('show_user_profile', array(&$this,'wpseo_user_profile'));
-			add_action('edit_user_profile', array(&$this,'wpseo_user_profile'));
-			add_action('personal_options_update', array(&$this,'wpseo_process_user_option_update'));
-			add_action('edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
+			add_action( 'show_user_profile', array(&$this,'wpseo_user_profile'));
+			add_action( 'edit_user_profile', array(&$this,'wpseo_user_profile'));
+			add_action( 'personal_options_update', array(&$this,'wpseo_process_user_option_update'));
+			add_action( 'edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
 
 			if ( '0' == get_option('blog_public') )
 				add_action('admin_footer', array(&$this,'blog_public_warning'));
@@ -65,7 +65,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					}
 				}
 				$option['ms_defaults_set'] = true;
-				update_option('wpseo', $option);
+				update_option( 'wpseo', $option );
 			}
 		}
 		
@@ -77,7 +77,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
 			echo "<div id='message' class='error'>";
-			echo "<p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\");' class='button'>I know, don't bug me.</a></p></div>";
+			echo "<p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\",\"".wp_create_nonce('wpseo-ignore')."\");' class='button'>I know, don't bug me.</a></p></div>";
 		}
 		
 		function admin_sidebar() {
@@ -106,6 +106,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function admin_header($title, $expl = true, $form = true, $option = 'yoast_wpseo_options', $optionshort = 'wpseo', $contains_files = false) {
 			?>
 			<div class="wrap">
+				<?php settings_errors(); ?>
 				<?php 
 				if ( (isset($_GET['updated']) && $_GET['updated'] == 'true') || (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true') ) {
 					$msg = __('Settings updated');
@@ -427,22 +428,22 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 
 		function titles_page() {
-			$this->admin_header('Titles', false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
+			$this->admin_header(__('Titles'), false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
 			$options = get_wpseo_options();
 			$content = '<p>'.__('Be aware that for WordPress SEO to be able to modify your page titles, the title section of your header.php file should look like this:').'</p>';
 			$content .= '<pre>&lt;title&gt;&lt;?php wp_title(&#x27;&#x27;); ?&gt;&lt;/title&gt;</pre>';
 			$content .= '<p>'.__('If you can\'t modify or don\'t know how to modify your template, check the box below. Be aware that changing your template will be faster.').'</p>';
 			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles','yoast-wpseo'));
-			$content .= '<h4 class="big">Singular pages</h4>';
+			$content .= '<h4 class="big">'.__('Singular pages').'</h4>';
 			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.").'</p>';
 			if ( 'posts' == get_option('show_on_front') ) {
-				$content .= '<h4>Homepage</h4>';
-				$content .= $this->textinput('title-home','Title template');
-				$content .= $this->textinput('metadesc-home','Meta description template');
+				$content .= '<h4>'.__('Homepage').'</h4>';
+				$content .= $this->textinput('title-home',__('Title template'));
+				$content .= $this->textarea('metadesc-home',__('Meta description template'), '', 'metadesc');
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-home','Meta keywords template');
+					$content .= $this->textinput('metakey-home',__('Meta keywords template'));
 			} else {
-				$content .= '<h4>Homepage &amp; Front page</h4>';
+				$content .= '<h4>'.__('Homepage &amp; Front page').'</h4>';
 				$content .= '<p>'.__('You can determine the title and description for the front page by').' <a href="'.get_edit_post_link( get_option('page_on_front') ).'">'.__('editing the front page itself').' &raquo;</a>.</p>';
 				if ( is_numeric( get_option('page_for_posts') ) )
 				$content .= '<p>'.__('You can determine the title and description for the blog page by').' <a href="'.get_edit_post_link( get_option('page_for_posts') ).'">'.__('editing the blog page itself').' &raquo;</a>.</p>';
@@ -453,41 +454,63 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
 					continue;
 				$content .= '<h4 id="'.$posttype.'">'.ucfirst($posttype).'</h4>';
-				$content .= $this->textinput('title-'.$posttype,'Title template');
-				$content .= $this->textinput('metadesc-'.$posttype,'Meta description template');
+				$content .= $this->textinput('title-'.$posttype,__('Title template'));
+				$content .= $this->textarea('metadesc-'.$posttype,__('Meta description template'), '', 'metadesc');
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$posttype,'Meta keywords template');
+					$content .= $this->textinput('metakey-'.$posttype,__('Meta keywords template'));
 				$content .= '<br/>';
 			}
 			$content .= '<br/>';
-			$content .= '<h4 class="big">Taxonomies</h4>';
+			$content .= '<h4 class="big">'.__('Taxonomies').'</h4>';
 			foreach (get_taxonomies() as $taxonomy) {
 				if ( in_array($taxonomy, array('link_category','nav_menu','post_format') ) )
 					continue;				
 				$content .= '<h4>'.ucfirst($taxonomy).'</h4>';
-				$content .= $this->textinput('title-'.$taxonomy,'Title template');
-				$content .= $this->textinput('metadesc-'.$taxonomy,'Meta description template');
+				$content .= $this->textinput('title-'.$taxonomy,__('Title template'));
+				$content .= $this->textarea('metadesc-'.$taxonomy,__('Meta description template'), '', 'metadesc' );
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$taxonomy,'Meta keywords template');
+					$content .= $this->textinput('metakey-'.$taxonomy,__('Meta keywords template'));
 				$content .= '<br/>';				
 			}
 			$content .= '<br/>';
-			$content .= '<h4 class="big">Special pages</h4>';
-			$content .= '<h4>Author Archives</h4>';
-			$content .= $this->textinput('title-author','Title template');
-			$content .= $this->textinput('metadesc-author','Meta description template');
+			$content .= '<h4 class="big">'.__('Special pages').'</h4>';
+			$content .= '<h4>'.__('Author Archives').'</h4>';
+			$content .= $this->textinput('title-author',__('Title template'));
+			$content .= $this->textarea('metadesc-author',__('Meta description template'), '', 'metadesc' );
 			if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-				$content .= $this->textinput('metakey-author','Meta keywords template');
+				$content .= $this->textinput('metakey-author',__('Meta keywords template'));
 			$content .= '<br/>';
-			$content .= '<h4>Date Archives</h4>';
-			$content .= $this->textinput('title-archive','Title template');
-			$content .= $this->textinput('metadesc-archive','Meta description template');
+			$content .= '<h4>'.__('Date Archives').'</h4>';
+			$content .= $this->textinput('title-archive',__('Title template'));
+			$content .= $this->textarea('metadesc-archive',__('Meta description template'), '', 'metadesc' );
 			$content .= '<br/>';
-			$content .= '<h4>Search pages</h4>';
+			$content .= '<h4>'.__('Search pages').'</h4>';
 			$content .= $this->textinput('title-search','Title template');
-			$content .= '<h4>404 pages</h4>';
-			$content .= $this->textinput('title-404','Title template');
+			$content .= '<h4>'.__('404 pages').'</h4>';
+			$content .= $this->textinput('title-404',__('Title template'));
 			$content .= '<br class="clear"/>';
+			
+			$i = 1;
+			foreach ( get_post_types() as $post_type ) {
+				if ( in_array($post_type, array('post','page','attachment','revision','nav_menu_item') ) )
+					continue;
+				$pt = get_post_type_object($post_type);
+				if ( !$pt->has_archive )
+					continue;
+
+				if ( $i == 1 ) {
+					$content .= '<h4 class="big">'.__('Custom Post Type Archives').'</h4>';
+					$content .= '<p>'.__('Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.').'</p>';
+				}
+				
+				$content .= '<h4>'.$pt->labels->name.'</h4>';
+				$content .= $this->textinput( 'title-ptarchive-' . $post_type, __('Title') );
+				$content .= $this->textarea( 'metadesc-ptarchive-' . $post_type, __('Meta description'), '', 'metadesc' );
+				if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
+					$content .= $this->textinput( 'bctitle-ptarchive-' . $post_type, __('Breadcrumbs Title') );
+				$i++;
+			}
+			unset($i, $pt, $post_type);
 			
 			$this->postbox('titles',__('Title Settings', 'yoast-wpseo'), $content); 
 			
@@ -660,7 +683,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br/><br/>';
 			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:').'</strong><br/>';
 			foreach (get_post_types() as $pt) {
-				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item', 'post_format')))
+				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
 					continue;
 
 				$taxonomies = get_object_taxonomies($pt);
@@ -675,6 +698,26 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}
 			}
 			$content .= '<br/>';
+			
+			$content .= '<strong>'.__('Post type archive to show in breadcrumbs for:').'</strong><br/>';
+			foreach (get_taxonomies() as $taxonomy) {
+				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format', 'category', 'post_tag') ) ) {
+					$tax = get_taxonomy($taxonomy);
+					$values = array( '' => 'None' );
+					if ( get_option('show_on_front') == 'page' )
+						$values['post'] = 'Blog';
+					
+					foreach (get_post_types() as $pt) {
+						if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
+							continue;
+						$ptobj = get_post_type_object($pt);
+						if ($ptobj->has_archive)
+							$values[$pt] = $ptobj->labels->name;
+					}
+					$content .= $this->select('taxonomy-'.$taxonomy.'-ptparent', $tax->labels->singular_name, $values);					
+				}
+			}
+			
 			$content .= $this->checkbox('breadcrumbs-boldlast',__('Bold the last page in the breadcrumb'));
 			$content .= $this->checkbox('breadcrumbs-trytheme',__('Try to add automatically'));
 			$content .= '<p class="desc">'.__('If you\'re using Hybrid, Thesis or Thematic, check this box for some lovely simple action').'.</p>';
@@ -828,6 +871,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<p class="desc">'.__('The above two options prevent the search engines from indexing your login, register and admin pages.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('pagedhome',__('Subpages of the homepage', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('Prevent the search engines from indexing your subpages, if you want them to only index your category and / or tag archives.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('noindexsubpages',__('Subpages of archives and taxonomies', 'yoast-wpseo') );
+			$content .= '<p class="desc">'.__('Prevent the search engines from indexing (not from crawling and following the links) your taxonomies & archives subpages.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('noindexauthor',__('Author archives', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('By default, WordPress creates author archives for each user, usually available under <code>/author/username</code>. If you have sufficient other archives, or yours is a one person blog, there\'s no need and you can best disable them or prevent search engines from indexing them.', 'yoast-wpseo').'</p>';
 			
@@ -980,13 +1025,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
 				$content .= '<p id="wrong_permalink" class="wrong">'
 				.'<a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\');" class="button fixit">'.__('Ignore.').'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.').'</a>'
 				.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.').'</p>';
 
 			if ( get_option('page_comments') && !isset( $options['ignore_page_comments'] ) )
 				$content .= '<p id="wrong_page_comments" class="wrong">'
-				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\');" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\');" class="button fixit">'.__('Ignore.').'</a>'
+				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-setoption').'\');" class="button fixit">'.__('Fix it.').'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.').'</a>'
 				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
 
 			if ($content != '')
@@ -1043,7 +1088,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_post_types() as $post_type) {
-				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment','post_format') ) ) {
+				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
 					$pt = get_post_type_object($post_type);
 					$content .= $this->checkbox('post_types-'.$post_type.'-not_in_sitemap', $pt->labels->name);
 				}
@@ -1053,7 +1098,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<strong>'.__('Exclude taxonomies').'</strong><br/>';
 			$content .= '<p>'.__('Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
 			foreach (get_taxonomies() as $taxonomy) {
-				if ( !in_array( $taxonomy, array('nav_menu','link_category') ) ) {
+				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
 					$tax = get_taxonomy($taxonomy);
 					if ( isset( $tax->labels->name ) && trim($tax->labels->name) != '' )
 						$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->name);

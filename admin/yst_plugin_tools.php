@@ -19,7 +19,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		var $accesslvl	= 'manage_options';
 		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles');
 		
-		function Yoast_WPSEO_Plugin_Admin() {
+		function __construct() {
 		}
 		
 		function add_ozh_adminmenu_icon( $hook ) {
@@ -35,7 +35,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				wp_enqueue_style('thickbox');
 				wp_enqueue_style('global');
 				wp_enqueue_style('wp-admin');
-				wp_enqueue_style('yoast-admin-css', WPSEO_URL . 'css/yst_plugin_tools.css');
+				wp_enqueue_style('yoast-admin-css', WPSEO_URL . 'css/yst_plugin_tools.css', WPSEO_VERSION );
 			}
 		}
 
@@ -86,14 +86,13 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		
 		function config_page_scripts() {
 			global $pagenow;
-			wp_enqueue_script('wpseo-admin-global-script', WPSEO_URL.'js/wp-seo-admin-global.js',array('jquery'));
+			wp_enqueue_script( 'wpseo-admin-global-script', WPSEO_URL.'js/wp-seo-admin-global.js', array('jquery'), WPSEO_VERSION, true );
 
 			if ( $pagenow == 'admin.php' && isset($_GET['page']) && in_array($_GET['page'], $this->adminpages) ) {
-				wp_enqueue_script('wpseo-admin-script', WPSEO_URL.'js/wp-seo-admin.js',array('jquery'));
-				wp_enqueue_script('postbox');
-				wp_enqueue_script('dashboard');
-				wp_enqueue_script('thickbox');
-				wp_enqueue_script('media-upload');
+				wp_enqueue_script( 'wpseo-admin-script', WPSEO_URL.'js/wp-seo-admin.js', array('jquery'), WPSEO_VERSION, true );
+				wp_enqueue_script( 'postbox' );
+				wp_enqueue_script( 'dashboard' );
+				wp_enqueue_script( 'thickbox' );
 			}
 		}
 
@@ -146,6 +145,28 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				$val = htmlspecialchars($options[$id]);
 			
 			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$option.'['.$id.']" value="'.$val.'"/>' . '<br class="clear" />';
+		}
+		
+		/**
+		 * Create a small textarea
+		 */
+		function textarea($id, $label, $option = '', $class = '') {
+			if ( $option == '') {
+				$options = get_wpseo_options();
+				$option = !empty($option) ? $option : $this->currentoption;
+			} else {
+				if ( function_exists('is_network_admin') && is_network_admin() ) {
+					$options = get_site_option($option);
+				} else {
+					$options = get_option($option);
+				}
+			}
+			
+			$val = '';
+			if (isset($options[$id]))
+				$val = esc_html($options[$id]);
+			
+			return '<label class="textinput" for="'.$id.'">'.$label.':</label><textarea class="textinput '.$class.'" id="'.$id.'" name="'.$option.'['.$id.']">' . $val . '</textarea>' . '<br class="clear" />';
 		}
 		
 		/**
@@ -319,15 +340,16 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			$content .= '<li><a href="http://wordpress.org/extend/plugins/'.$this->hook.'/">'.__('Give it a 5 star rating on WordPress.org.','ystplugin').'</a></li>';
 			$content .= '<li><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2017947">'.__('Donate a token of your appreciation.','ystplugin').'</a></li>';
 			$content .= '</ul>';
-			$this->postbox($this->hook.'like', 'Like this plugin?', $content);
+			$this->postbox($this->hook.'like', __('Like this plugin?'), $content);
 		}	
 		
 		/**
 		 * Info box with link to the support forums.
 		 */
 		function plugin_support() {
-			$content = '<p>'.__('If you have any problems with this plugin or good ideas for improvements or new features, please talk about them in the','ystplugin').' <a href="http://wordpress.org/tags/'.$this->hook.'">'.__("Support forums",'ystplugin').'</a>.</p>';
-			$this->postbox($this->hook.'support', 'Need support?', $content);
+			$content = '<p>'.__('If you are having problems with this plugin, please talk about them in the','ystplugin').' <a href="http://wordpress.org/tags/'.$this->hook.'">'.__("Support forums",'ystplugin').'</a>.</p>';
+			$content .= '<p>'.__("If you're sure you've found a bug, or have a feature request, please submit it in the")." <a href='http://yoast.com/bugs/wordpress-seo/'>".__('bug tracker')."</a>.</p>";
+			$this->postbox($this->hook.'support', __('Need support?'), $content);
 		}
 
 		function text_limit( $text, $limit, $finish = '&hellip;') {

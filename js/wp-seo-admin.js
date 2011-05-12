@@ -48,12 +48,13 @@ function wpseo_exportSettings() {
 	);
 }
 
-function setWPOption( option, newval, hide ) {
+function setWPOption( option, newval, hide, nonce ) {
 	jQuery.post(ajaxurl, { 
 			action: 'wpseo_set_option', 
 			option: option,
-			newval: newval 
-		}, function(data) { 
+			newval: newval,
+			_wpnonce: nonce 
+		}, function(data) {
 			if (data)
 				jQuery('#'+hide).hide();
 		}

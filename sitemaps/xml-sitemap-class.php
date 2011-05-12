@@ -277,7 +277,7 @@ class WPSEO_XML_Sitemap extends WPSEO_XML_Sitemap_Base {
 		}
 
 		// If WP E-commerce is running, grab all product categories and all products and add to stack
-		if ( defined('WPSC_VERSION') ) {
+		if ( defined('WPSC_VERSION') && WPSC_VERSION < 3.8 ) {
 			// Categories first
 			$product_list_table 		= WPSC_TABLE_PRODUCT_LIST;
 			$item_category_assoc_table 	= WPSC_TABLE_ITEM_CATEGORY_ASSOC;
