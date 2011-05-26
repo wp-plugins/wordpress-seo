@@ -50,6 +50,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			register_setting( 'yoast_wpseo_titles_options', 'wpseo_titles' );
 			register_setting( 'yoast_wpseo_rss_options', 'wpseo_rss' );
 			register_setting( 'yoast_wpseo_internallinks_options', 'wpseo_internallinks' );
+			register_setting( 'yoast_wpseo_xml_sitemap_options', 'wpseo_xml' );
 			
 			if ( function_exists('is_multisite') && is_multisite() )
 				register_setting( 'yoast_wpseo_multisite_options', 'wpseo_multisite' );
@@ -118,6 +119,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						$msg .= __(' &amp; WP Super Cache flushed');
 					}
 
+					flush_rewrite_rules();
+					
 					echo '<div id="message" style="width:94%;" class="message updated"><p><strong>'.$msg.'.</strong></p></div>';
 				}  
 				?>
@@ -998,10 +1001,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function xml_sitemaps_page() {
 			$options = get_wpseo_options();
 			
-			$this->admin_header('XML Sitemaps', false);
+			$this->admin_header('XML Sitemaps', false, true, 'yoast_wpseo_xml_sitemap_options', 'wpseo_xml');
 
 			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
-			$content .= '<div id="sitemapinfo"><br/>';
+			$content .= '<div id="sitemapinfo">';
+			$content .= '<p>'.sprintf(__('You can find your XML Sitemap %shere%s'), '<a href="'.home_url('sitemap_index.xml').'">', '</a>').'. You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.</p>';
 			$content .= '<strong>'.__('General settings').'</strong><br/><br/>';
 			$content .= $this->checkbox('xml_include_images', __("Add images to XML Sitemap."), false);
 			$content .= '<p>'.__('After content publication:').'</p>';

@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 0.4
+Stable tag: 0.4.1
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -80,6 +80,12 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 6. Example of the Linkdex Page Analysis functionality.
 
 == Changelog ==
+
+= 0.4.1 =
+
+* Fixes bug in saving XML Sitemap and Dashboard settings.
+* Forces flush of rewrite rules so XML sitemaps start working immediately after enabling.
+* Adds a line of copy to the XML Sitemaps page to point the user at the index sitemap file.
 
 = 0.4 =
 
