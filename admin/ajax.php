@@ -1,45 +1,49 @@
 <?php
 
 function wpseo_set_option() {
-	update_option($_POST['option'], $_POST['newval']);
-	return 1;
-	die();
+	if ( ! current_user_can('manage_options') )
+		die('-1');
+	check_ajax_referer('wpseo-setoption');
+
+	$option = $_POST['option'];
+	if ( $option != 'page_comments' )
+		die('-1');
+
+	update_option( $option, 0 );
+	die('1');
 }
 add_action('wp_ajax_wpseo_set_option', 'wpseo_set_option');
 
 function wpseo_set_ignore() {
+	if ( ! current_user_can('manage_options') )
+		die('-1');
+	check_ajax_referer('wpseo-ignore');
+
 	$options = get_option('wpseo');
 	$options['ignore_'.$_POST['option']] = 'ignore';
 	update_option('wpseo', $options);
-	return 1;
-	die();
+	die('1');
 }
 add_action('wp_ajax_wpseo_set_ignore', 'wpseo_set_ignore');
 
-function wpseo_ajax_generate_sitemap_callback() {
-	$options = get_option('wpseo');
-	$type = (isset($_POST['type'])) ? $_POST['type'] : '';
-	
-	if ($type == '') {
-		global $wpseo_generate, $wpseo_echo;
-		$wpseo_generate = true;
-		$wpseo_echo = true;
-		
-		$mem_before = function_exists('memory_get_peak_usage') ? memory_get_peak_usage() : memory_get_usage();
-		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
-		$mem_after = function_exists('memory_get_peak_usage') ? memory_get_peak_usage() : memory_get_usage();
-		echo number_format( ($mem_after - $mem_before) / 1024 ).'KB of memory used.';
+function wpseo_kill_blocking_files() {
+	if ( ! current_user_can('manage_options') )
+		die('-1');
+	check_ajax_referer('wpseo-blocking-files');
 
-	} else {
-		global $wpseo_generate, $wpseo_echo;
-		$wpseo_generate = true;
-		$module_name = $type;
-		if($type == 'kml' || $type == 'geo') {
-			$module_name = 'local';
-			$type = 'geo';
+	$message = 'There were no files to delete.';
+	$options = get_option( 'wpseo' );
+	if ( isset($options['blocking_files']) && is_array($options['blocking_files']) && count($options['blocking_files']) > 0 ) {
+		$message = 'success';
+		foreach ( $options['blocking_files'] as $k => $file ) {
+			if ( ! @unlink( $file ) )
+				$message = 'Some files could not be removed. Please remove them via FTP.';
+			else
+				unset( $options['blocking_files'][$k] );
 		}
-		require_once WP_PLUGIN_DIR.'/wordpress-seo-modules/wpseo-' . $module_name . '/xml-' . $type . '-sitemap-class.php';
-	}	
-	die();
+		update_option( 'wpseo', $options );
+	}
+
+	die( $message );
 }
-add_action('wp_ajax_wpseo_generate_sitemap', 'wpseo_ajax_generate_sitemap_callback');
+add_action('wp_ajax_wpseo_kill_blocking_files', 'wpseo_kill_blocking_files');
