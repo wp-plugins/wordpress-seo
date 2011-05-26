@@ -39,7 +39,11 @@ div.inside ul {
 }
 
 .textinput, .select {
-	width: 320px;
+	width: 400px;
+}
+
+.textinput.metadesc {
+	height: 50px;	
 }
 
 textarea.import {

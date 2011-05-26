@@ -7,9 +7,6 @@ class WPSEO_Rewrite {
 		
 		add_filter('query_vars', array(&$this, 'query_vars') );
 
-		if ( isset( $options['enablexmlsitemap']) && $options['enablexmlsitemap'] )
-			add_action( 'generate_rewrite_rules', array(&$this, 'add_sitemap_rewrite_rules') );
-
 		if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] ) {
 			add_filter( 'category_link', array(&$this, 'no_category_base'), 1000, 2 );
 			add_filter( 'request', array(&$this, 'no_category_base_request') );
@@ -21,6 +18,7 @@ class WPSEO_Rewrite {
 		}
 	}
 	
+	// FIXME: could use flush_rewrite_rules() instead.
 	function flush_rules() {
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
@@ -47,11 +45,6 @@ class WPSEO_Rewrite {
 		
 	function query_vars( $query_vars ) {
 		$options = get_wpseo_options();
-		
-		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
-			$query_vars[] = 'wpseo_sitemap';
-			$query_vars[] = 'wpseo_sitemap_gz';
-		}
 		
 		if ( isset($options['stripcategorybase']) && $options['stripcategorybase'] ) {
 			$query_vars[] = 'wpseo_category_redirect';
@@ -100,15 +93,7 @@ class WPSEO_Rewrite {
 		$category_rewrite[$old_base.'$'] = 'index.php?wpseo_category_redirect=$matches[1]';
 
 		return $category_rewrite;
-	}
-
-	function add_sitemap_rewrite_rules( $rewrite ) { 
-		$new_rules = array(
-			'((news)?_?sitemap\.xml)(\.gz)?$' => 'index.php?robots=1&wpseo_sitemap='.$rewrite->preg_index(1).'&wpseo_sitemap_gz='.$rewrite->preg_index(3),
-		);
-		$rewrite->rules = $new_rules + $rewrite->rules;
-	} 
-		
+	}		
 }
 
 $wpseo_rewrite = new WPSEO_Rewrite();
