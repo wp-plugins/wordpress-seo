@@ -7,26 +7,6 @@ class WPSEO_Metabox {
 	
 	function __construct() {
 		$options = get_wpseo_options();
-		
-		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
-			// WPSC integration
-			add_action('wpsc_edit_product', array($this,'rebuild_sitemap'));
-			add_action('wpsc_rate_product', array($this,'rebuild_sitemap'));
-
-			// When permalink structure is changed, sitemap should be regenerated
-			add_action('permalink_structure_changed', array(&$this,'rebuild_sitemap') );
-			
-			// Rebuild the sitemap for all post types that are supposed to be in the sitemap
-			foreach ( get_post_types() as $post_type ) {
-
-				if ( ! in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
-
-					if ( ! $options['post_types-'.$post_type.'-not_in_sitemap'] )
-						add_action( 'publish_'.$post_type, array( $this, 'rebuild_sitemap' ) );
-				}
-				
-			}
-		}
 
 		add_action( 'add_meta_boxes',                  array( $this, 'add_meta_box' ) );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'enqueue'      ) );
@@ -303,7 +283,7 @@ class WPSEO_Metabox {
 		}
 		$this->do_tab( 'general', 'General', $content );
 
-		require_once WPSEO_PATH.'/admin/linkdex/linkdex.php';
+		require WPSEO_PATH.'/admin/linkdex/linkdex.php';
 		
 		$linkdex = new Linkdex();
 		$this->do_tab( 'linkdex', 'Page Analysis', $linkdex->output( $post ) );
@@ -540,13 +520,6 @@ class WPSEO_Metabox {
 
 		wp_enqueue_script( 'jquery-ui-autocomplete', WPSEO_URL.'js/jquery-ui-autocomplete.min.js', array( 'jquery', 'jquery-ui-core' ), WPSEO_VERSION, true );		
 		wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-autocomplete' ), WPSEO_VERSION, true );
-	}
-
-	function rebuild_sitemap( $post ) {
-		global $wpseo_generate, $wpseo_echo;
-		$wpseo_generate = true;
-		$wpseo_echo = false;
-		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
 	}
 
 	function page_title_column_heading( $columns ) {

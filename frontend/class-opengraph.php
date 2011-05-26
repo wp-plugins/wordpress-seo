@@ -6,6 +6,11 @@ class WPSEO_OpenGraph {
 		$options = get_wpseo_options();
 
 		add_action( 'wpseo_head', array(&$this, 'opengraph') );
+
+		$options = get_wpseo_options();
+
+		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
+			add_filter('language_attributes', array(&$this, 'add_opengraph_namespace'));
 	}
 
 	public function opengraph() {
@@ -15,7 +20,7 @@ class WPSEO_OpenGraph {
 		
 		wp_reset_query();
 		
-		echo "\n";
+		$this->id();
 		$this->title();
 		$this->description();
 		$this->url();
@@ -23,7 +28,22 @@ class WPSEO_OpenGraph {
 		$this->type();
 		$this->image();
 		do_action('wpseo_opengraph');
-		echo "\n";
+	}
+
+	public function add_opengraph_namespace( $output ) {
+		return $output . ' xmlns:og="http://opengraphprotocol.org/schema/"';
+	}
+	
+	public function id() {
+		$options = get_wpseo_options();
+		if ( isset($options['fb_adminid']) && trim($options['fb_adminid']) != '' )
+			echo "<meta property='fb:admins' content='".esc_attr( strip_tags( stripslashes( $options['fb_adminid'] ) ) )."'/>\n";
+
+		if ( isset($options['fb_pageid']) && trim($options['fb_pageid']) != '' )
+			echo "<meta property='fb:page_id' content='".esc_attr( strip_tags( stripslashes( $options['fb_pageid'] ) ) )."'/>\n";
+
+		if ( isset($options['fb_appid']) && trim($options['fb_appid']) != '' )
+			echo "<meta property='fb:app_id' content='".esc_attr( strip_tags( stripslashes( $options['fb_appid'] ) ) )."'/>\n";
 	}
 	
 	private function title( ) {
@@ -122,12 +142,12 @@ class WPSEO_OpenGraph {
 			else
 				$title = __('Page not found');
 		} 
-		echo "\t<meta property='og:title' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
+		echo "<meta property='og:title' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
 	}
 		
 	public function url() {
 		$url = WPSEO_Frontend::canonical( false );
-		echo "\t<meta property='og:url' content='".esc_attr( $url )."'/>\n";
+		echo "<meta property='og:url' content='".esc_attr( $url )."'/>\n";
 	}
 	
 	public function type() {
@@ -138,7 +158,7 @@ class WPSEO_OpenGraph {
 		} else {
 			$type = 'website';
 		}
-		echo "\t<meta property='og:type' content='".esc_attr( $type )."'/>\n";
+		echo "<meta property='og:type' content='".esc_attr( $type )."'/>\n";
 	}
 		
 	public function image( $image = '' ) {
@@ -166,7 +186,7 @@ class WPSEO_OpenGraph {
 			}	
 		} 
 		if ( $image != '' )
-			echo "\t<meta property='og:image' content='".esc_attr( $image )."'/>\n";
+			echo "<meta property='og:image' content='".esc_attr( $image )."'/>\n";
 	}
 		
 	public function description() {
@@ -176,11 +196,11 @@ class WPSEO_OpenGraph {
 			$desc = WPSEO_Frontend::metadesc( false );
 
 		if ( $desc && $desc != '' )
-			echo "\t<meta property='og:description' content='".esc_attr( $desc )."'/>\n";
+			echo "<meta property='og:description' content='".esc_attr( $desc )."'/>\n";
 	}
 
 	public function site_name() {
-		echo "\t<meta property='og:site_name' content='".esc_attr( get_bloginfo('name') )."'/>\n";
+		echo "<meta property='og:site_name' content='".esc_attr( get_bloginfo('name') )."'/>\n";
 	}
 }
 

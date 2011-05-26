@@ -17,7 +17,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		var $homepage	= '';
 		var $feed		= 'http://yoast.com/feed/';
 		var $accesslvl	= 'manage_options';
-		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles');
+		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles', 'wpseo_xml');
 		
 		function __construct() {
 		}
@@ -47,6 +47,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			add_menu_page($this->longname, $this->shortname, $this->accesslvl, 'wpseo_dashboard', array(&$this,'config_page'), WPSEO_URL.'images/yoast-icon.png');
 			add_submenu_page('wpseo_dashboard','Titles','Titles',$this->accesslvl, 'wpseo_titles', array(&$this,'titles_page'));
 			add_submenu_page('wpseo_dashboard','Indexation','Indexation',$this->accesslvl, 'wpseo_indexation', array(&$this,'indexation_page'));
+			add_submenu_page('wpseo_dashboard','XML Sitemaps','XML Sitemaps',$this->accesslvl, 'wpseo_xml', array(&$this,'xml_sitemaps_page'));
 			add_submenu_page('wpseo_dashboard','Permalinks','Permalinks',$this->accesslvl, 'wpseo_permalinks', array(&$this,'permalinks_page'));
 			add_submenu_page('wpseo_dashboard','Internal Links','Internal Links',$this->accesslvl, 'wpseo_internal-links', array(&$this,'internallinks_page'));
 			add_submenu_page('wpseo_dashboard','RSS','RSS',$this->accesslvl, 'wpseo_rss', array(&$this,'rss_page'));

@@ -8,9 +8,6 @@ class WPSEO_Frontend {
 		
 		$options = get_wpseo_options();
 
-		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
-			add_filter('language_attributes', array(&$this, 'add_opengraph_namespace'));
-
 		add_action('wp_head', array(&$this, 'head'), 1, 1);
 		remove_action('wp_head', 'rel_canonical');
 
@@ -93,14 +90,17 @@ class WPSEO_Frontend {
 		
 		global $wp_query;
 
-		wp_reset_query();
-
 		if ( is_feed() )
 			return $title;
 			
 		$options = get_wpseo_options();
 
-		if ( is_home() && 'posts' == get_option('show_on_front') ) {
+		if ( is_front_page() && 'posts' != get_option('show_on_front') ) {
+			global $post;
+			$title = wpseo_get_value( 'title', $post->ID );
+			if ( '' == $title )
+				$title = $post->post_title.$sep.get_bloginfo('name');
+		} else if ( is_home() && 'posts' == get_option('show_on_front') ) {
 			if ( isset($options['title-home']) && $options['title-home'] != '' )
 				$title = wpseo_replace_vars( $options['title-home'], array() );
 			else {
@@ -216,7 +216,7 @@ class WPSEO_Frontend {
 			else
 				$title = __('Page not found').$sep.get_bloginfo('name');
 		} 
-		return esc_html( strip_tags( stripslashes( $title ) ) );
+		return esc_html( strip_tags( stripslashes( apply_filters( 'wpseo_title', $title ) ) ) );
 	}
 	
 	function force_wp_title() {
@@ -232,7 +232,7 @@ class WPSEO_Frontend {
 
 		global $wp_query;
 		
-		echo "\n\t<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
+		echo "\n<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
@@ -245,7 +245,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $google_meta, $match);
 					$google_meta = $match[1];
 				}
-				echo "\t<meta name='google-site-verification' content='$google_meta' />\n";
+				echo "<meta name='google-site-verification' content='$google_meta' />\n";
 			}
 			if (!empty($options['yahooverify'])) {
 				$yahoo_meta = $options['yahooverify'];
@@ -253,7 +253,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $yahoo_meta, $match);
 					$yahoo_meta = $match[1];
 				}				
-				echo "\t<meta name='y_key' content='$yahoo_meta' />\n";
+				echo "<meta name='y_key' content='$yahoo_meta' />\n";
 			}
 				
 			if (!empty($options['msverify'])) {
@@ -262,14 +262,14 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $bing_meta, $match);
 					$bing_meta = $match[1];
 				}								
-				echo "\t<meta name='msvalidate.01' content='$bing_meta' />\n";
+				echo "<meta name='msvalidate.01' content='$bing_meta' />\n";
 			}
 				
 		}
 
 		do_action( 'wpseo_head' );
 		
-		echo "\t<!-- / Yoast WordPress SEO plugin. -->\n\n";
+		echo "<!-- / Yoast WordPress SEO plugin. -->\n\n";
 	}
 
 	function robots() {
@@ -337,7 +337,7 @@ class WPSEO_Frontend {
 		$robotsstr = preg_replace( '/^index,follow,?/', '', $robotsstr );
 		
 		if ($robotsstr != '') {
-			echo "\t<meta name='robots' content='".$robotsstr."'/>\n";
+			echo "<meta name='robots' content='".$robotsstr."'/>\n";
 		}
 	}
 	
@@ -405,7 +405,7 @@ class WPSEO_Frontend {
 		
 		if ( !empty($canonical) && !is_wp_error($canonical) ) {
 			if ( $echo ) 
-				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
+				echo '<link rel="canonical" href="'.$canonical.'" />'."\n";
 			else
 				return $canonical;
 		}
@@ -451,7 +451,7 @@ class WPSEO_Frontend {
 
 		$metakey = trim( $metakey );
 		if ( !empty( $metakey ) ) 
-			echo "\t<meta name='keywords' content='".esc_attr( strip_tags( stripslashes( $metakey ) ) )."'/>\n";
+			echo "<meta name='keywords' content='".esc_attr( strip_tags( stripslashes( $metakey ) ) )."'/>\n";
 
 	}
 	
@@ -498,12 +498,13 @@ class WPSEO_Frontend {
 			}
 		}
 	
-		$metadesc = trim( $metadesc );
+		$metadesc = apply_filters( 'wpseo_metadesc', trim( $metadesc ) );
+		
 		if ( $echo ) {
 			if ( !empty( $metadesc ) )
-				echo "\t<meta name='description' content='".esc_attr( strip_tags( stripslashes( $metadesc ) ) )."'/>\n";
+				echo "<meta name='description' content='".esc_attr( strip_tags( stripslashes( $metadesc ) ) )."'/>\n";
 			else if ( current_user_can('manage_options') && is_singular() )
-				echo "\t".'<!-- Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template. -->'."\n";			
+				echo '<!-- Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template. -->'."\n";			
 		} else {
 			return $metadesc;
 		}
@@ -524,8 +525,8 @@ class WPSEO_Frontend {
 	}
 	
 	function noindex_page() {
-		echo "\t<!-- This site is optimized with the Yoast WordPress SEO plugin. -->\n";
-		echo "\t".'<meta name="robots" content="noindex" />'."\n";
+		echo "<!-- This site is optimized with the Yoast WordPress SEO plugin. -->\n";
+		echo '<meta name="robots" content="noindex" />'."\n";
 	}
 
 	function noindex_feed() {
@@ -793,10 +794,6 @@ class WPSEO_Frontend {
 		global $wpseo_ob;
 		$wpseo_ob = true;
 		ob_start();
-	}
-
-	function add_opengraph_namespace( $output ) {
-		return $output . ' xmlns:og="http://opengraphprotocol.org/schema/"';
 	}
 }
 

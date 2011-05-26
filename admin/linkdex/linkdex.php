@@ -3,7 +3,7 @@
 class Linkdex {
 	
 	function __construct() {
-		require_once WPSEO_PATH."/admin/linkdex/TextStatistics.php";
+		require WPSEO_PATH."/admin/linkdex/TextStatistics.php";
 	}
 	
 	function output( $post ) {
@@ -397,9 +397,9 @@ class Linkdex {
 
 	// Currently just returns an array of the text content
 	function GetHeadings( $postcontent ) {
-		preg_match_all('/<h([1-6])>(.*)?<\/h\\1>/i', $postcontent, $matches);
+		preg_match_all('/<h([1-6])([^>]+)?>(.*)?<\/h\\1>/i', $postcontent, $matches);
 		$headings = array();
-		foreach ($matches[2] as $heading) {
+		foreach ($matches[3] as $heading) {
 			$headings[] = wpseo_strtolower_utf8( $heading );
 		}
 		return $headings;

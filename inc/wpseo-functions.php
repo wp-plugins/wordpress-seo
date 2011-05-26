@@ -144,6 +144,18 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 			$string = str_replace($var, $repl, $string);
 	}
 	
+	if ( strpos( $string, '%%' ) === false ) {
+		$string = preg_replace( '/\s\s+/',' ', $string );
+		return trim( $string );
+	}
+
+	if ( preg_match_all( '/%%cf_([^%]+)%%/', $string, $matches, PREG_SET_ORDER ) ) {
+		global $post;
+		foreach ($matches as $match) {
+			$string = str_replace( $match[0], get_post_meta( $post->ID, $match[1], true), $string );
+		}
+	}
+	
 	$string = preg_replace( '/\s\s+/',' ', $string );
 	return trim( $string );
 }
@@ -181,68 +193,6 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 		return false;
 	
 	return (isset($tax_meta['wpseo_'.$meta])) ? $tax_meta['wpseo_'.$meta] : false;
-}
-
-function wpseo_dir_setup() {
-	$options = get_option('wpseo');
-	
-	$error = __('An error occurred while trying to create or find the <code>/wpseo/</code> folder in your uploads directory.');
-	
-	if ( !is_array($options) )
-		$options = array();
-		
-	if ( isset( $options['wpseodir'] ) ) {
-		if ( @is_writable( $options['wpseodir'] ) ) {
-			$wpseodir = $options['wpseodir'];
-			$wpseourl = $options['wpseourl'];
-		} else {
-			unset($options['wpseodir']);
-			unset($options['wpseourl']);
-			update_option('wpseo', $options);
-		}
-	} 
-	
-	if ( !isset( $wpseodir ) ) {
-		$dir = wp_upload_dir();
-		if ( is_wp_error($dir) ) {
-			$error = __('Trying to get the upload dir gave the following error:').'<br/>';
-			foreach ( $dir->get_error_messages() as $msg ) {
-				$error .= $msg.'<br/>';
-			}
-			$wpseodir = false;
-		} else if ( $dir['basedir'] == '' ) { 
-			$error = __('WordPress didn\'t return a valid path to your upload directory, please make sure your upload path is set correctly');
-			$wpseodir = false;
-		} else if ( !file_exists( $dir['basedir'].'/wpseo/' ) ) {
-			$dircreated = @mkdir( $dir['basedir'].'/wpseo/' );
-			if ( $dircreated ) {
-				$wpseodir = $dir['basedir'].'/wpseo/';
-				$stat = @stat( dirname( $wpseodir ) );
-				$dir_perms = $stat['mode'] & 0007777;
-				@chmod( dirname( $wpseodir ), $dir_perms );
-				
-				$options['wpseodir'] = $wpseodir;
-				$wpseourl = $options['wpseourl'] = $dir['baseurl'].'/wpseo/';
-				update_option( 'wpseo' , $options );
-			} else {
-				$error = '<code>'.$dir['basedir'].'/wpseo/</code> could not be created';
-				$wpseodir = false;
-			}
-		} else {
-			$wpseodir = $options['wpseodir'] = $dir['basedir'].'/wpseo/';
-			$wpseourl = $options['wpseourl'] = $dir['baseurl'].'/wpseo/';
-			update_option('wpseo', $options);
-		}
-	}
-
-	if ( $wpseodir && @is_writable( $wpseodir ) ) {
-		define( 'WPSEO_UPLOAD_DIR', $wpseodir );
-		define( 'WPSEO_UPLOAD_URL', $wpseourl );
-	} else {
-		define( 'WPSEO_UPLOAD_DIR', false );
-		define( 'WPSEO_UPLOAD_URL', false );
-		define( 'WPSEO_UPLOAD_ERROR', $error );
-	}
 }
 
 // Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.

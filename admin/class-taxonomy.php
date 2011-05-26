@@ -89,7 +89,7 @@ class WPSEO_Taxonomy {
 			else
 				$tax_meta[$taxonomy][$term_id]['wpseo_'.$key] = false;			
 		}
-		
+
 		update_option( 'wpseo_taxonomy_meta', $tax_meta );
 
 		if ( defined('W3TC_DIR') ) {
@@ -98,12 +98,7 @@ class WPSEO_Taxonomy {
 
 		    $w3_objectcache->flush();			
 		}
-	    
-		global $wpseo_generate, $wpseo_echo;
-		$wpseo_generate = true;
-		$wpseo_echo = false;
-		require_once WPSEO_PATH.'/sitemaps/xml-sitemap-class.php';
-	}	
+	}
 }
 $wpseo_taxonomy = new WPSEO_Taxonomy();
 

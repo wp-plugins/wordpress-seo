@@ -7,12 +7,12 @@ function wpseo_load_plugins( $path ) {
 	if ($dir) {
 		while (($entry = @readdir($dir)) !== false) {
 			$full_dir_path = $path . "/" . $entry;
-			if(is_readable($full_dir_path) && is_dir($full_dir_path) && in_array($entry, $allowed_plugins)) {
+			if( in_array($entry, $allowed_plugins) && is_readable($full_dir_path) && is_dir($full_dir_path) ) {
 				$module_dir = @opendir( $full_dir_path );
 				if ($module_dir) {
 					while (($module_entry = @readdir($module_dir)) !== false) {
 						if (strrchr($module_entry, '.') === '.php') {
-							require_once $full_dir_path . '/' . $module_entry;
+							require $full_dir_path . '/' . $module_entry;
 						}
 					}
 				}

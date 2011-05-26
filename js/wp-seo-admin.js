@@ -61,28 +61,14 @@ function setWPOption( option, newval, hide, nonce ) {
 	);
 }
 
-function rebuildSitemap( baseurl, type ) {
-	jQuery('#'+type+'sitemapgeneration').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
-	jQuery.post(ajaxurl, { 
-			action: 'wpseo_generate_sitemap', 
-			type: type, 
-		}, function(data) { 
-			if (data)
-				jQuery('#'+type+'sitemapgeneration').html(data); 
-		}
-	);
-}
-
-function rebuildKml( baseurl ) {
-	jQuery('#kmlgeneration').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
-	jQuery.post(ajaxurl, { 
-			action: 'wpseo_generate_sitemap', 
-			type: 'kml', 
-		}, function(data) { 
-			if (data) {
-				jQuery('#kmlgeneration').html(data); 
-				rebuildSitemap(baseurl, 'geo');
-			}
-		}
-	);
+function wpseo_killBlockingFiles( nonce ) {
+	jQuery.post( ajaxurl, {
+		action: 'wpseo_kill_blocking_files',
+		_ajax_nonce: nonce
+	}, function(data) {
+		if (data == 'success')
+			jQuery('#blocking_files').hide();
+		else
+			jQuery('#block_files').html(data);
+	});
 }

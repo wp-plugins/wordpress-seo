@@ -106,7 +106,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function admin_header($title, $expl = true, $form = true, $option = 'yoast_wpseo_options', $optionshort = 'wpseo', $contains_files = false) {
 			?>
 			<div class="wrap">
-				<?php settings_errors(); ?>
 				<?php 
 				if ( (isset($_GET['updated']) && $_GET['updated'] == 'true') || (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true') ) {
 					$msg = __('Settings updated');
@@ -118,7 +117,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						wp_cache_clear_cache();
 						$msg .= __(' &amp; WP Super Cache flushed');
 					}
-					
+
 					echo '<div id="message" style="width:94%;" class="message updated"><p><strong>'.$msg.'.</strong></p></div>';
 				}  
 				?>
@@ -132,6 +131,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				echo '<form action="'.admin_url('options.php').'" method="post" id="wpseo-conf"' . ($contains_files ? ' enctype="multipart/form-data"' : '') . '>';
 				settings_fields($option); 
 				$this->currentoption = $optionshort;
+				// Set some of the ignore booleans here to prevent unsetting.
+				echo $this->hidden('ignore_blog_public_warning');
+				echo $this->hidden('ignore_page_comments');
+				echo $this->hidden('ignore_permalink');
+				echo $this->hidden('ms_defaults_set');
 			}
 			if ($expl)
 				$this->postbox('pluginsettings',__('Plugin Settings', 'yoast-wpseo'),$this->checkbox('disableexplanation',__('Hide verbose explanations of settings', 'yoast-wpseo'))); 
@@ -141,7 +145,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function admin_footer($title, $submit = true) {
 			if ($submit) {
 			?>
-							<div class="submit"><input type="submit" class="button-primary" name="submit" value="<?php _e("Save Yoast WordPress SEO ".$title." Settings", 'yoast-wpseo'); ?>" /></div>
+							<div class="submit"><input type="submit" class="button-primary" name="submit" value="<?php _e("Save ".$title." Settings", 'yoast-wpseo'); ?>" /></div>
 			<?php } ?>
 							</form>
 						</div>
@@ -401,9 +405,9 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				if ( isset( $file['file'] ) && !is_wp_error($file) ) {
 					require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
 					$zip = new PclZip( $file['file'] );
-					$unzipped = $zip->extract( $p_path = WPSEO_UPLOAD_DIR.'import/' );
+					$unzipped = $zip->extract( $p_path = WP_CONTENT_DIR.'wpseo-import/' );
 					if ( $unzipped[0]['stored_filename'] == 'settings.ini' ) {
-						$options = parse_ini_file( WPSEO_UPLOAD_DIR.'import/settings.ini', true );
+						$options = parse_ini_file( WP_CONTENT_DIR.'wpseo-import/settings.ini', true );
 						foreach ($options as $name => $optgroup) {
 							if ($name != 'wpseo_taxonomy_meta') {
 								update_option($name, $optgroup);
@@ -411,6 +415,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 								update_option($name, json_decode( urldecode( $optgroup['wpseo_taxonomy_meta'] ), true ) );
 							}
 						}
+						@unlink( WP_CONTENT_DIR.'wpseo-import/' );
+						
 						$content .= '<p><strong>'.__('Settings successfully imported.').'</strong></p>';
 					} else {
 						$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Unzipping failed.').'</strong></p>';
@@ -858,7 +864,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->admin_header('Indexation', true, true, 'yoast_wpseo_indexation_options', 'wpseo_indexation');
 
 			$content = $this->checkbox('opengraph',__('Add OpenGraph meta data', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. (very experimental)', 'yoast-wpseo').'</p>';
+			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. You can specify some of the ID\'s that are sometimes needed below:', 'yoast-wpseo').'</p>';
+			$content .= $this->textinput('fb_pageid', __('Facebook Page ID') );
+			$content .= $this->textinput('fb_adminid', __('Facebook Admin ID') );
+			$content .= '<p class="desc">'.__('Separate multiple admin ID\'s with comma\'s.', 'yoast-wpseo').'</p>';
+			$content .= $this->textinput('fb_appid', __('Facebook App ID') );
 
 			$this->postbox('opengraph',__('OpenGraph (Facebook)', 'yoast-wpseo'),$content);
 					
@@ -985,6 +995,50 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->admin_footer('RSS');
 		}
 		
+		function xml_sitemaps_page() {
+			$options = get_wpseo_options();
+			
+			$this->admin_header('XML Sitemaps', false);
+
+			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
+			$content .= '<div id="sitemapinfo"><br/>';
+			$content .= '<strong>'.__('General settings').'</strong><br/><br/>';
+			$content .= $this->checkbox('xml_include_images', __("Add images to XML Sitemap."), false);
+			$content .= '<p>'.__('After content publication:').'</p>';
+			$content .= $this->checkbox('xml_ping_google', __("Ping Google."), false);
+			$content .= $this->checkbox('xml_ping_bing', __("Ping Bing."), false);
+			$content .= $this->checkbox('xml_ping_yahoo', __("Ping Yahoo!."), false);
+			$content .= $this->checkbox('xml_ping_ask', __("Ping Ask.com."), false);
+			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
+			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
+			foreach (get_post_types() as $post_type) {
+				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
+					$pt = get_post_type_object($post_type);
+					$content .= $this->checkbox('post_types-'.$post_type.'-not_in_sitemap', $pt->labels->name);
+				}
+			}
+
+			$content .= '<br/>';
+			$content .= '<strong>'.__('Exclude taxonomies').'</strong><br/>';
+			$content .= '<p>'.__('Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
+			foreach (get_taxonomies() as $taxonomy) {
+				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
+					$tax = get_taxonomy($taxonomy);
+					if ( isset( $tax->labels->name ) && trim($tax->labels->name) != '' )
+						$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->name);
+				}
+			}
+			
+			$content .= '<br class="clear"/>';
+			$content .= '</div>';
+
+			$this->postbox('xmlsitemaps',__('XML Sitemap', 'yoast-wpseo'),$content);
+			
+			do_action('wpseo_xmlsitemaps_config', $this);		
+			
+			$this->admin_footer('XML Sitemaps');
+		}
+		
 		function config_page() {
 			$options = get_wpseo_options();
 			
@@ -993,33 +1047,16 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			ksort($options);
 			$content = '';
 			
-			if ( defined('WPSEO_UPLOAD_ERROR') ) {
-				$content .= '<p class="wrong">'.WPSEO_UPLOAD_ERROR.'</p>';
-				$wpseodir = false;
-			}
-						
 			if ( isset($options['blocking_files']) && is_array($options['blocking_files']) && count($options['blocking_files']) > 0 ) {
-				// Let's try and see if the issue has been fixed first.
-				foreach($options['blocking_files'] as $num => $file) {
-					if ( file_exists( $file ) ) {
-						$return = @unlink($file);
-						if ( $return )
-							unset( $options['blocking_files'][$num] );
-					} else {
-						unset( $options['blocking_files'][$num] );
-					}
-				}
 				$options['blocking_files'] = array_unique( $options['blocking_files'] );
-				update_option('wpseo', $options);
-				if ( count($options['blocking_files']) > 0 ) {
-					$content .= '<p id="blocking_files" class="wrong">'
-					.'<a href="javascript:wpseo_setIgnore(\'blocking_files\',\'blocking_files\');" class="button fixit">'.__('Ignore.').'</a>'
-					.'The following file(s) is/are blocking your XML Sitemap from working properly, please delete them:<br/>';
-					foreach($options['blocking_files'] as $file) {
-						$content .= $file.'<br/>';
-					}
-					$content .= '</p>';
+				$content .= '<p id="blocking_files" class="wrong">'
+				.'<a href="javascript:wpseo_killBlockingFiles(\''.wp_create_nonce('wpseo-blocking-files').'\')" class="button fixit">'.__('Fix it.').'</a>'
+				.'The following file(s) is/are blocking your XML sitemaps from working properly:<br />';
+				foreach($options['blocking_files'] as $file) {
+					$content .= esc_html( $file ) . '<br/>';
 				}
+				$content .= 'Either delete them (this can be done with the "Fix it" button) or disable WP SEO XML sitemaps.';
+				$content .= '</p>';
 			}
 			
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
@@ -1037,12 +1074,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ($content != '')
 				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
 			
-			// Set some of the ignore booleans here to prevent unsetting.
-			$content = $this->hidden('ignore_blog_public_warning');
-			$content .= $this->hidden('ignore_page_comments');
-			$content .= $this->hidden('ignore_permalink');
-			$content .= $this->hidden('ms_defaults_set');
-
 			$content .= $this->checkbox('usemetakeywords', 'Use <code>meta</code> keywords tag?');
 			$content .= $this->checkbox('disabledatesnippet', 'Disable date in snippet preview for posts');
 			
@@ -1074,44 +1105,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'yoast-wpseo').'</a>');
 
 			$this->postbox('webmastertools',__('Webmaster Tools', 'yoast-wpseo'),$content);
-			
-			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
-			$content .= '<div id="sitemapinfo"><br/>';
-			$content .= '<strong>'.__('General settings').'</strong><br/><br/>';
-			$content .= $this->checkbox('no_xmlsitemap_update', __("Don't update the XML sitemap automatically when a post is published."), false);
-			$content .= $this->checkbox('xml_include_images', __("Add images to XML Sitemap."), false);
-			$content .= '<p>'.__('After sitemap generation:').'</p>';
-			$content .= $this->checkbox('xml_ping_google', __("Ping Google."), false);
-			$content .= $this->checkbox('xml_ping_bing', __("Ping Bing."), false);
-			$content .= $this->checkbox('xml_ping_yahoo', __("Ping Yahoo!."), false);
-			$content .= $this->checkbox('xml_ping_ask', __("Ping Ask.com."), false);
-			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
-			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
-			foreach (get_post_types() as $post_type) {
-				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
-					$pt = get_post_type_object($post_type);
-					$content .= $this->checkbox('post_types-'.$post_type.'-not_in_sitemap', $pt->labels->name);
-				}
-			}
-
-			$content .= '<br/>';
-			$content .= '<strong>'.__('Exclude taxonomies').'</strong><br/>';
-			$content .= '<p>'.__('Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
-			foreach (get_taxonomies() as $taxonomy) {
-				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
-					$tax = get_taxonomy($taxonomy);
-					if ( isset( $tax->labels->name ) && trim($tax->labels->name) != '' )
-						$content .= $this->checkbox('taxonomies-'.$taxonomy.'-not_in_sitemap', $tax->labels->name);
-				}
-			}
-			
-			$content .= '<br class="clear"/>';
-			$content .= '<p>'.__('<strong>Note:</strong> make sure to save the settings if you\'ve changed anything above before regenerating the XML sitemap.').'</p>';
-			$content .= '<a class="button" href="javascript:rebuildSitemap(\''.WPSEO_URL.'\',\'\');">(Re)build XML sitemap</a><br/><br/>';
-			$content .= '<div id="sitemapgeneration"></div>';
-			$content .= '</div>';
-
-			$this->postbox('xmlsitemaps',__('XML Sitemap', 'yoast-wpseo'),$content);
 			
 			do_action('wpseo_dashboard', $this);
 			

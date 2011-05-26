@@ -26,17 +26,19 @@ jQuery.fn.googleSuggest = function(opts){
 }
 // End Google Suggest library
 
-function yst_strip_tags( str ) { 
+function yst_clean( str, cleanalphanumeric ) { 
 	if ( str == '' || str == undefined )
 		return '';
 	
+	if ( cleanalphanumeric == true )
+		str = str.replace(/[^a-zA-Z0-9\s]/, '');
 	str = str.replace(/<\/?[^>]+>/gi, ''); 
 	str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
 	return str;
 }
 
 function ptest(str, p) {
-	str = yst_strip_tags( str );
+	str = yst_clean( str, true );
 	str = str.toLowerCase();
 	var r = str.match(p);
 	if (r != null)
@@ -53,7 +55,7 @@ function testFocusKw() {
 	var postname = jQuery('#editable-post-name-full').text();
 	var url	= wpseo_permalink_template.replace('%postname%', postname).replace('http://','');
 
-	var p = new RegExp("(^\|[ \n\r\t.,'\"\+!?-]+)"+focuskw+"($\|[ \n\r\t.,'\"\+!?-]+)",'gim');
+	var p = new RegExp("(^\|[ \n\r\t.,'\"\+!?:-]+)"+focuskw+"($\|[ \n\r\t.,'\"\+!?:-]+)",'gim');
 	var p2 = new RegExp(focuskw.replace(/\s+/g,"[-_\\\//]"),'gim');
 	if (focuskw != '') {
 		var html = '<p>Your focus keyword was found in:<br/>';
@@ -79,7 +81,7 @@ function updateTitle( force ) {
 	if ( force ) 
 		jQuery('#yoast_wpseo_title').val( title );
 
-	title = yst_strip_tags( title );
+	title = yst_clean( title );
 	title = jQuery.trim( title );
 
 	if ( title.length > 70 ) {
@@ -101,12 +103,12 @@ function updateTitle( force ) {
 
 function updateDesc( desc ) {
 	var autogen 	= false;
-	var desc 		= jQuery.trim( yst_strip_tags( jQuery("#yoast_wpseo_metadesc").val() ) );
+	var desc 		= jQuery.trim( yst_clean( jQuery("#yoast_wpseo_metadesc").val() ) );
 	var color 		= '#000';
 
 	if ( desc == '' ) {
 		if ( wpseo_metadesc_template != '' ) {
-			var excerpt = yst_strip_tags( jQuery("#excerpt").val() );
+			var excerpt = yst_clean( jQuery("#excerpt").val() );
 			desc = wpseo_metadesc_template.replace('%%excerpt_only%%', excerpt);
 			desc = desc.replace('%%excerpt%%', excerpt);
 		}
@@ -115,7 +117,7 @@ function updateDesc( desc ) {
 
 		if ( desc == '' ) {
 			desc = jQuery("#content").val();
-			desc = yst_strip_tags( desc );
+			desc = yst_clean( desc );
 			var focuskw = jQuery.trim( jQuery('#yoast_wpseo_focuskw').val() );
 			if ( focuskw != '' ) {
 				var descsearch = new RegExp( focuskw, 'gim');
@@ -175,12 +177,12 @@ function boldKeywords( str, url ) {
 		var keywords	= new Array( focuskw );
 	}
 	for (var i in keywords) {
-		var kw		= yst_strip_tags( keywords[i] );
+		var kw		= yst_clean( keywords[i], true );
 		if ( url ) {
 			var kw 	= kw.replace(' ','-').toLowerCase();
 			kwregex = new RegExp( "([-/])("+kw+")([-/])?" );
 		} else {
-			kwregex = new RegExp( "(^\|[ \n\r\t.,'\"\+!?-]+)("+kw+")($\|[ \n\r\t.,'\"\+!?-]+)", 'gim' );
+			kwregex = new RegExp( "(^\|[ \n\r\t.,'\"\+!?:-]+)("+kw+")($\|[ \n\r\t.,'\"\+!?:-]+)", 'gim' );
 		}
 		str 	= str.replace( kwregex, "$1<strong>$2</strong>$3" );
 	}

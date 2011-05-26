@@ -3,8 +3,8 @@ Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.1
-Tested up to: 3.1
-Stable tag: 0.3.5
+Tested up to: 3.2
+Stable tag: 0.4
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -17,6 +17,7 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 * Taxonomy (tag, category & custom taxonomy) title and meta description support.
 * Google search result snippet previews, let your editors improve your SEO!
 * Focus keyword testing.
+* Full page analysis functionality: see what you need to do to further SEO optimize your post content, page title, headings, images etc.
 * Meta Robots configuration:
 	* Easily add noodp, noydir meta tags.
 	* Easily noindex, or nofollow pages, taxonomies or entire archives.
@@ -25,11 +26,10 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 * Permalink clean ups, while still allowing for, for instance, Google Custom Search.
 * Breadcrumbs support, with configurable breadcrumbs titles.
 * The ultimate XML Sitemaps for your SEO with:
- 	* Images
-	* Configurable removal of post types and taxonomies
+ 	* Images.
 	* Pages or posts that have been noindexed will not show in XML sitemap (but can if you want them too).
-	* Custom post type support.
-* XML News Sitemaps.
+	* Custom post type and custom taxonomy support.
+	* No static files are generated, so no delays when publishing posts.
 * .htaccess and robots.txt editor.
 * Basic import functionality for HeadSpace2 and All in One SEO.
 
@@ -77,8 +77,44 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 3. The WordPress SEO settings for a taxonomy.
 4. The fully configurable XML sitemap for WordPress SEO.
 5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
+6. Example of the Linkdex Page Analysis functionality.
 
 == Changelog ==
+
+= 0.4 =
+
+* Fixes:
+	* XML Sitemaps:
+		* Complete rewrite of the XML Sitemap system, now using a sitemap index file and sitemap files per taxonomy and post type. Way more scaleable and awesome.
+		* Updated the XSL to work with Sitemap Index file too.
+		* Added functionality to remove old style & potential blocking XML sitemaps.
+		* Removed all code that wrote files, as it's no longer needed.
+		* Removed all functionality for updating sitemaps after publish, as it's no longer needed (search engines will still be pinged though).
+	* Breadcrumbs:
+	 	* Support for bbPress (the plugin), breadcrumbs.
+		* Fixed bug with blog URL appearing for non-post post_types.
+		* Fixed bug with post ancestors being in wrong order.
+		* Removed erroneous var_dump.
+	* Bug with title for homepage when using page as homepage.
+	* OpenGraph:
+		* Moved all OpenGraph code to specific OpenGraph class.
+		* Added option to specify and add FB Page and App ID and FB admin ID or ID's.
+	* Linkdex:
+		* Fixed bug in detection of headings with an ID or other attribute.
+	* Several performance optimizations to class includes.
+	* Some fixes in JavaScript keyword detection and keyword bolding in snippet when using colon and semicolons etc in title or meta description.
+	* Tiny CSS fixes so it all looks nice in WordPress 3.2.
+	
+
+* Also:
+	* XML Sitemaps now have their own settings page.
+	* Plugin version is now stored in the options for the plugin to allow easy upgrade.
+	* Added the option to use custom fields in title and description templates. Use `%%cf_&lt;custom-field-name&gt;%%` and it'll be replaced with your custom field. So for instance %%cf_city%% when your custom field is named "city".
+	* Removed some of the tabs and empty lines the plugin was outputting.
+	* Added some filters:
+		* `wpseo_sitemap_urlimages` so you can add images to the sitemap, found in inc/class-sitemaps.php
+		* `wpseo_title` and `wpseo_metadesc` in frontend/class-frontend.php
+		
 
 = 0.3.5 =
 
