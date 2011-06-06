@@ -60,9 +60,6 @@ function wpseo_export_settings( $include_taxonomy ) {
 		if (!is_array($options))
 			continue;
 	    foreach ($options as $key => $elem) { 
-			// Let's not export SEO dir and URL, that might cause havoc when imported elsewhere.
-			if ( in_array($key, array('wpseourl', 'wpseodir') ) )
-				continue;
 	        if( is_array($elem) ) { 
 	            for($i=0;$i<count($elem);$i++)  { 
 	                $content .= $key."[] = \"".$elem[$i]."\"\n"; 
@@ -155,8 +152,9 @@ function wpseo_admin_bar_menu() {
 
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Titles' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-indexation', 'title' => __( 'Indexation' ), 'href' => admin_url('admin.php?page=wpseo_indexation'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-xml', 'title' => __( 'XML Sitemaps' ), 'href' => admin_url('admin.php?page=wpseo_xml'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks' ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-internallinks', 'title' => __( 'Internal Links' ), 'href' => admin_url('admin.php?page=wpseo_internallinks'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-internal-links', 'title' => __( 'Internal Links' ), 'href' => admin_url('admin.php?page=wpseo_internal-links'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-rss', 'title' => __( 'RSS' ), 'href' => admin_url('admin.php?page=wpseo_rss'), ) );	
 	}	
 }

@@ -54,7 +54,7 @@ ul.wpseo-metabox-tabs li {
 	border-width: 1px;
 }
 
-#wpwrap #postsstuff .postbox .inside .wpseo-tab-content {
+#wpseo_meta .postbox .inside .wpseo-tab-content {
 	font-size: 13px !important;
 }
 

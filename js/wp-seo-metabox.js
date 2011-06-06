@@ -177,7 +177,7 @@ function boldKeywords( str, url ) {
 		var keywords	= new Array( focuskw );
 	}
 	for (var i in keywords) {
-		var kw		= yst_clean( keywords[i], true );
+		var kw		= yst_clean( keywords[i] );
 		if ( url ) {
 			var kw 	= kw.replace(' ','-').toLowerCase();
 			kwregex = new RegExp( "([-/])("+kw+")([-/])?" );

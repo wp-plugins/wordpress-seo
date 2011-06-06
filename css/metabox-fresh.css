@@ -8,6 +8,7 @@ ul.wpseo-metabox-tabs li.active {
 
 ul.wpseo-metabox-tabs li.active, div.wpseo-tab-content {
 	border-color: #DFDFDF;
+	background-color: #FFF;
 }
 
 .wpseo-metabox-tabs .active a {

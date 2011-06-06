@@ -119,8 +119,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						$msg .= __(' &amp; WP Super Cache flushed');
 					}
 
-					flush_rewrite_rules();
-					
+					// flush rewrite rules if XML sitemap settings have been updated.
+					if ( isset($_GET['page']) && 'wpseo_xml' == $_GET['page'] )
+						flush_rewrite_rules();
+
 					echo '<div id="message" style="width:94%;" class="message updated"><p><strong>'.$msg.'.</strong></p></div>';
 				}  
 				?>
@@ -999,13 +1001,15 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 		
 		function xml_sitemaps_page() {
-			$options = get_wpseo_options();
-			
 			$this->admin_header('XML Sitemaps', false, true, 'yoast_wpseo_xml_sitemap_options', 'wpseo_xml');
+
+			$options = get_option('wpseo_xml');
+
+			$base = $GLOBALS['wp_rewrite']->using_index_permalinks() ? 'index.php/' : '';
 
 			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
 			$content .= '<div id="sitemapinfo">';
-			$content .= '<p>'.sprintf(__('You can find your XML Sitemap %shere%s'), '<a href="'.home_url('sitemap_index.xml').'">', '</a>').'. You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.</p>';
+			$content .= '<p>'.sprintf(__('You can find your XML Sitemap %shere%s'), '<a href="'.home_url($base.'sitemap_index.xml').'">', '</a>').'. You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.</p>';
 			$content .= '<strong>'.__('General settings').'</strong><br/><br/>';
 			$content .= $this->checkbox('xml_include_images', __("Add images to XML Sitemap."), false);
 			$content .= '<p>'.__('After content publication:').'</p>';

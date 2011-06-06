@@ -71,9 +71,6 @@ class WPSEO_Frontend {
 		if (isset($options['cleanpermalinks']) && $options['cleanpermalinks'])
 			add_action('template_redirect',array(&$this,'clean_permalink'),1);	
 
-		add_filter('robots_txt', array(&$this,'sitemap_output'), 10, 2 ); 
-		add_action('do_robotstxt', array(&$this,'sitemap_header'), 99);		
-		
 		add_filter('the_content_feed', array(&$this, 'embed_rssfooter') );
 		add_filter('the_excerpt_rss', array(&$this, 'embed_rssfooter_excerpt') );	
 		
@@ -299,16 +296,19 @@ class WPSEO_Frontend {
 					$robots['follow'] = 'follow';
 				}
 			} else if ( is_tax() || is_tag() || is_category() ) {
-				$term = $wp_query->get_queried_object();
-				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' ) )
+				if ( ( is_category() 	&& isset( $options['noindexcat'] ) && $options['noindexcat'] ) || 
+					 ( is_tag() 		&& isset( $options['noindextag'] ) && $options['noindextag']) ) {
 					$robots['index'] = 'noindex';
+				} else {
+					$term = $wp_query->get_queried_object();
+					if ( wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' ) )
+						$robots['index'] = 'noindex';					
+				}
 				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'nofollow' ) )
 					$robots['follow'] = 'nofollow';
 			} else if ( 
 				(is_author() 	&& isset($options['noindexauthor']) && $options['noindexauthor']) || 
-				(is_category() 	&& isset($options['noindexcat']) && $options['noindexcat']) || 
 				(is_date() 		&& isset($options['noindexdate']) && $options['noindexdate']) || 
-				(is_tag() 		&& isset($options['noindextag']) && $options['noindextag']) || 
 				(is_home() 		&& isset($options['pagedhome']) && $options['pagedhome'] && get_query_var('paged') > 1) )
 			{
 				$robots['index']  = 'noindex';
@@ -569,7 +569,7 @@ class WPSEO_Frontend {
 	}
 
 	public function clean_permalink( $headers ) {
-		if ( is_robots() )
+		if ( is_robots() || get_query_var('sitemap') )
 			return;
 
 		global $wp_query;
@@ -637,19 +637,7 @@ class WPSEO_Frontend {
 					else
 						$properurl = get_bloginfo('url').'/';
 				}
-			} 
-			
-			add_filter('posts_where', array(&$this, 'filter_where_404') );
-			$posts = query_posts('type=any');
-			remove_filter('posts_where', array(&$this, 'filter_where_404') );
-
-			if ( count($posts) == 1 ) {
-				wp_redirect( get_permalink($posts[0]->ID), 301 );
-				exit;
-			} else {
-				unset( $posts );
-				wp_reset_query();
-			}	
+			}
 		}
 		
 		if ( !empty($properurl) && $wp_query->query_vars['paged'] != 0 && $wp_query->post_count != 0 ) {
@@ -695,14 +683,6 @@ class WPSEO_Frontend {
 			exit;
 		}
 	}
-
-	function filter_where_404($where = '') {
-		global $wp_query;
-		
-		$str = preg_replace("/(.*)[\.-](html|htm|php|asp|aspx)$/","$1",$wp_query->query_vars['name']);
-		$where .= " AND post_name LIKE '".$str."%'";
-		return $where;
-	}
 	
 	function rss_replace_vars($temp) {
 		$postlink = '<a href="'.get_permalink().'">'.get_the_title()."</a>";
@@ -742,38 +722,6 @@ class WPSEO_Frontend {
 			} 
 		}
 		return $content;
-	}
-	
-	function sitemap_output( $robots, $public ) {
-		if ( !get_query_var('wpseo_sitemap') || get_query_var('wpseo_sitemap') == '' )
-			return $robots;
-		
-		$options = get_option('wpseo');
-		
-		if ( !$options['wpseodir'] ) {
-			$robots .= '# Your WP SEO upload dir could not be found.';
-			return $robots;
-		}
-
-		$file = $options['wpseodir'] . get_query_var('wpseo_sitemap') . get_query_var('wpseo_sitemap_gz');
-
-		if ( file_exists( $file ) ) 
-			$robots = file_get_contents( $file );
-		else
-			$robots = '';
-
-		return $robots;
-	}
-	
-	function sitemap_header() {
-		if ( get_query_var('wpseo_sitemap') && get_query_var('wpseo_sitemap') != '' ) {
-			wpseo_dir_setup();
-
-			if ( get_query_var('wpseo_sitemap_gz') )
-				header( 'Content-Type: application/x-gzip; charset='.get_bloginfo('charset') );
-			else
-				header( 'Content-Type: application/xml; charset='.get_bloginfo('charset') );
-		}
 	}
 	
 	function flush_cache() {

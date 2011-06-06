@@ -332,7 +332,7 @@ class WPSEO_Metabox {
 				$ac = '';
 				if ( isset( $meta_box['autocomplete']) && $meta_box['autocomplete'] == 'off' )
 					$ac = 'autocomplete="off" ';
-				$content .= '<input type="text" id="yoast_wpseo_'.$meta_box['name'].'" '.$ac.'name="yoast_wpseo_'.$meta_box['name'].'" value="'.$meta_box_value.'" class="large-text"/><br />';  
+				$content .= '<input type="text" id="yoast_wpseo_'.$meta_box['name'].'" '.$ac.'name="yoast_wpseo_'.$meta_box['name'].'" value="'.esc_attr($meta_box_value).'" class="large-text"/><br />';  
 				break;
 			case "textarea":
 				$rows = 5;
@@ -341,10 +341,10 @@ class WPSEO_Metabox {
 				if (!isset($meta_box['richedit']) || $meta_box['richedit'] == true) {
 					$content .= '<div class="editor_container">';
 					wp_tiny_mce( true, array( "editor_selector" => $meta_box['name'].'_class' ) );
-					$content .= '<textarea class="large-text '.$meta_box['name'].'_class" rows="'.$rows.'" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box_value.'</textarea>';
+					$content .= '<textarea class="large-text '.$meta_box['name'].'_class" rows="'.$rows.'" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.esc_html($meta_box_value).'</textarea>';
 					$content .= '</div>';
 				} else {
-					$content .= '<textarea class="large-text" rows="3" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.$meta_box_value.'</textarea>';
+					$content .= '<textarea class="large-text" rows="3" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'">'.esc_html($meta_box_value).'</textarea>';
 				}
 				break;
 			case "select":
@@ -353,7 +353,7 @@ class WPSEO_Metabox {
 					$selected = '';
 					if ($meta_box_value == $val)
 						$selected = 'selected="selected"';
-					$content .= '<option '.$selected.' value="'.$val.'">'.$option.'</option>';
+					$content .= '<option '.$selected.' value="'.esc_attr($val).'">'.$option.'</option>';
 				}
 				$content .= '</select>';
 				break;
@@ -365,7 +365,7 @@ class WPSEO_Metabox {
 					$selected = '';
 					if (in_array($val, $selectedarr))
 						$selected = 'selected="selected"';
-					$content .= '<option '.$selected.' value="'.$val.'">'.$option.'</option>';
+					$content .= '<option '.$selected.' value="'.esc_attr($val).'">'.$option.'</option>';
 				}
 				$content .= '</select>';
 				break;
@@ -382,7 +382,7 @@ class WPSEO_Metabox {
 					$selected = '';
 					if ($meta_box_value == $val)
 						$selected = 'checked="checked"';
-					$content .= '<input type="radio" '.$selected.' id="yoast_wpseo_'.$meta_box['name'].'_'.$val.'" name="yoast_wpseo_'.$meta_box['name'].'" value="'.$val.'"/> <label for="yoast_wpseo_'.$meta_box['name'].'_'.$val.'">'.$option.'</label> ';
+					$content .= '<input type="radio" '.$selected.' id="yoast_wpseo_'.$meta_box['name'].'_'.$val.'" name="yoast_wpseo_'.$meta_box['name'].'" value="'.esc_attr($val).'"/> <label for="yoast_wpseo_'.$meta_box['name'].'_'.$val.'">'.$option.'</label> ';
 				}
 				break;
 			case "divtext":

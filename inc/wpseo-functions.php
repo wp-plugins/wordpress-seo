@@ -24,7 +24,7 @@ function wpseo_set_value( $meta, $val, $postid ) {
 }
 
 function get_wpseo_options_arr() {
-	$optarr = array('wpseo', 'wpseo_indexation', 'wpseo_permalinks', 'wpseo_titles', 'wpseo_rss', 'wpseo_internallinks', 'wpseo_xml');
+	$optarr = array('wpseo','wpseo_indexation', 'wpseo_permalinks', 'wpseo_titles', 'wpseo_rss', 'wpseo_internallinks', 'wpseo_xml');
 	return apply_filters( 'wpseo_options', $optarr );
 }
 

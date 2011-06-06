@@ -13,20 +13,6 @@ jQuery(document).ready(function () {
 			jQuery("#sitemapinfo").css("display","none");
 		}
 	}).change();
-	jQuery("#enablexmlnewssitemap").change(function() {
-		if (jQuery("#enablexmlnewssitemap").is(':checked')) {
-			jQuery("#newssitemapinfo").css("display","block");
-		} else {
-			jQuery("#newssitemapinfo").css("display","none");
-		}
-	}).change();
-	jQuery("#enablexmlvideositemap").change(function() {
-		if (jQuery("#enablexmlvideositemap").is(':checked')) {
-			jQuery("#videositemapinfo").css("display","block");
-		} else {
-			jQuery("#videositemapinfo").css("display","none");
-		}
-	}).change();
 	jQuery("#cleanpermalinks").change(function() {
 		if (jQuery("#cleanpermalinks").is(':checked')) {
 			jQuery("#cleanpermalinksdiv").css("display","block");

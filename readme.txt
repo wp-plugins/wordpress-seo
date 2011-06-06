@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 0.4.1
+Stable tag: 0.4.2
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -80,6 +80,27 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 6. Example of the Linkdex Page Analysis functionality.
 
 == Changelog ==
+
+= 0.4.2 =
+
+* Fixes:
+	* XML Sitemaps:
+		* Bug in redirection of www to non-www
+		* Removed no longer needed robots_txt code.
+		* Proper flushing of rewrites.
+		* Fix for sites using index.php in permalinks.
+		* Moved XML settings to its own options array, cleaning up the settings. This also allows you to save XML Sitemap settings again.
+		* Sitemaps now contains all the last updated posts (under 1,000) of one post type in one new XML sitemap, so SE only has to crawl one sitemap per post type.
+		* XML Sitemap Index file is now being pushed into cache if a caching plugin is active (by loading it through a cron job).
+		* No longer breaks when `get_post_type_archive` doesn't exist.
+	* Metaboxes / Edit Post:
+		* Proper escaping of attribute values / already filled boxes.
+		* Bug in bolding / keyword recognition JS code.
+		* Background of tab content is now white again.
+	* Taxonomies:
+		* Fixed bug that could prevent noindex from showing up.
+	* Other:
+		* Admin menu works properly again and has XML Sitemaps menu added.
 
 = 0.4.1 =
 
