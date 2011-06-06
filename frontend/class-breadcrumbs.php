@@ -2,7 +2,7 @@
 
 class WPSEO_Breadcrumbs {
 
-	function WPSEO_Breadcrumbs() {
+	function __construct() {
 		$options = get_option("wpseo_internallinks");
 
 		if (isset($options['trytheme']) && $options['trytheme']) {
@@ -19,6 +19,9 @@ class WPSEO_Breadcrumbs {
 			add_action('framework_hook_content_open', array(&$this, 'breadcrumb_output'),10,1);			
 		}
 
+		// If breadcrumbs are active (which they are otherwise this class wouldn't be instantiated), there's no reason
+		// to have bbPress breadcrumbs as well.
+		add_filter( 'bbp_get_breadcrumb', '__return_false' );
 	}
 
 	function breadcrumb_output() {
@@ -104,6 +107,8 @@ class WPSEO_Breadcrumbs {
 	}
 	
 	function breadcrumb($prefix = '', $suffix = '', $display = true) {
+		$options = get_wpseo_options();
+
 		global $wp_query, $post, $paged;
 
 		$opt 		= get_option("wpseo_internallinks");
@@ -113,7 +118,7 @@ class WPSEO_Breadcrumbs {
 		$home		= ( isset($opt['breadcrumbs-home']) && $opt['breadcrumbs-home'] != '' ) ? $opt['breadcrumbs-home'] : __('Home');
 		$selmenu	= ( isset($opt['breadcrumbs-selectedmenu']) && $opt['breadcrumbs-selectedmenu'] != '' ) ? $opt['breadcrumbs-selectedmenu'] : 0;
 		
-		if ($on_front == "page") {
+		if ($on_front == "page" && $post->post_type == 'post') {
 			$homelink = '<a href="'.get_permalink(get_option('page_on_front')).'">'.$home.'</a>';
 			$bloglink = $homelink;
 			if ( $blog_page && ( !isset($opt['breadcrumbs-blog-remove']) || !$opt['breadcrumbs-blog-remove'] ) )
@@ -123,22 +128,21 @@ class WPSEO_Breadcrumbs {
 			$bloglink = $homelink;
 		}
 
-		if ( ( $on_front == "page" && is_front_page() ) || ( $on_front == "posts" && is_home() ) ) {
+ 		if ( ( $on_front == "page" && is_front_page() ) || ( $on_front == "posts" && is_home() ) ) {
 			$output = $this->bold_or_not($home);
 		} else if ( $on_front == "page" && is_home() ) {
 			$output = $homelink.' '.$sep.' '.$this->bold_or_not( $this->get_bc_title($blog_page) );
 		} else if ( is_singular() ) {
 			$output = $bloglink.' '.$sep.' ';
-			
-			if ( function_exists('get_post_type_archive_link') && get_post_type_archive_link( get_post_type() ) ) {
-				$post_type_obj = get_post_type_object( get_post_type() );
-				$output .= '<a href="'.get_post_type_archive_link( get_post_type() ).'">'.$post_type_obj->labels->menu_name.'</a> ' . $sep . ' ';
-			}
-				
+
 			if( isset($opt['breadcrumbs-menus']) && $opt['breadcrumbs-menus'] = 'on'){
 				$use_menu = $this->in_menu( $selmenu );
 			}
-			if( isset( $use_menu ) && $use_menu ){
+			if ( function_exists('bbp_body_class') && count( bbp_body_class( array() ) ) > 1 ) {
+				remove_filter('bbp_get_breadcrumb','__return_false');
+				$output .= bbp_get_breadcrumb( ' '.$sep.' ' );
+				add_filter('bbp_get_breadcrumb','__return_false');
+			} else if( isset( $use_menu ) && $use_menu ){
 				$trail = $this->get_menu_trail();
 				$trail = array_reverse ( $trail );
 				$trailposts = array();
@@ -151,12 +155,25 @@ class WPSEO_Breadcrumbs {
 				}
 				$output .= $this->bold_or_not( $this->get_bc_title( $post->ID ) );
 			} else {
+				
+				$post_type = get_post_type();
+				if ( function_exists('get_post_type_archive_link') && get_post_type_archive_link( $post_type ) ) {
+					if ( isset($options['bctitle-ptarchive-'.$post_type]) && '' != $options['bctitle-ptarchive-'.$post_type] ) {
+						$archive_title = $options['bctitle-ptarchive-'.$post_type];
+					} else {
+						$post_type_obj = get_post_type_object( $post_type );
+						$archive_title = $post_type_obj->labels->menu_name;
+					}
+					$output .= '<a href="'.get_post_type_archive_link( $post_type ).'">'.$archive_title.'</a> ' . $sep . ' ';
+				}
+
 				if ( 0 == $post->post_parent ) {
 					if ( isset( $opt['post_types-'.$post->post_type.'-maintax'] ) && $opt['post_types-'.$post->post_type.'-maintax'] != '0' ) {
 						$main_tax = $opt['post_types-'.$post->post_type.'-maintax'];
 						$terms = wp_get_object_terms( $post->ID, $main_tax );
 						if ( is_taxonomy_hierarchical($main_tax) && $terms[0]->parent != 0 ) {
 							$parents = $this->get_term_parents($terms[0], $main_tax);
+							$parents = array_reverse($parents);
 							foreach($parents as $parent) {
 								$bctitle = wpseo_get_term_meta( $parent, $main_tax, 'bctitle' );
 								if (!$bctitle)
@@ -173,35 +190,24 @@ class WPSEO_Breadcrumbs {
 					}
 					$output .= $this->bold_or_not( $this->get_bc_title( $post->ID ) );
 				} else {
-					if ( 0 == $post->post_parent ) {
-						$output = $homelink." ".$sep." ".$this->bold_or_not( $this->get_bc_title() );
+					if (isset($post->ancestors)) {
+						if (is_array($post->ancestors))
+							$ancestors = array_values($post->ancestors);
+						else 
+							$ancestors = array($post->ancestors);				
 					} else {
-						if (isset($post->ancestors)) {
-							if (is_array($post->ancestors))
-								$ancestors = array_values($post->ancestors);
-							else 
-								$ancestors = array($post->ancestors);				
-						} else {
-							$ancestors = array($post->post_parent);
-						}
-	
-						// Reverse the order so it's oldest to newest
-						$ancestors = array_reverse($ancestors);
-	
-						// Add the current Page to the ancestors list (as we need it's title too)
-						$ancestors[] = $post->ID;
-	
-						$output = $homelink;
-	
-						foreach ( $ancestors as $ancestor ) {
-							$output .= ' '.$sep.' ';
-							if ($ancestor != $post->ID)
-								$output .= '<a href="'.get_permalink($ancestor).'">'.$this->get_bc_title( $ancestor ).'</a>';
-							else
-								$output .= $this->bold_or_not( $this->get_bc_title( $ancestor ) );
-						}
+						$ancestors = array($post->post_parent);
 					}
-				}
+
+					// Reverse the order so it's oldest to newest
+					$ancestors = array_reverse($ancestors);
+
+					foreach ( $ancestors as $ancestor ) {
+						$output .= '<a href="'.get_permalink($ancestor).'">'.$this->get_bc_title( $ancestor ).'</a> '.$sep.' ';
+					}
+
+					$output .= $this->bold_or_not( $this->get_bc_title( $post->ID ) );
+				}					
 			}
 		} else {
 			if (! is_404() ) {
@@ -210,16 +216,42 @@ class WPSEO_Breadcrumbs {
 				$output = $homelink.' '.$sep.' ';
 			}
 			
-			if ( is_post_type_archive() ) {
-				$post_type_obj = get_post_type_object( get_post_type() );
-				$archive_title = $post_type_obj->labels->menu_name;
+			// echo '<pre>'.print_r($wp_query,1).'</pre>';
+			
+			if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
+				$post_type = get_post_type();
+				if ( isset($options['bctitle-ptarchive-'.$post_type]) && '' != $options['bctitle-ptarchive-'.$post_type] ) {
+					$archive_title = $options['bctitle-ptarchive-'.$post_type];
+				} else {
+					$post_type_obj = get_post_type_object( $post_type );
+					$archive_title = $post_type_obj->labels->menu_name;
+				}
 				$output .= $this->bold_or_not( $archive_title );
 			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
-			
+
+				if ( isset($options['taxonomy-'.$term->taxonomy.'-ptparent']) && $options['taxonomy-'.$term->taxonomy.'-ptparent'] != '' ) {
+					$post_type = $options['taxonomy-'.$term->taxonomy.'-ptparent'];
+					if ( 'post' == $post_type && get_option('show_on_front') == 'page' ) {
+						$posts_page = get_option('page_for_posts');
+						if ( $posts_page ) {
+							$output .= '<a href="'.get_permalink( $posts_page ).'">'.$this->get_bc_title( $posts_page ).'</a> '.$sep.' ';
+						}
+					} else {
+						if ( isset($options['bctitle-ptarchive-'.$post_type]) && '' != $options['bctitle-ptarchive-'.$post_type] ) {
+							$archive_title = $options['bctitle-ptarchive-'.$post_type];
+						} else {
+							$post_type_obj = get_post_type_object( $post_type );
+							$archive_title = $post_type_obj->labels->menu_name;
+						}
+						$output .= '<a href="'.get_post_type_archive_link( $post_type ).'">'.$archive_title.'</a> '.$sep.' ';
+					}
+				}
+					
 				if ( is_taxonomy_hierarchical($term->taxonomy) && $term->parent != 0 ) {
 					$parents = $this->get_term_parents($term, $term->taxonomy);
-
+					$parents = array_reverse( $parents );
+					
 					foreach($parents as $parent) {
 						$bctitle = wpseo_get_term_meta( $parent, $term->taxonomy, 'bctitle' );
 						if (!$bctitle)
@@ -235,7 +267,7 @@ class WPSEO_Breadcrumbs {
 				if ($paged)
 					$output .= $this->bold_or_not('<a href="'.get_term_link( $term, $term->taxonomy ).'">'.$bctitle.'</a>');
 				else
-					$output .= $bctitle;
+					$output .= $this->bold_or_not($bctitle);
 			} else if ( is_date() ) { 
 				if ( isset($opt['breadcrumbs-archiveprefix']) )
 					$bc = $opt['breadcrumbs-archiveprefix'];
@@ -263,6 +295,10 @@ class WPSEO_Breadcrumbs {
 				else
 					$bc = __('You searched for');
 				$output .= $this->bold_or_not($bc.' "'.stripslashes(strip_tags(get_search_query())).'"');
+			} elseif ( isset( $wp_query->query_vars['bbp_topic_tag'] ) ) {
+				remove_filter('bbp_get_breadcrumb','__return_false');
+				$output .= bbp_get_breadcrumb( ' '.$sep.' ' );
+				add_filter('bbp_get_breadcrumb','__return_false');
 			} elseif ( is_404() ) {
 				if ( isset($opt['breadcrumbs-404crumb']) && $opt['breadcrumbs-404crumb'] != '' )
 					$crumb404 = $opt['breadcrumbs-404crumb'];

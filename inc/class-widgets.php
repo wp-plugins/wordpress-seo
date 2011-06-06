@@ -16,7 +16,7 @@ class WPSEO_Widgets {
 	}	
 	
 	function load_widgets() {
-		require_once 'class-meta-widget.php';
+		require WPSEO_PATH.'inc/class-meta-widget.php';
 	}
 }
 

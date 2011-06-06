@@ -13,20 +13,6 @@ jQuery(document).ready(function () {
 			jQuery("#sitemapinfo").css("display","none");
 		}
 	}).change();
-	jQuery("#enablexmlnewssitemap").change(function() {
-		if (jQuery("#enablexmlnewssitemap").is(':checked')) {
-			jQuery("#newssitemapinfo").css("display","block");
-		} else {
-			jQuery("#newssitemapinfo").css("display","none");
-		}
-	}).change();
-	jQuery("#enablexmlvideositemap").change(function() {
-		if (jQuery("#enablexmlvideositemap").is(':checked')) {
-			jQuery("#videositemapinfo").css("display","block");
-		} else {
-			jQuery("#videositemapinfo").css("display","none");
-		}
-	}).change();
 	jQuery("#cleanpermalinks").change(function() {
 		if (jQuery("#cleanpermalinks").is(':checked')) {
 			jQuery("#cleanpermalinksdiv").css("display","block");
@@ -48,40 +34,27 @@ function wpseo_exportSettings() {
 	);
 }
 
-function setWPOption( option, newval, hide ) {
+function setWPOption( option, newval, hide, nonce ) {
 	jQuery.post(ajaxurl, { 
 			action: 'wpseo_set_option', 
 			option: option,
-			newval: newval 
-		}, function(data) { 
+			newval: newval,
+			_wpnonce: nonce 
+		}, function(data) {
 			if (data)
 				jQuery('#'+hide).hide();
 		}
 	);
 }
 
-function rebuildSitemap( baseurl, type ) {
-	jQuery('#'+type+'sitemapgeneration').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
-	jQuery.post(ajaxurl, { 
-			action: 'wpseo_generate_sitemap', 
-			type: type, 
-		}, function(data) { 
-			if (data)
-				jQuery('#'+type+'sitemapgeneration').html(data); 
-		}
-	);
-}
-
-function rebuildKml( baseurl ) {
-	jQuery('#kmlgeneration').html('<img src="'+baseurl+'/images/waiting.gif" alt="Waiting" />');
-	jQuery.post(ajaxurl, { 
-			action: 'wpseo_generate_sitemap', 
-			type: 'kml', 
-		}, function(data) { 
-			if (data) {
-				jQuery('#kmlgeneration').html(data); 
-				rebuildSitemap(baseurl, 'geo');
-			}
-		}
-	);
+function wpseo_killBlockingFiles( nonce ) {
+	jQuery.post( ajaxurl, {
+		action: 'wpseo_kill_blocking_files',
+		_ajax_nonce: nonce
+	}, function(data) {
+		if (data == 'success')
+			jQuery('#blocking_files').hide();
+		else
+			jQuery('#block_files').html(data);
+	});
 }

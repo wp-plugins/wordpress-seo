@@ -7,12 +7,12 @@ function wpseo_load_plugins( $path ) {
 	if ($dir) {
 		while (($entry = @readdir($dir)) !== false) {
 			$full_dir_path = $path . "/" . $entry;
-			if(is_readable($full_dir_path) && is_dir($full_dir_path) && in_array($entry, $allowed_plugins)) {
+			if( in_array($entry, $allowed_plugins) && is_readable($full_dir_path) && is_dir($full_dir_path) ) {
 				$module_dir = @opendir( $full_dir_path );
 				if ($module_dir) {
 					while (($module_entry = @readdir($module_dir)) !== false) {
 						if (strrchr($module_entry, '.') === '.php') {
-							require_once $full_dir_path . '/' . $module_entry;
+							require $full_dir_path . '/' . $module_entry;
 						}
 					}
 				}
@@ -60,9 +60,6 @@ function wpseo_export_settings( $include_taxonomy ) {
 		if (!is_array($options))
 			continue;
 	    foreach ($options as $key => $elem) { 
-			// Let's not export SEO dir and URL, that might cause havoc when imported elsewhere.
-			if ( in_array($key, array('wpseourl', 'wpseodir') ) )
-				continue;
 	        if( is_array($elem) ) { 
 	            for($i=0;$i<count($elem);$i++)  { 
 	                $content .= $key."[] = \"".$elem[$i]."\"\n"; 
@@ -131,13 +128,54 @@ function wpseo_admin_bar_menu() {
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-header', 'title' => __( 'Check Headers' ), 'href' => 'http://quixapp.com/headers/?r='.urlencode($url), 'meta' => array('target' => '_blank') ) );
 	}
 
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-settings', 'title' => __( 'SEO Settings' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
-
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Titles' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-indexation', 'title' => __( 'Indexation' ), 'href' => admin_url('admin.php?page=wpseo_indexation'), ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks' ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-internallinks', 'title' => __( 'Internal Links' ), 'href' => admin_url('admin.php?page=wpseo_internallinks'), ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-rss', 'title' => __( 'RSS' ), 'href' => admin_url('admin.php?page=wpseo_rss'), ) );
+	$admin_menu = false;
+	if ( function_exists('is_multisite') && is_multisite() ) {
+		$options = get_site_option('wpseo_ms');
+		if ( is_array( $options ) && isset( $options['access'] ) && $options['access'] == 'superadmin' ) {
+			if ( is_super_admin() )
+				$admin_menu = true;
+			else
+				$admin_menu = false;
+		} else {
+			if ( current_user_can('manage_options') )
+				$admin_menu = true;
+			else
+				$admin_menu = false;
+		}
+	} else {
+		if ( current_user_can('manage_options') )
+			$admin_menu = true;
+	}
 	
+	if ( $admin_menu ) {
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-settings', 'title' => __( 'SEO Settings' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Titles' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-indexation', 'title' => __( 'Indexation' ), 'href' => admin_url('admin.php?page=wpseo_indexation'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-xml', 'title' => __( 'XML Sitemaps' ), 'href' => admin_url('admin.php?page=wpseo_xml'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks' ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-internal-links', 'title' => __( 'Internal Links' ), 'href' => admin_url('admin.php?page=wpseo_internal-links'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-rss', 'title' => __( 'RSS' ), 'href' => admin_url('admin.php?page=wpseo_rss'), ) );	
+	}	
 }
 add_action( 'admin_bar_menu', 'wpseo_admin_bar_menu', 95 );
+
+function wpseo_stopwords_check( $haystack, $checkingUrl = false ) {
+	// TODO: Make it possible to internationalize this
+	$stopWords = array("a","about","above","after","again","against","all","am","an","and","any","are","aren't","as","at","be","because","been","before","being","below","between","both","but","by","can't","cannot","could","couldn't","did","didn't","do","does","doesn't","doing","don't","down","during","each","few","for","from","further","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","he's","her","here","here's","hers","herself","him","himself","his","how","how's","i","i'd","i'll","i'm","i've","if","in","into","is","isn't","it","it's","its","itself","let's","me","more","most","mustn't","my","myself","no","nor","not","of","off","on","once","only","or","other","ought","our","ours "," ourselves","out","over","own","same","shan't","she","she'd","she'll","she's","should","shouldn't","so","some","such","than","that","that's","the","their","theirs","them","themselves","then","there","there's","these","they","they'd","they'll","they're","they've","this","those","through","to","too","under","until","up","very","was","wasn't","we","we'd","we'll","we're","we've","were","weren't","what","what's","when","when's","where","where's","which","while","who","who's","whom","why","why's","with","won't","would","wouldn't","you","you'd","you'll","you're","you've","your","yours","yourself","yourselves");
+	
+	foreach ( $stopWords as $stopWord ) {
+		// If checking a URL remove the single quotes
+		if ( $checkingUrl )
+			$stopWord = str_replace( "'", "", $stopWord );
+
+		// Check whether the stopword appears as a whole word
+		$res = preg_match( "/\b".$stopWord."\b/i", $haystack, $match );
+		if ( $res > 0 )
+			return $stopWord;
+	}
+	
+	return false;
+}
+
+

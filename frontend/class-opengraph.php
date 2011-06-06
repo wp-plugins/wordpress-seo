@@ -6,6 +6,11 @@ class WPSEO_OpenGraph {
 		$options = get_wpseo_options();
 
 		add_action( 'wpseo_head', array(&$this, 'opengraph') );
+
+		$options = get_wpseo_options();
+
+		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
+			add_filter('language_attributes', array(&$this, 'add_opengraph_namespace'));
 	}
 
 	public function opengraph() {
@@ -13,7 +18,9 @@ class WPSEO_OpenGraph {
 
 		global $wp_query, $paged;
 		
-		echo "\n";
+		wp_reset_query();
+		
+		$this->id();
 		$this->title();
 		$this->description();
 		$this->url();
@@ -21,7 +28,22 @@ class WPSEO_OpenGraph {
 		$this->type();
 		$this->image();
 		do_action('wpseo_opengraph');
-		echo "\n";
+	}
+
+	public function add_opengraph_namespace( $output ) {
+		return $output . ' xmlns:og="http://opengraphprotocol.org/schema/"';
+	}
+	
+	public function id() {
+		$options = get_wpseo_options();
+		if ( isset($options['fb_adminid']) && trim($options['fb_adminid']) != '' )
+			echo "<meta property='fb:admins' content='".esc_attr( strip_tags( stripslashes( $options['fb_adminid'] ) ) )."'/>\n";
+
+		if ( isset($options['fb_pageid']) && trim($options['fb_pageid']) != '' )
+			echo "<meta property='fb:page_id' content='".esc_attr( strip_tags( stripslashes( $options['fb_pageid'] ) ) )."'/>\n";
+
+		if ( isset($options['fb_appid']) && trim($options['fb_appid']) != '' )
+			echo "<meta property='fb:app_id' content='".esc_attr( strip_tags( stripslashes( $options['fb_appid'] ) ) )."'/>\n";
 	}
 	
 	private function title( ) {
@@ -92,34 +114,40 @@ class WPSEO_OpenGraph {
 				$title = __('Search for "').get_search_query().'"';
 		} else if ( is_author() ) {
 			$author_id = get_query_var('author');
-			$title = get_the_author_meta('title', $author_id);
+			$title = get_the_author_meta('wpseo_title', $author_id);
 			if ( empty($title) ) {
 				if ( isset($options['title-author']) && !empty($options['title-author']) )
 					$title = wpseo_replace_vars($options['title-author'], array() );
 				else
 					$title = get_the_author_meta('display_name', $author_id); 
 			}
+		} else if ( is_post_type_archive() ) {
+			$post_type = get_post_type();
+			if ( isset($options['title-ptarchive-'.$post_type]) && '' != $options['title-ptarchive-'.$post_type] ) {
+				return $options['title-ptarchive-'.$post_type];
+			} else {
+				$post_type_obj = get_post_type_object( $post_type );
+				$title = $post_type_obj->labels->menu_name;
+			}
 		} else if ( is_archive() ) {
 		 	if ( isset($options['title-archive']) && !empty($options['title-archive']) )
 				$title = wpseo_replace_vars($options['title-archive'], array('post_title' => $title) );
-			else {
-				if ( is_month() )
-					$title = single_month_title(' ', false).' '.__('Archives'); 
-				else if ( is_year() )
-					$title = get_query_var('year').' '.__('Archives'); 
-			}
+			else if ( is_month() ) 
+				$title = single_month_title(' ', false).' '.__('Archives'); 
+			else if ( is_year() )
+				$title = get_query_var('year').' '.__('Archives'); 
 		} else if ( is_404() ) {
 		 	if ( isset($options['title-404']) && !empty($options['title-404']) )
 				$title = wpseo_replace_vars($options['title-404'], array('post_title' => $title) );
 			else
 				$title = __('Page not found');
 		} 
-		echo "\t<meta property='og:title' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
+		echo "<meta property='og:title' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
 	}
 		
 	public function url() {
 		$url = WPSEO_Frontend::canonical( false );
-		echo "\t<meta property='og:url' content='".esc_attr( $url )."'/>\n";
+		echo "<meta property='og:url' content='".esc_attr( $url )."'/>\n";
 	}
 	
 	public function type() {
@@ -130,33 +158,35 @@ class WPSEO_OpenGraph {
 		} else {
 			$type = 'website';
 		}
-		echo "\t<meta property='og:type' content='".esc_attr( $type )."'/>\n";
+		echo "<meta property='og:type' content='".esc_attr( $type )."'/>\n";
 	}
 		
 	public function image( $image = '' ) {
 		global $post;
 		// Grab the featured image
-		if ( is_singular() && empty( $image ) && function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
-			$thumbnail = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'post-thumbnail' );
-			if ( $thumbnail )
-				$image = $thumbnail[0];
-		// If that's not there, grab the first attached image
-		} else {
-			$files = get_children( 
-						array( 
-						'post_parent' => $post->ID,
-						'post_type' => 'attachment',
-						'post_mime_type' => 'image',
-						) 
-					);
-		    if ( $files ) {
-		        $keys = array_reverse( array_keys( $files ) );
-		        $image = image_downsize( $keys[0], 'thumbnail' );
-		        $image = $image[0];
-		    }
-		}
+		if ( is_singular() ) {
+			if ( empty( $image ) && function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
+				$thumbnail = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'post-thumbnail' );
+				if ( $thumbnail )
+					$image = $thumbnail[0];
+			// If that's not there, grab the first attached image
+			} else {
+				$files = get_children( 
+							array( 
+							'post_parent' => $post->ID,
+							'post_type' => 'attachment',
+							'post_mime_type' => 'image',
+							) 
+						);
+			    if ( $files ) {
+			        $keys = array_reverse( array_keys( $files ) );
+			        $image = image_downsize( $keys[0], 'thumbnail' );
+			        $image = $image[0];
+			    }
+			}	
+		} 
 		if ( $image != '' )
-			echo "\t<meta property='og:image' content='".esc_attr( $image )."'/>\n";
+			echo "<meta property='og:image' content='".esc_attr( $image )."'/>\n";
 	}
 		
 	public function description() {
@@ -166,11 +196,11 @@ class WPSEO_OpenGraph {
 			$desc = WPSEO_Frontend::metadesc( false );
 
 		if ( $desc && $desc != '' )
-			echo "\t<meta property='og:description' content='".esc_attr( $desc )."'/>\n";
+			echo "<meta property='og:description' content='".esc_attr( $desc )."'/>\n";
 	}
 
 	public function site_name() {
-		echo "\t<meta property='og:site_name' content='".esc_attr( get_bloginfo('name') )."'/>\n";
+		echo "<meta property='og:site_name' content='".esc_attr( get_bloginfo('name') )."'/>\n";
 	}
 }
 

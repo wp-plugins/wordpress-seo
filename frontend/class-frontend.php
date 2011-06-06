@@ -2,13 +2,13 @@
 
 class WPSEO_Frontend {
 
-	function WPSEO_Frontend() {
+	function __construct() {
+		
+		wp_reset_query();
+		
 		$options = get_wpseo_options();
 
-		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
-			add_filter('language_attributes', array(&$this, 'add_opengraph_namespace'));
-
-		add_action('wp_head', array(&$this, 'head'), 10, 1);
+		add_action('wp_head', array(&$this, 'head'), 1, 1);
 		remove_action('wp_head', 'rel_canonical');
 
 		add_filter( 'wp_title', array(&$this, 'title'), 10, 3);
@@ -71,9 +71,6 @@ class WPSEO_Frontend {
 		if (isset($options['cleanpermalinks']) && $options['cleanpermalinks'])
 			add_action('template_redirect',array(&$this,'clean_permalink'),1);	
 
-		add_filter('robots_txt', array(&$this,'sitemap_output'), 10, 2 ); 
-		add_action('do_robotstxt', array(&$this,'sitemap_header'), 99);		
-		
 		add_filter('the_content_feed', array(&$this, 'embed_rssfooter') );
 		add_filter('the_excerpt_rss', array(&$this, 'embed_rssfooter_excerpt') );	
 		
@@ -88,14 +85,19 @@ class WPSEO_Frontend {
 			$sep = '-';
 		$sep = ' '.$sep.' ';
 		
-		global $post, $wp_query;
-		if ( empty($post) && is_singular() ) {
-			$post = $wp_query->get_queried_object();
-		}
+		global $wp_query;
 
+		if ( is_feed() )
+			return $title;
+			
 		$options = get_wpseo_options();
 
-		if ( is_home() && 'posts' == get_option('show_on_front') ) {
+		if ( is_front_page() && 'posts' != get_option('show_on_front') ) {
+			global $post;
+			$title = wpseo_get_value( 'title', $post->ID );
+			if ( '' == $title )
+				$title = $post->post_title.$sep.get_bloginfo('name');
+		} else if ( is_home() && 'posts' == get_option('show_on_front') ) {
 			if ( isset($options['title-home']) && $options['title-home'] != '' )
 				$title = wpseo_replace_vars( $options['title-home'], array() );
 			else {
@@ -105,17 +107,13 @@ class WPSEO_Frontend {
 				$title .= $sep.get_bloginfo('description');
 			}
 		} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
-			// For some reason, in some instances is_home returns true for the front page when page_for_posts is not set.
-			if ( get_option('page_for_posts') == 0 )
-				$post = get_post( get_option( 'page_on_front') );
-			else
-				$post = get_post( get_option( 'page_for_posts' ) );
-			$fixed_title = wpseo_get_value('title');
+			$blogpage = get_post( get_option( 'page_for_posts' ) );
+			$fixed_title = wpseo_get_value( 'title', $blogpage->ID );
 			if ( $fixed_title ) { 
-				$title = $fixed_title; 
+				$title = wpseo_replace_vars( $fixed_title, (array) $blogpage ); 
 			} else {
-				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
-					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
+				if (isset($options['title-'.$blogpage->post_type]) && !empty($options['title-'.$blogpage->post_type]) )
+					$title = wpseo_replace_vars($options['title-'.$blogpage->post_type], (array) $blogpage );
 				else {
 					$title = get_bloginfo('name');
 					if ( $wp_query->query_vars['paged'] )
@@ -124,6 +122,10 @@ class WPSEO_Frontend {
 				}
 			}
 		} else if ( is_singular() ) {
+			global $post;
+			if ( empty($post) ) {
+				$post = $wp_query->get_queried_object();
+			}
 			$fixed_title = wpseo_get_value('title');
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
@@ -134,6 +136,16 @@ class WPSEO_Frontend {
 					$title = apply_filters('single_post_title', $title);
 					$title = $title.$sep.get_bloginfo('name'); 
 				}
+			}
+		} else if ( is_search() ) {
+			if ( isset($options['title-search']) && !empty($options['title-search']) )
+				$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );	
+			else {
+				$title = __('Search for "').get_search_query().'"';
+				
+				if ( isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'] )
+					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
+				$title .= $sep.get_bloginfo('name'); 	
 			}
 		} else if ( is_category() || is_tag() || is_tax() ) {
 			$term = $wp_query->get_queried_object();
@@ -160,19 +172,9 @@ class WPSEO_Frontend {
 					$title .= $sep.get_bloginfo('name'); 
 				}
 			}
-		} else if ( is_search() ) {
-			if ( isset($options['title-search']) && !empty($options['title-search']) )
-				$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );	
-			else {
-				$title = __('Search for "').get_search_query().'"';
-				
-				if ( isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'] )
-					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
-				$title .= $sep.get_bloginfo('name'); 	
-			}
 		} else if ( is_author() ) {
 			$author_id = get_query_var('author');
-			$title = get_the_author_meta('title', $author_id);
+			$title = get_the_author_meta('wpseo_title', $author_id);
 			if ( empty($title) ) {
 				if ( isset($options['title-author']) && !empty($options['title-author']) )
 					$title = wpseo_replace_vars($options['title-author'], array() );
@@ -183,6 +185,14 @@ class WPSEO_Frontend {
 						$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
 					$title .= $sep.get_bloginfo('name'); 		
 				}
+			}
+		} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
+			$post_type = get_post_type();
+			if ( isset($options['title-ptarchive-'.$post_type]) && '' != $options['title-ptarchive-'.$post_type] ) {
+				$title = $options['title-ptarchive-'.$post_type];
+			} else {
+				$post_type_obj = get_post_type_object( $post_type );
+				$title = $post_type_obj->labels->menu_name.$sep.get_bloginfo('name');
 			}
 		} else if ( is_archive() ) {
 		 	if ( isset($options['title-archive']) && !empty($options['title-archive']) )
@@ -203,7 +213,7 @@ class WPSEO_Frontend {
 			else
 				$title = __('Page not found').$sep.get_bloginfo('name');
 		} 
-		return esc_html( strip_tags( stripslashes( $title ) ) );
+		return esc_html( strip_tags( stripslashes( apply_filters( 'wpseo_title', $title ) ) ) );
 	}
 	
 	function force_wp_title() {
@@ -219,7 +229,7 @@ class WPSEO_Frontend {
 
 		global $wp_query;
 		
-		echo "\n\t<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
+		echo "\n<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
@@ -232,7 +242,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $google_meta, $match);
 					$google_meta = $match[1];
 				}
-				echo "\t<meta name='google-site-verification' content='$google_meta' />\n";
+				echo "<meta name='google-site-verification' content='$google_meta' />\n";
 			}
 			if (!empty($options['yahooverify'])) {
 				$yahoo_meta = $options['yahooverify'];
@@ -240,7 +250,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $yahoo_meta, $match);
 					$yahoo_meta = $match[1];
 				}				
-				echo "\t<meta name='y_key' content='$yahoo_meta' />\n";
+				echo "<meta name='y_key' content='$yahoo_meta' />\n";
 			}
 				
 			if (!empty($options['msverify'])) {
@@ -249,14 +259,14 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $bing_meta, $match);
 					$bing_meta = $match[1];
 				}								
-				echo "\t<meta name='msvalidate.01' content='$bing_meta' />\n";
+				echo "<meta name='msvalidate.01' content='$bing_meta' />\n";
 			}
 				
 		}
 
 		do_action( 'wpseo_head' );
 		
-		echo "\t<!-- / Yoast WordPress SEO plugin. -->\n\n";
+		echo "<!-- / Yoast WordPress SEO plugin. -->\n\n";
 	}
 
 	function robots() {
@@ -269,7 +279,7 @@ class WPSEO_Frontend {
 		$robots['follow'] 	= 'follow';
 		$robots['other'] 	= array();
 		
-		if (is_singular()) {
+		if ( is_singular() ) {
 			if ( wpseo_get_value('meta-robots-noindex') )
 				$robots['index'] = 'noindex';
 			if ( wpseo_get_value('meta-robots-nofollow') )
@@ -280,21 +290,32 @@ class WPSEO_Frontend {
 				}
 			}
 		} else {
-			if ( is_tax() || is_tag() || is_category() ) {
-				$term = $wp_query->get_queried_object();
-				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' ) )
+			if ( is_search() ) {
+				if ( isset( $options['search'] ) && $options['search'] ) {
+					$robots['index']  = 'noindex';
+					$robots['follow'] = 'follow';
+				}
+			} else if ( is_tax() || is_tag() || is_category() ) {
+				if ( ( is_category() 	&& isset( $options['noindexcat'] ) && $options['noindexcat'] ) || 
+					 ( is_tag() 		&& isset( $options['noindextag'] ) && $options['noindextag']) ) {
 					$robots['index'] = 'noindex';
+				} else {
+					$term = $wp_query->get_queried_object();
+					if ( wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' ) )
+						$robots['index'] = 'noindex';					
+				}
 				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'nofollow' ) )
 					$robots['follow'] = 'nofollow';
-			}
-			if ( 
+			} else if ( 
 				(is_author() 	&& isset($options['noindexauthor']) && $options['noindexauthor']) || 
-				(is_category() 	&& isset($options['noindexcat']) && $options['noindexcat']) || 
 				(is_date() 		&& isset($options['noindexdate']) && $options['noindexdate']) || 
-				(is_tag() 		&& isset($options['noindextag']) && $options['noindextag']) || 
-				(is_search() 	&& isset($options['search']) && $options['search']) || 
 				(is_home() 		&& isset($options['pagedhome']) && $options['pagedhome'] && get_query_var('paged') > 1) )
 			{
+				$robots['index']  = 'noindex';
+				$robots['follow'] = 'follow';
+			}
+
+			if ( $wp_query->query_vars['paged'] && $wp_query->query_vars['paged'] > 1 && isset($options['noindexsubpages']) && $options['noindexsubpages'] ) {
 				$robots['index']  = 'noindex';
 				$robots['follow'] = 'follow';
 			}
@@ -316,7 +337,7 @@ class WPSEO_Frontend {
 		$robotsstr = preg_replace( '/^index,follow,?/', '', $robotsstr );
 		
 		if ($robotsstr != '') {
-			echo "\t<meta name='robots' content='".$robotsstr."'/>\n";
+			echo "<meta name='robots' content='".$robotsstr."'/>\n";
 		}
 	}
 	
@@ -337,10 +358,12 @@ class WPSEO_Frontend {
 				if ( $page && $page != 1 ) {
 					// If below doesn't return true, there actually aren't that much pages in the post.
 					if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
-						$canonical = user_trailingslashit( trailingslashit($properurl) . get_query_var('page') );
+						$canonical = user_trailingslashit( trailingslashit($canonical) . get_query_var('page') );
 				}
 			} else {
-				if ( is_front_page() ) {
+				if ( is_search() ) {
+					$canonical = '';
+				} else if ( is_front_page() ) {
 					$canonical = get_bloginfo('url').'/';
 				} else if ( is_home() && get_option('show_on_front') == "page" ) {
 					$canonical = get_permalink( get_option( 'page_for_posts' ) );
@@ -350,6 +373,9 @@ class WPSEO_Frontend {
 					$canonical = wpseo_get_term_meta( $term, $term->taxonomy, 'canonical' );
 					if ( !$canonical )
 						$canonical = get_term_link( $term, $term->taxonomy );
+				} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
+					if ( function_exists('get_post_type_archive_link') )
+						$canonical = get_post_type_archive_link( get_post_type() );
 				} else if ( is_archive() ) {
 					if ( is_date() ) {
 						if ( is_day() ) {
@@ -370,10 +396,16 @@ class WPSEO_Frontend {
 		
 		if ( isset($options['force_transport']) && $options['force_transport'] != 'default' )
 			$canonical = preg_replace( '/https?/', $options['force_transport'], $canonical );
-			
-		if ( !empty($canonical) ) {
-			if ( $echo )
-				echo "\t".'<link rel="canonical" href="'.$canonical.'" />'."\n";
+
+		// Allow filtering everywhere.
+		if ( empty($canonical) )
+			$canonical = '';
+
+		$canonical = apply_filters( 'wpseo_canonical', $canonical );
+		
+		if ( !empty($canonical) && !is_wp_error($canonical) ) {
+			if ( $echo ) 
+				echo '<link rel="canonical" href="'.$canonical.'" />'."\n";
 			else
 				return $canonical;
 		}
@@ -419,7 +451,7 @@ class WPSEO_Frontend {
 
 		$metakey = trim( $metakey );
 		if ( !empty( $metakey ) ) 
-			echo "\t<meta name='keywords' content='".esc_attr( strip_tags( stripslashes( $metakey ) ) )."'/>\n";
+			echo "<meta name='keywords' content='".esc_attr( strip_tags( stripslashes( $metakey ) ) )."'/>\n";
 
 	}
 	
@@ -438,7 +470,9 @@ class WPSEO_Frontend {
 					$metadesc = wpseo_replace_vars($options['metadesc-'.$post->post_type], (array) $post );
 			}
 		} else {
-			if ( is_home() && 'posts' == get_option('show_on_front') && isset($options['metadesc-home']) ) {
+			if ( is_search() ) {
+				$metadesc = '';
+			} else if  ( is_home() && 'posts' == get_option('show_on_front') && isset($options['metadesc-home']) ) {
 				$metadesc = wpseo_replace_vars($options['metadesc-home'], array() );
 			} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
 				$post = get_post( get_option('page_for_posts') );
@@ -453,18 +487,24 @@ class WPSEO_Frontend {
 					$metadesc = wpseo_replace_vars($options['metadesc-'.$term->taxonomy], (array) $term );
 			} else if ( is_author() ) {
 				$author_id = get_query_var('author');
-				$metadesc = get_the_author_meta('metadesc', $author_id);
+				$metadesc = get_the_author_meta('wpseo_metadesc', $author_id);
 				if ( !$metadesc && isset($options['metadesc-author']))
 					$metadesc = wpseo_replace_vars($options['metadesc-author'], (array) $wp_query->get_queried_object() );
-			} 
+			} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
+				$post_type = get_post_type();
+				if ( isset($options['metadesc-ptarchive-'.$post_type]) && '' != $options['metadesc-ptarchive-'.$post_type] ) {
+					$metadesc = $options['metadesc-ptarchive-'.$post_type];
+				} 
+			}
 		}
 	
-		$metadesc = trim( $metadesc );
+		$metadesc = apply_filters( 'wpseo_metadesc', trim( $metadesc ) );
+		
 		if ( $echo ) {
 			if ( !empty( $metadesc ) )
-				echo "\t<meta name='description' content='".esc_attr( strip_tags( stripslashes( $metadesc ) ) )."'/>\n";
+				echo "<meta name='description' content='".esc_attr( strip_tags( stripslashes( $metadesc ) ) )."'/>\n";
 			else if ( current_user_can('manage_options') && is_singular() )
-				echo "\t".'<!-- Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template. -->'."\n";			
+				echo '<!-- Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template. -->'."\n";			
 		} else {
 			return $metadesc;
 		}
@@ -472,19 +512,21 @@ class WPSEO_Frontend {
 	}
 
 	function page_redirect( $input ) {
-		global $post;
-		if ( !isset($post) )
-			return;
-		$redir = wpseo_get_value('redirect', $post->ID);
-		if (!empty($redir)) {
-			wp_redirect($redir, 301);
-			exit;
+		if ( is_singular() ) {
+			global $post;
+			if ( !isset($post) )
+				return;
+			$redir = wpseo_get_value('redirect', $post->ID);
+			if (!empty($redir)) {
+				wp_redirect($redir, 301);
+				exit;
+			}
 		}
 	}
 	
 	function noindex_page() {
-		echo "\t<!-- This site is optimized with the Yoast WordPress SEO plugin. -->\n";
-		echo "\t".'<meta name="robots" content="noindex" />'."\n";
+		echo "<!-- This site is optimized with the Yoast WordPress SEO plugin. -->\n";
+		echo '<meta name="robots" content="noindex" />'."\n";
 	}
 
 	function noindex_feed() {
@@ -502,7 +544,7 @@ class WPSEO_Frontend {
 	function archive_redirect() {
 		global $wp_query;
 		$options  = get_wpseo_options();
-		if ( ($options['disabledate'] && $wp_query->is_date) || ($options['disableauthor'] && $wp_query->is_author) ) {
+		if ( (isset($options['disabledate']) && $options['disabledate'] && $wp_query->is_date) || (isset($options['disableauthor']) && $options['disableauthor'] && $wp_query->is_author) ) {
 			wp_redirect(get_bloginfo('url'),301);
 			exit;
 		}
@@ -526,8 +568,8 @@ class WPSEO_Frontend {
 		}
 	}
 
-	function clean_permalink( $headers ) {
-		if ( is_robots() )
+	public function clean_permalink( $headers ) {
+		if ( is_robots() || get_query_var('sitemap') )
 			return;
 
 		global $wp_query;
@@ -548,20 +590,30 @@ class WPSEO_Frontend {
 		$properurl = '';
 		
 		if ( is_singular() ) {
-			$properurl = get_permalink($wp_query->post->ID);
+			global $post;
+			if ( empty($post) )
+				$post = $wp_query->get_queried_object();
+
+			$properurl = get_permalink($post->ID);
 			
-			// Fixed paginated pages
 			$page = get_query_var('page');
 			if ( $page && $page != 1 ) {
-				// If below doesn't return true, there actually aren't that much pages in the post.
-				if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
-					$properurl = user_trailingslashit( trailingslashit($properurl) . get_query_var('page') );
+				$post = get_post($post->ID);
+				$page_count = substr_count($post->post_content, '<!--nextpage-->');
+				if ( $page > ($page_count+1) )
+					$properurl = user_trailingslashit( trailingslashit( $properurl ) . ( $page_count + 1 ) );
+				else
+					$properurl = user_trailingslashit( trailingslashit( $properurl ) . $page );
 			}
 				
 			// Fix reply to comment links, whoever decided this should be a GET variable?
 			$result = preg_match('/(\?replytocom=[^&]+)/', $_SERVER["REQUEST_URI"], $matches);
 			if ( $result )
 				$properurl .= str_replace('?replytocom=','#comment-',$matches[0]);
+
+			// Prevent cleaning out posts & page previews for people capable of viewing them
+			if ( isset($_GET['preview']) && isset($_GET['preview_nonce']) && current_user_can('edit_post') )
+				$properurl = '';
 		} else if ( is_front_page() ) {
 			if ( 'posts' == get_option('show_on_front') && is_home() ) {
 				$properurl = get_bloginfo('url').'/';
@@ -570,7 +622,10 @@ class WPSEO_Frontend {
 			}
 		} else if ( is_category() || is_tag() || is_tax() ) {
 			$term = $wp_query->get_queried_object();
-			$properurl = get_term_link( $term, $term->taxonomy );
+			if ( is_feed() )
+				$properurl = get_term_feed_link( $term, $term->taxonomy );
+			else
+				$properurl = get_term_link( $term, $term->taxonomy );
 		} else if ( is_search() ) {
 			$s = preg_replace( '/(%20|\+)/', ' ', get_search_query() );
 			$properurl = get_bloginfo('url').'/?s=' . rawurlencode( $s );
@@ -582,19 +637,7 @@ class WPSEO_Frontend {
 					else
 						$properurl = get_bloginfo('url').'/';
 				}
-			} 
-			
-			add_filter('posts_where', array(&$this, 'filter_where_404') );
-			$posts = query_posts('type=any');
-			remove_filter('posts_where', array(&$this, 'filter_where_404') );
-
-			if ( count($posts) == 1 ) {
-				wp_redirect( get_permalink($posts[0]->ID), 301 );
-				exit;
-			} else {
-				unset( $posts );
-				wp_reset_query();
-			}	
+			}
 		}
 		
 		if ( !empty($properurl) && $wp_query->query_vars['paged'] != 0 && $wp_query->post_count != 0 ) {
@@ -640,14 +683,6 @@ class WPSEO_Frontend {
 			exit;
 		}
 	}
-
-	function filter_where_404($where = '') {
-		global $wp_query;
-		
-		$str = preg_replace("/(.*)[\.-](html|htm|php|asp|aspx)$/","$1",$wp_query->query_vars['name']);
-		$where .= " AND post_name LIKE '".$str."%'";
-		return $where;
-	}
 	
 	function rss_replace_vars($temp) {
 		$postlink = '<a href="'.get_permalink().'">'.get_the_title()."</a>";
@@ -689,38 +724,6 @@ class WPSEO_Frontend {
 		return $content;
 	}
 	
-	function sitemap_output( $robots, $public ) {
-		if ( !get_query_var('wpseo_sitemap') )
-			return $robots;
-		
-		$options = get_option('wpseo');
-		
-		if ( !$options['wpseodir'] ) {
-			$robots .= '# Your WP SEO upload dir could not be found.';
-			return $robots;
-		}
-
-		$file = $options['wpseodir'] . get_query_var('wpseo_sitemap') . get_query_var('wpseo_sitemap_gz');
-
-		if ( file_exists( $file ) ) 
-			$robots = file_get_contents( $file );
-		else
-			$robots = '';
-
-		return $robots;
-	}
-	
-	function sitemap_header() {
-		if ( get_query_var('wpseo_sitemap') ) {
-			wpseo_dir_setup();
-
-			if ( get_query_var('wpseo_sitemap_gz') )
-				header( 'Content-Type: application/x-gzip; charset='.get_bloginfo('charset') );
-			else
-				header( 'Content-Type: application/xml; charset='.get_bloginfo('charset') );
-		}
-	}
-	
 	function flush_cache() {
 		global $wp_query, $post, $wpseo_ob;
 
@@ -739,10 +742,6 @@ class WPSEO_Frontend {
 		global $wpseo_ob;
 		$wpseo_ob = true;
 		ob_start();
-	}
-
-	function add_opengraph_namespace( $output ) {
-		return $output . ' xmlns:og="http://opengraphprotocol.org/schema/"';
 	}
 }
 
