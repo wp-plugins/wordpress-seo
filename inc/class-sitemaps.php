@@ -26,6 +26,7 @@ class WPSEO_Sitemaps {
 		add_filter( 'redirect_canonical', array( $this, 'canonical' ) );
 		add_action( 'transition_post_status', array( $this, 'status_transition' ), 10, 3 );
 		add_action( 'admin_init', array( $this, 'delete_sitemaps' ) );
+		add_action( 'wpseo_hit_sitemap_index', array( $this, 'hit_sitemap_index' ) );
 
 		// default stylesheet
 		$this->stylesheet = '<?xml-stylesheet type="text/xsl" href="'.WPSEO_FRONT_URL.'css/xml-sitemap.xsl"?>';
@@ -502,8 +503,20 @@ class WPSEO_Sitemaps {
 		if ( isset($options['post_types-'.$post->post_type.'-not_in_sitemap']) && $options['post_types-'.$post->post_type.'-not_in_sitemap'] )
 			return;
 
+		if ( WP_CACHE )
+			wp_schedule_single_event( time(), 'wpseo_hit_sitemap_index' );
+
 		if ( wpseo_get_value( 'sitemap-include', $post->ID ) != 'never' )
 			$this->ping_search_engines();
+	}
+
+	/**
+	 * Make a request for the sitemap index so as to cache it before the arrival of the search engines.
+	 */
+	function hit_sitemap_index() {
+		$base = $GLOBALS['wp_rewrite']->using_index_permalinks() ? 'index.php/' : '';
+		$url = home_url( $base . 'sitemap_index.xml' );
+		wp_remote_get( $url );
 	}
 
 	/**
