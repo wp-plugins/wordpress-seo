@@ -308,8 +308,14 @@ class WPSEO_Sitemaps {
 							// FIXME: get true caption instead of alt / title
 							if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
 								$src = $match[2];
-								if ( strpos($src, 'http') !== 0 )
+								if ( strpos($src, 'http') !== 0 ) {
+									if ( $src[0] != '/' )
+										continue;
 									$src = get_bloginfo('url') . $src;
+								}
+
+								if ( $src != esc_url( $src ) )
+									continue;
 
 								if ( isset( $url['images'][$src] ) )
 									continue;
