@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 0.4.3
+Stable tag: 1.0
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -31,7 +31,10 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Custom post type and custom taxonomy support.
 	* No static files are generated, so no delays when publishing posts.
 * .htaccess and robots.txt editor.
+* Import and export functionality: save your default SEO settings and import them on every (new) site!
 * Basic import functionality for HeadSpace2 and All in One SEO.
+
+Be sure to also check out the [News SEO module](http://yoast.com/wordpress/seo/news-seo/) if you need Google News Sitemaps!
 
 == Installation ==
 
@@ -62,6 +65,10 @@ There are two possible issues with a meta description:
 
 Disable the clean permalinks feature on the SEO -> Permalinks settings page.
 
+= Does your plugin allow for Google News Sitemaps too? =
+
+It does! You'll need an add-on module for that though, which you can download from the [News SEO](http://yoast.com/wordpress/seo/news-seo/) module homepage!
+
 = Why is WordPress SEO better than All In One SEO Pack? =
 
 It's not a secret that the author of this plugin, Joost de Valk, aka Yoast, doesn't really like All In One SEO Pack. The main reason is that All in One SEO pack has a default option for auto generating meta descriptions that is actually making it harder for people to rank well in a lot of cases, giving them a false sense of security.
@@ -80,6 +87,12 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 6. Example of the Linkdex Page Analysis functionality.
 
 == Changelog ==
+
+= 1.0 =
+
+* I now dare call this plugin STABLE. This doesn't mean there are no more bugs, it does mean that I think it won't break sites anymore.
+* Fixed the import/export settings functionality.
+* Updated the snippet preview to Google's new snippet design.
 
 = 0.4.3 =
 
