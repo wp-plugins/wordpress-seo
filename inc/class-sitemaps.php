@@ -557,9 +557,11 @@ class WPSEO_Sitemaps {
 		$options = get_option( 'wpseo' );
 		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
 			$file = ABSPATH . 'sitemap_index.xml';
-			if ( ( ! isset($options['blocking_files']) || ! in_array( $file, $options['blocking_files'] ) ) &&
+			if ( ( ! isset($options['blocking_files']) || ! is_array( $options['blocking_files'] ) || ! in_array( $file, $options['blocking_files'] ) ) &&
 				file_exists( $file )
 			) {
+				if ( ! is_array( $options['blocking_files'] ) )
+					$options['blocking_files'] = array();
 				$options['blocking_files'][] = $file;
 				update_option( 'wpseo', $options );
 			}

@@ -388,7 +388,7 @@ class WPSEO_Frontend {
 					}
 				}
 				
-				if ( isset( $wp_query->query_vars['paged'] ) && $wp_query->query_vars['paged'] && !empty( $canonical ) )
+				if ( isset( $wp_query->query_vars['paged'] ) && $wp_query->query_vars['paged'] && $wp_query->query_vars['paged'] != 1 && !empty( $canonical ) )
 					$canonical = user_trailingslashit( trailingslashit( $canonical ) . 'page/' . $wp_query->query_vars['paged'] );
 			}
 				

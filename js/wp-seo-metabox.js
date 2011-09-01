@@ -30,10 +30,12 @@ function yst_clean( str, cleanalphanumeric ) {
 	if ( str == '' || str == undefined )
 		return '';
 	
-	if ( cleanalphanumeric == true )
-		str = str.replace(/[^a-zA-Z0-9\s]/, '');
-	str = str.replace(/<\/?[^>]+>/gi, ''); 
-	str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
+	try {
+		if ( cleanalphanumeric == true )
+			str = str.replace(/[^a-zA-Z0-9\s]/, '');
+		str = str.replace(/<\/?[^>]+>/gi, ''); 
+		str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
+	} catch(e) {}
 	return str;
 }
 
@@ -176,7 +178,7 @@ function boldKeywords( str, url ) {
 	} else {
 		var keywords	= new Array( focuskw );
 	}
-	for (var i in keywords) {
+	for (var i=0;i<keywords.length;i++) {
 		var kw		= yst_clean( keywords[i] );
 		if ( url ) {
 			var kw 	= kw.replace(' ','-').toLowerCase();
