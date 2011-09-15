@@ -434,8 +434,11 @@ class WPSEO_Frontend {
 				
 				if ( $paged > 1 ) 
 					echo $this->get_adjacent_rel_link( "prev", $url, $paged-1 );
-				if ( $paged < $wp_query->max_num_pages ) 
+				if ( $paged < $wp_query->max_num_pages ) {
+					if ( 0 == $paged )
+						$paged = 1;
 					echo $this->get_adjacent_rel_link( "next", $url, $paged+1 );
+				}
 			}
 		}
 	}
