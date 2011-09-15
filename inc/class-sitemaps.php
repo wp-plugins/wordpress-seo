@@ -292,11 +292,14 @@ class WPSEO_Sitemaps {
 
 				$url['mod']	= ( isset( $p->post_modified_gmt ) && $p->post_modified_gmt != '0000-00-00 00:00:00' ) ? $p->post_modified_gmt : $p->post_date_gmt ;
 				$url['chf'] = 'weekly';
+				$url['loc'] = get_permalink( $p );
 
-				if ( wpseo_get_value('canonical', $p->ID) && wpseo_get_value('canonical', $p->ID) != '' ) {
-					$url['loc'] = wpseo_get_value('canonical', $p->ID);
+				$canonical = wpseo_get_value('canonical', $p->ID);
+				if ( $canonical && $canonical != '' && $canonical != $url['loc']) {
+					// Let's assume that if a canonical is set for this page and it's different from the URL of this post, that page is either
+					// already in the XML sitemap OR is on an external site, either way, we shouldn't include it here.
+					continue;
 				} else {
-					$url['loc'] = get_permalink( $p );
 
 					if ( isset($options['trailingslash']) && $options['trailingslash'] && $p->post_type != 'post' )
 						$url['loc'] = trailingslashit( $url['loc'] );

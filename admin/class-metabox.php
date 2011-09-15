@@ -73,8 +73,8 @@ class WPSEO_Metabox {
 		<script type="text/javascript">
 			var wpseo_lang ='<?php echo substr(get_locale(),0,2); ?>';
 			var wpseo_meta_desc_length = '<?php echo $this->wpseo_meta_length; ?>';
-			var wpseo_title_template = '<?php echo $title_template; ?>';
-			var wpseo_metadesc_template = '<?php echo $metadesc_template; ?>';
+			var wpseo_title_template = '<?php echo esc_attr($title_template); ?>';
+			var wpseo_metadesc_template = '<?php echo esc_attr($metadesc_template); ?>';
 			var wpseo_permalink_template = '<?php echo $sample_permalink; ?>'
 		</script>
 		<?php

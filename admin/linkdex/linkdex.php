@@ -32,7 +32,7 @@ class Linkdex {
 		$job 		= array();
 
 		$sampleurl = get_sample_permalink($post->ID);
-		$job["pageUrl"] = str_replace( '%postname%', $sampleurl[1], $sampleurl[0] );
+		$job["pageUrl"] = preg_replace( '/%(post|page)name%/', $sampleurl[1], $sampleurl[0] );
 		$job["pageSlug"] = urldecode( $post->post_name );
 		$job["keyword"]	= wpseo_get_value('focuskw');
 		$job["keyword_folded"] = $this->strip_separators_and_fold( $job["keyword"] );
@@ -183,7 +183,7 @@ class Linkdex {
 		$urlMedium 		= __("The keyword / phrase does not appear in the URL for this page. If you decide to rename the URL be sure to check the old URL 301 redirects to the new one!");
 		$urlStopWords	= __("The slug for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them.");
 		$longSlug		= __("The slug for this page is a bit long, consider shortening it.");
-		
+
 		$needle 	= $this->strip_separators_and_fold( $job["keyword"] );
 		$haystack1 	= $this->strip_separators_and_fold( $job["pageUrl"], true );
 		$haystack2 	= $this->strip_separators_and_fold( $job["pageUrl"], false );
