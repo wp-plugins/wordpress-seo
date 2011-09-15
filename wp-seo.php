@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: WordPress SEO
-Version: 0.4.2
+Version: 1.0.2.1
 Plugin URI: http://yoast.com/wordpress/seo/
 Description: The first true all-in-one SEO solution for WordPress, including on-page content analysis, XML sitemaps and much more.
 Author: Joost de Valk
@@ -12,13 +12,13 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 	if ( is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX) ) {
 		require_once ABSPATH.'/wp-admin/includes/plugin.php';
 		deactivate_plugins( __FILE__ );
-	    wp_die( __('WordPress SEO requires PHP 5.2 or higher, as will WordPress 3.2 and higher. The plugin has now disabled itself. For more info, <a href="http://yoast.com/requires-php-52/">see this post</a>.') );
+	    wp_die( __('WordPress SEO requires PHP 5.2 or higher, as does WordPress 3.2 and higher. The plugin has now disabled itself. For more info, <a href="http://yoast.com/requires-php-52/">see this post</a>.') );
 	} else {
 		return;
 	}
 }
 
-define( 'WPSEO_VERSION', '0.4.2' );
+define( 'WPSEO_VERSION', '1.0.2.1' );
 
 $pluginurl = plugin_dir_url(__FILE__);
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )

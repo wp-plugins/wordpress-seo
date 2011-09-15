@@ -447,7 +447,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles','yoast-wpseo'));
 			$content .= '<h4 class="big">'.__('Singular pages').'</h4>';
 			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.").'</p>';
-			if ( 'posts' == get_option('show_on_front') ) {
+			if ( 'page' != get_option('show_on_front') ) {
 				$content .= '<h4>'.__('Homepage').'</h4>';
 				$content .= $this->textinput('title-home',__('Title template'));
 				$content .= $this->textarea('metadesc-home',__('Meta description template'), '', 'metadesc');

@@ -233,6 +233,7 @@ class WPSEO_Frontend {
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
+		$this->adjacent_archive_rel_links();
 		$this->robots();
 		
 		if ( is_front_page() ) {
@@ -341,41 +342,42 @@ class WPSEO_Frontend {
 		}
 	}
 	
-	function canonical( $echo = true ) {
-		global $wp_query;
-		
+	function canonical( $echo = true, $unpaged = false ) {
 		$options = get_wpseo_options();
+		
+		$canonical = false;
 		
 		// Set decent canonicals for homepage, singulars and taxonomy pages
 		if ( wpseo_get_value('canonical') && wpseo_get_value('canonical') != '' ) { 
 			$canonical = wpseo_get_value('canonical');
 		} else {
 			if ( is_singular() ) {
-				global $post;
-				$canonical = get_permalink( $post->ID );
+				$canonical = get_permalink( get_queried_object() );
 				// Fix paginated pages
-				$page = get_query_var('page');
-				if ( $page && $page != 1 ) {
-					// If below doesn't return true, there actually aren't that much pages in the post.
-					if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
-						$canonical = user_trailingslashit( trailingslashit($canonical) . get_query_var('page') );
+				if ( get_query_var('page') > 1 ) {
+					global $wp_rewrite;
+					if ( !$wp_rewrite->using_permalinks() ) {
+						$link = add_query_arg( 'page', get_query_var('page'), $link );
+					} else {
+						$link = user_trailingslashit( trailingslashit( $link ) . get_query_var( 'page' ) );
+					}
 				}
 			} else {
 				if ( is_search() ) {
-					$canonical = '';
+					$canonical = get_search_link();
 				} else if ( is_front_page() ) {
-					$canonical = get_bloginfo('url').'/';
-				} else if ( is_home() && get_option('show_on_front') == "page" ) {
+					$canonical = home_url( '/' );
+				} else if ( is_home() && "page" == get_option('show_on_front') ) {
 					$canonical = get_permalink( get_option( 'page_for_posts' ) );
 				} else if ( is_tax() || is_tag() || is_category() ) {
-					$term = $wp_query->get_queried_object();
-					
+					$term = get_queried_object();
 					$canonical = wpseo_get_term_meta( $term, $term->taxonomy, 'canonical' );
 					if ( !$canonical )
 						$canonical = get_term_link( $term, $term->taxonomy );
-				} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
-					if ( function_exists('get_post_type_archive_link') )
-						$canonical = get_post_type_archive_link( get_post_type() );
+				} else if ( function_exists('get_post_type_archive_link') && is_post_type_archive() ) {
+					$canonical = get_post_type_archive_link( get_post_type() );
+				} else if ( is_author() ) {
+					$canonical = get_author_posts_url( get_query_var('author'), get_query_var('author_name') );
 				} else if ( is_archive() ) {
 					if ( is_date() ) {
 						if ( is_day() ) {
@@ -388,27 +390,80 @@ class WPSEO_Frontend {
 					}
 				}
 				
-				if ( isset( $wp_query->query_vars['paged'] ) && $wp_query->query_vars['paged'] && !empty( $canonical ) )
-					$canonical = user_trailingslashit( trailingslashit( $canonical ) . 'page/' . $wp_query->query_vars['paged'] );
+				if ( $canonical && $unpaged )
+					return $canonical;
+					
+				if ( $canonical && get_query_var('paged') > 1 ) {
+					global $wp_rewrite;
+					if ( !$wp_rewrite->using_permalinks() ) {
+						$canonical = add_query_arg( 'paged', get_query_var('paged'), $canonical );
+					} else {
+						$canonical = user_trailingslashit( trailingslashit( $canonical ) . trailingslashit( $wp_rewrite->pagination_base ) . get_query_var('paged') );
+					}
+				}
 			}
 				
 		}
 		
-		if ( isset($options['force_transport']) && $options['force_transport'] != 'default' )
+		if ( $canonical && isset($options['force_transport']) && 'default' != $options['force_transport'] )
 			$canonical = preg_replace( '/https?/', $options['force_transport'], $canonical );
-
-		// Allow filtering everywhere.
-		if ( empty($canonical) )
-			$canonical = '';
 
 		$canonical = apply_filters( 'wpseo_canonical', $canonical );
 		
-		if ( !empty($canonical) && !is_wp_error($canonical) ) {
+		if ( $canonical && !is_wp_error( $canonical ) ) {
 			if ( $echo ) 
-				echo '<link rel="canonical" href="'.$canonical.'" />'."\n";
+				echo '<link rel="canonical" href="' . esc_url( $canonical, null, 'other' ) . '" />'."\n";
 			else
 				return $canonical;
 		}
+	}
+	
+	/**
+	 * Adds 'prev' and 'next' links to archives, as described in this Google blog post: http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html
+	 *
+	 * @since 1.0.2
+	 */
+	function adjacent_archive_rel_links() {
+		global $wp_query;
+
+		if ( !is_single() ) {
+			$url = $this->canonical( false, true );
+
+			if ( $url ) {
+				$paged = get_query_var('paged');
+				
+				if ( $paged > 1 ) 
+					echo $this->get_adjacent_rel_link( "prev", $url, $paged-1 );
+				if ( $paged < $wp_query->max_num_pages ) {
+					if ( 0 == $paged )
+						$paged = 1;
+					echo $this->get_adjacent_rel_link( "next", $url, $paged+1 );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get adjacent pages link for archives
+	 *
+	 * @param string $rel Link relationship, prev or next.
+	 * @param string $url the unpaginated URL of the current archive.
+	 * @param string $page the page number to add on to $url for the $link tag
+	 * @return string $link link element
+	 *
+	 * @since 1.0.2
+	 */
+	function get_adjacent_rel_link( $rel, $url, $page ) {
+		global $wp_rewrite;
+		if ( !$wp_rewrite->using_permalinks() ) {
+			if ( $page > 1 )
+				$url = add_query_arg( 'paged', $page, $url );
+		} else {
+			if ( $page > 1 )
+				$url = user_trailingslashit( trailingslashit( $url ) . trailingslashit( $wp_rewrite->pagination_base ) . $page );
+		}
+		$link = "<link rel='$rel' href='$url' />\n";
+		return apply_filters( $rel."_rel_link", $link );	
 	}
 	
 	function metakeywords() {
