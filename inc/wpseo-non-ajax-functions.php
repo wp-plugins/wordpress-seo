@@ -77,7 +77,9 @@ function wpseo_export_settings( $include_taxonomy ) {
 		$content .= "wpseo_taxonomy_meta = \"".urlencode( json_encode( get_option('wpseo_taxonomy_meta') ) )."\"";
 	}
 
-    if ( !$handle = fopen( WPSEO_UPLOAD_DIR.'settings.ini', 'w' ) )
+	$dir = wp_upload_dir();
+	
+    if ( !$handle = fopen( $dir['path'].'/settings.ini', 'w' ) )
         die();
 
     if ( !fwrite($handle, $content) ) 
@@ -87,12 +89,12 @@ function wpseo_export_settings( $include_taxonomy ) {
 
 	require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
 	
-	chdir(WPSEO_UPLOAD_DIR);
+	chdir( $dir['path'] );
 	$zip = new PclZip('./settings.zip');
 	if ($zip->create('./settings.ini') == 0)
 	  	return false;
 	
-	return WPSEO_UPLOAD_URL.'settings.zip'; 
+	return $dir['url'].'/settings.zip'; 
 }
 
 function wpseo_admin_bar_menu() {
