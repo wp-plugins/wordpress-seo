@@ -39,14 +39,11 @@ class WPSEO_Frontend {
 			remove_action('wp_head', 'rsd_link');
 		if ( isset($options['hidewlwmanifest']) && $options['hidewlwmanifest'] )
 			remove_action('wp_head', 'wlwmanifest_link');
-		if ( isset($options['hidewpgenerator']) && $options['hidewpgenerator'] )
-			add_filter('the_generator', array(&$this, 'fix_generator') ,10,1);
-		if ( isset($options['hideindexrel']) && $options['hideindexrel'] )
-			remove_action('wp_head', 'index_rel_link');
-		if ( isset($options['hidestartrel']) && $options['hidestartrel'] )
-			remove_action('wp_head', 'start_post_rel_link');
-		if ( isset($options['hideprevnextpostlink']) && $options['hideprevnextpostlink'] )
-			remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
+
+		remove_action('wp_head', 'index_rel_link');
+		remove_action('wp_head', 'start_post_rel_link');
+		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
+
 		if ( isset($options['hideshortlink']) && $options['hideshortlink'] )
 			remove_action('wp_head', 'wp_shortlink_wp_head');
 		if ( isset($options['hidefeedlinks']) && $options['hidefeedlinks'] ) {
@@ -233,6 +230,7 @@ class WPSEO_Frontend {
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
+		$this->adjacent_rel_links();
 		$this->robots();
 		
 		if ( is_front_page() ) {
@@ -341,41 +339,42 @@ class WPSEO_Frontend {
 		}
 	}
 	
-	function canonical( $echo = true ) {
-		global $wp_query;
-		
+	function canonical( $echo = true, $unpaged = false ) {
 		$options = get_wpseo_options();
+		
+		$canonical = false;
 		
 		// Set decent canonicals for homepage, singulars and taxonomy pages
 		if ( wpseo_get_value('canonical') && wpseo_get_value('canonical') != '' ) { 
 			$canonical = wpseo_get_value('canonical');
 		} else {
 			if ( is_singular() ) {
-				global $post;
-				$canonical = get_permalink( $post->ID );
+				$canonical = get_permalink( get_queried_object() );
 				// Fix paginated pages
-				$page = get_query_var('page');
-				if ( $page && $page != 1 ) {
-					// If below doesn't return true, there actually aren't that much pages in the post.
-					if ( substr_count($wp_query->queried_object->post_content, '<!--nextpage-->') >= ($page-1) )
-						$canonical = user_trailingslashit( trailingslashit($canonical) . get_query_var('page') );
+				if ( get_query_var('page') > 1 ) {
+					global $wp_rewrite;
+					if ( !$wp_rewrite->using_permalinks() ) {
+						$link = add_query_arg( 'page', get_query_var('page'), $link );
+					} else {
+						$link = user_trailingslashit( trailingslashit( $link ) . get_query_var( 'page' ) );
+					}
 				}
 			} else {
 				if ( is_search() ) {
-					$canonical = '';
+					$canonical = get_search_link();
 				} else if ( is_front_page() ) {
-					$canonical = get_bloginfo('url').'/';
-				} else if ( is_home() && get_option('show_on_front') == "page" ) {
+					$canonical = home_url( '/' );
+				} else if ( is_home() && "page" == get_option('show_on_front') ) {
 					$canonical = get_permalink( get_option( 'page_for_posts' ) );
 				} else if ( is_tax() || is_tag() || is_category() ) {
-					$term = $wp_query->get_queried_object();
-					
+					$term = get_queried_object();
 					$canonical = wpseo_get_term_meta( $term, $term->taxonomy, 'canonical' );
 					if ( !$canonical )
 						$canonical = get_term_link( $term, $term->taxonomy );
-				} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
-					if ( function_exists('get_post_type_archive_link') )
-						$canonical = get_post_type_archive_link( get_post_type() );
+				} else if ( function_exists('get_post_type_archive_link') && is_post_type_archive() ) {
+					$canonical = get_post_type_archive_link( get_post_type() );
+				} else if ( is_author() ) {
+					$canonical = get_author_posts_url( get_query_var('author'), get_query_var('author_name') );
 				} else if ( is_archive() ) {
 					if ( is_date() ) {
 						if ( is_day() ) {
@@ -388,27 +387,103 @@ class WPSEO_Frontend {
 					}
 				}
 				
-				if ( isset( $wp_query->query_vars['paged'] ) && $wp_query->query_vars['paged'] && !empty( $canonical ) )
-					$canonical = user_trailingslashit( trailingslashit( $canonical ) . 'page/' . $wp_query->query_vars['paged'] );
+				if ( $canonical && $unpaged )
+					return $canonical;
+					
+				if ( $canonical && get_query_var('paged') > 1 ) {
+					global $wp_rewrite;
+					if ( !$wp_rewrite->using_permalinks() ) {
+						$canonical = add_query_arg( 'paged', get_query_var('paged'), $canonical );
+					} else {
+						$canonical = user_trailingslashit( trailingslashit( $canonical ) . trailingslashit( $wp_rewrite->pagination_base ) . get_query_var('paged') );
+					}
+				}
 			}
 				
 		}
 		
-		if ( isset($options['force_transport']) && $options['force_transport'] != 'default' )
+		if ( $canonical && isset($options['force_transport']) && 'default' != $options['force_transport'] )
 			$canonical = preg_replace( '/https?/', $options['force_transport'], $canonical );
-
-		// Allow filtering everywhere.
-		if ( empty($canonical) )
-			$canonical = '';
 
 		$canonical = apply_filters( 'wpseo_canonical', $canonical );
 		
-		if ( !empty($canonical) && !is_wp_error($canonical) ) {
+		if ( $canonical && !is_wp_error( $canonical ) ) {
 			if ( $echo ) 
-				echo '<link rel="canonical" href="'.$canonical.'" />'."\n";
+				echo '<link rel="canonical" href="' . esc_url( $canonical, null, 'other' ) . '" />'."\n";
 			else
 				return $canonical;
 		}
+	}
+	
+	/**
+	 * Adds 'prev' and 'next' links to archives, as described in this Google blog post: http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html
+	 *
+	 * @since 1.0.2.2
+	 */
+	function adjacent_rel_links() {
+		global $wp_query;
+
+		if ( !is_single() ) {
+			$url = $this->canonical( false, true );
+
+			if ( $url ) {
+				$paged = get_query_var('paged');
+				
+				if ( 0 == $paged )
+					$paged = 1;
+
+				if ( $paged > 1 ) 
+					$this->get_adjacent_rel_link( "prev", $url, $paged-1, true );
+
+				if ( $paged < $wp_query->max_num_pages )
+					$this->get_adjacent_rel_link( "next", $url, $paged+1, true );
+			}
+		} else {
+			global $page, $numpages, $multipage;
+			setup_postdata( $wp_query->post );
+			if ( !$multipage )
+				return;
+
+			// Throw current page in another var to not screw up other functionality
+			$pg = $page;
+			if ( $pg == 0 )
+				$pg = 1;
+
+			$url = get_permalink( $post->ID );
+
+			if ( $pg > 1 )
+				$this->get_adjacent_rel_link( "prev", $url, $pg-1, false );
+			if ( $pg < $numpages )
+				$this->get_adjacent_rel_link( "next", $url, $pg+1, false );
+		}
+	}
+
+	/**
+	 * Get adjacent pages link for archives
+	 *
+	 * @param string $rel Link relationship, prev or next.
+	 * @param string $url the unpaginated URL of the current archive.
+	 * @param string $page the page number to add on to $url for the $link tag.
+	 * @param boolean $incl_pagination_base whether or not to include /page/ or not.
+	 * @return string $link link element
+	 *
+	 * @since 1.0.2
+	 */
+	function get_adjacent_rel_link( $rel, $url, $page, $incl_pagination_base ) {
+		global $wp_rewrite;
+		if ( !$wp_rewrite->using_permalinks() ) {
+			if ( $page > 1 )
+				$url = add_query_arg( 'paged', $page, $url );
+		} else {
+			if ( $page > 1 ) {
+				$base = '';
+				if ( $incl_pagination_base )
+					$base = trailingslashit( $wp_rewrite->pagination_base );
+				$url = user_trailingslashit( trailingslashit( $url ) . $base . $page );
+			}
+		}
+		$link = "<link rel='$rel' href='$url' />\n";
+		echo apply_filters( $rel."_rel_link", $link );	
 	}
 	
 	function metakeywords() {
