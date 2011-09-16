@@ -39,14 +39,11 @@ class WPSEO_Frontend {
 			remove_action('wp_head', 'rsd_link');
 		if ( isset($options['hidewlwmanifest']) && $options['hidewlwmanifest'] )
 			remove_action('wp_head', 'wlwmanifest_link');
-		if ( isset($options['hidewpgenerator']) && $options['hidewpgenerator'] )
-			add_filter('the_generator', array(&$this, 'fix_generator') ,10,1);
-		if ( isset($options['hideindexrel']) && $options['hideindexrel'] )
-			remove_action('wp_head', 'index_rel_link');
-		if ( isset($options['hidestartrel']) && $options['hidestartrel'] )
-			remove_action('wp_head', 'start_post_rel_link');
-		if ( isset($options['hideprevnextpostlink']) && $options['hideprevnextpostlink'] )
-			remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
+
+		remove_action('wp_head', 'index_rel_link');
+		remove_action('wp_head', 'start_post_rel_link');
+		remove_action('wp_head', 'adjacent_posts_rel_link_wp_head');
+
 		if ( isset($options['hideshortlink']) && $options['hideshortlink'] )
 			remove_action('wp_head', 'wp_shortlink_wp_head');
 		if ( isset($options['hidefeedlinks']) && $options['hidefeedlinks'] ) {
@@ -233,7 +230,7 @@ class WPSEO_Frontend {
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
-		$this->adjacent_archive_rel_links();
+		$this->adjacent_rel_links();
 		$this->robots();
 		
 		if ( is_front_page() ) {
@@ -421,9 +418,9 @@ class WPSEO_Frontend {
 	/**
 	 * Adds 'prev' and 'next' links to archives, as described in this Google blog post: http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html
 	 *
-	 * @since 1.0.2
+	 * @since 1.0.2.2
 	 */
-	function adjacent_archive_rel_links() {
+	function adjacent_rel_links() {
 		global $wp_query;
 
 		if ( !is_single() ) {
@@ -432,14 +429,32 @@ class WPSEO_Frontend {
 			if ( $url ) {
 				$paged = get_query_var('paged');
 				
+				if ( 0 == $paged )
+					$paged = 1;
+
 				if ( $paged > 1 ) 
-					echo $this->get_adjacent_rel_link( "prev", $url, $paged-1 );
-				if ( $paged < $wp_query->max_num_pages ) {
-					if ( 0 == $paged )
-						$paged = 1;
-					echo $this->get_adjacent_rel_link( "next", $url, $paged+1 );
-				}
+					$this->get_adjacent_rel_link( "prev", $url, $paged-1, true );
+
+				if ( $paged < $wp_query->max_num_pages )
+					$this->get_adjacent_rel_link( "next", $url, $paged+1, true );
 			}
+		} else {
+			global $page, $numpages, $multipage;
+			setup_postdata( $wp_query->post );
+			if ( !$multipage )
+				return;
+
+			// Throw current page in another var to not screw up other functionality
+			$pg = $page;
+			if ( $pg == 0 )
+				$pg = 1;
+
+			$url = get_permalink( $post->ID );
+
+			if ( $pg > 1 )
+				$this->get_adjacent_rel_link( "prev", $url, $pg-1, false );
+			if ( $pg < $numpages )
+				$this->get_adjacent_rel_link( "next", $url, $pg+1, false );
 		}
 	}
 
@@ -448,22 +463,27 @@ class WPSEO_Frontend {
 	 *
 	 * @param string $rel Link relationship, prev or next.
 	 * @param string $url the unpaginated URL of the current archive.
-	 * @param string $page the page number to add on to $url for the $link tag
+	 * @param string $page the page number to add on to $url for the $link tag.
+	 * @param boolean $incl_pagination_base whether or not to include /page/ or not.
 	 * @return string $link link element
 	 *
 	 * @since 1.0.2
 	 */
-	function get_adjacent_rel_link( $rel, $url, $page ) {
+	function get_adjacent_rel_link( $rel, $url, $page, $incl_pagination_base ) {
 		global $wp_rewrite;
 		if ( !$wp_rewrite->using_permalinks() ) {
 			if ( $page > 1 )
 				$url = add_query_arg( 'paged', $page, $url );
 		} else {
-			if ( $page > 1 )
-				$url = user_trailingslashit( trailingslashit( $url ) . trailingslashit( $wp_rewrite->pagination_base ) . $page );
+			if ( $page > 1 ) {
+				$base = '';
+				if ( $incl_pagination_base )
+					$base = trailingslashit( $wp_rewrite->pagination_base );
+				$url = user_trailingslashit( trailingslashit( $url ) . $base . $page );
+			}
 		}
 		$link = "<link rel='$rel' href='$url' />\n";
-		return apply_filters( $rel."_rel_link", $link );	
+		echo apply_filters( $rel."_rel_link", $link );	
 	}
 	
 	function metakeywords() {

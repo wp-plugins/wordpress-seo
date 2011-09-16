@@ -934,12 +934,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use remote editors.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('hidewlwmanifest','Hide WLW Manifest Links');
 			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use Windows Live Writer.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('hidewpgenerator','Hide WordPress Generator');
-			$content .= '<p class="desc">'.__('If you want to show off that you\'re on the latest version, don\'t check this box.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('hideindexrel','Hide Index Relation Links');
-			$content .= $this->checkbox('hidestartrel','Hide Start Relation Links');
-			$content .= '<p class="desc">'.__('Check these boxes, or please tell the plugin author why you shouldn\'t.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('hideprevnextpostlink','Hide Previous &amp; Next Post Links');
 			$content .= $this->checkbox('hideshortlink','Hide Shortlink for posts');
 			$content .= '<p class="desc">'.__('Hides the shortlink for the current post.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('hidefeedlinks','Hide RSS Links');
