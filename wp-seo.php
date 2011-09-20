@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: WordPress SEO
-Version: 0.4.2
+Version: 1.0.2.3
 Plugin URI: http://yoast.com/wordpress/seo/
 Description: The first true all-in-one SEO solution for WordPress, including on-page content analysis, XML sitemaps and much more.
 Author: Joost de Valk
@@ -12,13 +12,13 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 	if ( is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX) ) {
 		require_once ABSPATH.'/wp-admin/includes/plugin.php';
 		deactivate_plugins( __FILE__ );
-	    wp_die( __('WordPress SEO requires PHP 5.2 or higher, as will WordPress 3.2 and higher. The plugin has now disabled itself. For more info, <a href="http://yoast.com/requires-php-52/">see this post</a>.') );
+	    wp_die( __('WordPress SEO requires PHP 5.2 or higher, as does WordPress 3.2 and higher. The plugin has now disabled itself. For more info, <a href="http://yoast.com/requires-php-52/">see this post</a>.') );
 	} else {
 		return;
 	}
 }
 
-define( 'WPSEO_VERSION', '0.4.2' );
+define( 'WPSEO_VERSION', '1.0.2.3' );
 
 $pluginurl = plugin_dir_url(__FILE__);
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
@@ -73,6 +73,7 @@ if ( !class_exists('All_in_One_SEO_Pack') ) {
 function wpseo_maybe_upgrade() {
 	$options = get_option( 'wpseo' );
 	$current_version = isset($options['version']) ? $options['version'] : 0;
+
 	if ( version_compare( $current_version, WPSEO_VERSION, '==' ) )
 		return;
 
@@ -118,6 +119,12 @@ function wpseo_maybe_upgrade() {
 		unset( $options['wpseodir'], $options['wpseourl'] );
 	}
 
+	if ( version_compare( $current_version, '1.0.2.2', '<' ) ) {
+		$opt = (array) get_option( 'wpseo_indexation' );		
+		unset( $opt['hideindexrel'], $opt['hidestartrel'], $opt['hideprevnextpostlink'], $opt['hidewpgenerator'] );
+		update_option( 'wpseo_indexation', $opt );
+	}
+	
 	$options['version'] = WPSEO_VERSION;
 	update_option( 'wpseo', $options );
 }

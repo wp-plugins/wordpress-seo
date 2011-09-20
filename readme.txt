@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 0.4.2
+Stable tag: 1.0.2.3
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -30,8 +30,19 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Pages or posts that have been noindexed will not show in XML sitemap (but can if you want them too).
 	* Custom post type and custom taxonomy support.
 	* No static files are generated, so no delays when publishing posts.
+	* Automatically ping search engines.
 * .htaccess and robots.txt editor.
+* Import and export functionality: save your default SEO settings and import them on every (new) site!
 * Basic import functionality for HeadSpace2 and All in One SEO.
+
+=== Fully MultiSite compatible ===
+
+* Multisite Network Admin page, with three features:
+	* The option to make WordPress SEO only accessible to Super admins instead of site admins.
+	* The option to set a "default" site, from which new sites will henceforth acquire their settings on creation.
+	* The option to revert a site to the "default" site's settings.
+
+Be sure to also check out the [News SEO module](http://yoast.com/wordpress/seo/news-seo/) if you need Google News Sitemaps!
 
 == Installation ==
 
@@ -62,6 +73,10 @@ There are two possible issues with a meta description:
 
 Disable the clean permalinks feature on the SEO -> Permalinks settings page.
 
+= Does your plugin allow for Google News Sitemaps too? =
+
+It does! You'll need an add-on module for that though, which you can download from the [News SEO](http://yoast.com/wordpress/seo/news-seo/) module homepage!
+
 = Why is WordPress SEO better than All In One SEO Pack? =
 
 It's not a secret that the author of this plugin, Joost de Valk, aka Yoast, doesn't really like All In One SEO Pack. The main reason is that All in One SEO pack has a default option for auto generating meta descriptions that is actually making it harder for people to rank well in a lot of cases, giving them a false sense of security.
@@ -80,6 +95,49 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 6. Example of the Linkdex Page Analysis functionality.
 
 == Changelog ==
+
+= 1.0.2.3 =
+
+* Fixed some edge cases with rel=next and rel=prev, particularly relating to a paginated page as a frontpage.
+* Updated the snippet preview so the date part of the snippet has the right color.
+* Fixed a bug in the update routine that could cause errors in the backend.
+* Enabled OpenGraph meta box on edit screens, first "stab".
+
+= 1.0.2.2 =
+
+* Removed all rel=index, rel=prev etc references that WP core currently uses as they're wrongly implemented.
+* Added rel=prev and rel=next for paginated posts and pages.
+* Removed the interface options for all rel= links, they're off by default now.
+* Removed the option to hide the version number. It's very easy to detect the version number anyway so let's not clutter the interface.
+
+= 1.0.2.1 =
+
+* I missed a case where the next link would point to the current page, fixed it though :)
+
+= 1.0.2 =
+
+* Fixed keyword in slug detection on non-post post types.
+* Optimizations in canonical functionality, adding canonicals to author archives and more.
+* Added prev and next links as [suggested by Google](http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html).
+* Fixed issue with unescaped characters in title and description when updating edit screen.
+* Posts with a canonical set to another URL are no longer included in the XML sitemap.
+
+= 1.0.1 =
+
+* Fixed a bug where canonical would be set to /page/1/ on archives.
+* Fixed an error for blocking files.
+* Fixed a JS error that would cause the link editor in the rich editor not to work.
+* Fixed possible error when reading settings have gone haywire (ie not 'posts' or 'page' on front but something else).
+
+= 1.0 =
+
+* I now dare call this plugin STABLE. This doesn't mean there are no more bugs, it does mean that I think it won't break sites anymore.
+* Fixed the import/export settings functionality.
+* Updated the snippet preview to Google's new snippet design.
+
+= 0.4.3 =
+
+* Heavily, very heavily, reduced memory usage in XML Sitemap generation.
 
 = 0.4.2 =
 
