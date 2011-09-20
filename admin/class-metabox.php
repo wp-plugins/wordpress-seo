@@ -444,11 +444,11 @@ class WPSEO_Metabox {
 			</div>';
 		} else {
 			if ( !empty($date) )
-				$date .= ' – ';
+				$date = '<span style="color: #666;">'.$date.'</span> – ';
 			$content .= '<div id="wpseosnippet">
 				<a class="title" href="#">'.$title.'</a><br/>
 			<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a>
-				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span>'.$desc.'</span></p>
+				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span class="content">'.$desc.'</span></p>
 			</div>';
 		} 
 		return $content;

@@ -154,8 +154,8 @@ function updateDesc( desc ) {
 	desc = boldKeywords( desc, false );
 
 	jQuery('#yoast_wpseo_metadesc-length').html(len);
-	jQuery("#wpseosnippet .desc span").css( 'color', color );
-	jQuery("#wpseosnippet .desc span").html( desc );
+	jQuery("#wpseosnippet .desc span.content").css( 'color', color );
+	jQuery("#wpseosnippet .desc span.content").html( desc );
 	testFocusKw();
 }
 

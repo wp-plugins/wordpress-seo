@@ -418,12 +418,12 @@ class WPSEO_Frontend {
 	/**
 	 * Adds 'prev' and 'next' links to archives, as described in this Google blog post: http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html
 	 *
-	 * @since 1.0.2.2
+	 * @since 1.0.3
 	 */
 	function adjacent_rel_links() {
 		global $wp_query;
 
-		if ( !is_single() ) {
+		if ( !is_singular() ) {
 			$url = $this->canonical( false, true );
 
 			if ( $url ) {
@@ -439,22 +439,25 @@ class WPSEO_Frontend {
 					$this->get_adjacent_rel_link( "next", $url, $paged+1, true );
 			}
 		} else {
-			global $page, $numpages, $multipage;
-			setup_postdata( $wp_query->post );
-			if ( !$multipage )
-				return;
+			$numpages = substr_count( $wp_query->post->post_content, '<!--nextpage-->' ) + 1;
+			if ( $numpages > 1 ) {		
+				$page = get_query_var('page');
+				if ( !$page )
+					$page = 1;
 
-			// Throw current page in another var to not screw up other functionality
-			$pg = $page;
-			if ( $pg == 0 )
-				$pg = 1;
+				$url = get_permalink( $wp_query->post->ID );
 
-			$url = get_permalink( $post->ID );
+				// If the current page is the frontpage, pagination should use /base/
+				if ( 'page' == get_option('show_on_front') && get_option('page_on_front') == $wp_query->post->ID )
+					$usebase = true;
+				else
+					$usebase = false;
 
-			if ( $pg > 1 )
-				$this->get_adjacent_rel_link( "prev", $url, $pg-1, false );
-			if ( $pg < $numpages )
-				$this->get_adjacent_rel_link( "next", $url, $pg+1, false );
+				if ( $page > 1 )
+					$this->get_adjacent_rel_link( "prev", $url, $page-1, $usebase, 'single_paged' );
+				if ( $page < $numpages )
+					$this->get_adjacent_rel_link( "next", $url, $page+1, $usebase, 'single_paged' );
+			}
 		}
 	}
 

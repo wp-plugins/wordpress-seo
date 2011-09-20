@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 1.0.2.2
+Stable tag: 1.0.2.3
 
 Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
 
@@ -30,9 +30,17 @@ The most complete all in one SEO solution for your WordPress blog, this plugin h
 	* Pages or posts that have been noindexed will not show in XML sitemap (but can if you want them too).
 	* Custom post type and custom taxonomy support.
 	* No static files are generated, so no delays when publishing posts.
+	* Automatically ping search engines.
 * .htaccess and robots.txt editor.
 * Import and export functionality: save your default SEO settings and import them on every (new) site!
 * Basic import functionality for HeadSpace2 and All in One SEO.
+
+=== Fully MultiSite compatible ===
+
+* Multisite Network Admin page, with three features:
+	* The option to make WordPress SEO only accessible to Super admins instead of site admins.
+	* The option to set a "default" site, from which new sites will henceforth acquire their settings on creation.
+	* The option to revert a site to the "default" site's settings.
 
 Be sure to also check out the [News SEO module](http://yoast.com/wordpress/seo/news-seo/) if you need Google News Sitemaps!
 
@@ -87,6 +95,13 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 6. Example of the Linkdex Page Analysis functionality.
 
 == Changelog ==
+
+= 1.0.2.3 =
+
+* Fixed some edge cases with rel=next and rel=prev, particularly relating to a paginated page as a frontpage.
+* Updated the snippet preview so the date part of the snippet has the right color.
+* Fixed a bug in the update routine that could cause errors in the backend.
+* Enabled OpenGraph meta box on edit screens, first "stab".
 
 = 1.0.2.2 =
 
