@@ -1,16 +1,16 @@
 === WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
-Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
+Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast
 Requires at least: 3.1
 Tested up to: 3.2
 Stable tag: 1.0.2.3
 
-Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
+Yoast's all in one WordPress SEO solution for your WordPress site: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & more.
 
 == Description ==
 
-The most complete all in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
+The most complete all in one WordPress SEO solution, this plugin has a huge list of features, including:
 
 * Post title and meta description meta box to change these on a per post basis for ultimate SEO.
 * On page SEO Analysis using the Linkdex page analysis library.
