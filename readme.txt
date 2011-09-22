@@ -1,4 +1,4 @@
-=== WordPress SEO by Yoast ===
+=== WordPress SEO ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast
