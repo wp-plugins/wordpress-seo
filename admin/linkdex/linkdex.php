@@ -183,7 +183,7 @@ class Linkdex {
 		$urlMedium 		= __("The keyword / phrase does not appear in the URL for this page. If you decide to rename the URL be sure to check the old URL 301 redirects to the new one!");
 		$urlStopWords	= __("The slug for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them.");
 		$longSlug		= __("The slug for this page is a bit long, consider shortening it.");
-
+		
 		$needle 	= $this->strip_separators_and_fold( $job["keyword"] );
 		$haystack1 	= $this->strip_separators_and_fold( $job["pageUrl"], true );
 		$haystack2 	= $this->strip_separators_and_fold( $job["pageUrl"], false );

@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 1.0.2.3
+Stable tag: 1.0.3
 
 Yoast's all in one WordPress SEO solution for your WordPress site: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & more.
 
@@ -95,6 +95,26 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 6. Example of the Linkdex Page Analysis functionality.
 
 == Changelog ==
+
+= 1.0.3 =
+
+* This release is dedicated to removing options and setting defaults instead. Specifically, the following settings are now defaults without options to change them:
+	* Images are now always included in the XML sitemap as Bing no longer breaks on them.
+	* Pinging Google and Bing is now a default action as that's the whole point of having XML sitemaps.
+	* RSS feeds are now always noindex, followed. No search engine should ever list an RSS feed as a result in the resultpages.
+	* Admin, login and registration pages are always noindexed now for the same reason.
+	* Search result pages are now always noindex, follow.
+	* Subpages of the homepage are now also noindex, follow. It just doesn't make sense to index,follow those especially with the new rel="prev" and rel="next" changes.
+* The option to add `nosnippet` and `noarchive` meta tags sitewide has been removed. No one in his right mind would want to do that, and if you do, then adding the robots meta to your template yourself should be doable.
+* Pinging search engines with your RSS feed is no longer part of this plugin (as its unneeded because the XML sitemaps do that).
+* UTF-8 characters in RSS footer no longer break.
+* Added the option to use the author name and link in the RSS header and footer using %%AUTHORLINK%%.
+* No longer show the admin bar SEO menu for subscribers.
+* Some style changes to make the backend look nicer in WP 3.2 and 3.3.
+* Bug with importing settings fixed.
+* No longer redirect attachments that have no parent.
+* Correctly grab thumbnail for OpenGraph settings.
+* Pages now get the correct priority (0.8).
 
 = 1.0.2.3 =
 

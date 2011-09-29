@@ -97,7 +97,14 @@ function wpseo_export_settings( $include_taxonomy ) {
 	return $dir['url'].'/settings.zip'; 
 }
 
+/**
+ * Adds an SEO admin bar menu with several options. If the current user is an admin he can also go straight to several settings menu's from here.
+ */
 function wpseo_admin_bar_menu() {
+	// If the current user can't write posts, this is all of no use, so let's not output an admin menu
+	if ( !current_user_can('edit_posts') )
+		return;
+		
 	global $wp_admin_bar, $wpseo_front, $post;
 
 	if ( is_object($wpseo_front) ) {

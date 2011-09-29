@@ -17,18 +17,12 @@ class WPSEO_Frontend {
 		
 		add_action('wp',array(&$this,'page_redirect'),99,1);
 
-		if (isset($options['login']) && $options['login'])
-			add_action('login_head', array(&$this, 'noindex_page') );
-		if (isset($options['admin']) && $options['admin'])
-			add_action('admin_head', array(&$this, 'noindex_page') );
+		add_action('login_head', array(&$this, 'noindex_page') );
+		add_action('admin_head', array(&$this, 'noindex_page') );
 
-		if (isset($options['allfeeds']) && $options['allfeeds']) {
-			add_action('rss_head', array(&$this, 'noindex_feed') );
-			add_action('rss2_head', array(&$this, 'noindex_feed') );
-			add_action('commentsrss2_head', array(&$this, 'noindex_feed') );
-		} else if (isset($options['commentfeeds']) && $options['commentfeeds']) {
-			add_action('commentsrss2_head', array(&$this, 'noindex_feed') );
-		}
+		add_action('rss_head', array(&$this, 'noindex_feed') );
+		add_action('rss2_head', array(&$this, 'noindex_feed') );
+		add_action('commentsrss2_head', array(&$this, 'noindex_feed') );
 
 		if (isset($options['nofollowmeta']) && $options['nofollowmeta']) {
 			add_filter('loginout',array(&$this,'nofollow_link'));
@@ -52,8 +46,9 @@ class WPSEO_Frontend {
 			remove_action('wp_head', 'feed_links_extra', 3);
 		}
 		
-		if ( (isset($options['disabledate']) && $options['disabledate']) || 
-			 (isset($options['disableauthor']) && $options['disableauthor']) )
+		if ( ( isset($options['disabledate']) && $options['disabledate'] ) || 
+			 ( isset($options['disableauthor']) && $options['disableauthor'] ) ||
+			 ( isset($options['disablepostformats']) && $options['disablepostformats'] ) )
 			add_action('wp', array(&$this, 'archive_redirect') );
 
 		if (isset($options['redirectattachment']) && $options['redirectattachment'])
@@ -214,6 +209,7 @@ class WPSEO_Frontend {
 	}
 	
 	function force_wp_title() {
+		wp_reset_query();
 		return wp_title('', 0);
 	}
 	
@@ -289,16 +285,15 @@ class WPSEO_Frontend {
 			}
 		} else {
 			if ( is_search() ) {
-				if ( isset( $options['search'] ) && $options['search'] ) {
-					$robots['index']  = 'noindex';
-					$robots['follow'] = 'follow';
-				}
+				$robots['index']  = 'noindex';
+				$robots['follow'] = 'follow';
 			} else if ( is_tax() || is_tag() || is_category() ) {
+				$term = $wp_query->get_queried_object();
 				if ( ( is_category() 	&& isset( $options['noindexcat'] ) && $options['noindexcat'] ) || 
-					 ( is_tag() 		&& isset( $options['noindextag'] ) && $options['noindextag']) ) {
+					 ( is_tag() 		&& isset( $options['noindextag'] ) && $options['noindextag']) ||
+					 ( is_tax('post_format') && isset( $options['noindexpostformat'] ) && $options['noindexpostformat'] ) ) {
 					$robots['index'] = 'noindex';
 				} else {
-					$term = $wp_query->get_queried_object();
 					if ( wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' ) )
 						$robots['index'] = 'noindex';					
 				}
@@ -307,7 +302,7 @@ class WPSEO_Frontend {
 			} else if ( 
 				(is_author() 	&& isset($options['noindexauthor']) && $options['noindexauthor']) || 
 				(is_date() 		&& isset($options['noindexdate']) && $options['noindexdate']) || 
-				(is_home() 		&& isset($options['pagedhome']) && $options['pagedhome'] && get_query_var('paged') > 1) )
+				(is_home() 		&& get_query_var('paged') > 1) )
 			{
 				$robots['index']  = 'noindex';
 				$robots['follow'] = 'follow';
@@ -319,7 +314,7 @@ class WPSEO_Frontend {
 			}
 		}
 		
-		foreach ( array('noodp','noydir','noarchive','nosnippet') as $robot ) {
+		foreach ( array('noodp','noydir') as $robot ) {
 			if ( isset($options[$robot]) && $options[$robot] ) {
 				$robots['other'][] = $robot;
 			}
@@ -621,8 +616,12 @@ class WPSEO_Frontend {
 
 	function archive_redirect() {
 		global $wp_query;
-		$options  = get_wpseo_options();
-		if ( (isset($options['disabledate']) && $options['disabledate'] && $wp_query->is_date) || (isset($options['disableauthor']) && $options['disableauthor'] && $wp_query->is_author) ) {
+		$options = get_wpseo_options();
+		if ( 
+			 ( isset($options['disabledate']) && $options['disabledate'] && $wp_query->is_date ) || 
+			 ( isset($options['disableauthor']) && $options['disableauthor'] && $wp_query->is_author ) ||
+			 ( isset($options['disablepostformats']) && $options['disablepostformats'] && $wp_query->is_tax('post_format') ) 
+		) {
 			wp_redirect(get_bloginfo('url'),301);
 			exit;
 		}
@@ -630,7 +629,7 @@ class WPSEO_Frontend {
 
 	function attachment_redirect() {
 		global $post;
-		if ( is_attachment() ) {
+		if ( is_attachment() && isset($post->post_parent) && is_numeric($post->post_parent) ) {
 			wp_redirect(get_permalink($post->post_parent), 301);
 			exit;
 		}
@@ -763,11 +762,15 @@ class WPSEO_Frontend {
 	}
 	
 	function rss_replace_vars($temp) {
-		$postlink = '<a href="'.get_permalink().'">'.get_the_title()."</a>";
-		$bloglink = '<a href="'.get_bloginfo('url').'">'.get_bloginfo('name').'</a>';
+		global $post;
+		
+		$authorlink   = '<a rel="author" href="'.get_author_posts_url( $post->post_author ).'">'.get_the_author().'</a>';
+		$postlink 	  = '<a href="'.get_permalink().'">'.get_the_title()."</a>";
+		$bloglink 	  = '<a href="'.get_bloginfo('url').'">'.get_bloginfo('name').'</a>';
 		$blogdesclink = '<a href="'.get_bloginfo('url').'">'.get_bloginfo('name').' - '.get_bloginfo('description').'</a>';
 
 		$temp = stripslashes($temp);
+		$temp = str_replace("%%AUTHORLINK%%", $authorlink, $temp);
 		$temp = str_replace("%%POSTLINK%%", $postlink, $temp);
 		$temp = str_replace("%%BLOGLINK%%", $bloglink, $temp);		
 		$temp = str_replace("%%BLOGDESCLINK%%", $blogdesclink, $temp);					

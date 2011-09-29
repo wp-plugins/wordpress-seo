@@ -166,7 +166,7 @@ class WPSEO_OpenGraph {
 		// Grab the featured image
 		if ( is_singular() ) {
 			if ( empty( $image ) && function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
-				$thumbnail = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'post-thumbnail' );
+				$thumbnail = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'thumbnail' );
 				if ( $thumbnail )
 					$image = $thumbnail[0];
 			// If that's not there, grab the first attached image

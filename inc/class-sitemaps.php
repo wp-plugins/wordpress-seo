@@ -248,11 +248,7 @@ class WPSEO_Sitemaps {
 		// Let's flush the object cache so we're not left with garbage from other plugins
 		wp_cache_flush();
 		
-		$images_in_sitemap = isset($options['xml_include_images']) && $options['xml_include_images'];
 		$stackedurls = array();
-
-		// If we're not going to include images, we might as well save ourselves the memory of grabbing post_content.
-		$post_content_query = $images_in_sitemap ? 'post_content,' : '';
 
 		$steps = 25;
 		$n = (int) get_query_var( 'sitemap_n' );
@@ -263,7 +259,7 @@ class WPSEO_Sitemaps {
 
 		// We grab post_date, post_name, post_author and post_status too so we can throw these objects into get_permalink, which saves a get_post call for each permalink.
 		while( $total > $offset ) {
-			$posts = $wpdb->get_results("SELECT ID, $post_content_query post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
+			$posts = $wpdb->get_results("SELECT ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
 											FROM $wpdb->posts
 											WHERE post_status = 'publish'
 											AND	post_password = ''
@@ -308,7 +304,7 @@ class WPSEO_Sitemaps {
 				$pri = wpseo_get_value('sitemap-prio', $p->ID);
 				if (is_numeric($pri))
 					$url['pri'] = $pri;
-				elseif ($p->post_parent == 0 && $p->post_type = 'page')
+				elseif ($p->post_parent == 0 && $p->post_type == 'page')
 					$url['pri'] = 0.8;
 				else
 					$url['pri'] = 0.6;
@@ -496,14 +492,12 @@ class WPSEO_Sitemaps {
 		$base = $GLOBALS['wp_rewrite']->using_index_permalinks() ? 'index.php/' : '';
 		$sitemapurl = urlencode( home_url( $base . 'sitemap_index.xml' ) );
 
-		if ( isset($options['xml_ping_google']) && $options['xml_ping_google'] )
-			wp_remote_get('http://www.google.com/webmasters/tools/ping?sitemap='.$sitemapurl);
-
+		// Always ping Google and Bing, optionally ping Ask and Yahoo!
+		wp_remote_get('http://www.google.com/webmasters/tools/ping?sitemap='.$sitemapurl);
+		wp_remote_get('http://www.bing.com/webmaster/ping.aspx?sitemap='.$sitemapurl);
+		
 		if ( isset($options['xml_ping_yahoo']) && $options['xml_ping_yahoo'] )
-			wp_remote_get('http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=3usdTDLV34HbjQpIBuzMM1UkECFl5KDN7fogidABihmHBfqaebDuZk1vpLDR64I-&url='.$sitemapurl);
-
-		if ( isset($options['xml_ping_bing']) && $options['xml_ping_bing'] )
-			wp_remote_get('http://www.bing.com/webmaster/ping.aspx?sitemap='.$sitemapurl);
+				wp_remote_get('http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=3usdTDLV34HbjQpIBuzMM1UkECFl5KDN7fogidABihmHBfqaebDuZk1vpLDR64I-&url='.$sitemapurl);
 
 		if ( isset($options['xml_ping_ask']) && $options['xml_ping_ask'] )
 			wp_remote_get('http://submissions.ask.com/ping?sitemap='.$sitemapurl);

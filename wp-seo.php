@@ -1,7 +1,7 @@
 <?php 
 /*
 Plugin Name: WordPress SEO
-Version: 1.0.2.3
+Version: 1.0.3
 Plugin URI: http://yoast.com/wordpress/seo/
 Description: The first true all-in-one SEO solution for WordPress, including on-page content analysis, XML sitemaps and much more.
 Author: Joost de Valk
@@ -18,7 +18,9 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 	}
 }
 
-define( 'WPSEO_VERSION', '1.0.2.3' );
+define( 'WPSEO_VERSION', '1.0.3' );
+
+global $wp_version;
 
 $pluginurl = plugin_dir_url(__FILE__);
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
@@ -48,6 +50,9 @@ if ( is_admin() ) {
 		require WPSEO_PATH.'admin/class-taxonomy.php';
 		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
 			require WPSEO_PATH.'admin/class-opengraph-admin.php';
+
+		if ( version_compare( $wp_version, '3.2.1', '>') )
+			require WPSEO_PATH.'admin/class-pointers.php';
 	}
 } else {
 	require WPSEO_PATH.'frontend/class-frontend.php';
