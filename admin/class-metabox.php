@@ -73,8 +73,8 @@ class WPSEO_Metabox {
 		<script type="text/javascript">
 			var wpseo_lang ='<?php echo substr(get_locale(),0,2); ?>';
 			var wpseo_meta_desc_length = '<?php echo $this->wpseo_meta_length; ?>';
-			var wpseo_title_template = '<?php echo $title_template; ?>';
-			var wpseo_metadesc_template = '<?php echo $metadesc_template; ?>';
+			var wpseo_title_template = '<?php echo esc_attr($title_template); ?>';
+			var wpseo_metadesc_template = '<?php echo esc_attr($metadesc_template); ?>';
 			var wpseo_permalink_template = '<?php echo $sample_permalink; ?>'
 		</script>
 		<?php
@@ -400,9 +400,9 @@ class WPSEO_Metabox {
 	
 	function get_post_date( $post ) {
 		if ( isset($post->post_date) && $post->post_status == 'publish' )
-			$date = date('M j, Y', strtotime($post->post_date) );
+			$date = date('j M Y', strtotime($post->post_date) );
 		else 
-			$date = date('M j, Y');
+			$date = date('j M Y');
 		return $date;
 	}
 	
@@ -444,11 +444,11 @@ class WPSEO_Metabox {
 			</div>';
 		} else {
 			if ( !empty($date) )
-				$date .= ' <strong>...</strong> ';
+				$date = '<span style="color: #666;">'.$date.'</span> – ';
 			$content .= '<div id="wpseosnippet">
-				<a class="title" href="#">'.$title.'</a>
-				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span>'.$desc.'</span></p>
-				<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a> - <a href="#" class="util">Similar</a>
+				<a class="title" href="#">'.$title.'</a><br/>
+			<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a>
+				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span class="content">'.$desc.'</span></p>
 			</div>';
 		} 
 		return $content;

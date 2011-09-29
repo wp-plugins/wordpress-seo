@@ -28,6 +28,10 @@ div.inside ul {
 	margin-left: 20px;
 }
 
+.postbox {
+	margin: 10px 10px 0 0;	
+}
+
 .postbox .inside p, .postbox .inside label, .postbox .inside li, .postbox .inside a {
 	font-size: 12px;
 }

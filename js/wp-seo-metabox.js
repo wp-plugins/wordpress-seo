@@ -30,10 +30,12 @@ function yst_clean( str, cleanalphanumeric ) {
 	if ( str == '' || str == undefined )
 		return '';
 	
-	if ( cleanalphanumeric == true )
-		str = str.replace(/[^a-zA-Z0-9\s]/, '');
-	str = str.replace(/<\/?[^>]+>/gi, ''); 
-	str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
+	try {
+		if ( cleanalphanumeric == true )
+			str = str.replace(/[^a-zA-Z0-9\s]/, '');
+		str = str.replace(/<\/?[^>]+>/gi, ''); 
+		str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
+	} catch(e) {}
 	return str;
 }
 
@@ -152,8 +154,8 @@ function updateDesc( desc ) {
 	desc = boldKeywords( desc, false );
 
 	jQuery('#yoast_wpseo_metadesc-length').html(len);
-	jQuery("#wpseosnippet .desc span").css( 'color', color );
-	jQuery("#wpseosnippet .desc span").html( desc );
+	jQuery("#wpseosnippet .desc span.content").css( 'color', color );
+	jQuery("#wpseosnippet .desc span.content").html( desc );
 	testFocusKw();
 }
 
@@ -176,7 +178,7 @@ function boldKeywords( str, url ) {
 	} else {
 		var keywords	= new Array( focuskw );
 	}
-	for (var i in keywords) {
+	for (var i=0;i<keywords.length;i++) {
 		var kw		= yst_clean( keywords[i] );
 		if ( url ) {
 			var kw 	= kw.replace(' ','-').toLowerCase();

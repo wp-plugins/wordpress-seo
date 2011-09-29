@@ -77,7 +77,9 @@ function wpseo_export_settings( $include_taxonomy ) {
 		$content .= "wpseo_taxonomy_meta = \"".urlencode( json_encode( get_option('wpseo_taxonomy_meta') ) )."\"";
 	}
 
-    if ( !$handle = fopen( WPSEO_UPLOAD_DIR.'settings.ini', 'w' ) )
+	$dir = wp_upload_dir();
+	
+    if ( !$handle = fopen( $dir['path'].'/settings.ini', 'w' ) )
         die();
 
     if ( !fwrite($handle, $content) ) 
@@ -87,15 +89,22 @@ function wpseo_export_settings( $include_taxonomy ) {
 
 	require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
 	
-	chdir(WPSEO_UPLOAD_DIR);
+	chdir( $dir['path'] );
 	$zip = new PclZip('./settings.zip');
 	if ($zip->create('./settings.ini') == 0)
 	  	return false;
 	
-	return WPSEO_UPLOAD_URL.'settings.zip'; 
+	return $dir['url'].'/settings.zip'; 
 }
 
+/**
+ * Adds an SEO admin bar menu with several options. If the current user is an admin he can also go straight to several settings menu's from here.
+ */
 function wpseo_admin_bar_menu() {
+	// If the current user can't write posts, this is all of no use, so let's not output an admin menu
+	if ( !current_user_can('edit_posts') )
+		return;
+		
 	global $wp_admin_bar, $wpseo_front, $post;
 
 	if ( is_object($wpseo_front) ) {

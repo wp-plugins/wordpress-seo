@@ -410,9 +410,9 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				if ( isset( $file['file'] ) && !is_wp_error($file) ) {
 					require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
 					$zip = new PclZip( $file['file'] );
-					$unzipped = $zip->extract( $p_path = WP_CONTENT_DIR.'wpseo-import/' );
+					$unzipped = $zip->extract( $p_path = WP_CONTENT_DIR.'/wpseo-import/' );
 					if ( $unzipped[0]['stored_filename'] == 'settings.ini' ) {
-						$options = parse_ini_file( WP_CONTENT_DIR.'wpseo-import/settings.ini', true );
+						$options = parse_ini_file( WP_CONTENT_DIR.'/wpseo-import/settings.ini', true );
 						foreach ($options as $name => $optgroup) {
 							if ($name != 'wpseo_taxonomy_meta') {
 								update_option($name, $optgroup);
@@ -420,7 +420,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 								update_option($name, json_decode( urldecode( $optgroup['wpseo_taxonomy_meta'] ), true ) );
 							}
 						}
-						@unlink( WP_CONTENT_DIR.'wpseo-import/' );
+						@unlink( WP_CONTENT_DIR.'/wpseo-import/' );
 						
 						$content .= '<p><strong>'.__('Settings successfully imported.').'</strong></p>';
 					} else {
@@ -447,7 +447,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles','yoast-wpseo'));
 			$content .= '<h4 class="big">'.__('Singular pages').'</h4>';
 			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.").'</p>';
-			if ( 'posts' == get_option('show_on_front') ) {
+			if ( 'page' != get_option('show_on_front') ) {
 				$content .= '<h4>'.__('Homepage').'</h4>';
 				$content .= $this->textinput('title-home',__('Title template'));
 				$content .= $this->textarea('metadesc-home',__('Meta description template'), '', 'metadesc');
@@ -878,14 +878,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->postbox('opengraph',__('OpenGraph (Facebook)', 'yoast-wpseo'),$content);
 					
 			$content = '<p>'.__("Below you'll find checkboxes for each of the sections of your site that you might want to disallow the search engines from indexing. Be aware that this is a powerful tool, blocking category archives, for instance, really blocks all category archives from showing up in the index.").'</p>';
-			$content .= $this->checkbox('search',__('This site\'s search result pages', 'yoast-wpseo'));
-			$content .= '<p class="desc">'.__('Prevents the search engines from indexing your search result pages, by a <code>noindex,follow</code> robots tag to them. The <code>follow</code> part means that search engine crawlers <em>will</em> spider the pages listed in the search results.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('logininput',__('The login and register pages', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('(warning: don\'t enable this if you have the <a href="http://wordpress.org/extend/plugins/minimeta-widget/">minimeta widget</a> installed!)', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('admin',__('All admin pages', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('The above two options prevent the search engines from indexing your login, register and admin pages.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('pagedhome',__('Subpages of the homepage', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Prevent the search engines from indexing your subpages, if you want them to only index your category and / or tag archives.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('noindexsubpages',__('Subpages of archives and taxonomies', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('Prevent the search engines from indexing (not from crawling and following the links) your taxonomies & archives subpages.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('noindexauthor',__('Author archives', 'yoast-wpseo') );
@@ -899,6 +891,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->checkbox('noindextag',__('Tag archives', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('Read the categories explanation above for categories and switch the words category and tag around ;)', 'yoast-wpseo').'</p>';
 
+			if ( current_theme_supports('post-formats') ) {
+				$content .= $this->checkbox('noindexpostformat',__('Post Formats archives', 'yoast-wpseo') );
+				$content .= '<p class="desc">'.__('Post formats have publicly queriable archives by default that should be disabled below or noindexed here.', 'yoast-wpseo').'</p>';
+			}
+				
 			$this->postbox('preventindexing',__('Indexation Rules', 'yoast-wpseo'),$content);
 
 			$content = $this->checkbox('nofollowmeta',__('Nofollow login and registration links', 'yoast-wpseo') );
@@ -914,7 +911,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<p class="desc">'.__('If you\'re running a one author blog, the author archive will always look exactly the same as your homepage. And even though you may not link to it, others might, to do you harm. Disabling them here will make sure any link to those archives will be 301 redirected to the blog homepage.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('disabledate',__('Disable the date-based archives', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('For the date based archives, the same applies: they probably look a lot like your homepage, and could thus be seen as duplicate content.', 'yoast-wpseo').'</p>';
-						
+			if ( current_theme_supports('post-formats') ) {
+				$content .= $this->checkbox('disablepostformats',__('Disable the post format archives', 'yoast-wpseo') );
+				$content .= '<p class="desc">'.__('This completely disables the archives for post formats.', 'yoast-wpseo').'</p>';
+			}
 			$this->postbox('archivesettings',__('Archive Settings', 'yoast-wpseo'),$content);
 					
 			$content = '<p>'.__("You can add all these on a per post / page basis from the edit screen, by clicking on advanced. Should you wish to use any of these sitewide, you can do so here. (This is <em>not</em> recommended.)").'</p>';
@@ -922,10 +922,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<p class="desc">'.__('Prevents search engines from using the DMOZ description for pages from this site in the search results.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('noydir',__('Add <code>noydir</code> meta robots tag sitewide', 'yoast-wpseo') );
 			$content .= '<p class="desc">'.__('Prevents search engines from using the Yahoo! directory description for pages from this site in the search results.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('nosnippet',__('Add <code>nosnippet</code> meta robots tag sitewide', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Prevents search engines from displaying snippets for your pages.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('noarchive',__('Add <code>noarchive</code> meta robots tag sitewide', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Prevents search engines from caching pages from this site.', 'yoast-wpseo').'</p>';
 			
 			$this->postbox('directories',__('Robots Meta Settings', 'yoast-wpseo'),$content); 
 			
@@ -934,12 +930,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use remote editors.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('hidewlwmanifest','Hide WLW Manifest Links');
 			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use Windows Live Writer.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('hidewpgenerator','Hide WordPress Generator');
-			$content .= '<p class="desc">'.__('If you want to show off that you\'re on the latest version, don\'t check this box.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('hideindexrel','Hide Index Relation Links');
-			$content .= $this->checkbox('hidestartrel','Hide Start Relation Links');
-			$content .= '<p class="desc">'.__('Check these boxes, or please tell the plugin author why you shouldn\'t.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('hideprevnextpostlink','Hide Previous &amp; Next Post Links');
 			$content .= $this->checkbox('hideshortlink','Hide Shortlink for posts');
 			$content .= '<p class="desc">'.__('Hides the shortlink for the current post.', 'yoast-wpseo').'</p>';
 			$content .= $this->checkbox('hidefeedlinks','Hide RSS Links');
@@ -952,27 +942,17 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 		function rss_page() {
 			$options = get_wpseo_options();
-			$this->admin_header('RSS', true, true, 'yoast_wpseo_rss_options', 'wpseo_rss');
-			$content = $this->checkbox('commentfeeds',__('<code>noindex</code> the comment RSS feeds', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('This will prevent the search engines from indexing your comment feeds.', 'yoast-wpseo').'</p>';
-		
-			$content .= $this->checkbox('allfeeds',__('<code>noindex</code> <strong>all</strong> RSS feeds', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('This will prevent the search engines from indexing <strong>all your</strong> feeds. Highly discouraged.', 'yoast-wpseo').'</p>';
-
-			$content .= $this->checkbox('pingfeed',__('Ping the Search Engines with feed on new post', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('This will ping search engines that your RSS feed has been updated.', 'yoast-wpseo').'</p>';
-
-			$this->postbox('rssfeeds',__('RSS Feeds', 'yoast-wpseo'),$content); 			
+			$this->admin_header('RSS', false, true, 'yoast_wpseo_rss_options', 'wpseo_rss');
 			
-			$content = '<p>'."The feature below is used to automatically add content to your RSS, more specifically, it's meant to add links back to your blog and your blog posts, so dumb scrapers will automatically add these links too, helping search engines identify you as the original source of the content.".'</p>';
+			$content = '<p>'."This feature is used to automatically add content to your RSS, more specifically, it's meant to add links back to your blog and your blog posts, so dumb scrapers will automatically add these links too, helping search engines identify you as the original source of the content.".'</p>';
 			$rows = array();
 			$rssbefore = '';
 			if ( isset($options['rssbefore']) )
-				$rssbefore = stripslashes(htmlentities($options['rssbefore']));
+				$rssbefore = esc_html(stripslashes($options['rssbefore']));
 
 			$rssafter = '';
 			if ( isset($options['rssafter']) )
-				$rssafter = stripslashes(htmlentities($options['rssafter']));
+				$rssafter = esc_html(stripslashes($options['rssafter']));
 			
 			$rows[] = array(
 				"id" => "rssbefore",
@@ -989,11 +969,12 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$rows[] = array(
 				"label" => __('Explanation', 'yoast-wpseo'),
 				"content" => '<p>'.__('You can use the following variables within the content, they will be replaced by the value on the right.', 'yoast-wpseo').'</p>'.
-				'<ul>'.
-				'<li><strong>%%POSTLINK%%</strong> : '.__('A link to the post, with the title as anchor text.', 'yoast-wpseo').'</li>'.
-				'<li><strong>%%BLOGLINK%%</strong> : '.__("A link to your site, with your site's name as anchor text.", 'yoast-wpseo').'</li>'.
-				'<li><strong>%%BLOGDESCLINK%%</strong> : '.__("A link to your site, with your site's name and description as anchor text.", 'yoast-wpseo').'</li>'.
-				'</ul>'
+				'<table>'.
+				'<tr><th><strong>%%AUTHORLINK%%</strong></th><td>'.__('A link to the archive for the post author, with the authors name as anchor text.', 'yoast-wpseo').'</td></tr>'.
+				'<tr><th><strong>%%POSTLINK%%</strong></th><td>'.__('A link to the post, with the title as anchor text.', 'yoast-wpseo').'</td></tr>'.
+				'<tr><th><strong>%%BLOGLINK%%</strong></th><td>'.__("A link to your site, with your site's name as anchor text.", 'yoast-wpseo').'</td></tr>'.
+				'<tr><th><strong>%%BLOGDESCLINK%%</strong></th><td>'.__("A link to your site, with your site's name and description as anchor text.", 'yoast-wpseo').'</td></tr>'.
+				'</table>'
 			);
 			$this->postbox('rssfootercontent',__('Content of your RSS Feed', 'yoast-wpseo'),$content.$this->form_table($rows));
 			
@@ -1009,12 +990,12 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
 			$content .= '<div id="sitemapinfo">';
-			$content .= '<p>'.sprintf(__('You can find your XML Sitemap %shere%s'), '<a href="'.home_url($base.'sitemap_index.xml').'">', '</a>').'. You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.</p>';
-			$content .= '<strong>'.__('General settings').'</strong><br/><br/>';
-			$content .= $this->checkbox('xml_include_images', __("Add images to XML Sitemap."), false);
-			$content .= '<p>'.__('After content publication:').'</p>';
-			$content .= $this->checkbox('xml_ping_google', __("Ping Google."), false);
-			$content .= $this->checkbox('xml_ping_bing', __("Ping Bing."), false);
+			if ( $options['enablexmlsitemap'] )
+				$content .= '<p>'.sprintf(__('You can find your XML Sitemap here: %sXML Sitemap%s'), '<a target="_blank" class="button-secondary" href="'.home_url($base.'sitemap_index.xml').'">', '</a>').'<br/><br/> You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.</p>';
+			else
+				$content .= '<p>'.__('Save your settings to activate XML Sitemaps.').'</p>';
+			$content .= '<strong>'.__('General settings').'</strong><br/>';
+			$content .= '<p>'.__('After content publication, the plugin automatically pings Google and Bing, do you need it to ping other search engines too? If so, check the box:').'</p>';
 			$content .= $this->checkbox('xml_ping_yahoo', __("Ping Yahoo!."), false);
 			$content .= $this->checkbox('xml_ping_ask', __("Ping Ask.com."), false);
 			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
@@ -1079,10 +1060,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.').'</a>'
 				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
 
-			if ($content != '')
+			if ( isset($options['ignore_tour'] ) && $options['ignore_tour'] )
+				$content .= '<p><a class="button-secondary" href="'.admin_url('admin.php?page=wpseo_dashboard&wpseo_restart_tour').'">'.__('Start Introduction Tour').'</a></p>';
+			
+			if ( '' != $content )
 				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
 			
-			$content .= $this->checkbox('usemetakeywords', 'Use <code>meta</code> keywords tag?');
+			$content = $this->checkbox('usemetakeywords', 'Use <code>meta</code> keywords tag?');
 			$content .= $this->checkbox('disabledatesnippet', 'Disable date in snippet preview for posts');
 			
 			// TODO: make this settable per user level...

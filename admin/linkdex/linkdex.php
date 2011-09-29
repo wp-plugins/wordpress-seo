@@ -32,7 +32,7 @@ class Linkdex {
 		$job 		= array();
 
 		$sampleurl = get_sample_permalink($post->ID);
-		$job["pageUrl"] = str_replace( '%postname%', $sampleurl[1], $sampleurl[0] );
+		$job["pageUrl"] = preg_replace( '/%(post|page)name%/', $sampleurl[1], $sampleurl[0] );
 		$job["pageSlug"] = urldecode( $post->post_name );
 		$job["keyword"]	= wpseo_get_value('focuskw');
 		$job["keyword_folded"] = $this->strip_separators_and_fold( $job["keyword"] );
