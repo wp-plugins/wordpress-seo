@@ -3,8 +3,8 @@
 class WPSEO_Widget_Meta extends WP_Widget {
 
 	function WPSEO_Widget_Meta() {
-		$widget_ops = array('classname' => 'widget_meta', 'description' => __( "Log in/out, admin, feed and WordPress links - nofollowed") );
-		$this->WP_Widget('meta', __('Meta - Nofollowed'), $widget_ops);
+		$widget_ops = array('classname' => 'widget_meta', 'description' => __( "Log in/out, admin, feed and WordPress links - nofollowed", WPSEO_TEXT_DOMAIN ) );
+		$this->WP_Widget('meta', __('Meta - Nofollowed', WPSEO_TEXT_DOMAIN ), $widget_ops);
 	}
 
 	function widget( $args, $instance ) {

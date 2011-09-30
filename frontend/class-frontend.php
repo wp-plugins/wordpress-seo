@@ -217,12 +217,16 @@ class WPSEO_Frontend {
 		return preg_replace('/\s?'.get_bloginfo('version').'/','',$generator);
 	}
 	
+	function promo() {
+		echo "\n<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
+	}
+	
 	function head() {
 		$options = get_wpseo_options();
 
 		global $wp_query;
 		
-		echo "\n<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
+		$this->promo();
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
@@ -577,7 +581,7 @@ class WPSEO_Frontend {
 			if ( !empty( $metadesc ) )
 				echo "<meta name='description' content='".esc_attr( strip_tags( stripslashes( $metadesc ) ) )."'/>\n";
 			else if ( current_user_can('manage_options') && is_singular() )
-				echo '<!-- Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template. -->'."\n";			
+				echo '<!-- '.__( 'Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template.', WPSEO_TEXT_DOMAIN ).' -->'."\n";			
 		} else {
 			return $metadesc;
 		}
@@ -598,7 +602,7 @@ class WPSEO_Frontend {
 	}
 	
 	function noindex_page() {
-		echo "<!-- This site is optimized with the Yoast WordPress SEO plugin. -->\n";
+		$this->promo();
 		echo '<meta name="robots" content="noindex" />'."\n";
 	}
 

@@ -96,6 +96,11 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= next =
+
+* Show proper post type names in admin menu for disabling editor box and hide non-public post types (props Nacin).
+* Disabling the Advanced Editor now only disables it for non admins.
+
 = 1.0.3 =
 
 * This release is dedicated to removing options and setting defaults instead. Specifically, the following settings are now defaults without options to change them:
@@ -115,6 +120,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * No longer redirect attachments that have no parent.
 * Correctly grab thumbnail for OpenGraph settings.
 * Pages now get the correct priority (0.8).
+* Added the option to noindex or completely disable post format archives.
 
 = 1.0.2.3 =
 

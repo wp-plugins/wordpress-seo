@@ -5,12 +5,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 		var $hook 			= 'wordpress-seo';
 		var $filename		= 'wordpress-seo/wp-seo.php';
-		var $longname		= 'WordPress SEO Configuration';
-		var $shortname		= 'SEO';
+		var $longname;
+		var $shortname;
 		var $currentoption 	= 'wpseo';
 		var $ozhicon		= 'tag.png';
 		
 		function WPSEO_Admin() {
+			$this->longname = __( 'WordPress SEO Configuration', WPSEO_TEXT_DOMAIN );
+			$this->shortname = __( 'SEO', WPSEO_TEXT_DOMAIN );
 			$this->multisite_defaults();
 			add_action( 'init', array(&$this, 'init') );
 		}
@@ -78,7 +80,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($options['ignore_blog_public_warning']) && $options['ignore_blog_public_warning'] == 'ignore' )
 				return;
 			echo "<div id='message' class='error'>";
-			echo "<p><strong>Huge SEO Issue: You're blocking access to robots.</strong> You must <a href='options-privacy.php'>go to your Privacy settings</a> and set your blog visible to everyone. <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\",\"".wp_create_nonce('wpseo-ignore')."\");' class='button'>I know, don't bug me.</a></p></div>";
+			echo "<p><strong>".__( "Huge SEO Issue: You're blocking access to robots.", WPSEO_TEXT_DOMAIN )."</strong> ".sprintf( __( "You must %sgo to your Privacy settings%s and set your blog visible to everyone.", WPSEO_TEXT_DOMAIN ), "<a href='options-privacy.php'>", "</a>" )." <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\",\"".wp_create_nonce('wpseo-ignore')."\");' class='button'>".__( "I know, don't bug me.", WPSEO_TEXT_DOMAIN )."</a></p></div>";
 		}
 		
 		function admin_sidebar() {
@@ -88,10 +90,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					<div class="meta-box-sortables">
 						<?php
 							$this->plugin_like();
-							$this->postbox('donate','<strong class="red">Donate $10, $20 or $50!</strong>','<p>This plugin has cost me countless hours of work, if you use it, please donate a token of your appreciation!</p><br/><form style="margin-left:30px;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+							$this->postbox('donate','<strong class="red">'.__( 'Donate $10, $20 or $50!', WPSEO_TEXT_DOMAIN ).'</strong>','<p>'.__( 'This plugin has cost me countless hours of work, if you use it, please donate a token of your appreciation!', WPSEO_TEXT_DOMAIN ).'</p><br/><form style="margin-left:30px;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
 							<input type="hidden" name="cmd" value="_s-xclick">
 							<input type="hidden" name="hosted_button_id" value="83KQ269Q2SR82">
-							<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+							<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit">
 							<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 							</form>');
 							$this->plugin_support();
@@ -109,14 +111,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			<div class="wrap">
 				<?php 
 				if ( (isset($_GET['updated']) && $_GET['updated'] == 'true') || (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true') ) {
-					$msg = __('Settings updated');
+					$msg = __('Settings updated', WPSEO_TEXT_DOMAIN );
 
 					if ( function_exists('w3tc_pgcache_flush') ) {
 						w3tc_pgcache_flush();
-						$msg .= __(' &amp; W3 Total Cache Page Cache flushed');
+						$msg .= __(' &amp; W3 Total Cache Page Cache flushed', WPSEO_TEXT_DOMAIN );
 					} else if (function_exists('wp_cache_clear_cache() ')) {
 						wp_cache_clear_cache();
-						$msg .= __(' &amp; WP Super Cache flushed');
+						$msg .= __(' &amp; WP Super Cache flushed', WPSEO_TEXT_DOMAIN );
 					}
 
 					// flush rewrite rules if XML sitemap settings have been updated.
@@ -127,7 +129,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}  
 				?>
 				<a href="http://yoast.com/"><div id="yoast-icon" style="background: url(<?php echo WPSEO_URL; ?>images/wordpress-SEO-32x32.png) no-repeat;" class="icon32"><br /></div></a>
-				<h2><?php _e("Yoast WordPress SEO: ".$title, 'yoast-wpseo'); ?></h2>
+				<h2><?php _e("Yoast WordPress SEO: ", WPSEO_TEXT_DOMAIN ); echo $title; ?></h2>
 				<div class="postbox-container" style="width:70%;">
 					<div class="metabox-holder">	
 						<div class="meta-box-sortables">
@@ -138,19 +140,20 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$this->currentoption = $optionshort;
 				// Set some of the ignore booleans here to prevent unsetting.
 				echo $this->hidden('ignore_blog_public_warning');
+				echo $this->hidden('ignore_tour');
 				echo $this->hidden('ignore_page_comments');
 				echo $this->hidden('ignore_permalink');
 				echo $this->hidden('ms_defaults_set');
 			}
 			if ($expl)
-				$this->postbox('pluginsettings',__('Plugin Settings', 'yoast-wpseo'),$this->checkbox('disableexplanation',__('Hide verbose explanations of settings', 'yoast-wpseo'))); 
+				$this->postbox('pluginsettings',__('Plugin Settings', WPSEO_TEXT_DOMAIN),$this->checkbox('disableexplanation',__('Hide verbose explanations of settings', WPSEO_TEXT_DOMAIN))); 
 			
 		}
 		
 		function admin_footer($title, $submit = true) {
 			if ($submit) {
 			?>
-							<div class="submit"><input type="submit" class="button-primary" name="submit" value="<?php _e("Save ".$title." Settings", 'yoast-wpseo'); ?>" /></div>
+							<div class="submit"><input type="submit" class="button-primary" name="submit" value="<?php _e("Save Settings", WPSEO_TEXT_DOMAIN); ?>" /></div>
 			<?php } ?>
 							</form>
 						</div>
@@ -203,7 +206,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$options[$opt] = $_POST['wpseo_ms'][$opt];
 				}
 				update_site_option('wpseo_ms', $options);
-				echo '<div id="message" class="updated">'.__('Settings Updated.').'</div>';
+				echo '<div id="message" class="updated">'.__('Settings Updated.', WPSEO_TEXT_DOMAIN ).'</div>';
 			}
 			
 			if ( isset( $_POST['wpseo_restore_blog'] ) ) {
@@ -215,7 +218,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							if ( count($new_options) > 0 )
 								update_blog_option( $_POST['wpseo_ms']['restoreblog'], $option, $new_options );
 						}
-						echo '<div id="message" class="updated"><p>'.$blog->blogname.' '.__('restored to default SEO settings.').'</p></div>';
+						echo '<div id="message" class="updated"><p>'.$blog->blogname.' '.__('restored to default SEO settings.', WPSEO_TEXT_DOMAIN ).'</p></div>';
 					}
 				}
 			}
@@ -223,28 +226,28 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->admin_header('MultiSite Settings', false, false);
 			
 			$content = '<form method="post">';
-			$content .= $this->select('access',__('Who should have access to the WordPress SEO settings'), 
+			$content .= $this->select('access',__('Who should have access to the WordPress SEO settings', WPSEO_TEXT_DOMAIN ), 
 				array(
-					'admin' => 'Site Admins (default)',
-					'superadmin' => 'Super Admins only'
+					'admin' => __( 'Site Admins (default)', WPSEO_TEXT_DOMAIN ),
+					'superadmin' => __( 'Super Admins only', WPSEO_TEXT_DOMAIN )
 				), 'wpseo_ms'
 			);
-			$content .= $this->textinput('defaultblog',__('New blogs get the SEO settings from this blog'),'wpseo_ms');
-			$content .= '<p>'.__('Enter the Blog ID for the site whose settings you want to use as default for all sites that are added to your network. Leave empty for none.').'</p>';
-			$content .= '<input type="submit" name="wpseo_submit" class="button-primary" value="'.__('Save MultiSite Settings').'"/>';
+			$content .= $this->textinput('defaultblog',__('New blogs get the SEO settings from this blog'), WPSEO_TEXT_DOMAIN );
+			$content .= '<p>'.__('Enter the Blog ID for the site whose settings you want to use as default for all sites that are added to your network. Leave empty for none.', WPSEO_TEXT_DOMAIN ).'</p>';
+			$content .= '<input type="submit" name="wpseo_submit" class="button-primary" value="'.__('Save MultiSite Settings', WPSEO_TEXT_DOMAIN ).'"/>';
 			$content .= '</form>';
 
-			$this->postbox('wpseo_export',__('MultiSite Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('wpseo_export',__('MultiSite Settings', WPSEO_TEXT_DOMAIN),$content); 
 			
 			$content = '<form method="post">';
-			$content .= '<p>'.__( 'Using this form you can reset a site to the default SEO settings.' ).'</p>';
-			$content .= $this->textinput( 'restoreblog', __('Blog ID'), 'wpseo_ms' );
-			$content .= '<input type="submit" name="wpseo_restore_blog" value="'.__('Restore site to defaults').'" class="button"/>';
+			$content .= '<p>'.__( 'Using this form you can reset a site to the default SEO settings.', WPSEO_TEXT_DOMAIN  ).'</p>';
+			$content .= $this->textinput( 'restoreblog', __('Blog ID'), WPSEO_TEXT_DOMAIN );
+			$content .= '<input type="submit" name="wpseo_restore_blog" value="'.__('Restore site to defaults', WPSEO_TEXT_DOMAIN ).'" class="button"/>';
 			$content .= '</form>';
 
-			$this->postbox('wpseo_export',__('Restore site to default settings', 'yoast-wpseo'),$content); 
+			$this->postbox('wpseo_export',__('Restore site to default settings', WPSEO_TEXT_DOMAIN),$content); 
 			
-			$this->admin_footer('Restore to Default', false);
+			$this->admin_footer(__( 'Restore to Default', WPSEO_TEXT_DOMAIN ), false);
 		}
 		
 		function import_page() {
@@ -293,13 +296,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$this->replace_meta('_aioseop_description', '_yoast_wpseo_metadesc', $replace);
 					$this->replace_meta('_aioseop_keywords', '_yoast_wpseo_metakeywords', $replace);
 					$this->replace_meta('_aioseop_title', '_yoast_wpseo_title', $replace);
-					$msg .= '<p>All in One SEO data successfully imported.</p>';
+					$msg .= '<p>'.__( 'All in One SEO data successfully imported.', WPSEO_TEXT_DOMAIN ).'</p>';
 				}
 				if ( isset($_POST['wpseo']['importaioseoold']) ) {
 					$this->replace_meta('description', '_yoast_wpseo_metadesc', $replace);
 					$this->replace_meta('keywords', '_yoast_wpseo_metakeywords', $replace);
 					$this->replace_meta('title', '_yoast_wpseo_title', $replace);
-					$msg .= '<p>'.__('All in One SEO (Old version) data successfully imported.').'</p>';
+					$msg .= '<p>'.__('All in One SEO (Old version) data successfully imported.', WPSEO_TEXT_DOMAIN ).'</p>';
 				}
 				if ( isset($_POST['wpseo']['importrobotsmeta']) ) {
 					$posts = $wpdb->get_results("SELECT ID, robotsmeta FROM $wpdb->posts");
@@ -310,7 +313,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						if ( strpos($post->robotsmeta, 'nofollow') !== false )
 							wpseo_set_value('meta-robots-nofollow', true, $post->ID);
 					}
-					$msg .= '<p>'.__('Robots Meta values imported.').'</p>';
+					$msg .= '<p>'.__('Robots Meta values imported.', WPSEO_TEXT_DOMAIN ).'</p>';
 				}
 				if ( isset($_POST['wpseo']['importrssfooter']) ) {
 					$optold = get_option( 'RSSFooterOptions' );
@@ -323,7 +326,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							$optnew['rssbefore'] = $optold['footerstring'];						
 					}
 					update_option( 'wpseo_rss', $optnew );
-					$msg .= '<p>'.__('RSS Footer options imported successfully.').'</p>';
+					$msg .= '<p>'.__('RSS Footer options imported successfully.', WPSEO_TEXT_DOMAIN ).'</p>';
 				}
 				if ( isset($_POST['wpseo']['importbreadcrumbs']) ) {
 					$optold = get_option( 'yoast_breadcrumbs' );
@@ -337,50 +340,50 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 								$optnew['breadcrumbs-'.$opt] = $val;
 						}						
 						update_option( 'wpseo_internallinks', $optnew );
-						$msg .= '<p>'.__('Yoast Breadcrumbs options imported successfully.').'</p>';
+						$msg .= '<p>'.__('Yoast Breadcrumbs options imported successfully.', WPSEO_TEXT_DOMAIN ).'</p>';
 					} else {
-						$msg .= '<p>'.__('Yoast Breadcrumbs options could not be found').'</p>';
+						$msg .= '<p>'.__('Yoast Breadcrumbs options could not be found', WPSEO_TEXT_DOMAIN ).'</p>';
 					}
 				}
 				if ($replace)
-					$msg .= __(', and old data deleted');
+					$msg .= __(', and old data deleted', WPSEO_TEXT_DOMAIN );
 				if ($deletekw)
-					$msg .= __(', and meta keywords data deleted');
+					$msg .= __(', and meta keywords data deleted', WPSEO_TEXT_DOMAIN );
 			}
 			
 			$this->admin_header('Import', false, false);
 			if ($msg != '')
 				echo '<div id="message" class="message updated" style="width:94%;">'.$msg.'</div>';
 				
-			$content = "<p>".__("No doubt you've used an SEO plugin before if this site isn't new. Let's make it easy on you, you can import the data below. If you want, you can import first, check if it was imported correctly, and then import &amp; delete. No duplicate data will be imported.")."</p>";
-			$content .= '<p>'.__("If you've used another SEO plugin, try the <a href='http://wordpress.org/extend/plugins/seo-data-transporter/'>SEO Data Transporter</a> plugin to move your data into this plugin, it rocks!").'</p>';
+			$content = "<p>".__("No doubt you've used an SEO plugin before if this site isn't new. Let's make it easy on you, you can import the data below. If you want, you can import first, check if it was imported correctly, and then import &amp; delete. No duplicate data will be imported.", WPSEO_TEXT_DOMAIN )."</p>";
+			$content .= '<p>'.sprintf( __("If you've used another SEO plugin, try the %sSEO Data Transporter%s plugin to move your data into this plugin, it rocks!", WPSEO_TEXT_DOMAIN ), "<a href='http://wordpress.org/extend/plugins/seo-data-transporter/'>", "</a>" ).'</p>';
 			$content .= '<form action="" method="post">';
-			$content .= $this->checkbox('importheadspace',__('Import from HeadSpace2?','yoast-wpseo'));
-			$content .= $this->checkbox('importaioseo',__('Import from All-in-One SEO?','yoast-wpseo'));
-			$content .= $this->checkbox('importaioseoold',__('Import from OLD All-in-One SEO?','yoast-wpseo'));
+			$content .= $this->checkbox('importheadspace',__('Import from HeadSpace2?', WPSEO_TEXT_DOMAIN));
+			$content .= $this->checkbox('importaioseo',__('Import from All-in-One SEO?', WPSEO_TEXT_DOMAIN));
+			$content .= $this->checkbox('importaioseoold',__('Import from OLD All-in-One SEO?', WPSEO_TEXT_DOMAIN));
 			$content .= '<br/>';
-			$content .= $this->checkbox('deleteolddata',__('Delete the old data after import? (recommended)','yoast-wpseo'));
-			$content .= '<input type="submit" class="button-primary" name="import" value="Import" />';
+			$content .= $this->checkbox('deleteolddata',__('Delete the old data after import? (recommended)', WPSEO_TEXT_DOMAIN));
+			$content .= '<input type="submit" class="button-primary" name="import" value="'.__( 'Import', WPSEO_TEXT_DOMAIN ).'" />';
 			$content .= '<br/><br/>';
 			$content .= '<form action="" method="post">';
-			$content .= '<h2>Import settings from other plugins</h2>';
-			$content .= $this->checkbox('importrobotsmeta',__('Import from Robots Meta (by Yoast)?','yoast-wpseo'));
-			$content .= $this->checkbox('importrssfooter',__('Import from RSS Footer (by Yoast)?','yoast-wpseo'));
-			$content .= $this->checkbox('importbreadcrumbs',__('Import from Yoast Breadcrumbs?','yoast-wpseo'));
-			$content .= '<input type="submit" class="button-primary" name="import" value="Import" />';			
+			$content .= '<h2>'.__( 'Import settings from other plugins', WPSEO_TEXT_DOMAIN ).'</h2>';
+			$content .= $this->checkbox('importrobotsmeta',__('Import from Robots Meta (by Yoast)?', WPSEO_TEXT_DOMAIN));
+			$content .= $this->checkbox('importrssfooter',__('Import from RSS Footer (by Yoast)?', WPSEO_TEXT_DOMAIN));
+			$content .= $this->checkbox('importbreadcrumbs',__('Import from Yoast Breadcrumbs?', WPSEO_TEXT_DOMAIN));
+			$content .= '<input type="submit" class="button-primary" name="import" value="'.__( 'Import', WPSEO_TEXT_DOMAIN ).'" />';			
 			$content .= '</form>';			
 			
-			$this->postbox('import',__('Import', 'yoast-wpseo'),$content); 
+			$this->postbox('import',__('Import', WPSEO_TEXT_DOMAIN),$content); 
 			
 			do_action('wpseo_import', $this);
 
 			$content = '</form>';
-			$content .= '<strong>Export</strong><br/>';
+			$content .= '<strong>'.__( 'Export', WPSEO_TEXT_DOMAIN ).'</strong><br/>';
 			$content .= '<form method="post">';
-			$content .= '<p>'.__('Export your WordPress SEO settings here, to import them again later or to import them on another site.').'</p>';
+			$content .= '<p>'.__('Export your WordPress SEO settings here, to import them again later or to import them on another site.', WPSEO_TEXT_DOMAIN ).'</p>';
 			if ( phpversion() > 5.2 )
-				$content .= $this->checkbox('include_taxonomy_meta', __('Include Taxonomy Metadata'));
-			$content .= '<input type="submit" class="button" name="wpseo_export" value="'.__('Export settings').'"/>';
+				$content .= $this->checkbox('include_taxonomy_meta', __('Include Taxonomy Metadata', WPSEO_TEXT_DOMAIN ));
+			$content .= '<input type="submit" class="button" name="wpseo_export" value="'.__('Export settings', WPSEO_TEXT_DOMAIN ).'"/>';
 			$content .= '</form>';
 			if ( isset($_POST['wpseo_export']) ) {
 				$include_taxonomy = false;
@@ -396,13 +399,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}
 			}
 			
-			$content .= '<br class="clear"/><br/><strong>Import</strong><br/>';
+			$content .= '<br class="clear"/><br/><strong>'.__( 'Import', WPSEO_TEXT_DOMAIN ).'</strong><br/>';
 			if ( !isset($_FILES['settings_import_file']) || empty($_FILES['settings_import_file']) ) {
-				$content .= '<p>'.__('Import settings by locating <em>settings.zip</em> and clicking').' "'.__('Import settings').'":</p>';
+				$content .= '<p>'.__('Import settings by locating <em>settings.zip</em> and clicking', WPSEO_TEXT_DOMAIN ).' "'.__('Import settings', WPSEO_TEXT_DOMAIN ).'":</p>';
 				$content .= '<form method="post" enctype="multipart/form-data">';
 				$content .= '<input type="file" name="settings_import_file"/>';
 				$content .= '<input type="hidden" name="action" value="wp_handle_upload"/>';
-				$content .= '<input type="submit" class="button" value="'.__('Import settings').'"/>';
+				$content .= '<input type="submit" class="button" value="'.__('Import settings', WPSEO_TEXT_DOMAIN ).'"/>';
 				$content .= '</form>';
 			} else {
 				$file = wp_handle_upload($_FILES['settings_import_file']);
@@ -422,42 +425,42 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						}
 						@unlink( WP_CONTENT_DIR.'/wpseo-import/' );
 						
-						$content .= '<p><strong>'.__('Settings successfully imported.').'</strong></p>';
+						$content .= '<p><strong>'.__('Settings successfully imported.', WPSEO_TEXT_DOMAIN ).'</strong></p>';
 					} else {
-						$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Unzipping failed.').'</strong></p>';
+						$content .= '<p><strong>'.__('Settings could not be imported:', WPSEO_TEXT_DOMAIN ).' '.__('Unzipping failed.', WPSEO_TEXT_DOMAIN ).'</strong></p>';
 					}
 				} else {
 					if ( is_wp_error($file) )
-						$content .= '<p><strong>'.__('Settings could not be imported:').' '.$file['error'].'</strong></p>';
+						$content .= '<p><strong>'.__('Settings could not be imported:', WPSEO_TEXT_DOMAIN ).' '.$file['error'].'</strong></p>';
 					else
-						$content .= '<p><strong>'.__('Settings could not be imported:').' '.__('Upload failed.').'</strong></p>';
+						$content .= '<p><strong>'.__('Settings could not be imported:', WPSEO_TEXT_DOMAIN ).' '.__('Upload failed.', WPSEO_TEXT_DOMAIN ).'</strong></p>';
 				}
 			}
-			$this->postbox('wpseo_export',__('Export & Import SEO Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('wpseo_export',__('Export & Import SEO Settings', WPSEO_TEXT_DOMAIN),$content); 
 			
 			$this->admin_footer('Import', false);
 		}
 
 		function titles_page() {
-			$this->admin_header(__('Titles'), false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
+			$this->admin_header(__('Titles', WPSEO_TEXT_DOMAIN ), false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
 			$options = get_wpseo_options();
-			$content = '<p>'.__('Be aware that for WordPress SEO to be able to modify your page titles, the title section of your header.php file should look like this:').'</p>';
+			$content = '<p>'.__('Be aware that for WordPress SEO to be able to modify your page titles, the title section of your header.php file should look like this:', WPSEO_TEXT_DOMAIN ).'</p>';
 			$content .= '<pre>&lt;title&gt;&lt;?php wp_title(&#x27;&#x27;); ?&gt;&lt;/title&gt;</pre>';
-			$content .= '<p>'.__('If you can\'t modify or don\'t know how to modify your template, check the box below. Be aware that changing your template will be faster.').'</p>';
-			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles','yoast-wpseo'));
-			$content .= '<h4 class="big">'.__('Singular pages').'</h4>';
-			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.").'</p>';
+			$content .= '<p>'.__('If you can\'t modify or don\'t know how to modify your template, check the box below. Be aware that changing your template will be faster.', WPSEO_TEXT_DOMAIN ).'</p>';
+			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles', WPSEO_TEXT_DOMAIN));
+			$content .= '<h4 class="big">'.__('Singular pages', WPSEO_TEXT_DOMAIN ).'</h4>';
+			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.", WPSEO_TEXT_DOMAIN ).'</p>';
 			if ( 'page' != get_option('show_on_front') ) {
-				$content .= '<h4>'.__('Homepage').'</h4>';
-				$content .= $this->textinput('title-home',__('Title template'));
-				$content .= $this->textarea('metadesc-home',__('Meta description template'), '', 'metadesc');
+				$content .= '<h4>'.__('Homepage', WPSEO_TEXT_DOMAIN ).'</h4>';
+				$content .= $this->textinput('title-home',__('Title template', WPSEO_TEXT_DOMAIN ));
+				$content .= $this->textarea('metadesc-home',__('Meta description template', WPSEO_TEXT_DOMAIN ), '', 'metadesc');
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-home',__('Meta keywords template'));
+					$content .= $this->textinput('metakey-home',__('Meta keywords template', WPSEO_TEXT_DOMAIN ));
 			} else {
-				$content .= '<h4>'.__('Homepage &amp; Front page').'</h4>';
-				$content .= '<p>'.__('You can determine the title and description for the front page by').' <a href="'.get_edit_post_link( get_option('page_on_front') ).'">'.__('editing the front page itself').' &raquo;</a>.</p>';
+				$content .= '<h4>'.__('Homepage &amp; Front page', WPSEO_TEXT_DOMAIN ).'</h4>';
+				$content .= '<p>'.sprintf( __('You can determine the title and description for the front page by %sediting the front page itself &raquo;%s', WPSEO_TEXT_DOMAIN ), '<a href="'.get_edit_post_link( get_option('page_on_front') ).'">', '</a>').'.</p>';
 				if ( is_numeric( get_option('page_for_posts') ) )
-				$content .= '<p>'.__('You can determine the title and description for the blog page by').' <a href="'.get_edit_post_link( get_option('page_for_posts') ).'">'.__('editing the blog page itself').' &raquo;</a>.</p>';
+				$content .= '<p>' . sprintf( __('You can determine the title and description for the blog page by %sediting the blog page itself &raquo;%s', WPSEO_TEXT_DOMAIN ), '<a href="'.get_edit_post_link( get_option('page_for_posts') ).'">', '</a>' ) . '</p>';
 			}
 			foreach (get_post_types() as $posttype) {
 				if ( in_array($posttype, array('revision','nav_menu_item') ) )
@@ -465,40 +468,40 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
 					continue;
 				$content .= '<h4 id="'.$posttype.'">'.ucfirst($posttype).'</h4>';
-				$content .= $this->textinput('title-'.$posttype,__('Title template'));
-				$content .= $this->textarea('metadesc-'.$posttype,__('Meta description template'), '', 'metadesc');
+				$content .= $this->textinput('title-'.$posttype,__('Title template', WPSEO_TEXT_DOMAIN ));
+				$content .= $this->textarea('metadesc-'.$posttype,__('Meta description template', WPSEO_TEXT_DOMAIN ), '', 'metadesc');
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$posttype,__('Meta keywords template'));
+					$content .= $this->textinput('metakey-'.$posttype,__('Meta keywords template', WPSEO_TEXT_DOMAIN ));
 				$content .= '<br/>';
 			}
 			$content .= '<br/>';
-			$content .= '<h4 class="big">'.__('Taxonomies').'</h4>';
+			$content .= '<h4 class="big">'.__('Taxonomies', WPSEO_TEXT_DOMAIN ).'</h4>';
 			foreach (get_taxonomies() as $taxonomy) {
 				if ( in_array($taxonomy, array('link_category','nav_menu','post_format') ) )
 					continue;				
 				$content .= '<h4>'.ucfirst($taxonomy).'</h4>';
-				$content .= $this->textinput('title-'.$taxonomy,__('Title template'));
-				$content .= $this->textarea('metadesc-'.$taxonomy,__('Meta description template'), '', 'metadesc' );
+				$content .= $this->textinput('title-'.$taxonomy,__('Title template', WPSEO_TEXT_DOMAIN ));
+				$content .= $this->textarea('metadesc-'.$taxonomy,__('Meta description template', WPSEO_TEXT_DOMAIN ), '', 'metadesc' );
 				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$taxonomy,__('Meta keywords template'));
+					$content .= $this->textinput('metakey-'.$taxonomy,__('Meta keywords template', WPSEO_TEXT_DOMAIN ));
 				$content .= '<br/>';				
 			}
 			$content .= '<br/>';
-			$content .= '<h4 class="big">'.__('Special pages').'</h4>';
+			$content .= '<h4 class="big">'.__('Special pages', WPSEO_TEXT_DOMAIN ).'</h4>';
 			$content .= '<h4>'.__('Author Archives').'</h4>';
-			$content .= $this->textinput('title-author',__('Title template'));
-			$content .= $this->textarea('metadesc-author',__('Meta description template'), '', 'metadesc' );
+			$content .= $this->textinput('title-author',__('Title template', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->textarea('metadesc-author',__('Meta description template', WPSEO_TEXT_DOMAIN ), '', 'metadesc' );
 			if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-				$content .= $this->textinput('metakey-author',__('Meta keywords template'));
+				$content .= $this->textinput('metakey-author',__('Meta keywords template', WPSEO_TEXT_DOMAIN ));
 			$content .= '<br/>';
-			$content .= '<h4>'.__('Date Archives').'</h4>';
-			$content .= $this->textinput('title-archive',__('Title template'));
-			$content .= $this->textarea('metadesc-archive',__('Meta description template'), '', 'metadesc' );
+			$content .= '<h4>'.__('Date Archives', WPSEO_TEXT_DOMAIN ).'</h4>';
+			$content .= $this->textinput('title-archive',__('Title template', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->textarea('metadesc-archive',__('Meta description template', WPSEO_TEXT_DOMAIN ), '', 'metadesc' );
 			$content .= '<br/>';
-			$content .= '<h4>'.__('Search pages').'</h4>';
-			$content .= $this->textinput('title-search','Title template');
-			$content .= '<h4>'.__('404 pages').'</h4>';
-			$content .= $this->textinput('title-404',__('Title template'));
+			$content .= '<h4>'.__('Search pages', WPSEO_TEXT_DOMAIN ).'</h4>';
+			$content .= $this->textinput('title-search','Title template', WPSEO_TEXT_DOMAIN );
+			$content .= '<h4>'.__('404 pages', WPSEO_TEXT_DOMAIN ).'</h4>';
+			$content .= $this->textinput('title-404',__('Title template', WPSEO_TEXT_DOMAIN ));
 			$content .= '<br class="clear"/>';
 			
 			$i = 1;
@@ -510,136 +513,136 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					continue;
 
 				if ( $i == 1 ) {
-					$content .= '<h4 class="big">'.__('Custom Post Type Archives').'</h4>';
-					$content .= '<p>'.__('Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.').'</p>';
+					$content .= '<h4 class="big">'.__('Custom Post Type Archives', WPSEO_TEXT_DOMAIN ).'</h4>';
+					$content .= '<p>'.__('Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.', WPSEO_TEXT_DOMAIN ).'</p>';
 				}
 				
 				$content .= '<h4>'.$pt->labels->name.'</h4>';
-				$content .= $this->textinput( 'title-ptarchive-' . $post_type, __('Title') );
-				$content .= $this->textarea( 'metadesc-ptarchive-' . $post_type, __('Meta description'), '', 'metadesc' );
+				$content .= $this->textinput( 'title-ptarchive-' . $post_type, __('Title', WPSEO_TEXT_DOMAIN ) );
+				$content .= $this->textarea( 'metadesc-ptarchive-' . $post_type, __('Meta description', WPSEO_TEXT_DOMAIN ), '', 'metadesc' );
 				if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
-					$content .= $this->textinput( 'bctitle-ptarchive-' . $post_type, __('Breadcrumbs Title') );
+					$content .= $this->textinput( 'bctitle-ptarchive-' . $post_type, __('Breadcrumbs Title', WPSEO_TEXT_DOMAIN ) );
 				$i++;
 			}
 			unset($i, $pt, $post_type);
 			
-			$this->postbox('titles',__('Title Settings', 'yoast-wpseo'), $content); 
+			$this->postbox('titles',__('Title Settings', WPSEO_TEXT_DOMAIN), $content); 
 			
 			$content = '
-				<p>These tags can be included and will be replaced by Yoast WordPress SEO when a page is displayed. For convenience sake, they\'re the same as HeadSpace2 uses.</p>
+				<p>'.__( 'These tags can be included and will be replaced by Yoast WordPress SEO when a page is displayed. For convenience sake, they\'re the same as HeadSpace2 uses.', WPSEO_TEXT_DOMAIN ).'</p>
 					<table class="yoast_help">
 						<tr>
 							<th>%%date%%</th>
-							<td>Replaced with the date of the post/page</td>
+							<td>'.__( 'Replaced with the date of the post/page', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%title%%</th>
-							<td>Replaced with the title of the post/page</td>
+							<td>'.__('Replaced with the title of the post/page', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%sitename%%</th>
-							<td>The site\'s name</td>
+							<td>'.__('The site\'s name', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%sitedesc%%</th>
-							<td>The site\'s tagline / description</td>
+							<td>'.__('The site\'s tagline / description', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%excerpt%%</th>
-							<td>Replaced with the post/page excerpt (or auto-generated if it does not exist)</td>
+							<td>'.__('Replaced with the post/page excerpt (or auto-generated if it does not exist)', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%excerpt_only%%</th>
-							<td>Replaced with the post/page excerpt (without auto-generation)</td>
+							<td>'.__('Replaced with the post/page excerpt (without auto-generation)', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%tag%%</th>
-							<td>Replaced with the current tag/tags</td>
+							<td>'.__('Replaced with the current tag/tags', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%category%%</th>
-							<td>Replaced with the post categories (comma separated)</td>
+							<td>'.__('Replaced with the post categories (comma separated)', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%category_description%%</th>
-							<td>Replaced with the category description</td>
+							<td>'.__('Replaced with the category description', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%tag_description%%</th>
-							<td>Replaced with the tag description</td>
+							<td>'.__('Replaced with the tag description', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%term_description%%</th>
-							<td>Replaced with the term description</td>
+							<td>'.__('Replaced with the term description', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%term_title%%</th>
-							<td>Replaced with the term name</td>
+							<td>'.__('Replaced with the term name', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%modified%%</th>
-							<td>Replaced with the post/page modified time</td>
+							<td>'.__('Replaced with the post/page modified time', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%id%%</th>
-							<td>Replaced with the post/page ID</td>
+							<td>'.__('Replaced with the post/page ID', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%name%%</th>
-							<td>Replaced with the post/page author\'s \'nicename\'</td>
+							<td>'.__('Replaced with the post/page author\'s \'nicename\'', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%userid%%</th>
-							<td>Replaced with the post/page author\'s userid</td>
+							<td>'.__('Replaced with the post/page author\'s userid', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%searchphrase%%</th>
-							<td>Replaced with the current search phrase</td>
+							<td>'.__('Replaced with the current search phrase', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%currenttime%%</th>
-							<td>Replaced with the current time</td>
+							<td>'.__('Replaced with the current time', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%currentdate%%</th>
-							<td>Replaced with the current date</td>
+							<td>'.__('Replaced with the current date', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%currentmonth%%</th>
-							<td>Replaced with the current month</td>
+							<td>'.__('Replaced with the current month', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%currentyear%%</th>
-							<td>Replaced with the current year</td>
+							<td>'.__('Replaced with the current year', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%page%%</th>
-							<td>Replaced with the current page number (i.e. page 2 of 4)</td>
+							<td>'.__('Replaced with the current page number (i.e. page 2 of 4)', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%pagetotal%%</th>
-							<td>Replaced with the current page total</td>
+							<td>'.__('Replaced with the current page total', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%pagenumber%%</th>
-							<td>Replaced with the current page number</td>
+							<td>'.__('Replaced with the current page number', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr>
 							<th>%%caption%%</th>
-							<td>Attachment caption</td>
+							<td>'.__('Attachment caption', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 						<tr class="alt">
 							<th>%%focuskw%%</th>
-							<td>Replaced with the posts focus keyword</td>
+							<td>'.__('Replaced with the posts focus keyword', WPSEO_TEXT_DOMAIN ).'</td>
 						</tr>
 					</table>';
-			$this->postbox('titleshelp',__('Help on Title Settings', 'yoast-wpseo'), $content); 
+			$this->postbox('titleshelp',__('Help on Title Settings', WPSEO_TEXT_DOMAIN), $content); 
 			
 			$this->admin_footer('Titles');
 		}
 				
 		function settings_advice_page() {
-			$this->admin_header('Settings Advice', false, true, 'yoast_wpseo_advice_options', 'wpseo_advice');
+			$this->admin_header(__( 'Settings Advice', WPSEO_TEXT_DOMAIN ), false, true, 'yoast_wpseo_advice_options', 'wpseo_advice');
 		}
 		
 		function permalinks_page() {
@@ -647,34 +650,34 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				delete_option('rewrite_rules');
 			}
 			
-			$this->admin_header('Permalinks', true, true, 'yoast_wpseo_permalinks_options', 'wpseo_permalinks');
-			$content = $this->checkbox('stripcategorybase',__('Strip the category base (usually <code>/category/</code>) from the category URL.'));
-			$content .= $this->checkbox('trailingslash',__('Enforce a trailing slash on all category and tag URL\'s'));
-			$content .= '<p class="desc">'.__('If you choose a permalink for your posts with <code>.html</code>, or anything else but a / on the end, this will force WordPress to add a trailing slash to non-post pages nonetheless.', 'yoast-wpseo').'</p>';
+			$this->admin_header(__( 'Permalinks', WPSEO_TEXT_DOMAIN ), true, true, 'yoast_wpseo_permalinks_options', 'wpseo_permalinks');
+			$content = $this->checkbox('stripcategorybase',__('Strip the category base (usually <code>/category/</code>) from the category URL.', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->checkbox('trailingslash',__('Enforce a trailing slash on all category and tag URL\'s', WPSEO_TEXT_DOMAIN ));
+			$content .= '<p class="desc">'.__('If you choose a permalink for your posts with <code>.html</code>, or anything else but a / on the end, this will force WordPress to add a trailing slash to non-post pages nonetheless.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$content .= $this->checkbox('redirectattachment',__('Redirect attachment URL\'s to parent post URL.'));
-			$content .= '<p class="desc">'.__('Attachments to posts are stored in the database as posts, this means they\'re accessible under their own URL\'s if you do not redirect them, enabling this will redirect them to the post they were attached to.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('redirectattachment',__('Redirect attachment URL\'s to parent post URL.', WPSEO_TEXT_DOMAIN ));
+			$content .= '<p class="desc">'.__('Attachments to posts are stored in the database as posts, this means they\'re accessible under their own URL\'s if you do not redirect them, enabling this will redirect them to the post they were attached to.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$content .= $this->checkbox('cleanpermalinks',__('Redirect ugly URL\'s to clean permalinks. (Not recommended in many cases!)'));
-			$content .= '<p class="desc">'.__('People make mistakes in their links towards you sometimes, or unwanted parameters are added to the end of your URLs, this allows you to redirect them all away. Please note that while this is a feature that is actively maintained, it is known to break several plugins, and should for that reason be the first feature you disable when you encounter issues after installing this plugin.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('cleanpermalinks',__('Redirect ugly URL\'s to clean permalinks. (Not recommended in many cases!)', WPSEO_TEXT_DOMAIN ));
+			$content .= '<p class="desc">'.__('People make mistakes in their links towards you sometimes, or unwanted parameters are added to the end of your URLs, this allows you to redirect them all away. Please note that while this is a feature that is actively maintained, it is known to break several plugins, and should for that reason be the first feature you disable when you encounter issues after installing this plugin.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$this->postbox('permalinks',__('Permalink Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('permalinks',__('Permalink Settings', WPSEO_TEXT_DOMAIN),$content); 
 			
-			$content = $this->select('force_transport', 'Force Transport', array('default' => 'Leave default', 'http' => 'Force http', 'https' => 'Force https'));			
-			$content .= '<p class="desc">'.__('Force the canonical to either http or https, when your blog runs under both.', 'yoast-wpseo').'</p>';
+			$content = $this->select('force_transport', __( 'Force Transport', WPSEO_TEXT_DOMAIN ), array('default' => __( 'Leave default', WPSEO_TEXT_DOMAIN ), 'http' => __( 'Force http', WPSEO_TEXT_DOMAIN ), 'https' => __( 'Force https', WPSEO_TEXT_DOMAIN )));			
+			$content .= '<p class="desc">'.__('Force the canonical to either http or https, when your blog runs under both.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$this->postbox('canonical',__('Canonical Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('canonical',__('Canonical Settings', WPSEO_TEXT_DOMAIN),$content); 
 
-			$content = $this->checkbox('cleanpermalink-googlesitesearch',__('Prevent cleaning out Google Site Search URL\'s.'));
-			$content .= '<p class="desc">'.__('Google Site Search URL\'s look weird, and ugly, but if you\'re using Google Site Search, you probably do not want them cleaned out.', 'yoast-wpseo').'</p>';
+			$content = $this->checkbox('cleanpermalink-googlesitesearch',__('Prevent cleaning out Google Site Search URL\'s.', WPSEO_TEXT_DOMAIN ));
+			$content .= '<p class="desc">'.__('Google Site Search URL\'s look weird, and ugly, but if you\'re using Google Site Search, you probably do not want them cleaned out.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$content .= $this->checkbox('cleanpermalink-googlecampaign',__('Prevent cleaning out Google Analytics Campaign Parameters.'));
-			$content .= '<p class="desc">'.__('If you use Google Analytics campaign parameters starting with <code>?utm_</code>, check this box. You shouldn\'t use these btw, you should instead use the hash tagged version instead.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('cleanpermalink-googlecampaign',__('Prevent cleaning out Google Analytics Campaign Parameters.', WPSEO_TEXT_DOMAIN ));
+			$content .= '<p class="desc">'.__('If you use Google Analytics campaign parameters starting with <code>?utm_</code>, check this box. You shouldn\'t use these btw, you should instead use the hash tagged version instead.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$content .= $this->textinput('cleanpermalink-extravars',__('Other variables not to clean'));
-			$content .= '<p class="desc">'.__('You might have extra variables you want to prevent from cleaning out, add them here, comma separarted.', 'yoast-wpseo').'</p>';
+			$content .= $this->textinput('cleanpermalink-extravars',__('Other variables not to clean', WPSEO_TEXT_DOMAIN ));
+			$content .= '<p class="desc">'.__('You might have extra variables you want to prevent from cleaning out, add them here, comma separarted.', WPSEO_TEXT_DOMAIN).'</p>';
 			
-			$this->postbox('cleanpermalinksdiv',__('Clean Permalink Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('cleanpermalinksdiv',__('Clean Permalink Settings', WPSEO_TEXT_DOMAIN),$content); 
 			
 			$this->admin_footer('Permalinks');
 		}
@@ -682,17 +685,17 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function internallinks_page() {
 			$this->admin_header(__('Internal Links'), false, true, 'yoast_wpseo_internallinks_options', 'wpseo_internallinks');
 
-			$content = $this->checkbox('breadcrumbs-enable',__('Enable Breadcrumbs'));
+			$content = $this->checkbox('breadcrumbs-enable',__('Enable Breadcrumbs', WPSEO_TEXT_DOMAIN ));
 			$content .= '<br/>';
-			$content .= $this->textinput('breadcrumbs-sep',__('Separator between breadcrumbs'));
-			$content .= $this->textinput('breadcrumbs-home',__('Anchor text for the Homepage'));
-			$content .= $this->textinput('breadcrumbs-prefix',__('Prefix for the breadcrumb path'));
-			$content .= $this->textinput('breadcrumbs-archiveprefix',__('Prefix for Archive breadcrumbs'));
-			$content .= $this->textinput('breadcrumbs-searchprefix',__('Prefix for Search Page breadcrumbs'));
-			$content .= $this->textinput('breadcrumbs-404crumb',__('Breadcrumb for 404 Page'));
-			$content .= $this->checkbox('breadcrumbs-blog-remove',__('Remove Blog page from Breadcrumbs'));
+			$content .= $this->textinput('breadcrumbs-sep',__('Separator between breadcrumbs', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->textinput('breadcrumbs-home',__('Anchor text for the Homepage', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->textinput('breadcrumbs-prefix',__('Prefix for the breadcrumb path', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->textinput('breadcrumbs-archiveprefix',__('Prefix for Archive breadcrumbs', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->textinput('breadcrumbs-searchprefix',__('Prefix for Search Page breadcrumbs', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->textinput('breadcrumbs-404crumb',__('Breadcrumb for 404 Page', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->checkbox('breadcrumbs-blog-remove',__('Remove Blog page from Breadcrumbs', WPSEO_TEXT_DOMAIN ));
 			$content .= '<br/><br/>';
-			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:').'</strong><br/>';
+			$content .= '<strong>'.__('Taxonomy to show in breadcrumbs for:', WPSEO_TEXT_DOMAIN ).'</strong><br/>';
 			foreach (get_post_types() as $pt) {
 				if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
 					continue;
@@ -710,15 +713,15 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			}
 			$content .= '<br/>';
 			
-			$content .= '<strong>'.__('Post type archive to show in breadcrumbs for:').'</strong><br/>';
-			foreach (get_taxonomies() as $taxonomy) {
+			$content .= '<strong>'.__('Post type archive to show in breadcrumbs for:', WPSEO_TEXT_DOMAIN ).'</strong><br/>';
+			foreach (get_taxonomies(array('public'=>true)) as $taxonomy) {
 				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format', 'category', 'post_tag') ) ) {
 					$tax = get_taxonomy($taxonomy);
-					$values = array( '' => 'None' );
+					$values = array( '' => __( 'None', WPSEO_TEXT_DOMAIN ) );
 					if ( get_option('show_on_front') == 'page' )
-						$values['post'] = 'Blog';
+						$values['post'] = __( 'Blog', WPSEO_TEXT_DOMAIN );
 					
-					foreach (get_post_types() as $pt) {
+					foreach (get_post_types( array('public' =>true) ) as $pt) {
 						if (in_array($pt, array('revision', 'attachment', 'nav_menu_item')))
 							continue;
 						$ptobj = get_post_type_object($pt);
@@ -729,24 +732,24 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}
 			}
 			
-			$content .= $this->checkbox('breadcrumbs-boldlast',__('Bold the last page in the breadcrumb'));
-			$content .= $this->checkbox('breadcrumbs-trytheme',__('Try to add automatically'));
-			$content .= '<p class="desc">'.__('If you\'re using Hybrid, Thesis or Thematic, check this box for some lovely simple action').'.</p>';
+			$content .= $this->checkbox('breadcrumbs-boldlast',__('Bold the last page in the breadcrumb', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->checkbox('breadcrumbs-trytheme',__('Try to add automatically', WPSEO_TEXT_DOMAIN ));
+			$content .= '<p class="desc">'.__('If you\'re using Hybrid, Thesis or Thematic, check this box for some lovely simple action', WPSEO_TEXT_DOMAIN ).'.</p>';
 
 			$content .= '<br class="clear"/>';
-			$content .= '<h4>'.__('How to insert breadcrumbs in your theme').'</h4>';
-			$content .= '<p>'.__('Usage of this breadcrumbs feature is explained <a href="http://yoast.com/wordpress/breadcrumbs/">here</a>. For the more code savvy, insert this in your theme:').'</p>';
+			$content .= '<h4>'.__('How to insert breadcrumbs in your theme', WPSEO_TEXT_DOMAIN ).'</h4>';
+			$content .= '<p>'.__('Usage of this breadcrumbs feature is explained <a href="http://yoast.com/wordpress/breadcrumbs/">here</a>. For the more code savvy, insert this in your theme:', WPSEO_TEXT_DOMAIN ).'</p>';
 			$content .= '<pre>&lt;?php if ( function_exists(&#x27;yoast_breadcrumb&#x27;) ) {
 	yoast_breadcrumb(&#x27;&lt;p id=&quot;breadcrumbs&quot;&gt;&#x27;,&#x27;&lt;/p&gt;&#x27;);
 } ?&gt;</pre>';
-			$this->postbox('internallinks',__('Breadcrumbs Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('internallinks',__('Breadcrumbs Settings', WPSEO_TEXT_DOMAIN),$content); 
 			
 			$this->admin_footer('Internal Links');
 		}
 				
 		function files_page() {
 			if ( isset($_POST['submitrobots']) ) {
-				if (!current_user_can('manage_options')) die(__('You cannot edit the robots.txt file.', 'yoast-wpseo'));
+				if (!current_user_can('manage_options')) die(__('You cannot edit the robots.txt file.', WPSEO_TEXT_DOMAIN));
 				
 				check_admin_referer('wpseo-robotstxt');
 				
@@ -757,13 +760,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						$f = fopen($robots_file, 'w+');
 						fwrite($f, $robotsnew);
 						fclose($f);
-						$msg = 'Updated Robots.txt';
+						$msg = __( 'Updated Robots.txt', WPSEO_TEXT_DOMAIN );
 					}
 				} 
 			}
 			
 			if ( isset($_POST['submithtaccess']) ) {
-				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', 'yoast-wpseo'));
+				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', WPSEO_TEXT_DOMAIN));
 
 				check_admin_referer('wpseo-htaccess');
 
@@ -779,7 +782,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			}
 
 			if ( isset($_POST['submitcachehtaccess']) ) {
-				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', 'yoast-wpseo'));
+				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', WPSEO_TEXT_DOMAIN));
 
 				check_admin_referer('wpseo-htaccess-cache');
 
@@ -809,17 +812,17 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$robotstxtcontent = htmlspecialchars($content);
 
 				if (!is_writable($robots_file)) {
-					$content = "<p><em>".__("If your robots.txt were writable, you could edit it from here.", 'yoast-wpseo')."</em></p>";
+					$content = "<p><em>".__("If your robots.txt were writable, you could edit it from here.", WPSEO_TEXT_DOMAIN)."</em></p>";
 					$content .= '<textarea disabled="disabled" style="width: 90%;" rows="15" name="robotsnew">'.$robotstxtcontent.'</textarea><br/>';
 				} else {
 					$content = '<form action="" method="post" id="robotstxtform">';
 					$content .= wp_nonce_field('wpseo-robotstxt', '_wpnonce', true, false);
-					$content .= "<p>".__("Edit the content of your robots.txt:", 'yoast-wpseo')."</p>";
+					$content .= "<p>".__("Edit the content of your robots.txt:", WPSEO_TEXT_DOMAIN)."</p>";
 					$content .= '<textarea style="width: 90%;" rows="15" name="robotsnew">'.$robotstxtcontent.'</textarea><br/>';
-					$content .= '<div class="submit"><input class="button" type="submit" name="submitrobots" value="'.__("Save changes to Robots.txt", 'yoast-wpseo').'" /></div>';
+					$content .= '<div class="submit"><input class="button" type="submit" name="submitrobots" value="'.__("Save changes to Robots.txt", WPSEO_TEXT_DOMAIN).'" /></div>';
 					$content .= '</form>';
 				}
-				$this->postbox('robotstxt',__('Robots.txt', 'yoast-wpseo'),$content);
+				$this->postbox('robotstxt',__('Robots.txt', WPSEO_TEXT_DOMAIN),$content);
 			}
 			
 			if (file_exists( get_home_path().".htaccess" )) {
@@ -829,17 +832,17 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$contentht = htmlspecialchars($contentht);
 
 				if (!is_writable($htaccess_file)) {
-					$content = "<p><em>".__("If your .htaccess were writable, you could edit it from here.", 'yoast-wpseo')."</em></p>";
+					$content = "<p><em>".__("If your .htaccess were writable, you could edit it from here.", WPSEO_TEXT_DOMAIN)."</em></p>";
 					$content .= '<textarea disabled="disabled" style="width: 90%;" rows="15" name="robotsnew">'.$contentht.'</textarea><br/>';
 				} else {
 					$content = '<form action="" method="post" id="htaccessform">';
 					$content .= wp_nonce_field('wpseo-htaccess', '_wpnonce', true, false);
-					$content .=  "<p>Edit the content of your .htaccess:</p>";
+					$content .=  "<p>".__( 'Edit the content of your .htaccess:', WPSEO_TEXT_DOMAIN )."</p>";
 					$content .= '<textarea style="width: 90%;" rows="15" name="htaccessnew">'.$contentht.'</textarea><br/>';
-					$content .= '<div class="submit"><input class="button" type="submit" name="submithtaccess" value="'.__('Save changes to .htaccess', 'yoast-wpseo').'" /></div>';
+					$content .= '<div class="submit"><input class="button" type="submit" name="submithtaccess" value="'.__('Save changes to .htaccess', WPSEO_TEXT_DOMAIN).'" /></div>';
 					$content .= '</form>';
 				}
-				$this->postbox('htaccess',__('.htaccess file', 'yoast-wpseo'),$content);
+				$this->postbox('htaccess',__('.htaccess file', WPSEO_TEXT_DOMAIN),$content);
 			}
 			
 			if (is_plugin_active('wp-super-cache/wp-cache.php')) {
@@ -849,17 +852,17 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$cacheht = htmlspecialchars($cacheht);
 
 				if (!is_writable($cachehtaccess)) {
-					$content = "<p><em>".__("If your", 'yoast-wpseo')." ".WP_CONTENT_DIR."/cache/.htaccess ".__("were writable, you could edit it from here.", 'yoast-wpseo')."</em></p>";
+					$content = "<p><em>".__("If your", WPSEO_TEXT_DOMAIN)." ".WP_CONTENT_DIR."/cache/.htaccess ".__("were writable, you could edit it from here.", WPSEO_TEXT_DOMAIN)."</em></p>";
 					$content .= '<textarea disabled="disabled" style="width: 90%;" rows="15" name="robotsnew">'.$cacheht.'</textarea><br/>';
 				} else {
 					$content = '<form action="" method="post" id="htaccessform">';
 					$content .= wp_nonce_field('wpseo-htaccess-cache', '_wpnonce', true, false);
-					$content .=  "<p>".__("Edit the content of your cache directory's .htaccess:", 'yoast-wpseo')."</p>";
+					$content .=  "<p>".__("Edit the content of your cache directory's .htaccess:", WPSEO_TEXT_DOMAIN)."</p>";
 					$content .= '<textarea style="width: 90%;" rows="15" name="cachehtaccessnew">'.$cacheht.'</textarea><br/>';
-					$content .= '<div class="submit"><input class="button" type="submit" name="submitcachehtaccess" value="'.__('Save changes to .htaccess', 'yoast-wpseo').'" /></div>';
+					$content .= '<div class="submit"><input class="button" type="submit" name="submitcachehtaccess" value="'.__('Save changes to .htaccess', WPSEO_TEXT_DOMAIN).'" /></div>';
 					$content .= '</form>';
 				}
-				$this->postbox('cachehtaccess',__('wp-super-cache cache dir .htaccess file', 'yoast-wpseo'),$content);
+				$this->postbox('cachehtaccess',__('wp-super-cache cache dir .htaccess file', WPSEO_TEXT_DOMAIN),$content);
 			}
 			
 			$this->admin_footer('', false);
@@ -868,74 +871,74 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function indexation_page() {
 			$this->admin_header('Indexation', true, true, 'yoast_wpseo_indexation_options', 'wpseo_indexation');
 
-			$content = $this->checkbox('opengraph',__('Add OpenGraph meta data', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. You can specify some of the ID\'s that are sometimes needed below:', 'yoast-wpseo').'</p>';
-			$content .= $this->textinput('fb_pageid', __('Facebook Page ID') );
-			$content .= $this->textinput('fb_adminid', __('Facebook Admin ID') );
-			$content .= '<p class="desc">'.__('Separate multiple admin ID\'s with comma\'s.', 'yoast-wpseo').'</p>';
-			$content .= $this->textinput('fb_appid', __('Facebook App ID') );
+			$content = $this->checkbox('opengraph',__('Add OpenGraph meta data', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. You can specify some of the ID\'s that are sometimes needed below:', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->textinput('fb_pageid', __('Facebook Page ID', WPSEO_TEXT_DOMAIN ) );
+			$content .= $this->textinput('fb_adminid', __('Facebook Admin ID', WPSEO_TEXT_DOMAIN ) );
+			$content .= '<p class="desc">'.__('Separate multiple admin ID\'s with comma\'s.', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->textinput('fb_appid', __('Facebook App ID', WPSEO_TEXT_DOMAIN ) );
 
-			$this->postbox('opengraph',__('OpenGraph (Facebook)', 'yoast-wpseo'),$content);
+			$this->postbox('opengraph',__('OpenGraph (Facebook)', WPSEO_TEXT_DOMAIN),$content);
 					
-			$content = '<p>'.__("Below you'll find checkboxes for each of the sections of your site that you might want to disallow the search engines from indexing. Be aware that this is a powerful tool, blocking category archives, for instance, really blocks all category archives from showing up in the index.").'</p>';
-			$content .= $this->checkbox('noindexsubpages',__('Subpages of archives and taxonomies', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Prevent the search engines from indexing (not from crawling and following the links) your taxonomies & archives subpages.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('noindexauthor',__('Author archives', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('By default, WordPress creates author archives for each user, usually available under <code>/author/username</code>. If you have sufficient other archives, or yours is a one person blog, there\'s no need and you can best disable them or prevent search engines from indexing them.', 'yoast-wpseo').'</p>';
+			$content = '<p>'.__("Below you'll find checkboxes for each of the sections of your site that you might want to disallow the search engines from indexing. Be aware that this is a powerful tool, blocking category archives, for instance, really blocks all category archives from showing up in the index.", WPSEO_TEXT_DOMAIN ).'</p>';
+			$content .= $this->checkbox('noindexsubpages',__('Subpages of archives and taxonomies', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('Prevent the search engines from indexing (not from crawling and following the links) your taxonomies & archives subpages.', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->checkbox('noindexauthor',__('Author archives', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('By default, WordPress creates author archives for each user, usually available under <code>/author/username</code>. If you have sufficient other archives, or yours is a one person blog, there\'s no need and you can best disable them or prevent search engines from indexing them.', WPSEO_TEXT_DOMAIN).'</p>';
 			
-			$content .= $this->checkbox('noindexdate',__('Date-based archives', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('If you want to offer your users the option of crawling your site by date, but have ample other ways for the search engines to find the content on your site, I highly encourage you to prevent your date-based archives from being indexed.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('noindexcat',__('Category archives', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('If you\'re using tags as your only way of structure on your site, you would probably be better off when you prevent your categories from being indexed.', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('noindexdate',__('Date-based archives', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('If you want to offer your users the option of crawling your site by date, but have ample other ways for the search engines to find the content on your site, I highly encourage you to prevent your date-based archives from being indexed.', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->checkbox('noindexcat',__('Category archives', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('If you\'re using tags as your only way of structure on your site, you would probably be better off when you prevent your categories from being indexed.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$content .= $this->checkbox('noindextag',__('Tag archives', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Read the categories explanation above for categories and switch the words category and tag around ;)', 'yoast-wpseo').'</p>';
+			$content .= $this->checkbox('noindextag',__('Tag archives', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('Read the categories explanation above for categories and switch the words category and tag around ;)', WPSEO_TEXT_DOMAIN).'</p>';
 
 			if ( current_theme_supports('post-formats') ) {
-				$content .= $this->checkbox('noindexpostformat',__('Post Formats archives', 'yoast-wpseo') );
-				$content .= '<p class="desc">'.__('Post formats have publicly queriable archives by default that should be disabled below or noindexed here.', 'yoast-wpseo').'</p>';
+				$content .= $this->checkbox('noindexpostformat',__('Post Formats archives', WPSEO_TEXT_DOMAIN) );
+				$content .= '<p class="desc">'.__('Post formats have publicly queriable archives by default that should be disabled below or noindexed here.', WPSEO_TEXT_DOMAIN).'</p>';
 			}
 				
-			$this->postbox('preventindexing',__('Indexation Rules', 'yoast-wpseo'),$content);
+			$this->postbox('preventindexing',__('Indexation Rules', WPSEO_TEXT_DOMAIN),$content);
 
-			$content = $this->checkbox('nofollowmeta',__('Nofollow login and registration links', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('This might have happened to you: logging in to your admin panel to notice that it has become PR6... Nofollow those admin and login links, there\'s no use flowing PageRank to those pages!', 'yoast-wpseo').'</p>';			
-			$content .= $this->checkbox('nofollowcommentlinks',__('Nofollow comments links', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Simple way to decrease the number of links on your pages: nofollow all the links pointing to comment sections.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('replacemetawidget',__('Replace the Meta Widget with a nofollowed one', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('By default the Meta widget links to your RSS feeds and to WordPress.org with a follow link, this will replace that widget by a custom one in which all these links are nofollowed.', 'yoast-wpseo').'</p>';
+			$content = $this->checkbox('nofollowmeta',__('Nofollow login and registration links', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('This might have happened to you: logging in to your admin panel to notice that it has become PR6... Nofollow those admin and login links, there\'s no use flowing PageRank to those pages!', WPSEO_TEXT_DOMAIN).'</p>';			
+			$content .= $this->checkbox('nofollowcommentlinks',__('Nofollow comments links', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('Simple way to decrease the number of links on your pages: nofollow all the links pointing to comment sections.', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->checkbox('replacemetawidget',__('Replace the Meta Widget with a nofollowed one', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('By default the Meta widget links to your RSS feeds and to WordPress.org with a follow link, this will replace that widget by a custom one in which all these links are nofollowed.', WPSEO_TEXT_DOMAIN).'</p>';
 			
-			$this->postbox('internalnofollow',__('Internal nofollow settings', 'yoast-wpseo'),$content);
+			$this->postbox('internalnofollow',__('Internal nofollow settings', WPSEO_TEXT_DOMAIN),$content);
 
-			$content = $this->checkbox('disableauthor',__('Disable the author archives', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('If you\'re running a one author blog, the author archive will always look exactly the same as your homepage. And even though you may not link to it, others might, to do you harm. Disabling them here will make sure any link to those archives will be 301 redirected to the blog homepage.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('disabledate',__('Disable the date-based archives', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('For the date based archives, the same applies: they probably look a lot like your homepage, and could thus be seen as duplicate content.', 'yoast-wpseo').'</p>';
+			$content = $this->checkbox('disableauthor',__('Disable the author archives', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('If you\'re running a one author blog, the author archive will always look exactly the same as your homepage. And even though you may not link to it, others might, to do you harm. Disabling them here will make sure any link to those archives will be 301 redirected to the blog homepage.', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->checkbox('disabledate',__('Disable the date-based archives', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('For the date based archives, the same applies: they probably look a lot like your homepage, and could thus be seen as duplicate content.', WPSEO_TEXT_DOMAIN).'</p>';
 			if ( current_theme_supports('post-formats') ) {
-				$content .= $this->checkbox('disablepostformats',__('Disable the post format archives', 'yoast-wpseo') );
-				$content .= '<p class="desc">'.__('This completely disables the archives for post formats.', 'yoast-wpseo').'</p>';
+				$content .= $this->checkbox('disablepostformats',__('Disable the post format archives', WPSEO_TEXT_DOMAIN) );
+				$content .= '<p class="desc">'.__('This completely disables the archives for post formats.', WPSEO_TEXT_DOMAIN).'</p>';
 			}
-			$this->postbox('archivesettings',__('Archive Settings', 'yoast-wpseo'),$content);
+			$this->postbox('archivesettings',__('Archive Settings', WPSEO_TEXT_DOMAIN),$content);
 					
-			$content = '<p>'.__("You can add all these on a per post / page basis from the edit screen, by clicking on advanced. Should you wish to use any of these sitewide, you can do so here. (This is <em>not</em> recommended.)").'</p>';
-			$content .= $this->checkbox('noodp',__('Add <code>noodp</code> meta robots tag sitewide', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Prevents search engines from using the DMOZ description for pages from this site in the search results.', 'yoast-wpseo').'</p>';
-			$content .= $this->checkbox('noydir',__('Add <code>noydir</code> meta robots tag sitewide', 'yoast-wpseo') );
-			$content .= '<p class="desc">'.__('Prevents search engines from using the Yahoo! directory description for pages from this site in the search results.', 'yoast-wpseo').'</p>';
+			$content = '<p>'.__("You can add all these on a per post / page basis from the edit screen, by clicking on advanced. Should you wish to use any of these sitewide, you can do so here. (This is <em>not</em> recommended.)", WPSEO_TEXT_DOMAIN ).'</p>';
+			$content .= $this->checkbox('noodp',__('Add <code>noodp</code> meta robots tag sitewide', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('Prevents search engines from using the DMOZ description for pages from this site in the search results.', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->checkbox('noydir',__('Add <code>noydir</code> meta robots tag sitewide', WPSEO_TEXT_DOMAIN) );
+			$content .= '<p class="desc">'.__('Prevents search engines from using the Yahoo! directory description for pages from this site in the search results.', WPSEO_TEXT_DOMAIN).'</p>';
 			
-			$this->postbox('directories',__('Robots Meta Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('directories',__('Robots Meta Settings', WPSEO_TEXT_DOMAIN),$content); 
 			
-			$content = '<p>'.__('Some of us like to keep our &lt;heads&gt; clean. The settings below allow you to make it happen.', 'yoast-wpseo').'</p>';
+			$content = '<p>'.__('Some of us like to keep our &lt;heads&gt; clean. The settings below allow you to make it happen.', WPSEO_TEXT_DOMAIN).'</p>';
 			$content .= $this->checkbox('hidersdlink','Hide RSD Links');
-			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use remote editors.', 'yoast-wpseo').'</p>';
+			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use remote editors.', WPSEO_TEXT_DOMAIN).'</p>';
 			$content .= $this->checkbox('hidewlwmanifest','Hide WLW Manifest Links');
-			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use Windows Live Writer.', 'yoast-wpseo').'</p>';
+			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use Windows Live Writer.', WPSEO_TEXT_DOMAIN).'</p>';
 			$content .= $this->checkbox('hideshortlink','Hide Shortlink for posts');
-			$content .= '<p class="desc">'.__('Hides the shortlink for the current post.', 'yoast-wpseo').'</p>';
+			$content .= '<p class="desc">'.__('Hides the shortlink for the current post.', WPSEO_TEXT_DOMAIN).'</p>';
 			$content .= $this->checkbox('hidefeedlinks','Hide RSS Links');
-			$content .= '<p class="desc">'.__('Check this box only if you\'re absolutely positive your site doesn\'t need and use RSS feeds.', 'yoast-wpseo').'</p>';
+			$content .= '<p class="desc">'.__('Check this box only if you\'re absolutely positive your site doesn\'t need and use RSS feeds.', WPSEO_TEXT_DOMAIN).'</p>';
 
-			$this->postbox('headsection','Clean up &lt;head&gt; section',$content);
+			$this->postbox('headsection',__( 'Clean up &lt;head&gt; section', WPSEO_TEXT_DOMAIN ),$content);
 			
 			$this->admin_footer('Indexation');
 		}
@@ -944,7 +947,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$options = get_wpseo_options();
 			$this->admin_header('RSS', false, true, 'yoast_wpseo_rss_options', 'wpseo_rss');
 			
-			$content = '<p>'."This feature is used to automatically add content to your RSS, more specifically, it's meant to add links back to your blog and your blog posts, so dumb scrapers will automatically add these links too, helping search engines identify you as the original source of the content.".'</p>';
+			$content = '<p>'.__( "This feature is used to automatically add content to your RSS, more specifically, it's meant to add links back to your blog and your blog posts, so dumb scrapers will automatically add these links too, helping search engines identify you as the original source of the content.", WPSEO_TEXT_DOMAIN ).'</p>';
 			$rows = array();
 			$rssbefore = '';
 			if ( isset($options['rssbefore']) )
@@ -956,27 +959,27 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			$rows[] = array(
 				"id" => "rssbefore",
-				"label" => __("Content to put before each post in the feed", 'yoast-wpseo'),
-				"desc" => __("(HTML allowed)", 'yoast-wpseo'),
+				"label" => __("Content to put before each post in the feed", WPSEO_TEXT_DOMAIN),
+				"desc" => __("(HTML allowed)", WPSEO_TEXT_DOMAIN),
 				"content" => '<textarea cols="50" rows="5" id="rssbefore" name="wpseo_rss[rssbefore]">'.$rssbefore.'</textarea>',
 			);
 			$rows[] = array(
 				"id" => "rssafter",
-				"label" => __("Content to put after each post", 'yoast-wpseo'),
-				"desc" => __("(HTML allowed)", 'yoast-wpseo'),
+				"label" => __("Content to put after each post", WPSEO_TEXT_DOMAIN),
+				"desc" => __("(HTML allowed)", WPSEO_TEXT_DOMAIN),
 				"content" => '<textarea cols="50" rows="5" id="rssafter" name="wpseo_rss[rssafter]">'.$rssafter.'</textarea>',
 			);
 			$rows[] = array(
-				"label" => __('Explanation', 'yoast-wpseo'),
-				"content" => '<p>'.__('You can use the following variables within the content, they will be replaced by the value on the right.', 'yoast-wpseo').'</p>'.
+				"label" => __('Explanation', WPSEO_TEXT_DOMAIN),
+				"content" => '<p>'.__('You can use the following variables within the content, they will be replaced by the value on the right.', WPSEO_TEXT_DOMAIN).'</p>'.
 				'<table>'.
-				'<tr><th><strong>%%AUTHORLINK%%</strong></th><td>'.__('A link to the archive for the post author, with the authors name as anchor text.', 'yoast-wpseo').'</td></tr>'.
-				'<tr><th><strong>%%POSTLINK%%</strong></th><td>'.__('A link to the post, with the title as anchor text.', 'yoast-wpseo').'</td></tr>'.
-				'<tr><th><strong>%%BLOGLINK%%</strong></th><td>'.__("A link to your site, with your site's name as anchor text.", 'yoast-wpseo').'</td></tr>'.
-				'<tr><th><strong>%%BLOGDESCLINK%%</strong></th><td>'.__("A link to your site, with your site's name and description as anchor text.", 'yoast-wpseo').'</td></tr>'.
+				'<tr><th><strong>%%AUTHORLINK%%</strong></th><td>'.__('A link to the archive for the post author, with the authors name as anchor text.', WPSEO_TEXT_DOMAIN).'</td></tr>'.
+				'<tr><th><strong>%%POSTLINK%%</strong></th><td>'.__('A link to the post, with the title as anchor text.', WPSEO_TEXT_DOMAIN).'</td></tr>'.
+				'<tr><th><strong>%%BLOGLINK%%</strong></th><td>'.__("A link to your site, with your site's name as anchor text.", WPSEO_TEXT_DOMAIN).'</td></tr>'.
+				'<tr><th><strong>%%BLOGDESCLINK%%</strong></th><td>'.__("A link to your site, with your site's name and description as anchor text.", WPSEO_TEXT_DOMAIN).'</td></tr>'.
 				'</table>'
 			);
-			$this->postbox('rssfootercontent',__('Content of your RSS Feed', 'yoast-wpseo'),$content.$this->form_table($rows));
+			$this->postbox('rssfootercontent',__('Content of your RSS Feed', WPSEO_TEXT_DOMAIN),$content.$this->form_table($rows));
 			
 			$this->admin_footer('RSS');
 		}
@@ -988,18 +991,18 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 			$base = $GLOBALS['wp_rewrite']->using_index_permalinks() ? 'index.php/' : '';
 
-			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.'), false);
+			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.', WPSEO_TEXT_DOMAIN ), false);
 			$content .= '<div id="sitemapinfo">';
 			if ( $options['enablexmlsitemap'] )
-				$content .= '<p>'.sprintf(__('You can find your XML Sitemap here: %sXML Sitemap%s'), '<a target="_blank" class="button-secondary" href="'.home_url($base.'sitemap_index.xml').'">', '</a>').'<br/><br/> You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.</p>';
+				$content .= '<p>'.sprintf(__('You can find your XML Sitemap here: %sXML Sitemap%s', WPSEO_TEXT_DOMAIN ), '<a target="_blank" class="button-secondary" href="'.home_url($base.'sitemap_index.xml').'">', '</a>').'<br/><br/>'.__( 'You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.', WPSEO_TEXT_DOMAIN ).'</p>';
 			else
-				$content .= '<p>'.__('Save your settings to activate XML Sitemaps.').'</p>';
-			$content .= '<strong>'.__('General settings').'</strong><br/>';
-			$content .= '<p>'.__('After content publication, the plugin automatically pings Google and Bing, do you need it to ping other search engines too? If so, check the box:').'</p>';
-			$content .= $this->checkbox('xml_ping_yahoo', __("Ping Yahoo!."), false);
-			$content .= $this->checkbox('xml_ping_ask', __("Ping Ask.com."), false);
-			$content .= '<br/><strong>'.__('Exclude post types').'</strong><br/>';
-			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
+				$content .= '<p>'.__('Save your settings to activate XML Sitemaps.', WPSEO_TEXT_DOMAIN ).'</p>';
+			$content .= '<strong>'.__('General settings', WPSEO_TEXT_DOMAIN ).'</strong><br/>';
+			$content .= '<p>'.__('After content publication, the plugin automatically pings Google and Bing, do you need it to ping other search engines too? If so, check the box:', WPSEO_TEXT_DOMAIN ).'</p>';
+			$content .= $this->checkbox('xml_ping_yahoo', __("Ping Yahoo!.", WPSEO_TEXT_DOMAIN ), false);
+			$content .= $this->checkbox('xml_ping_ask', __("Ping Ask.com.", WPSEO_TEXT_DOMAIN ), false);
+			$content .= '<br/><strong>'.__('Exclude post types', WPSEO_TEXT_DOMAIN ).'</strong><br/>';
+			$content .= '<p>'.__('Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:', WPSEO_TEXT_DOMAIN ).'</p>';
 			foreach (get_post_types() as $post_type) {
 				if ( !in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) {
 					$pt = get_post_type_object($post_type);
@@ -1008,8 +1011,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			}
 
 			$content .= '<br/>';
-			$content .= '<strong>'.__('Exclude taxonomies').'</strong><br/>';
-			$content .= '<p>'.__('Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:').'</p>';
+			$content .= '<strong>'.__('Exclude taxonomies', WPSEO_TEXT_DOMAIN ).'</strong><br/>';
+			$content .= '<p>'.__('Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:', WPSEO_TEXT_DOMAIN ).'</p>';
 			foreach (get_taxonomies() as $taxonomy) {
 				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
 					$tax = get_taxonomy($taxonomy);
@@ -1021,7 +1024,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= '<br class="clear"/>';
 			$content .= '</div>';
 
-			$this->postbox('xmlsitemaps',__('XML Sitemap', 'yoast-wpseo'),$content);
+			$this->postbox('xmlsitemaps',__('XML Sitemap', WPSEO_TEXT_DOMAIN),$content);
 			
 			do_action('wpseo_xmlsitemaps_config', $this);		
 			
@@ -1039,48 +1042,48 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($options['blocking_files']) && is_array($options['blocking_files']) && count($options['blocking_files']) > 0 ) {
 				$options['blocking_files'] = array_unique( $options['blocking_files'] );
 				$content .= '<p id="blocking_files" class="wrong">'
-				.'<a href="javascript:wpseo_killBlockingFiles(\''.wp_create_nonce('wpseo-blocking-files').'\')" class="button fixit">'.__('Fix it.').'</a>'
-				.'The following file(s) is/are blocking your XML sitemaps from working properly:<br />';
+				.'<a href="javascript:wpseo_killBlockingFiles(\''.wp_create_nonce('wpseo-blocking-files').'\')" class="button fixit">'.__('Fix it.', WPSEO_TEXT_DOMAIN ).'</a>'
+				.__( 'The following file(s) is/are blocking your XML sitemaps from working properly:', WPSEO_TEXT_DOMAIN ).'<br />';
 				foreach($options['blocking_files'] as $file) {
 					$content .= esc_html( $file ) . '<br/>';
 				}
-				$content .= 'Either delete them (this can be done with the "Fix it" button) or disable WP SEO XML sitemaps.';
+				$content .= __( 'Either delete them (this can be done with the "Fix it" button) or disable WP SEO XML sitemaps.', WPSEO_TEXT_DOMAIN );
 				$content .= '</p>';
 			}
 			
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
 				$content .= '<p id="wrong_permalink" class="wrong">'
-				.'<a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.').'</a>'
-				.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.').'</p>';
+				.'<a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Fix it.', WPSEO_TEXT_DOMAIN ).'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.', WPSEO_TEXT_DOMAIN ).'</a>'
+				.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.', WPSEO_TEXT_DOMAIN ).'</p>';
 
 			if ( get_option('page_comments') && !isset( $options['ignore_page_comments'] ) )
 				$content .= '<p id="wrong_page_comments" class="wrong">'
-				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-setoption').'\');" class="button fixit">'.__('Fix it.').'</a>'
-				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.').'</a>'
-				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."').'</p>';
+				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-setoption').'\');" class="button fixit">'.__('Fix it.', WPSEO_TEXT_DOMAIN ).'</a>'
+				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.', WPSEO_TEXT_DOMAIN ).'</a>'
+				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."', WPSEO_TEXT_DOMAIN ).'</p>';
 
 			if ( isset($options['ignore_tour'] ) && $options['ignore_tour'] )
-				$content .= '<p><a class="button-secondary" href="'.admin_url('admin.php?page=wpseo_dashboard&wpseo_restart_tour').'">'.__('Start Introduction Tour').'</a></p>';
+				$content .= '<p><a class="button-secondary" href="'.admin_url('admin.php?page=wpseo_dashboard&wpseo_restart_tour').'">'.__('Start Introduction Tour', WPSEO_TEXT_DOMAIN ).'</a></p>';
 			
 			if ( '' != $content )
-				$this->postbox('advice',__('Settings Advice', 'yoast-wpseo'),$content); 
+				$this->postbox('advice',__('Settings Advice', WPSEO_TEXT_DOMAIN),$content); 
 			
-			$content = $this->checkbox('usemetakeywords', 'Use <code>meta</code> keywords tag?');
-			$content .= $this->checkbox('disabledatesnippet', 'Disable date in snippet preview for posts');
+			$content = $this->checkbox('usemetakeywords', __( 'Use <code>meta</code> keywords tag?', WPSEO_TEXT_DOMAIN ));
+			$content .= $this->checkbox('disabledatesnippet', __( 'Disable date in snippet preview for posts', WPSEO_TEXT_DOMAIN ));
 			
 			// TODO: make this settable per user level...
-			$content .= $this->checkbox('disableadvanced_meta', __('Disable the Advanced part of the WordPress SEO meta box'));
+			$content .= $this->checkbox('disableadvanced_meta', __('Disable the Advanced part of the WordPress SEO meta box', WPSEO_TEXT_DOMAIN ));
 			
 			
-			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following post types:').'</strong></p>';
+			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following post types:', WPSEO_TEXT_DOMAIN ).'</strong></p>';
 			foreach ( get_post_types() as $posttype ) {
 				if ( in_array( $posttype, array('revision','nav_menu_item') ) )
 					continue;
 				$content .= $this->checkbox('hideeditbox-'.$posttype, $posttype);
 			}	
 
-			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following taxonomies:').'</strong></p>';
+			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following taxonomies:', WPSEO_TEXT_DOMAIN ).'</strong></p>';
 			foreach (get_taxonomies() as $taxonomy) {
 				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
 					$tax = get_taxonomy($taxonomy);
@@ -1088,15 +1091,15 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 						$content .= $this->checkbox('tax-hideeditbox-'.$taxonomy, $tax->labels->name);
 				}
 			}
-			$this->postbox('general-settings',__('General Settings', 'yoast-wpseo'),$content); 
+			$this->postbox('general-settings',__('General Settings', WPSEO_TEXT_DOMAIN),$content); 
 			
 					
-			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:').'</p>';
-			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'yoast-wpseo').'</a>');
-			$content .= $this->textinput('yahooverify','<a target="_blank" href="https://siteexplorer.search.yahoo.com/mysites">'.__('Yahoo! Site Explorer', 'yoast-wpseo').'</a>');
-			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'yoast-wpseo').'</a>');
+			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:', WPSEO_TEXT_DOMAIN ).'</p>';
+			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', WPSEO_TEXT_DOMAIN).'</a>');
+			$content .= $this->textinput('yahooverify','<a target="_blank" href="https://siteexplorer.search.yahoo.com/mysites">'.__('Yahoo! Site Explorer', WPSEO_TEXT_DOMAIN).'</a>');
+			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', WPSEO_TEXT_DOMAIN).'</a>');
 
-			$this->postbox('webmastertools',__('Webmaster Tools', 'yoast-wpseo'),$content);
+			$this->postbox('webmastertools',__('Webmaster Tools', WPSEO_TEXT_DOMAIN),$content);
 			
 			do_action('wpseo_dashboard', $this);
 			
@@ -1109,19 +1112,19 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				
 			$options = get_wpseo_options();
 			?>
-				<h3 id="wordpress-seo">WordPress SEO settings</h3>
+				<h3 id="wordpress-seo"><?php _e( "WordPress SEO settings", WPSEO_TEXT_DOMAIN ); ?></h3>
 				<table class="form-table">
 					<tr>
-						<th>Title to use for Author page</th>
+						<th><?php _e( "Title to use for Author page", WPSEO_TEXT_DOMAIN ); ?></th>
 						<td><input class="regular-text" type="text" name="wpseo_author_title" value="<?php echo esc_attr(get_the_author_meta('wpseo_title', $user->ID) ); ?>"/></td>
 					</tr>
 					<tr>
-						<th>Meta description to use for Author page</th>
+						<th><?php _e( "Meta description to use for Author page", WPSEO_TEXT_DOMAIN ); ?></th>
 						<td><textarea rows="3" cols="30" name="wpseo_author_metadesc"><?php echo esc_html(get_the_author_meta('wpseo_metadesc', $user->ID) ); ?></textarea></td>
 					</tr>
 			<?php 	if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] ) {  ?>
 					<tr>
-						<th>Meta keywords to use for Author page</th>
+						<th><?php _e( "Meta keywords to use for Author page", WPSEO_TEXT_DOMAIN ); ?></th>
 						<td><input class="regular-text" type="text" name="wpseo_author_metakey" value="<?php echo esc_attr(get_the_author_meta('wpseo_metakey', $user->ID) ); ?>"/></td>
 					</tr>
 			<?php } ?>

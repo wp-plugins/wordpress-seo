@@ -32,7 +32,7 @@ class WPSEO_Metabox {
 				continue;
 			if ( isset($options['hideeditbox-'.$posttype]) && $options['hideeditbox-'.$posttype] )
 				continue;
-			add_meta_box( 'wpseo_meta', 'WordPress SEO by Yoast', array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
+			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', WPSEO_TEXT_DOMAIN ), array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
 		}
 	}
 	
@@ -48,7 +48,7 @@ class WPSEO_Metabox {
 			$date = $this->get_post_date( $post );
 
 			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
-			$this->wpseo_meta_length_reason = ' (because of date display)';
+			$this->wpseo_meta_length_reason = __( ' (because of date display)', WPSEO_TEXT_DOMAIN );
 		}
 		unset($date);
 		
@@ -88,7 +88,7 @@ class WPSEO_Metabox {
 				continue;
 			if ( isset($options['hideeditbox-'.$posttype]) && $options['hideeditbox-'.$posttype] )
 				continue;
-			add_meta_box( 'wpseo_meta', 'WordPress SEO by Yoast', array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
+			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', WPSEO_TEXT_DOMAIN ), array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
 		}
 	}
 	
@@ -112,37 +112,36 @@ class WPSEO_Metabox {
 		$mbs['snippetpreview'] = array(
 			"name" => "snippetpreview",
 			"type" => "snippetpreview",
-			"title" => __("Snippet Preview"),
+			"title" => __("Snippet Preview", WPSEO_TEXT_DOMAIN ),
 		);
 		$mbs['focuskw'] = array(
 			"name" => "focuskw",
 			"std" => "",
 			"type" => "text",
-			"title" => __("Focus Keyword"),
+			"title" => __("Focus Keyword", WPSEO_TEXT_DOMAIN ),
 			"description" => "<div class='alignright' style='width: 300px;'>"
-			."<a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords')."</a> "
-			."<p id='related_keywords_heading'>".__('Related keywords:')."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?")."</p></div>",
+			."<a class='preview button' id='wpseo_relatedkeywords' href='#wpseo_tag_suggestions'>".__('Find related keywords', WPSEO_TEXT_DOMAIN )."</a> "
+			."<p id='related_keywords_heading'>".__('Related keywords:', WPSEO_TEXT_DOMAIN )."</p><div id='wpseo_tag_suggestions'></div></div><div id='focuskwresults'><p>".__("What is the main keyword or key phrase this page should be found for?", WPSEO_TEXT_DOMAIN )."</p></div>",
 			"autocomplete" => "off",
 		);
 		$mbs['title'] = array(
 			"name" => "title",
 			"std" => "",
 			"type" => "text",
-			"title" => __("SEO Title"),
-			"description" => '<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title').'</a></div><p>'
-				.__("Title display in search engines is limited to 70 chars").", <span id='yoast_wpseo_title-length'></span> ".__("chars left.")."<br/>"
-				.__("If the SEO Title is empty, the preview shows what the plugin generates based on your ")
-				."<a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>".__("title template")."</a>.".'</p>',
+			"title" => __("SEO Title", WPSEO_TEXT_DOMAIN ),
+			"description" => '<div class="alignright" style="padding:5px;"><a class="button" href="#snippetpreview" id="wpseo_regen_title">'.__('Generate SEO title', WPSEO_TEXT_DOMAIN ).'</a></div><p>'
+				.sprintf(__("Title display in search engines is limited to 70 chars, %s chars left.", WPSEO_TEXT_DOMAIN ), "<span id='yoast_wpseo_title-length'></span>")."<br/>"
+				.sprintf(__("If the SEO Title is empty, the preview shows what the plugin generates based on your %stitle template%s.", WPSEO_TEXT_DOMAIN ), "<a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>", "</a>").'</p>',
 		);
 		$mbs['metadesc'] = array(
 			"name" => "metadesc",
 			"std" => "",
 			"class" => "metadesc",
 			"type" => "textarea",
-			"title" => __("Meta Description"),
+			"title" => __("Meta Description", WPSEO_TEXT_DOMAIN ),
 			"rows" => 2,
 			"richedit" => false,
-			"description" => "The <code>meta</code> description will be limited to ".$this->wpseo_meta_length." chars".$this->wpseo_meta_length_reason.", <span id='yoast_wpseo_metadesc-length'></span> chars left. <div id='yoast_wpseo_metadesc_notice'></div>"."<p>If the meta description is empty, the preview shows what the plugin generates based on your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta description template</a>.</p>"
+			"description" => sprintf(__( "The <code>meta</code> description will be limited to %s chars%s, %s chars left.", WPSEO_TEXT_DOMAIN ), $this->wpseo_meta_length, $this->wpseo_meta_length_reason, "<span id='yoast_wpseo_metadesc-length'></span>")." <div id='yoast_wpseo_metadesc_notice'></div><p>".sprintf(__( "If the meta description is empty, the preview shows what the plugin generates based on your %smeta description template%s.", WPSEO_TEXT_DOMAIN ),"<a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>", "</a>")."</p>"
 		);
 		if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] ) {
 			$mbs['metakeywords'] = array(
@@ -150,8 +149,8 @@ class WPSEO_Metabox {
 				"std" => "",
 				"class" => "metakeywords",
 				"type" => "text",
-				"title" => __("Meta Keywords"),
-				"description" => "If you type something above it will override your <a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>meta keywords template</a>."
+				"title" => __("Meta Keywords", WPSEO_TEXT_DOMAIN ),
+				"description" => sprintf(__( "If you type something above it will override your %smeta keywords template%s.", WPSEO_TEXT_DOMAIN ),"<a target='_blank' href='".admin_url('admin.php?page=wpseo_titles#'.$post_type)."'>","</a>")
 			);
 		}
 		
@@ -169,34 +168,34 @@ class WPSEO_Metabox {
 		$mbs['meta-robots-noindex'] = array(
 			"name" => "meta-robots-noindex",
 			"std" => "index",
-			"title" => __("Meta Robots Index"),
+			"title" => __("Meta Robots Index", WPSEO_TEXT_DOMAIN ),
 			"type" => "radio",
 			"options" => array(
-				"0" => __("Index"),
-				"1" => __("Noindex"),
+				"0" => __("Index", WPSEO_TEXT_DOMAIN ),
+				"1" => __("Noindex", WPSEO_TEXT_DOMAIN ),
 			),
 		);
 		$mbs['meta-robots-nofollow'] = array(
 			"name" => "meta-robots-nofollow",
 			"std" => "follow",
-			"title" => __("Meta Robots Follow"),
+			"title" => __("Meta Robots Follow", WPSEO_TEXT_DOMAIN ),
 			"type" => "radio",
 			"options" => array(
-				"0" => __("Follow"),
-				"1" => __("Nofollow"),
+				"0" => __("Follow", WPSEO_TEXT_DOMAIN ),
+				"1" => __("Nofollow", WPSEO_TEXT_DOMAIN ),
 			),
 		);
 		$mbs['meta-robots-adv'] = array(
 			"name" => "meta-robots-adv",
 			"std" => "none",
 			"type" => "multiselect",
-			"title" => __("Meta Robots Advanced"),
-			"description" => __("Advanced <code>meta</code> robots settings for this page."),
+			"title" => __("Meta Robots Advanced", WPSEO_TEXT_DOMAIN ),
+			"description" => __("Advanced <code>meta</code> robots settings for this page.", WPSEO_TEXT_DOMAIN ),
 			"options" => array(
-				"noodp" => "NO ODP",
-				"noydir" => "NO YDIR",
-				"noarchive" => __("No Archive"),
-				"nosnippet" => __("No Snippet"),
+				"noodp" => __( "NO ODP", WPSEO_TEXT_DOMAIN ),
+				"noydir" => __( "NO YDIR", WPSEO_TEXT_DOMAIN ),
+				"noarchive" => __("No Archive", WPSEO_TEXT_DOMAIN ),
+				"nosnippet" => __("No Snippet", WPSEO_TEXT_DOMAIN ),
 			),
 		);
 		if (isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable']) {
@@ -204,8 +203,8 @@ class WPSEO_Metabox {
 				"name" => "bctitle",
 				"std" => "",
 				"type" => "text",
-				"title" => __("Breadcrumbs title"),
-				"description" => __("Title to use for this page in breadcrumb paths"),
+				"title" => __("Breadcrumbs title", WPSEO_TEXT_DOMAIN ),
+				"description" => __("Title to use for this page in breadcrumb paths", WPSEO_TEXT_DOMAIN ),
 			);
 		}
 		if (isset($options['enablexmlsitemap']) && $options['enablexmlsitemap']) {		
@@ -213,32 +212,32 @@ class WPSEO_Metabox {
 				"name" => "sitemap-include",
 				"std" => "-",
 				"type" => "select",
-				"title" => __("Include in Sitemap"),
-				"description" => __("Should this page be in the XML Sitemap at all times, regardless of Robots Meta settings?"),
+				"title" => __("Include in Sitemap", WPSEO_TEXT_DOMAIN ),
+				"description" => __("Should this page be in the XML Sitemap at all times, regardless of Robots Meta settings?", WPSEO_TEXT_DOMAIN ),
 				"options" => array(
-					"-" => __("Auto detect"),
-					"always" => __("Always include"),
-					"never" => __("Never include"),
+					"-" => __("Auto detect", WPSEO_TEXT_DOMAIN ),
+					"always" => __("Always include", WPSEO_TEXT_DOMAIN ),
+					"never" => __("Never include", WPSEO_TEXT_DOMAIN ),
 				),
 			);
 			$mbs['sitemap-prio'] = array(
 				"name" => "sitemap-prio",
 				"std" => "-",
 				"type" => "select",
-				"title" => __("Sitemap Priority"),
-				"description" => __("The priority given to this page in the XML sitemap."),
+				"title" => __("Sitemap Priority", WPSEO_TEXT_DOMAIN ),
+				"description" => __("The priority given to this page in the XML sitemap.", WPSEO_TEXT_DOMAIN ),
 				"options" => array(
-					"-" => __("Automatic prioritization"),
-					"1" => __("1 - Highest priority"),
+					"-" => __("Automatic prioritization", WPSEO_TEXT_DOMAIN ),
+					"1" => __("1 - Highest priority", WPSEO_TEXT_DOMAIN ),
 					"0.9" => "0.9",
-					"0.8" => "0.8 - ".__("Default for first tier pages"),
+					"0.8" => "0.8 - ".__("Default for first tier pages", WPSEO_TEXT_DOMAIN ),
 					"0.7" => "0.7",
-					"0.6" => "0.6 - ".__("Default for second tier pages and posts"),
-					"0.5" => "0.5 - ".__("Medium priority"),
+					"0.6" => "0.6 - ".__("Default for second tier pages and posts", WPSEO_TEXT_DOMAIN ),
+					"0.5" => "0.5 - ".__("Medium priority", WPSEO_TEXT_DOMAIN ),
 					"0.4" => "0.4",
 					"0.3" => "0.3",
 					"0.2" => "0.2",
-					"0.1" => "0.1 - ".__("Lowest priority"),
+					"0.1" => "0.1 - ".__("Lowest priority", WPSEO_TEXT_DOMAIN ),
 				),
 			);
 		}
@@ -246,15 +245,15 @@ class WPSEO_Metabox {
 			"name" => "canonical",
 			"std" => "",
 			"type" => "text",
-			"title" => "Canonical URL",
-			"description" => "The canonical URL that this page should point to, leave empty to default to permalink. <a target='_blank' href='http://googlewebmastercentral.blogspot.com/2009/12/handling-legitimate-cross-domain.html'>Cross domain canonical</a> supported too."
+			"title" => __( "Canonical URL", WPSEO_TEXT_DOMAIN ),
+			"description" => sprintf(__( "The canonical URL that this page should point to, leave empty to default to permalink. %sCross domain canonical%s supported too.", WPSEO_TEXT_DOMAIN ), "<a target='_blank' href='http://googlewebmastercentral.blogspot.com/2009/12/handling-legitimate-cross-domain.html'>", "</a>")
 		);
 		$mbs['redirect'] = array(
 			"name" => "redirect",
 			"std" => "",
 			"type" => "text",
-			"title" => "301 Redirect",
-			"description" => "The URL that this page should redirect to."
+			"title" => __( "301 Redirect", WPSEO_TEXT_DOMAIN ),
+			"description" => __( "The URL that this page should redirect to.", WPSEO_TEXT_DOMAIN )
 		);
 	
 		// Apply filters for in advanced section
@@ -271,9 +270,9 @@ class WPSEO_Metabox {
 ?>
 	<div class="wpseo-metabox-tabs-div">
 		<ul class="wpseo-metabox-tabs" id="wpseo-metabox-tabs">
-			<li class="active general"><a class="active" href="javascript:void(null);">General</a></li>
-			<li class="linkdex"><a href="javascript:void(null);">Page Analysis</a></li>
-			<li class="advanced"><a href="javascript:void(null);">Advanced</a></li>
+			<li class="active general"><a class="active" href="javascript:void(null);"><?php _e( "General", WPSEO_TEXT_DOMAIN ); ?></a></li>
+			<li class="linkdex"><a href="javascript:void(null);"><?php _e( "Page Analysis", WPSEO_TEXT_DOMAIN ); ?></a></li>
+			<li class="advanced"><a href="javascript:void(null);"><?php _e( "Advanced", WPSEO_TEXT_DOMAIN ); ?></a></li>
 			<?php do_action('wpseo_tab_header'); ?>
 		</ul>
 <?php		
@@ -281,20 +280,20 @@ class WPSEO_Metabox {
 		foreach( $this->get_meta_boxes($post->post_type) as $meta_box) {
 			$content .= $this->do_meta_box( $meta_box );
 		}
-		$this->do_tab( 'general', 'General', $content );
+		$this->do_tab( 'general', __( 'General', WPSEO_TEXT_DOMAIN ), $content );
 
 		require WPSEO_PATH.'/admin/linkdex/linkdex.php';
 		
 		$linkdex = new Linkdex();
-		$this->do_tab( 'linkdex', 'Page Analysis', $linkdex->output( $post ) );
+		$this->do_tab( 'linkdex', __( 'Page Analysis', WPSEO_TEXT_DOMAIN ), $linkdex->output( $post ) );
 		unset($linkdex);
 		
-		if ( ! isset($options['disableadvanced_meta']) || !$options['disableadvanced_meta'] ) {
+		if ( current_user_can('edit_users') || ! isset($options['disableadvanced_meta']) || !$options['disableadvanced_meta'] ) {
 			$content = '';
 			foreach( $this->get_advanced_meta_boxes() as $meta_box ) {
 				$content .= $this->do_meta_box( $meta_box );
 			}
-			$this->do_tab( 'advanced', 'Advanced', $content );
+			$this->do_tab( 'advanced', __( 'Advanced', WPSEO_TEXT_DOMAIN ), $content );
 		}
 		
 		do_action('wpseo_tab_content');
@@ -553,7 +552,7 @@ class WPSEO_Metabox {
 			if ( isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
 				return wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );				
 			else
-				return wpseo_replace_vars('%%title%%', (array) $post );				
+				return wpseo_replace_vars('%%title%%', (array) $post );			
 		}
 	}
 }
