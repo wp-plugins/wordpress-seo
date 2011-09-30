@@ -133,7 +133,7 @@ class WPSEO_Frontend {
 			if ( isset($options['title-search']) && !empty($options['title-search']) )
 				$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );	
 			else {
-				$title = __('Search for "').get_search_query().'"';
+				$title = sprintf( __('Search for "%s"', WPSEO_TEXT_DOMAIN ), get_search_query() );
 				
 				if ( isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'] )
 					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
