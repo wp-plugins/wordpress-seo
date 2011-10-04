@@ -1,4 +1,4 @@
-=== WordPress SEO ===
+=== WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast
@@ -130,6 +130,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 * Show proper post type names in admin menu for disabling editor box and hide non-public post types (props Nacin).
 * Disabling the Advanced Editor now only disables it for non admins.
+* Replaced single quotes with double quotes in meta description and canonical, to please [Danny Sullivan](http://searchengineland.com)
 
 = 1.0.3 =
 
