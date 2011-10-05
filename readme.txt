@@ -1,7 +1,7 @@
 === WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
-Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast
+Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.2
 Stable tag: 1.0.3
@@ -23,20 +23,22 @@ The plugin also allows you to write meta titles and descriptions for all your ca
 Combined, this plugin makes sure that your content is the type of content search engines will love!
 
 = Technical WordPress Search Engine Optimization =
-While out of the box WordPress is pretty good for SEO, it needs some tweaks here and there. This plugin guides you through some of the settings needed, for instance by reminding you to enable pretty permalinks. But it also goes beyond that, by automatically optimizing and inserting the meta tags and link elements that Google and other search engines like so much:
+While out of the box WordPress is pretty good for SEO, it needs some tweaks here and there. This WordPress SEO plugin guides you through some of the settings needed, for instance by reminding you to enable pretty permalinks. But it also goes beyond that, by automatically optimizing and inserting the meta tags and link elements that Google and other search engines like so much:
 
 = Meta & Link Elements =
 With the WordPress SEO plugin you can control which pages Google shows in its search results and which pages it doesn't show. By default, it will tell search engines to index all of your pages, including category and tag archives, but only show the first pages in the search results. It's not very useful for a user to end up on the third page of your "personal" category, right?
 
-WordPress itself only shows canonical link elements on single pages, WordPress SEO makes it output canonical link elements everywhere. Google has recently announced they would also use `rel="next"` and `rel="prev"` link elements in the `head` section of your paginated archives, this plugin adds those automatically, see [this post](http://yoast.com/rel-next-prev-paginated-archives/ title="rel=”next” & rel=”prev” for paginated archives") for more info.
+WordPress itself only shows canonical link elements on single pages, WordPress SEO makes it output canonical link elements everywhere. Google has recently announced they would also use `rel="next"` and `rel="prev"` link elements in the `head` section of your paginated archives, this plugin adds those automatically, see [this post](http://yoast.com/rel-next-prev-paginated-archives/ title="rel=next & rel=prev for paginated archives") for more info.
 
 = XML Sitemaps =
 WordPress SEO has the most advanced XML Sitemaps functionality in any WordPress plugin. Once you check the box, it automatically creates XML sitemaps and notifies Google & Bing of the sitemaps existence. These XML sitemaps include the images in your posts & pages too, so that your images may be found better in the search engines too. 
 
 These XML Sitemaps will even work on large sites, because of how they're created, using one index sitemap that links to sub-sitemaps for each 1,000 posts. They will also work with custom post types and custom taxonomies automatically, while giving you the option to remove those from the XML sitemap should you wish to.
 
+Because of using [XSL stylesheets for these XML Sitemaps](http://yoast.com/xsl-stylesheet-xml-sitemap/), the XML sitemaps are easily readable for the human eye too, so you can spot things that shouldn't be in there.
+
 = RSS Optimization =
-Are you being outranked by scrapers? Instead of cursing at them, use them to your advantage! By automatically adding a link to your RSS feed pointing back to the original article, you're telling the search engine where they should be looking for the original. This increases your own chance of ranking for your chosen keywords and gets rid of scrapers in one go!
+Are you being outranked by scrapers? Instead of cursing at them, use them to your advantage! By automatically adding a link to your RSS feed pointing back to the original article, you're telling the search engine where they should be looking for the original. This way, the WordPress SEO plugin increases your own chance of ranking for your chosen keywords and gets rid of scrapers in one go!
 
 = Breadcrumbs =
 If your theme is compatible, like most [Genesis](http://yoast.com/wp-theme/genesis/ "Genesis Theme Review by Yoast") and [WooThemes](http://yoast.com/out/woothemes) themes are for instance, you can use the built-in Breadcrumbs functionality. This allows you to create an easy navigation that is great for both users and search engines and will support the search engines in understanding the structure of your site.
@@ -55,14 +57,14 @@ This WordPress SEO plugin, unlike some others, is fully Multi-Site compatible. T
 = Import & Export functionality =
 If you have multiple blogs, setting up plugins like this one on all of them might seem like a daunting task. Except that it's not, because what you can do is simple: you set up the plugin once. You then export your settings and simply import them on all your other sites. It's that simple!
 
-= Import functionality for other SEO plugins =
+= Import functionality for other WordPress SEO plugins =
 If you've used All In One SEO Pack or HeadSpace2 before using this plugin, you might want to import all your old titles and descriptions. You can do that easily using the built-in import functionality. There's also import functionality for some of the older Yoast plugins like Robots Meta and RSS footer.
 
 Should you have a need to import from another SEO plugin or from a theme like Genesis or Thesis, you can use the [SEO Data Transporter](http://wordpress.org/extend/plugins/seo-data-transporter/) plugin, that'll easily convert your SEO meta data from and to a whole set of plugins like Platinum SEO, SEO Ultimate, Greg's High Performance SEO and themes like Headway, Hybrid, WooFramework, Catalyst etc.
 
 Read [this migration guide](http://yoast.com/all-in-one-seo-pack-migration/) if you still have questions about migrating from another SEO plugin to WordPress SEO.
 
-= WordPress SEO in your language! =
+= WordPress SEO Plugin in your Language! =
 Currently a huge translation project is underway, translating WordPress SEO in as much as 24 languages. So far, the translations for French and Dutch are complete, but we still need help on a lot of other languages, so if you're good at translating, please join us at [translate.yoast.com](http://translate.yoast.com).
 
 = News SEO =
@@ -121,11 +123,12 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 == Screenshots ==
 
 1. The WordPress SEO plugin general meta box. You'll see this on edit post pages, for posts, pages and custom post types.
-2. The advanced section of the WordPress SEO meta box.
+2. Some of the sites using this WordPress SEO plugin.
 3. The WordPress SEO settings for a taxonomy.
 4. The fully configurable XML sitemap for WordPress SEO.
 5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
 6. Example of the Linkdex Page Analysis functionality.
+7. The advanced section of the WordPress SEO meta box.
 
 == Changelog ==
 
