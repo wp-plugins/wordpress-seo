@@ -10,6 +10,10 @@ Author URI: http://yoast.com/
 
 define( 'WPSEO_TEXT_DOMAIN', 'wordpress-seo' );
 
+define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
+define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
+define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
+
 load_plugin_textdomain( WPSEO_TEXT_DOMAIN, null, WPSEO_PATH . '/languages/' );
 
 if ( version_compare(PHP_VERSION, '5.2', '<') ) {
@@ -22,7 +26,7 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 	}
 }
 
-define( 'WPSEO_VERSION', '1.0.3' );
+define( 'WPSEO_VERSION', '1.0.4' );
 
 global $wp_version;
 
@@ -30,10 +34,6 @@ $pluginurl = plugin_dir_url(__FILE__);
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
 	$pluginurl = preg_replace( '/^https/', 'http', $pluginurl );
 define( 'WPSEO_FRONT_URL', $pluginurl );
-
-define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
-define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
-define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
 
 require WPSEO_PATH.'inc/wpseo-functions.php';
 require WPSEO_PATH.'inc/class-rewrite.php';
@@ -132,6 +132,19 @@ function wpseo_maybe_upgrade() {
 		$opt = (array) get_option( 'wpseo_indexation' );		
 		unset( $opt['hideindexrel'], $opt['hidestartrel'], $opt['hideprevnextpostlink'], $opt['hidewpgenerator'] );
 		update_option( 'wpseo_indexation', $opt );
+	}
+
+	if ( version_compare( $current_version, '1.0.4', '<' ) ) {
+		$opt = (array) get_option( 'wpseo_indexation' );
+		$newopt = array(
+			'opengraph' => $opt['opengraph'],
+			'fb_pageid' => $opt['fb_pageid'],
+			'fb_adminid' => $opt['fb_adminid'],
+			'fb_appid' => $opt['fb_appid'],
+		);
+		update_option('wpseo_social', $newopt);
+		unset($opt['opengraph'], $opt['fb_pageid'], $opt['fb_adminid'], $opt['fb_appid']);
+		update_option('wpseo_indexation', $opt);
 	}
 	
 	$options['version'] = WPSEO_VERSION;

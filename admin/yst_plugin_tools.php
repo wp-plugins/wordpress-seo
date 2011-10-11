@@ -17,7 +17,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		var $homepage	= '';
 		var $feed		= 'http://yoast.com/feed/';
 		var $accesslvl	= 'manage_options';
-		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles', 'wpseo_xml');
+		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles', 'wpseo_xml', 'wpseo_social');
 		
 		function __construct() {
 		}
@@ -47,6 +47,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			add_menu_page($this->longname, $this->shortname, $this->accesslvl, 'wpseo_dashboard', array(&$this,'config_page'), WPSEO_URL.'images/yoast-icon.png');
 			add_submenu_page('wpseo_dashboard',__( 'Titles', WPSEO_TEXT_DOMAIN ),__( 'Titles', WPSEO_TEXT_DOMAIN ),$this->accesslvl, 'wpseo_titles', array(&$this,'titles_page'));
 			add_submenu_page('wpseo_dashboard',__( 'Indexation', WPSEO_TEXT_DOMAIN ),__( 'Indexation', WPSEO_TEXT_DOMAIN ),$this->accesslvl, 'wpseo_indexation', array(&$this,'indexation_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Social', WPSEO_TEXT_DOMAIN ),__( 'Social', WPSEO_TEXT_DOMAIN ),$this->accesslvl, 'wpseo_social', array(&$this,'social_page'));
 			add_submenu_page('wpseo_dashboard',__( 'XML Sitemaps', WPSEO_TEXT_DOMAIN ),__( 'XML Sitemaps', WPSEO_TEXT_DOMAIN ),$this->accesslvl, 'wpseo_xml', array(&$this,'xml_sitemaps_page'));
 			add_submenu_page('wpseo_dashboard',__( 'Permalinks', WPSEO_TEXT_DOMAIN ),__( 'Permalinks', WPSEO_TEXT_DOMAIN ),$this->accesslvl, 'wpseo_permalinks', array(&$this,'permalinks_page'));
 			add_submenu_page('wpseo_dashboard',__( 'Internal Links', WPSEO_TEXT_DOMAIN ),__( 'Internal Links', WPSEO_TEXT_DOMAIN ),$this->accesslvl, 'wpseo_internal-links', array(&$this,'internallinks_page'));
@@ -400,6 +401,9 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 					$content .= '</li>';
 			    }
 			}						
+			$content .= '<li class="facebook"><a href="https://www.facebook.com/yoastcom">'.__( 'Like Yoast on Facebook', WPSEO_TEXT_DOMAIN ).'</a></li>';
+			$content .= '<li class="twitter"><a href="http://twitter.com/yoast">'.__( 'Follow Yoast on Twitter', WPSEO_TEXT_DOMAIN ).'</a></li>';
+			$content .= '<li class="googleplus"><a href="https://plus.google.com/115369062315673853712/posts">'.__( 'Circle Yoast on Google+', WPSEO_TEXT_DOMAIN ).'</a></li>';
 			$content .= '<li class="rss"><a href="'.$this->feed.'">'.__( 'Subscribe with RSS', WPSEO_TEXT_DOMAIN ).'</a></li>';
 			$content .= '<li class="email"><a href="http://yoast.com/wordpress-newsletter/">'.__( 'Subscribe by email', WPSEO_TEXT_DOMAIN ).'</a></li>';
 			$content .= '</ul>';

@@ -309,38 +309,36 @@ class WPSEO_Sitemaps {
 				else
 					$url['pri'] = 0.6;
 
-				if ( $images_in_sitemap ) {
-					$url['images'] = array();
-					if ( preg_match_all( '/<img [^>]+>/', $p->post_content, $matches ) ) {
-						foreach ( $matches[0] as $img ) {
-							// FIXME: get true caption instead of alt / title
-							if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
-								$src = $match[2];
-								if ( strpos($src, 'http') !== 0 ) {
-									if ( $src[0] != '/' )
-										continue;
-									$src = get_bloginfo('url') . $src;
-								}
-
-								if ( $src != esc_url( $src ) )
+				$url['images'] = array();
+				if ( preg_match_all( '/<img [^>]+>/', $p->post_content, $matches ) ) {
+					foreach ( $matches[0] as $img ) {
+						// FIXME: get true caption instead of alt / title
+						if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
+							$src = $match[2];
+							if ( strpos($src, 'http') !== 0 ) {
+								if ( $src[0] != '/' )
 									continue;
-
-								if ( isset( $url['images'][$src] ) )
-									continue;
-
-								$image = array();
-								if ( preg_match( '/title=("|\')([^"\']+)("|\')/', $img, $match ) )
-									$image['title'] = str_replace( array('-','_'), ' ', $match[2] );
-
-								if ( preg_match( '/alt=("|\')([^"\']+)("|\')/', $img, $match ) )
-									$image['alt'] = str_replace( array('-','_'), ' ', $match[2] );
-
-								$url['images'][$src] = $image;
+								$src = get_bloginfo('url') . $src;
 							}
+
+							if ( $src != esc_url( $src ) )
+								continue;
+
+							if ( isset( $url['images'][$src] ) )
+								continue;
+
+							$image = array();
+							if ( preg_match( '/title=("|\')([^"\']+)("|\')/', $img, $match ) )
+								$image['title'] = str_replace( array('-','_'), ' ', $match[2] );
+
+							if ( preg_match( '/alt=("|\')([^"\']+)("|\')/', $img, $match ) )
+								$image['alt'] = str_replace( array('-','_'), ' ', $match[2] );
+
+							$url['images'][$src] = $image;
 						}
 					}
-					$url['images'] = apply_filters( 'wpseo_sitemap_urlimages', $url['images'], $p->ID );
 				}
+				$url['images'] = apply_filters( 'wpseo_sitemap_urlimages', $url['images'], $p->ID );
 
 				if ( !in_array( $url['loc'], $stackedurls ) ) {
 					$output .= $this->sitemap_url( $url );
@@ -359,8 +357,7 @@ class WPSEO_Sitemaps {
 		}
 
 		$this->sitemap = '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-		if ( $images_in_sitemap )
-			$this->sitemap .= 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ';
+		$this->sitemap .= 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ';
 		$this->sitemap .= 'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" ';
 		$this->sitemap .= 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 		$this->sitemap .= $output . '</urlset>';

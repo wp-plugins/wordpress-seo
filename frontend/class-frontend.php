@@ -133,7 +133,7 @@ class WPSEO_Frontend {
 			if ( isset($options['title-search']) && !empty($options['title-search']) )
 				$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );	
 			else {
-				$title = sprintf( __('Search for "%s"', WPSEO_TEXT_DOMAIN ), get_search_query() );
+				$title = __('Search for "').get_search_query().'"';
 				
 				if ( isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'] )
 					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
@@ -334,7 +334,7 @@ class WPSEO_Frontend {
 		$robotsstr = preg_replace( '/^index,follow,?/', '', $robotsstr );
 		
 		if ($robotsstr != '') {
-			echo "<meta name='robots' content='".$robotsstr."'/>\n";
+			echo '<meta name="robots" content="'.$robotsstr.'"/>'."\n";
 		}
 	}
 	
@@ -500,7 +500,7 @@ class WPSEO_Frontend {
 		if ( is_singular() ) { 
 			global $post;
 			$metakey = wpseo_get_value('metakeywords');
-			if ( !$metakey || empty($metakey) ) {
+			if ( !$metakey || empty( $metakey ) && isset( $options['metakey-'.$post->post_type] ) ) {
 				$metakey = wpseo_replace_vars($options['metakey-'.$post->post_type], (array) $post );
 			}
 		} else {
@@ -528,7 +528,7 @@ class WPSEO_Frontend {
 
 		$metakey = trim( $metakey );
 		if ( !empty( $metakey ) ) 
-			echo "<meta name='keywords' content='".esc_attr( strip_tags( stripslashes( $metakey ) ) )."'/>\n";
+			echo '<meta name="keywords" content="'.esc_attr( strip_tags( stripslashes( $metakey ) ) ).'"/>'."\n";
 
 	}
 	
@@ -579,7 +579,7 @@ class WPSEO_Frontend {
 		
 		if ( $echo ) {
 			if ( !empty( $metadesc ) )
-				echo "<meta name='description' content='".esc_attr( strip_tags( stripslashes( $metadesc ) ) )."'/>\n";
+				echo '<meta name="description" content="'.esc_attr( strip_tags( stripslashes( $metadesc ) ) ).'"/>'."\n";
 			else if ( current_user_can('manage_options') && is_singular() )
 				echo '<!-- '.__( 'Admin only notice: this page doesn\'t show a meta description because it doesn\'t have one, either write it for this page specifically or go into the SEO -> Titles menu and set up a template.', WPSEO_TEXT_DOMAIN ).' -->'."\n";			
 		} else {

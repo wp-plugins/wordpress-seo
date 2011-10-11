@@ -53,6 +53,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			register_setting( 'yoast_wpseo_rss_options', 'wpseo_rss' );
 			register_setting( 'yoast_wpseo_internallinks_options', 'wpseo_internallinks' );
 			register_setting( 'yoast_wpseo_xml_sitemap_options', 'wpseo_xml' );
+			register_setting( 'yoast_wpseo_social_options', 'wpseo_social' );
 			
 			if ( function_exists('is_multisite') && is_multisite() )
 				register_setting( 'yoast_wpseo_multisite_options', 'wpseo_multisite' );
@@ -870,15 +871,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		
 		function indexation_page() {
 			$this->admin_header('Indexation', true, true, 'yoast_wpseo_indexation_options', 'wpseo_indexation');
-
-			$content = $this->checkbox('opengraph',__('Add OpenGraph meta data', WPSEO_TEXT_DOMAIN) );
-			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. You can specify some of the ID\'s that are sometimes needed below:', WPSEO_TEXT_DOMAIN).'</p>';
-			$content .= $this->textinput('fb_pageid', __('Facebook Page ID', WPSEO_TEXT_DOMAIN ) );
-			$content .= $this->textinput('fb_adminid', __('Facebook Admin ID', WPSEO_TEXT_DOMAIN ) );
-			$content .= '<p class="desc">'.__('Separate multiple admin ID\'s with comma\'s.', WPSEO_TEXT_DOMAIN).'</p>';
-			$content .= $this->textinput('fb_appid', __('Facebook App ID', WPSEO_TEXT_DOMAIN ) );
-
-			$this->postbox('opengraph',__('OpenGraph (Facebook)', WPSEO_TEXT_DOMAIN),$content);
 					
 			$content = '<p>'.__("Below you'll find checkboxes for each of the sections of your site that you might want to disallow the search engines from indexing. Be aware that this is a powerful tool, blocking category archives, for instance, really blocks all category archives from showing up in the index.", WPSEO_TEXT_DOMAIN ).'</p>';
 			$content .= $this->checkbox('noindexsubpages',__('Subpages of archives and taxonomies', WPSEO_TEXT_DOMAIN) );
@@ -1102,6 +1094,24 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->postbox('webmastertools',__('Webmaster Tools', WPSEO_TEXT_DOMAIN),$content);
 			
 			do_action('wpseo_dashboard', $this);
+			
+			$this->admin_footer('');
+		}
+		
+		function social_page() {
+			$this->admin_header('Social', true, true, 'yoast_wpseo_social_options', 'wpseo_social');
+
+			$content = $this->checkbox('opengraph', '<label for="opengraph">'.__('Add OpenGraph meta data', WPSEO_TEXT_DOMAIN).'</label>' );
+			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. You can specify some of the ID\'s that are sometimes needed below:', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->textinput('fb_pageid', __('Facebook Page ID', WPSEO_TEXT_DOMAIN ) );
+			$content .= $this->textinput('fb_adminid', __('Facebook Admin ID', WPSEO_TEXT_DOMAIN ) );
+			$content .= '<p class="desc">'.__('Separate multiple admin ID\'s with comma\'s.', WPSEO_TEXT_DOMAIN).'</p>';
+			$content .= $this->textinput('fb_appid', __('Facebook App ID', WPSEO_TEXT_DOMAIN ) );
+			$content .= '<h4>'.__( 'Frontpage settings', WPSEO_TEXT_DOMAIN ).'</h4>';
+			$content .= $this->textinput('og_frontpage_image', __('Image URL', WPSEO_TEXT_DOMAIN ) );
+			$content .= $this->textinput('og_frontpage_desc', __('Description', WPSEO_TEXT_DOMAIN ) );
+			
+			$this->postbox('opengraphbox',__('Facebook - OpenGraph', WPSEO_TEXT_DOMAIN),$content);
 			
 			$this->admin_footer('');
 		}

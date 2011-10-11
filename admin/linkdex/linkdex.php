@@ -172,7 +172,7 @@ class Linkdex {
 	}
 	
 	function ScoreKeyword($job, &$results) {
-		$keywordStopWord = sprintf(__("The keyword for this page contains one or more %sstop words%s, consider removing them. Found '%s'.", WPSEO_TEXT_DOMAIN ),"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>");
+		$keywordStopWord = sprintf(__("The keyword for this page contains one or more %sstop words%s, consider removing them. Found '\%s'.", WPSEO_TEXT_DOMAIN ),"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>");
 		
 		if ( wpseo_stopwords_check( $job["keyword"] ) !== false )
 			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, wpseo_stopwords_check( $job["keyword"] ) ) );

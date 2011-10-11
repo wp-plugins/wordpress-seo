@@ -70,6 +70,7 @@ label.radio {
 div.inside ul li {
 	list-style: square;
 	line-height:16px;
+	font-size: 11px;
 }
 
 div.inside a, div.inside a.rsswidget {
@@ -82,6 +83,18 @@ div.inside a:hover, div.inside a.rsswidget:hover {
 }
 div.inside ul li.rss {
 	list-style-image: url(../images/rss.png);
+}
+
+div.inside ul li.twitter {
+	list-style-image: url(../images/twitter-icon.png);
+}
+
+div.inside ul li.facebook {
+	list-style-image: url(../images/facebook-icon.png);
+}
+
+div.inside ul li.googleplus {
+	list-style-image: url(../images/google-plus-icon.png);
 }
 
 div.inside ul li.email {
