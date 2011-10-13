@@ -513,7 +513,9 @@ class WPSEO_Metabox {
 
 	public function enqueue() {
 		$color = get_user_meta( get_current_user_id(), 'admin_color', true );
-
+		if ( '' == $color ) 
+			$color = 'fresh';
+			
 		wp_enqueue_style( 'metabox-tabs', WPSEO_URL.'css/metabox-tabs.css', WPSEO_VERSION );
 		wp_enqueue_style( "metabox-$color", WPSEO_URL.'css/metabox-'.$color.'.css', WPSEO_VERSION );
 
