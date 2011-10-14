@@ -10,7 +10,7 @@ Improve your WordPress SEO: Write better content and have a fully optimized Word
 
 == Description ==
 
-WordPress out of the box is already technically quite a good platform for SEO. While this WordPress SEO plugin goes the extra mile to take care of all the technical optimization, more on that below, it first and foremost helps you write better content. WordPress SEO forces you to choose a focus keyword when you're writing your articles, and then makes sure you use that focus keyword everywhere. 
+WordPress out of the box is already technically quite a good platform for SEO. This plugin is written from the ground up by [WordPress SEO consultant](http://yoast.com/hire-me/wordpress-seo-consultant/) and [WordPress developer](http://yoast.com/hire-me/wordpress-developer/) Joost de Valk to improve your site's SEO on *all* needed aspects. While this WordPress SEO plugin goes the extra mile to take care of all the technical optimization, more on that below, it first and foremost helps you write better content.  WordPress SEO forces you to choose a focus keyword when you're writing your articles, and then makes sure you use that focus keyword everywhere. 
 
 = Write better content with WordPress SEO =
 Using the snippet preview you can see a rendering of what your post or page will look like in the search results, whether your title is too long or too short and your meta description makes sense in the context of a search result. This way the plugin will help you not only increase rankings but also increase the click through for organic search results.
@@ -74,7 +74,7 @@ Be sure to also check out the [News SEO module](http://yoast.com/wordpress/seo/n
 For more info, check out the following articles:
 
 * [WordPress SEO - The definitive Guide by Yoast](http://yoast.com/articles/wordpress-seo/).
-* Once you have great SEO, you'll need great [WordPress Hosting](http://yoast.com/articles/wordpress-hosting/).
+* Once you have great SEO, you'll need the [best WordPress Hosting](http://yoast.com/articles/wordpress-hosting/).
 * The [WordPress SEO Plugin](http://yoast.com/wordpress/seo/) official homepage.
 * Other [WordPress Plugins](http://yoast.com/wordpress/) by the same author.
 * Follow Yoast on [Facebook](https://facebook.com/yoastcom) & [Twitter](http://twitter.com/yoast).
