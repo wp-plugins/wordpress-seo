@@ -84,12 +84,12 @@ class WPSEO_Frontend {
 			
 		$options = get_wpseo_options();
 
-		if ( is_front_page() && 'posts' != get_option('show_on_front') ) {
+		if ( is_front_page() && 'page' get_option('show_on_front') ) {
 			global $post;
 			$title = wpseo_get_value( 'title', $post->ID );
 			if ( '' == $title )
 				$title = $post->post_title.$sep.get_bloginfo('name');
-		} else if ( is_home() && 'posts' == get_option('show_on_front') ) {
+		} else if ( is_home() && 'page' != get_option('show_on_front') ) {
 			if ( isset($options['title-home']) && $options['title-home'] != '' )
 				$title = wpseo_replace_vars( $options['title-home'], array() );
 			else {
@@ -98,7 +98,7 @@ class WPSEO_Frontend {
 					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
 				$title .= $sep.get_bloginfo('description');
 			}
-		} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
+		} else if ( is_home() && 'page' == get_option('show_on_front') ) {
 			$blogpage = get_post( get_option( 'page_for_posts' ) );
 			$fixed_title = wpseo_get_value( 'title', $blogpage->ID );
 			if ( $fixed_title ) { 
@@ -333,6 +333,8 @@ class WPSEO_Frontend {
 
 		$robotsstr = preg_replace( '/^index,follow,?/', '', $robotsstr );
 		
+		$robotsstr = apply_filters( 'wpseo_robots', $robotsstr );
+		
 		if ($robotsstr != '') {
 			echo '<meta name="robots" content="'.$robotsstr.'"/>'."\n";
 		}
@@ -504,9 +506,9 @@ class WPSEO_Frontend {
 				$metakey = wpseo_replace_vars($options['metakey-'.$post->post_type], (array) $post );
 			}
 		} else {
-			if ( is_home() && 'posts' == get_option('show_on_front') && isset($options['metakey-home']) ) {
+			if ( is_home() && 'page' != get_option('show_on_front') && isset($options['metakey-home']) ) {
 				$metakey = wpseo_replace_vars($options['metakey-home'], array() );
-			} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
+			} else if ( is_home() && 'page' == get_option('show_on_front') ) {
 				$post = get_post( get_option('page_for_posts') );
 				$metakey = wpseo_get_value('metakey');
 				if ( ($metakey == '' || !$metakey) && isset($options['metakey-'.$post->post_type]) )
