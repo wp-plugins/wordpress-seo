@@ -37,7 +37,7 @@ function wpseo_kill_blocking_files() {
 		$message = 'success';
 		foreach ( $options['blocking_files'] as $k => $file ) {
 			if ( ! @unlink( $file ) )
-				$message = __( 'Some files could not be removed. Please remove them via FTP.', WPSEO_TEXT_DOMAIN );
+				$message = __( 'Some files could not be removed. Please remove them via FTP.', 'wordpress-seo' );
 			else
 				unset( $options['blocking_files'][$k] );
 		}

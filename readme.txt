@@ -132,12 +132,26 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= next =
+= 1.1 (trunk) =
 
+* Biggest change: entire plugin now supports localization, testing can be done by dropping your properly named .mo file (wordpress-seo-nl_NL.mo for instance) into the languages dir. 
+* Added Dutch, German, French, Hebrew, Italian, Russian and Swedish translations.
 * Show proper post type names in admin menu for disabling editor box and hide non-public post types (props Nacin).
 * Disabling the Advanced Editor now only disables it for non admins.
 * Replaced single quotes with double quotes in meta description and canonical, to please [Danny Sullivan](http://searchengineland.com).
 * Fixed issue with images in XML sitemaps.
+* Added Social menu item.
+* Lots of changes to the Facebook integration:
+	* Added the locale.
+	* Added default image.
+	* Added homepage image & description.
+	* New method of adding Facebook Admins.
+* Removed all nofollow settings, login register links are now nofollow by default, all other functionality removed as it doesn't make sense anymore.
+* Cosmetic changes: added some Yoast links to backend widget in the right sidebar.
+* Switched text domain from a constant to a proper string 'wordpress-seo'.
+* Removed the now unneeded extra styling for admin pointers.
+* Fixed a notice in 3.3beta with caused by `wp_reset_query` being called too early.
+* Added several filters to allow WPML (and other plugins) to create XML Sitemaps for other languages.
 
 = 1.0.3 =
 

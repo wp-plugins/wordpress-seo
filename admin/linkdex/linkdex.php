@@ -17,16 +17,16 @@ class Linkdex {
 			return; 
 
 		if ( !class_exists('DOMDocument') ) {
-			$output = '<div class="wpseo_msg"><p><strong>'.__('Error', WPSEO_TEXT_DOMAIN ).':</strong> '.sprintf(__("your hosting environment does not support PHP's %sDocument Object Model%s.", WPSEO_TEXT_DOMAIN ), '<a href="http://php.net/manual/en/book.dom.php">','</a>').' '.__("To enjoy all the benefits of the page analysis feature, you'll need to (get your host to) install it.", WPSEO_TEXT_DOMAIN ).'</p></div>';
+			$output = '<div class="wpseo_msg"><p><strong>'.__('Error', 'wordpress-seo' ).':</strong> '.sprintf(__("your hosting environment does not support PHP's %sDocument Object Model%s.", 'wordpress-seo' ), '<a href="http://php.net/manual/en/book.dom.php">','</a>').' '.__("To enjoy all the benefits of the page analysis feature, you'll need to (get your host to) install it.", 'wordpress-seo' ).'</p></div>';
 			return $output;
 		}
 		
 		if ( !wpseo_get_value('focuskw') ) {
-			$output = '<div class="wpseo_msg"><p><strong>'.__('Error', WPSEO_TEXT_DOMAIN ).':</strong> '.__("you have not specified a focus keyword, you'll have to enter one, then save or update this post, before this report works.", WPSEO_TEXT_DOMAIN ).'</p></div>';
+			$output = '<div class="wpseo_msg"><p><strong>'.__('Error', 'wordpress-seo' ).':</strong> '.__("you have not specified a focus keyword, you'll have to enter one, then save or update this post, before this report works.", 'wordpress-seo' ).'</p></div>';
 			return $output;
 		}
 	
-		$output = '<div class="wpseo_msg"><p><strong>'.__('Note', WPSEO_TEXT_DOMAIN ).':</strong> '.__('to update this page analysis, save as draft or update and check this tab again', WPSEO_TEXT_DOMAIN ).'.</p></div>';
+		$output = '<div class="wpseo_msg"><p><strong>'.__('Note', 'wordpress-seo' ).':</strong> '.__('to update this page analysis, save as draft or update and check this tab again', 'wordpress-seo' ).'.</p></div>';
 		
 		$results	= '';
 		$job 		= array();
@@ -129,7 +129,7 @@ class Linkdex {
 		}
 		$output .= '</table>';
 		$output .= '<hr/>';
-		$output .= '<p style="font-size: 13px;"><a href="http://yoa.st/linkdex"><img class="alignleft" style="margin: 0 10px 5px 0;" src="'.WPSEO_URL.'images/linkdex-logo.png" alt="Linkdex"/></a>'.sprintf(__( 'This page analysis brought to you by the collaboration of Yoast and %sLinkdex%s. Linkdex is an SEO suite that helps you optimize your site and offers you all the SEO tools you\'ll need. Yoast uses %sLinkdex%s and highly recommends you do too!', WPSEO_TEXT_DOMAIN ),'<a href="http://yoa.st/linkdex">','</a>', '<a href="http://yoa.st/linkdex">','</a>').'</p>';
+		$output .= '<p style="font-size: 13px;"><a href="http://yoa.st/linkdex"><img class="alignleft" style="margin: 0 10px 5px 0;" src="'.WPSEO_URL.'images/linkdex-logo.png" alt="Linkdex"/></a>'.sprintf(__( 'This page analysis brought to you by the collaboration of Yoast and %sLinkdex%s. Linkdex is an SEO suite that helps you optimize your site and offers you all the SEO tools you\'ll need. Yoast uses %sLinkdex%s and highly recommends you do too!', 'wordpress-seo' ),'<a href="http://yoa.st/linkdex">','</a>', '<a href="http://yoa.st/linkdex">','</a>').'</p>';
 	
 		unset($results);
 		unset($job);
@@ -172,17 +172,17 @@ class Linkdex {
 	}
 	
 	function ScoreKeyword($job, &$results) {
-		$keywordStopWord = sprintf(__("The keyword for this page contains one or more %sstop words%s, consider removing them. Found '\%s'.", WPSEO_TEXT_DOMAIN ),"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>");
+		$keywordStopWord = sprintf(__("The keyword for this page contains one or more %sstop words%s, consider removing them. Found '\%s'.", 'wordpress-seo' ),"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>");
 		
 		if ( wpseo_stopwords_check( $job["keyword"] ) !== false )
 			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, wpseo_stopwords_check( $job["keyword"] ) ) );
 	}
 	
 	function ScoreUrl($job, &$results, $statistics) {
-		$urlGood 		= __("The keyword / phrase appears in the URL for this page.", WPSEO_TEXT_DOMAIN );
-		$urlMedium 		= __("The keyword / phrase does not appear in the URL for this page. If you decide to rename the URL be sure to check the old URL 301 redirects to the new one!", WPSEO_TEXT_DOMAIN );
-		$urlStopWords	= __("The slug for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them.", WPSEO_TEXT_DOMAIN );
-		$longSlug		= __("The slug for this page is a bit long, consider shortening it.", WPSEO_TEXT_DOMAIN );
+		$urlGood 		= __("The keyword / phrase appears in the URL for this page.", 'wordpress-seo' );
+		$urlMedium 		= __("The keyword / phrase does not appear in the URL for this page. If you decide to rename the URL be sure to check the old URL 301 redirects to the new one!", 'wordpress-seo' );
+		$urlStopWords	= __("The slug for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them.", 'wordpress-seo' );
+		$longSlug		= __("The slug for this page is a bit long, consider shortening it.", 'wordpress-seo' );
 		
 		$needle 	= $this->strip_separators_and_fold( $job["keyword"] );
 		$haystack1 	= $this->strip_separators_and_fold( $job["pageUrl"], true );
@@ -207,14 +207,14 @@ class Linkdex {
 		$scoreTitleMaxLength 		 = 70;
 		$scoreTitleKeywordLimit		 = 0;
 
-		$scoreTitleMissing 			 = __("Please create a page title.", WPSEO_TEXT_DOMAIN );
-		$scoreTitleCorrectLength 	 = __("The page title is more than 40 characters and less than the recommended 70 character limit.", WPSEO_TEXT_DOMAIN );
-		$scoreTitleTooShort 		 = __("The page title contains %d characters, which is less than the recommended minimum of 40 characters. Use the space to add keyword variations or create compelling call-to-action copy.", WPSEO_TEXT_DOMAIN );
-		$scoreTitleTooLong 			 = __("The page title contains %d characters, which is more than the viewable limit of 70 characters; some words will not be visible to users in your listing.", WPSEO_TEXT_DOMAIN );
-		$scoreTitleKeywordMissing 	 = __("The keyword / phrase %s does not appear in the page title.", WPSEO_TEXT_DOMAIN );
-		$scoreTitleKeywordBeginning  = __("The page title contains keyword / phrase, at the beginning which is considered to improve rankings.", WPSEO_TEXT_DOMAIN );
-		$scoreTitleKeywordEnd 		 = __("The page title contains keyword / phrase, but it does not appear at the beginning; try and move it to the beginning.", WPSEO_TEXT_DOMAIN );
-		$scoreTitleKeywordIn 		 = __("The page title contains keyword / phrase.", WPSEO_TEXT_DOMAIN );
+		$scoreTitleMissing 			 = __("Please create a page title.", 'wordpress-seo' );
+		$scoreTitleCorrectLength 	 = __("The page title is more than 40 characters and less than the recommended 70 character limit.", 'wordpress-seo' );
+		$scoreTitleTooShort 		 = __("The page title contains %d characters, which is less than the recommended minimum of 40 characters. Use the space to add keyword variations or create compelling call-to-action copy.", 'wordpress-seo' );
+		$scoreTitleTooLong 			 = __("The page title contains %d characters, which is more than the viewable limit of 70 characters; some words will not be visible to users in your listing.", 'wordpress-seo' );
+		$scoreTitleKeywordMissing 	 = __("The keyword / phrase %s does not appear in the page title.", 'wordpress-seo' );
+		$scoreTitleKeywordBeginning  = __("The page title contains keyword / phrase, at the beginning which is considered to improve rankings.", 'wordpress-seo' );
+		$scoreTitleKeywordEnd 		 = __("The page title contains keyword / phrase, but it does not appear at the beginning; try and move it to the beginning.", 'wordpress-seo' );
+		$scoreTitleKeywordIn 		 = __("The page title contains keyword / phrase.", 'wordpress-seo' );
 
 		if ( $title == "" ) {
 			$this->SaveScoreResult($results, 1, $scoreTitleMissing);
@@ -244,11 +244,11 @@ class Linkdex {
 	}
 
 	function ScoreAnchorTexts($job, &$results, $anchor_texts, $count) {
-		$scoreNoLinks 					= __("No outbound links appear in this page, consider adding some as appropriate.", WPSEO_TEXT_DOMAIN );
-		$scoreKeywordInOutboundLink		= __("You're linking to another page with the keyword you want this page to rank for, consider changing that if you truly want this page to rank.", WPSEO_TEXT_DOMAIN );
-		$scoreLinksDofollow				= __("This page has %s outbound link(s).", WPSEO_TEXT_DOMAIN );
-		$scoreLinksNofollow				= __("This page has %s outbound link(s), all nofollowed.", WPSEO_TEXT_DOMAIN );
-		$scoreLinks						= __("This page has %s nofollowed link(s) and %s normal outbound link(s).", WPSEO_TEXT_DOMAIN );
+		$scoreNoLinks 					= __("No outbound links appear in this page, consider adding some as appropriate.", 'wordpress-seo' );
+		$scoreKeywordInOutboundLink		= __("You're linking to another page with the keyword you want this page to rank for, consider changing that if you truly want this page to rank.", 'wordpress-seo' );
+		$scoreLinksDofollow				= __("This page has %s outbound link(s).", 'wordpress-seo' );
+		$scoreLinksNofollow				= __("This page has %s outbound link(s), all nofollowed.", 'wordpress-seo' );
+		$scoreLinks						= __("This page has %s nofollowed link(s) and %s normal outbound link(s).", 'wordpress-seo' );
 
 		
 		if ( $count['external']['nofollow'] == 0 && $count['external']['dofollow'] == 0 ) {
@@ -324,10 +324,10 @@ class Linkdex {
 	}
 	
 	function ScoreImagesAltText($job, &$results, $alts, $imgcount) {
-		$scoreImagesNoImages 			= __("No images appear in this page, consider adding some as appropriate.", WPSEO_TEXT_DOMAIN );
-		$scoreImagesNoAlt			 	= __("The images on this page are missing alt tags.", WPSEO_TEXT_DOMAIN );
-		$scoreImagesAltKeywordIn		= __("The images on this page contain alt tags with the target keyword / phrase.", WPSEO_TEXT_DOMAIN );
-		$scoreImagesAltKeywordMissing 	= __("The images on this page do not have alt tags containing your keyword / phrase.", WPSEO_TEXT_DOMAIN );
+		$scoreImagesNoImages 			= __("No images appear in this page, consider adding some as appropriate.", 'wordpress-seo' );
+		$scoreImagesNoAlt			 	= __("The images on this page are missing alt tags.", 'wordpress-seo' );
+		$scoreImagesAltKeywordIn		= __("The images on this page contain alt tags with the target keyword / phrase.", 'wordpress-seo' );
+		$scoreImagesAltKeywordMissing 	= __("The images on this page do not have alt tags containing your keyword / phrase.", 'wordpress-seo' );
 
 		if ( $imgcount == 0 ) {
 			$this->SaveScoreResult($results,6,$scoreImagesNoImages);
@@ -370,9 +370,9 @@ class Linkdex {
 	}
 	
 	function ScoreHeadings($job, &$results, $headings) {
-		$scoreHeadingsNone				= __("No heading tags appear in the copy.", WPSEO_TEXT_DOMAIN );
-		$scoreHeadingsKeywordIn			= __("Keyword / keyphrase appears in %s (out of %s) headings in the copy. While not a major ranking factor, this is beneficial.", WPSEO_TEXT_DOMAIN );
-		$scoreHeadingsKeywordMissing	= __("You have not used your keyword / keyphrase in any heading in your copy.", WPSEO_TEXT_DOMAIN );
+		$scoreHeadingsNone				= __("No heading tags appear in the copy.", 'wordpress-seo' );
+		$scoreHeadingsKeywordIn			= __("Keyword / keyphrase appears in %s (out of %s) headings in the copy. While not a major ranking factor, this is beneficial.", 'wordpress-seo' );
+		$scoreHeadingsKeywordMissing	= __("You have not used your keyword / keyphrase in any heading in your copy.", 'wordpress-seo' );
 
 		$headingCount = count( $headings );
 		if ( $headingCount == 0 )
@@ -407,16 +407,16 @@ class Linkdex {
 	
 	function ScoreDescription($job, &$results, $description, $maxlength = 155, $statistics) {
 		$scoreDescriptionMinLength = 120;
-		$scoreDescriptionCorrectLength	= __("In the specified meta description, consider: How does it compare to the competition? Could it be made more appealing?", WPSEO_TEXT_DOMAIN );
-		$scoreDescriptionTooShort 		= __("The meta description is under 120 characters, however up to %s characters are available. %s", WPSEO_TEXT_DOMAIN );
-		$scoreDescriptionTooLong		= __("The specified meta description is over %s characters, reducing it will ensure the entire description is visible. %s", WPSEO_TEXT_DOMAIN );
-		$scoreDescriptionMissing		= __("No meta description has been specified, search engines will display copy from the page instead.", WPSEO_TEXT_DOMAIN );
-		$scoreDescriptionKeywordIn		= __("The meta description contains the primary keyword / phrase.", WPSEO_TEXT_DOMAIN );
-		$scoreDescriptionKeywordMissing	= __("A meta description has been specified, but it does not contain the target keyword / phrase.", WPSEO_TEXT_DOMAIN );
+		$scoreDescriptionCorrectLength	= __("In the specified meta description, consider: How does it compare to the competition? Could it be made more appealing?", 'wordpress-seo' );
+		$scoreDescriptionTooShort 		= __("The meta description is under 120 characters, however up to %s characters are available. %s", 'wordpress-seo' );
+		$scoreDescriptionTooLong		= __("The specified meta description is over %s characters, reducing it will ensure the entire description is visible. %s", 'wordpress-seo' );
+		$scoreDescriptionMissing		= __("No meta description has been specified, search engines will display copy from the page instead.", 'wordpress-seo' );
+		$scoreDescriptionKeywordIn		= __("The meta description contains the primary keyword / phrase.", 'wordpress-seo' );
+		$scoreDescriptionKeywordMissing	= __("A meta description has been specified, but it does not contain the target keyword / phrase.", 'wordpress-seo' );
 
 		$metaShorter					= '';
 		if ($maxlength != 155)
-			$metaShorter				= __("The available space is shorter than the usual 155 characters because Google will also include the publication date in the snippet.", WPSEO_TEXT_DOMAIN );
+			$metaShorter				= __("The available space is shorter than the usual 155 characters because Google will also include the publication date in the snippet.", 'wordpress-seo' );
 		
 		if ( $description == "" ) {
 			$this->SaveScoreResult($results,1,$scoreDescriptionMissing);
@@ -445,19 +445,19 @@ class Linkdex {
 		$scoreBodyGoodLimit 	= 300;
 		$scoreBodyPoorLimit 	= 100;
 
-		$scoreBodyGoodLength 	= __("There are %d words contained in the body copy, this is greater than the 300 word recommended minimum.", WPSEO_TEXT_DOMAIN );
-		$scoreBodyPoorLength 	= __("There are %d words contained in the body copy, this is below the 300 word recommended minimum. Add more useful content on this topic for readers.", WPSEO_TEXT_DOMAIN );
-		$scoreBodyBadLength 	= __("There are %d words contained in the body copy. This is far too low and should be increased.", WPSEO_TEXT_DOMAIN );
+		$scoreBodyGoodLength 	= __("There are %d words contained in the body copy, this is greater than the 300 word recommended minimum.", 'wordpress-seo' );
+		$scoreBodyPoorLength 	= __("There are %d words contained in the body copy, this is below the 300 word recommended minimum. Add more useful content on this topic for readers.", 'wordpress-seo' );
+		$scoreBodyBadLength 	= __("There are %d words contained in the body copy. This is far too low and should be increased.", 'wordpress-seo' );
 
-		$scoreKeywordDensityLow 	= __("The keyword density is %s%%, which is a bit low, the keyword was found %s times.", WPSEO_TEXT_DOMAIN );
-		$scoreKeywordDensityHigh 	= __("The keyword density is %s%%, which is over the advised 5.5%% maximum, the keyword was found %s times.", WPSEO_TEXT_DOMAIN );
-		$scoreKeywordDensityGood 	= __("The keyword density is %s%%, which is great, the keyword was found %s times.", WPSEO_TEXT_DOMAIN );
+		$scoreKeywordDensityLow 	= __("The keyword density is %s%%, which is a bit low, the keyword was found %s times.", 'wordpress-seo' );
+		$scoreKeywordDensityHigh 	= __("The keyword density is %s%%, which is over the advised 5.5%% maximum, the keyword was found %s times.", 'wordpress-seo' );
+		$scoreKeywordDensityGood 	= __("The keyword density is %s%%, which is great, the keyword was found %s times.", 'wordpress-seo' );
 
-		$scoreFirstParagraphLow		= __("The keyword doesn't appear in the first paragraph of the copy, make sure the topic is clear immediately.", WPSEO_TEXT_DOMAIN );
-		$scoreFirstParagraphHigh	= __("The keyword appears in the first paragraph of the copy.", WPSEO_TEXT_DOMAIN );
+		$scoreFirstParagraphLow		= __("The keyword doesn't appear in the first paragraph of the copy, make sure the topic is clear immediately.", 'wordpress-seo' );
+		$scoreFirstParagraphHigh	= __("The keyword appears in the first paragraph of the copy.", 'wordpress-seo' );
 
-		$fleschurl					= '<a href="http://en.wikipedia.org/wiki/Flesch-Kincaid_readability_test#Flesch_Reading_Ease">'.__('Flesch Reading Ease', WPSEO_TEXT_DOMAIN ).'</a>';
-		$scoreFlesch				= __("The copy scores %s in the %s test, which is considered %s to read. %s", WPSEO_TEXT_DOMAIN );
+		$fleschurl					= '<a href="http://en.wikipedia.org/wiki/Flesch-Kincaid_readability_test#Flesch_Reading_Ease">'.__('Flesch Reading Ease', 'wordpress-seo' ).'</a>';
+		$scoreFlesch				= __("The copy scores %s in the %s test, which is considered %s to read. %s", 'wordpress-seo' );
 		
 		// Copy length check
 		$wordCount = $statistics->word_count( $body );
@@ -515,15 +515,15 @@ class Linkdex {
 				$score = 7;
 			} else if ( $flesch >= 50 ) {
 				$level = __('fairly difficult');
-				$note = __('Try to make shorter sentences to improve readability.', WPSEO_TEXT_DOMAIN );
+				$note = __('Try to make shorter sentences to improve readability.', 'wordpress-seo' );
 				$score = 6;
 			} else if ( $flesch >= 30 ) {
 				$level = __('difficult');
-				$note = __('Try to make shorter sentences, using less difficult words to improve readability.', WPSEO_TEXT_DOMAIN );
+				$note = __('Try to make shorter sentences, using less difficult words to improve readability.', 'wordpress-seo' );
 				$score = 5;
 			} else if ( $flesch >= 0 ) {
 				$level = __('very difficult');
-				$note = __('Try to make shorter sentences, using less difficult words to improve readability.', WPSEO_TEXT_DOMAIN );
+				$note = __('Try to make shorter sentences, using less difficult words to improve readability.', 'wordpress-seo' );
 				$score = 4;
 			}
 			$this->SaveScoreResult( $results, $score, sprintf( $scoreFlesch, $flesch, $fleschurl, $level, $note ) );	

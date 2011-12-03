@@ -1,6 +1,6 @@
 <?php 
 
-class WPSEO_OpenGraph {
+class WPSEO_OpenGraph extends WPSEO_Frontend {
 
 	var $options;
 	
@@ -9,9 +9,7 @@ class WPSEO_OpenGraph {
 
 		add_action( 'wpseo_head', array(&$this, 'opengraph') );
 
-		$this->options = get_wpseo_options();
-
-		if ( isset( $this->options['opengraph'] )  && $this->options['opengraph'] )
+		if ( isset( $this->options['opengraph'] ) && $this->options['opengraph'] )
 			add_filter('language_attributes', array(&$this, 'add_opengraph_namespace'));
 	}
 
@@ -20,6 +18,7 @@ class WPSEO_OpenGraph {
 		
 		wp_reset_query();
 		
+		$this->locale();
 		$this->id();
 		$this->title();
 		$this->description();
@@ -35,17 +34,21 @@ class WPSEO_OpenGraph {
 	}
 	
 	public function id() {
-		if ( isset($this->options['fb_adminid']) && trim($this->options['fb_adminid']) != '' )
-			echo "<meta property='fb:admins' content='".esc_attr( strip_tags( stripslashes( $this->options['fb_adminid'] ) ) )."'/>\n";
-
-		if ( isset($this->options['fb_pageid']) && trim($this->options['fb_pageid']) != '' )
-			echo "<meta property='fb:page_id' content='".esc_attr( strip_tags( stripslashes( $this->options['fb_pageid'] ) ) )."'/>\n";
-
-		if ( isset($this->options['fb_appid']) && trim($this->options['fb_appid']) != '' )
-			echo "<meta property='fb:app_id' content='".esc_attr( strip_tags( stripslashes( $this->options['fb_appid'] ) ) )."'/>\n";
+		if ( isset( $this->options['fbadminapp'] ) && 0 != $this->options['fbadminapp'] ) {
+			echo "<meta property='fb:app_id' content='".esc_attr( $this->options['fbadminapp'] )."' />\n";
+		} else if ( isset( $this->options['fbadminpage'] ) && 0 != $this->options['fbadminpage'] ) {
+			echo "<meta property='fb:page_id' content='".esc_attr( $this->options['fbadminpage'] )."'/>\n";
+		} else if ( is_array( $this->options['fb_admins'] && count( $this->options['fb_admins'] ) > 0 ) ) {
+			foreach ( $this->options['fb_admins'] as $admin_id => $admin ) {
+				if ( isset($adminstr) && $adminstr != '' )
+					$adminstr .= ',';
+				$adminstr .= $admin_id;
+			}
+			echo "<meta property='fb:admins' content='".esc_attr( $adminstr )."'/>\n";
+		}
 	}
 	
-	private function title( ) {
+	public function title( ) {
 		global $post, $wp_query;
 		if ( empty($post) && is_singular() ) {
 			$post = $wp_query->get_queried_object();
@@ -148,6 +151,10 @@ class WPSEO_OpenGraph {
 		echo "<meta property='og:url' content='".esc_attr( $url )."'/>\n";
 	}
 	
+	public function locale() {
+		echo "<meta property='og:locale' content='".esc_attr( get_locale() )."'/>\n";
+	}
+	
 	public function type() {
 		if ( is_singular() ) {
 			$type = wpseo_get_value('og_type');
@@ -184,10 +191,15 @@ class WPSEO_OpenGraph {
 			}
 			$og_image = $gp_image = $image;
 		} else if ( is_front_page() ) {
-			$og_image = $this->options['og_frontpage_image'];
-			$gp_image = $this->options['gp_frontpage_image'];
+			if ( isset( $this->options['og_frontpage_image'] ) )
+				$og_image = $this->options['og_frontpage_image'];
+			if ( isset( $this->options['gp_frontpage_image'] ) )
+				$gp_image = $this->options['gp_frontpage_image'];
 		}
-		if ( $og_image != '' )
+		if ( ( !isset( $og_image ) || $og_image == '' ) && isset( $this->options['og_default_image'] ) )
+			$og_image = $this->options['og_default_image'];
+		
+		if ( isset( $og_image ) && $og_image != '' ) 
 			echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
 	}
 		
