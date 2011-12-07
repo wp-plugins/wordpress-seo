@@ -245,9 +245,9 @@ class WPSEO_Sitemaps {
 		global $wpdb;
 		
 		$join_filter = '';
-		$join_filter = apply_filters('wpseo_typecount_join', $join_filter);
+		$join_filter = apply_filters('wpseo_typecount_join', $join_filter, $post_type);
 		$where_filter = '';
-		$where_filter = apply_filters('wpseo_typecount_where', $where_filter);
+		$where_filter = apply_filters('wpseo_typecount_where', $where_filter, $post_type);
 		$typecount = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status = 'publish' AND post_password = '' AND post_type = '$post_type' {$where_filter}");
 		
 		if ( $typecount == 0 && empty( $archive ) ) {
@@ -271,9 +271,9 @@ class WPSEO_Sitemaps {
 		while( $total > $offset ) {
 			
 			$join_filter = '';
-			$join_filter = apply_filters('wpseo_posts_join', $join_filter);
+			$join_filter = apply_filters('wpseo_posts_join', $join_filter, $post_type);
 			$where_filter = '';
-			$where_filter = apply_filters('wpseo_posts_where', $where_filter);
+			$where_filter = apply_filters('wpseo_posts_where', $where_filter, $post_type);
 			
 			$posts = $wpdb->get_results("SELECT ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
 			FROM $wpdb->posts {$join_filter}
