@@ -130,8 +130,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				}  
 				?>
 				<a href="http://yoast.com/"><div id="yoast-icon" style="background: url(<?php echo WPSEO_URL; ?>images/wordpress-SEO-32x32.png) no-repeat;" class="icon32"><br /></div></a>
-				<h2><?php _e("Yoast WordPress SEO: ", 'wordpress-seo' ); echo $title; ?></h2>
-				<div class="postbox-container" style="width:70%;">
+				<h2 id="wpseo-title"><?php _e("Yoast WordPress SEO: ", 'wordpress-seo' ); echo $title; ?></h2>
+				<div id="wpseo_content_top" class="postbox-container" style="width:70%;">
 					<div class="metabox-holder">	
 						<div class="meta-box-sortables">
 			<?php

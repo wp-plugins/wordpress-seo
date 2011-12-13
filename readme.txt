@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 1.0.3
+Stable tag: 1.1
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -132,7 +132,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= 1.1 (trunk) =
+= 1.1 =
 
 * Biggest change: entire plugin now supports localization, testing can be done by dropping your properly named .mo file (wordpress-seo-nl_NL.mo for instance) into the languages dir. 
 * Added Dutch, German, French, Hebrew, Italian, Russian and Swedish translations.
@@ -152,6 +152,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Removed the now unneeded extra styling for admin pointers.
 * Fixed a notice in 3.3beta with caused by `wp_reset_query` being called too early.
 * Added several filters to allow WPML (and other plugins) to create XML Sitemaps for other languages.
+* Minor updates to the plugin tour, removing the "Stop tour" button, "Close" now closes until you manually restart.
 
 = 1.0.3 =
 
