@@ -110,6 +110,8 @@ class WPSEO_Sitemaps {
 	 * @param string $type The requested sitemap's identifier.
 	 */
 	function build_sitemap( $type ) {
+		$type = apply_filters('wpseo_build_sitemap_post_type', $type);
+
 		if ( $type == 1 )
 			$this->build_root_map();
 		else if ( post_type_exists( $type ) )
@@ -128,6 +130,7 @@ class WPSEO_Sitemaps {
 	 *
 	 * @todo lastmod for sitemaps?
 	 */
+
 	function build_root_map() {
 		global $wpdb;
 
@@ -191,6 +194,7 @@ class WPSEO_Sitemaps {
 		// allow other plugins to add their sitemaps to the index
 		$this->sitemap .= apply_filters( 'wpseo_sitemap_index', '' );
 		$this->sitemap .= '</sitemapindex>';
+	
 	}
 
 	/**
@@ -200,6 +204,7 @@ class WPSEO_Sitemaps {
 	 */
 	function build_post_type_map( $post_type ) {
 		$options = get_wpseo_options();
+		
 		if ( 
 			( isset($options['post_types-'.$post_type.'-not_in_sitemap']) && $options['post_types-'.$post_type.'-not_in_sitemap'] ) 
 		 	|| in_array( $post_type, array('revision','nav_menu_item','attachment') ) 
@@ -238,17 +243,22 @@ class WPSEO_Sitemaps {
 		}
 
 		global $wpdb;
-		$typecount = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->posts WHERE post_status = 'publish' AND post_password = '' AND post_type = '$post_type'");
+		
+		$join_filter = '';
+		$join_filter = apply_filters('wpseo_typecount_join', $join_filter, $post_type);
+		$where_filter = '';
+		$where_filter = apply_filters('wpseo_typecount_where', $where_filter, $post_type);
+		$typecount = $wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status = 'publish' AND post_password = '' AND post_type = '$post_type' {$where_filter}");
+		
 		if ( $typecount == 0 && empty( $archive ) ) {
 			$this->bad_sitemap = true;
 			return;
 		}
 
-		$images_in_sitemap = isset($options['xml_include_images']) && $options['xml_include_images'];
+		// Let's flush the object cache so we're not left with garbage from other plugins
+		wp_cache_flush();
+		
 		$stackedurls = array();
-
-		// If we're not going to include images, we might as well save ourselves the memory of grabbing post_content.
-		$post_content_query = $images_in_sitemap ? 'post_content,' : '';
 
 		$steps = 25;
 		$n = (int) get_query_var( 'sitemap_n' );
@@ -257,18 +267,30 @@ class WPSEO_Sitemaps {
 		if ( $total > $typecount )
 			$total = $typecount;
 
+		// We grab post_date, post_name, post_author and post_status too so we can throw these objects into get_permalink, which saves a get_post call for each permalink.
 		while( $total > $offset ) {
-			$posts = $wpdb->get_results("SELECT ID, $post_content_query post_parent, post_type, post_modified_gmt, post_date_gmt
-											FROM $wpdb->posts
-											WHERE post_status = 'publish'
-											AND	post_password = ''
-											AND post_type = '$post_type'
-											ORDER BY post_modified ASC
-											LIMIT $steps OFFSET $offset");
-
+			
+			$join_filter = '';
+			$join_filter = apply_filters('wpseo_posts_join', $join_filter, $post_type);
+			$where_filter = '';
+			$where_filter = apply_filters('wpseo_posts_where', $where_filter, $post_type);
+			
+			$posts = $wpdb->get_results("SELECT ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
+			FROM $wpdb->posts {$join_filter}
+			WHERE post_status = 'publish'
+			AND	post_password = ''
+			AND post_type = '$post_type'
+			{$where_filter}
+			ORDER BY post_modified ASC
+			LIMIT $steps OFFSET $offset");
+			
 			$offset = $offset + $steps;
 
 			foreach ( $posts as $p ) {
+				$p->post_type 	= $post_type;
+				$p->post_status = 'publish';
+				$p->filter		= 'sample';
+				
 				if ( $p->ID == $front_id )
 					continue;
 
@@ -283,11 +305,14 @@ class WPSEO_Sitemaps {
 
 				$url['mod']	= ( isset( $p->post_modified_gmt ) && $p->post_modified_gmt != '0000-00-00 00:00:00' ) ? $p->post_modified_gmt : $p->post_date_gmt ;
 				$url['chf'] = 'weekly';
+				$url['loc'] = get_permalink( $p );
 
-				if ( wpseo_get_value('canonical', $p->ID) && wpseo_get_value('canonical', $p->ID) != '' && wpseo_get_value('canonical', $p->ID) != $link ) {
-					$url['loc'] = wpseo_get_value('canonical', $p->ID);
+				$canonical = wpseo_get_value('canonical', $p->ID);
+				if ( $canonical && $canonical != '' && $canonical != $url['loc']) {
+					// Let's assume that if a canonical is set for this page and it's different from the URL of this post, that page is either
+					// already in the XML sitemap OR is on an external site, either way, we shouldn't include it here.
+					continue;
 				} else {
-					$url['loc'] = get_permalink( $p->ID );
 
 					if ( isset($options['trailingslash']) && $options['trailingslash'] && $p->post_type != 'post' )
 						$url['loc'] = trailingslashit( $url['loc'] );
@@ -296,48 +321,50 @@ class WPSEO_Sitemaps {
 				$pri = wpseo_get_value('sitemap-prio', $p->ID);
 				if (is_numeric($pri))
 					$url['pri'] = $pri;
-				elseif ($p->post_parent == 0 && $p->post_type = 'page')
+				elseif ($p->post_parent == 0 && $p->post_type == 'page')
 					$url['pri'] = 0.8;
 				else
 					$url['pri'] = 0.6;
 
-				if ( $images_in_sitemap ) {
-					$url['images'] = array();
-					if ( preg_match_all( '/<img [^>]+>/', $p->post_content, $matches ) ) {
-						foreach ( $matches[0] as $img ) {
-							// FIXME: get true caption instead of alt / title
-							if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
-								$src = $match[2];
-								if ( strpos($src, 'http') !== 0 ) {
-									if ( $src[0] != '/' )
-										continue;
-									$src = get_bloginfo('url') . $src;
-								}
-
-								if ( $src != esc_url( $src ) )
+				$url['images'] = array();
+				if ( preg_match_all( '/<img [^>]+>/', $p->post_content, $matches ) ) {
+					foreach ( $matches[0] as $img ) {
+						// FIXME: get true caption instead of alt / title
+						if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
+							$src = $match[2];
+							if ( strpos($src, 'http') !== 0 ) {
+								if ( $src[0] != '/' )
 									continue;
-
-								if ( isset( $url['images'][$src] ) )
-									continue;
-
-								$image = array();
-								if ( preg_match( '/title=("|\')([^"\']+)("|\')/', $img, $match ) )
-									$image['title'] = str_replace( array('-','_'), ' ', $match[2] );
-
-								if ( preg_match( '/alt=("|\')([^"\']+)("|\')/', $img, $match ) )
-									$image['alt'] = str_replace( array('-','_'), ' ', $match[2] );
-
-								$url['images'][$src] = $image;
+								$src = get_bloginfo('url') . $src;
 							}
+
+							if ( $src != esc_url( $src ) )
+								continue;
+
+							if ( isset( $url['images'][$src] ) )
+								continue;
+
+							$image = array();
+							if ( preg_match( '/title=("|\')([^"\']+)("|\')/', $img, $match ) )
+								$image['title'] = str_replace( array('-','_'), ' ', $match[2] );
+
+							if ( preg_match( '/alt=("|\')([^"\']+)("|\')/', $img, $match ) )
+								$image['alt'] = str_replace( array('-','_'), ' ', $match[2] );
+
+							$url['images'][$src] = $image;
 						}
 					}
-					$url['images'] = apply_filters( 'wpseo_sitemap_urlimages', $url['images'], $p->ID );
 				}
+				$url['images'] = apply_filters( 'wpseo_sitemap_urlimages', $url['images'], $p->ID );
 
 				if ( !in_array( $url['loc'], $stackedurls ) ) {
 					$output .= $this->sitemap_url( $url );
 					$stackedurls[] = $url['loc'];
 				}
+
+				// Clear the post_meta and the term cache for the post, as we no longer need it now.
+				wp_cache_delete( $p->ID, 'post_meta' );
+				// clean_object_term_cache( $p->ID, $post_type );
 			}
 		}
 
@@ -346,9 +373,7 @@ class WPSEO_Sitemaps {
 			return;
 		}
 
-		$this->sitemap = '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-		if ( $images_in_sitemap )
-			$this->sitemap .= 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ';
+		$this->sitemap = '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ';
 		$this->sitemap .= 'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" ';
 		$this->sitemap .= 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 		$this->sitemap .= $output . '</urlset>';
@@ -434,9 +459,10 @@ class WPSEO_Sitemaps {
 		header( 'Content-Type: text/xml' );
 		echo '<?xml version="1.0" encoding="'.get_bloginfo('charset').'"?>';
 		if ( $this->stylesheet )
-			echo $this->stylesheet . "\n";
+			echo apply_filters('wpseo_stylesheet_url', $this->stylesheet) . "\n";
 		echo $this->sitemap;
 		echo "\n" . '<!-- XML Sitemap generated by Yoast WordPress SEO -->';
+
 		if ( WP_DEBUG )
 			echo "\n" . '<!-- Built in ' . timer_stop() . ' seconds | ' . memory_get_peak_usage() . ' | ' . count($GLOBALS['wpdb']->queries) . ' -->';
 	}
@@ -479,14 +505,12 @@ class WPSEO_Sitemaps {
 		$base = $GLOBALS['wp_rewrite']->using_index_permalinks() ? 'index.php/' : '';
 		$sitemapurl = urlencode( home_url( $base . 'sitemap_index.xml' ) );
 
-		if ( isset($options['xml_ping_google']) && $options['xml_ping_google'] )
-			wp_remote_get('http://www.google.com/webmasters/tools/ping?sitemap='.$sitemapurl);
-
+		// Always ping Google and Bing, optionally ping Ask and Yahoo!
+		wp_remote_get('http://www.google.com/webmasters/tools/ping?sitemap='.$sitemapurl);
+		wp_remote_get('http://www.bing.com/webmaster/ping.aspx?sitemap='.$sitemapurl);
+		
 		if ( isset($options['xml_ping_yahoo']) && $options['xml_ping_yahoo'] )
-			wp_remote_get('http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=3usdTDLV34HbjQpIBuzMM1UkECFl5KDN7fogidABihmHBfqaebDuZk1vpLDR64I-&url='.$sitemapurl);
-
-		if ( isset($options['xml_ping_bing']) && $options['xml_ping_bing'] )
-			wp_remote_get('http://www.bing.com/webmaster/ping.aspx?sitemap='.$sitemapurl);
+				wp_remote_get('http://search.yahooapis.com/SiteExplorerService/V1/updateNotification?appid=3usdTDLV34HbjQpIBuzMM1UkECFl5KDN7fogidABihmHBfqaebDuZk1vpLDR64I-&url='.$sitemapurl);
 
 		if ( isset($options['xml_ping_ask']) && $options['xml_ping_ask'] )
 			wp_remote_get('http://submissions.ask.com/ping?sitemap='.$sitemapurl);
@@ -543,9 +567,11 @@ class WPSEO_Sitemaps {
 		$options = get_option( 'wpseo' );
 		if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] ) {
 			$file = ABSPATH . 'sitemap_index.xml';
-			if ( ( ! isset($options['blocking_files']) || ! in_array( $file, $options['blocking_files'] ) ) &&
+			if ( ( ! isset($options['blocking_files']) || ! is_array( $options['blocking_files'] ) || ! in_array( $file, $options['blocking_files'] ) ) &&
 				file_exists( $file )
 			) {
+				if ( ! is_array( $options['blocking_files'] ) )
+					$options['blocking_files'] = array();
 				$options['blocking_files'][] = $file;
 				update_option( 'wpseo', $options );
 			}

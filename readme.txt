@@ -1,37 +1,83 @@
 === WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
-Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemaps, robots meta, rss footer, yahoo, bing, sitemaps, news sitemaps
+Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.2
-Stable tag: 0.4.2
+Stable tag: 1.1
 
-Yoast's all in one SEO solution for your WordPress blog: SEO titles, meta descriptions, XML sitemaps, breadcrumbs & much more.
+Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
 == Description ==
 
-The most complete all in one SEO solution for your WordPress blog, this plugin has a huge list of features, including:
+WordPress out of the box is already technically quite a good platform for SEO, this was true when I wrote my original [WordPress SEO](http://yoast.com/articles/wordpress-seo/) article in 2008 and it's still true today, but that doesn't mean you can't improve it further! This plugin is written from the ground up by [WordPress SEO consultant](http://yoast.com/hire-me/wordpress-seo-consultant/) and [WordPress developer](http://yoast.com/hire-me/wordpress-developer/) Joost de Valk to improve your site's SEO on *all* needed aspects. While this [WordPress SEO plugin](http://yoast.com/wordpress/seo/) goes the extra mile to take care of all the technical optimization, more on that below, it first and foremost helps you write better content.  WordPress SEO forces you to choose a focus keyword when you're writing your articles, and then makes sure you use that focus keyword everywhere. 
 
-* Post title and meta description meta box to change these on a per post basis for ultimate SEO.
-* On page SEO Analysis using the Linkdex page analysis library.
-* Taxonomy (tag, category & custom taxonomy) title and meta description support.
-* Google search result snippet previews, let your editors improve your SEO!
-* Focus keyword testing.
-* Full page analysis functionality: see what you need to do to further SEO optimize your post content, page title, headings, images etc.
-* Meta Robots configuration:
-	* Easily add noodp, noydir meta tags.
-	* Easily noindex, or nofollow pages, taxonomies or entire archives.
-* Improved canonical support, adding canonical to taxonomy archives, single posts and pages and the front page.
-* RSS footer / header configuration, improve your SEO by getting links from scrapers.
-* Permalink clean ups, while still allowing for, for instance, Google Custom Search.
-* Breadcrumbs support, with configurable breadcrumbs titles.
-* The ultimate XML Sitemaps for your SEO with:
- 	* Images.
-	* Pages or posts that have been noindexed will not show in XML sitemap (but can if you want them too).
-	* Custom post type and custom taxonomy support.
-	* No static files are generated, so no delays when publishing posts.
-* .htaccess and robots.txt editor.
-* Basic import functionality for HeadSpace2 and All in One SEO.
+= Write better content with WordPress SEO =
+Using the snippet preview you can see a rendering of what your post or page will look like in the search results, whether your title is too long or too short and your meta description makes sense in the context of a search result. This way the plugin will help you not only increase rankings but also increase the click through for organic search results.
+
+= Page Analysis =
+The WordPress SEO plugins [Linkdex Page Analysis](http://yoast.com/content-seo-wordpress-linkdex/) functionality checks simple things you're bound to forget. It checks, for instance, if you have images in your post and whether they have an alt tag containing the focus keyword for that post. It also checks whether your posts are long enough, if you've written a meta description and if that meta description contains your focus keyword, if you've used any subheadings within your post, etc. etc. 
+
+The plugin also allows you to write meta titles and descriptions for all your category, tag and custom taxonomy archives, giving you the option to further optimize those pages.
+
+Combined, this plugin makes sure that your content is the type of content search engines will love!
+
+= Technical WordPress Search Engine Optimization =
+While out of the box WordPress is pretty good for SEO, it needs some tweaks here and there. This WordPress SEO plugin guides you through some of the settings needed, for instance by reminding you to enable pretty permalinks. But it also goes beyond that, by automatically optimizing and inserting the meta tags and link elements that Google and other search engines like so much:
+
+= Meta & Link Elements =
+With the WordPress SEO plugin you can control which pages Google shows in its search results and which pages it doesn't show. By default, it will tell search engines to index all of your pages, including category and tag archives, but only show the first pages in the search results. It's not very useful for a user to end up on the third page of your "personal" category, right?
+
+WordPress itself only shows canonical link elements on single pages, WordPress SEO makes it output canonical link elements everywhere. Google has recently announced they would also use `rel="next"` and `rel="prev"` link elements in the `head` section of your paginated archives, this plugin adds those automatically, see [this post](http://yoast.com/rel-next-prev-paginated-archives/ title="rel=next & rel=prev for paginated archives") for more info.
+
+= XML Sitemaps =
+WordPress SEO has the most advanced XML Sitemaps functionality in any WordPress plugin. Once you check the box, it automatically creates XML sitemaps and notifies Google & Bing of the sitemaps existence. These XML sitemaps include the images in your posts & pages too, so that your images may be found better in the search engines too. 
+
+These XML Sitemaps will even work on large sites, because of how they're created, using one index sitemap that links to sub-sitemaps for each 1,000 posts. They will also work with custom post types and custom taxonomies automatically, while giving you the option to remove those from the XML sitemap should you wish to.
+
+Because of using [XSL stylesheets for these XML Sitemaps](http://yoast.com/xsl-stylesheet-xml-sitemap/), the XML sitemaps are easily readable for the human eye too, so you can spot things that shouldn't be in there.
+
+= RSS Optimization =
+Are you being outranked by scrapers? Instead of cursing at them, use them to your advantage! By automatically adding a link to your RSS feed pointing back to the original article, you're telling the search engine where they should be looking for the original. This way, the WordPress SEO plugin increases your own chance of ranking for your chosen keywords and gets rid of scrapers in one go!
+
+= Breadcrumbs =
+If your theme is compatible, like most [Genesis](http://yoast.com/wp-theme/genesis/ "Genesis Theme Review by Yoast") and [WooThemes](http://yoast.com/out/woothemes) themes are for instance, you can use the built-in Breadcrumbs functionality. This allows you to create an easy navigation that is great for both users and search engines and will support the search engines in understanding the structure of your site.
+
+Making your theme compatible isn't hard either, check [these instructions](http://yoast.com/wordpress/breadcrumbs/).
+
+= Edit your .htaccess and robots.txt file =
+Using the built-in file editor you can edit your WordPress blogs .htaccess and robots.txt file, giving you direct access to the two most powerful files, from an SEO perspective, in your WordPress install.
+
+= Social Integration =
+SEO and Social Media are heavily intertwined, that's why this plugin also comes with a Facebook OpenGraph implementation and will soon also support Google+ sharing tags.
+
+= Multi-Site Compatible =
+This WordPress SEO plugin, unlike some others, is fully Multi-Site compatible. The XML Sitemaps work fine in all setups and you even have the option, in the Network settings, to copy the settings from one blog to another, or make blogs default to the settings for a specific blog.
+
+= Import & Export functionality =
+If you have multiple blogs, setting up plugins like this one on all of them might seem like a daunting task. Except that it's not, because what you can do is simple: you set up the plugin once. You then export your settings and simply import them on all your other sites. It's that simple!
+
+= Import functionality for other WordPress SEO plugins =
+If you've used All In One SEO Pack or HeadSpace2 before using this plugin, you might want to import all your old titles and descriptions. You can do that easily using the built-in import functionality. There's also import functionality for some of the older Yoast plugins like Robots Meta and RSS footer.
+
+Should you have a need to import from another SEO plugin or from a theme like Genesis or Thesis, you can use the [SEO Data Transporter](http://wordpress.org/extend/plugins/seo-data-transporter/) plugin, that'll easily convert your SEO meta data from and to a whole set of plugins like Platinum SEO, SEO Ultimate, Greg's High Performance SEO and themes like Headway, Hybrid, WooFramework, Catalyst etc.
+
+Read [this migration guide](http://yoast.com/all-in-one-seo-pack-migration/) if you still have questions about migrating from another SEO plugin to WordPress SEO.
+
+= WordPress SEO Plugin in your Language! =
+Currently a huge translation project is underway, translating WordPress SEO in as much as 24 languages. So far, the translations for French and Dutch are complete, but we still need help on a lot of other languages, so if you're good at translating, please join us at [translate.yoast.com](http://translate.yoast.com).
+
+= News SEO =
+Be sure to also check out the [News SEO module](http://yoast.com/wordpress/seo/news-seo/) if you need Google News Sitemaps. It tightly integrates with WordPress SEO to give you the combined power of News Sitemaps and full Search Engine Optimization.
+
+= Further Reading =
+For more info, check out the following articles:
+
+* [WordPress SEO - The definitive Guide by Yoast](http://yoast.com/articles/wordpress-seo/).
+* Once you have great SEO, you'll need the [best WordPress Hosting](http://yoast.com/articles/wordpress-hosting/).
+* The [WordPress SEO Plugin](http://yoast.com/wordpress/seo/) official homepage.
+* Other [WordPress Plugins](http://yoast.com/wordpress/) by the same author.
+* Follow Yoast on [Facebook](https://facebook.com/yoastcom) & [Twitter](http://twitter.com/yoast).
 
 == Installation ==
 
@@ -62,6 +108,10 @@ There are two possible issues with a meta description:
 
 Disable the clean permalinks feature on the SEO -> Permalinks settings page.
 
+= Does your plugin allow for Google News Sitemaps too? =
+
+It does! You'll need an add-on module for that though, which you can download from the [News SEO](http://yoast.com/wordpress/seo/news-seo/) module homepage!
+
 = Why is WordPress SEO better than All In One SEO Pack? =
 
 It's not a secret that the author of this plugin, Joost de Valk, aka Yoast, doesn't really like All In One SEO Pack. The main reason is that All in One SEO pack has a default option for auto generating meta descriptions that is actually making it harder for people to rank well in a lot of cases, giving them a false sense of security.
@@ -73,13 +123,100 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 == Screenshots ==
 
 1. The WordPress SEO plugin general meta box. You'll see this on edit post pages, for posts, pages and custom post types.
-2. The advanced section of the WordPress SEO meta box.
+2. Some of the sites using this WordPress SEO plugin.
 3. The WordPress SEO settings for a taxonomy.
 4. The fully configurable XML sitemap for WordPress SEO.
 5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
 6. Example of the Linkdex Page Analysis functionality.
+7. The advanced section of the WordPress SEO meta box.
 
 == Changelog ==
+
+= 1.1 =
+
+* Biggest change: entire plugin now supports localization, testing can be done by dropping your properly named .mo file (wordpress-seo-nl_NL.mo for instance) into the languages dir. 
+* Added Dutch, German, French, Hebrew, Italian, Russian and Swedish translations.
+* Show proper post type names in admin menu for disabling editor box and hide non-public post types (props Nacin).
+* Disabling the Advanced Editor now only disables it for non admins.
+* Replaced single quotes with double quotes in meta description and canonical, to please [Danny Sullivan](http://searchengineland.com).
+* Fixed issue with images in XML sitemaps.
+* Added Social menu item.
+* Lots of changes to the Facebook integration:
+	* Added the locale.
+	* Added default image.
+	* Added homepage image & description.
+	* New method of adding Facebook Admins.
+* Removed all nofollow settings, login register links are now nofollow by default, all other functionality removed as it doesn't make sense anymore.
+* Cosmetic changes: added some Yoast links to backend widget in the right sidebar.
+* Switched text domain from a constant to a proper string 'wordpress-seo'.
+* Removed the now unneeded extra styling for admin pointers.
+* Fixed a notice in 3.3beta with caused by `wp_reset_query` being called too early.
+* Added several filters to allow WPML (and other plugins) to create XML Sitemaps for other languages.
+* Minor updates to the plugin tour, removing the "Stop tour" button, "Close" now closes until you manually restart.
+
+= 1.0.3 =
+
+* This release is dedicated to removing options and setting defaults instead. Specifically, the following settings are now defaults without options to change them:
+	* Images are now always included in the XML sitemap as Bing no longer breaks on them.
+	* Pinging Google and Bing is now a default action as that's the whole point of having XML sitemaps.
+	* RSS feeds are now always noindex, followed. No search engine should ever list an RSS feed as a result in the resultpages.
+	* Admin, login and registration pages are always noindexed now for the same reason.
+	* Search result pages are now always noindex, follow.
+	* Subpages of the homepage are now also noindex, follow. It just doesn't make sense to index,follow those especially with the new rel="prev" and rel="next" changes.
+* The option to add `nosnippet` and `noarchive` meta tags sitewide has been removed. No one in his right mind would want to do that, and if you do, then adding the robots meta to your template yourself should be doable.
+* Pinging search engines with your RSS feed is no longer part of this plugin (as its unneeded because the XML sitemaps do that).
+* UTF-8 characters in RSS footer no longer break.
+* Added the option to use the author name and link in the RSS header and footer using %%AUTHORLINK%%.
+* No longer show the admin bar SEO menu for subscribers.
+* Some style changes to make the backend look nicer in WP 3.2 and 3.3.
+* Bug with importing settings fixed.
+* No longer redirect attachments that have no parent.
+* Correctly grab thumbnail for OpenGraph settings.
+* Pages now get the correct priority (0.8).
+* Added the option to noindex or completely disable post format archives.
+
+= 1.0.2.3 =
+
+* Fixed some edge cases with rel=next and rel=prev, particularly relating to a paginated page as a frontpage.
+* Updated the snippet preview so the date part of the snippet has the right color.
+* Fixed a bug in the update routine that could cause errors in the backend.
+* Enabled OpenGraph meta box on edit screens, first "stab".
+
+= 1.0.2.2 =
+
+* Removed all rel=index, rel=prev etc references that WP core currently uses as they're wrongly implemented.
+* Added rel=prev and rel=next for paginated posts and pages.
+* Removed the interface options for all rel= links, they're off by default now.
+* Removed the option to hide the version number. It's very easy to detect the version number anyway so let's not clutter the interface.
+
+= 1.0.2.1 =
+
+* I missed a case where the next link would point to the current page, fixed it though :)
+
+= 1.0.2 =
+
+* Fixed keyword in slug detection on non-post post types.
+* Optimizations in canonical functionality, adding canonicals to author archives and more.
+* Added prev and next links as [suggested by Google](http://googlewebmastercentral.blogspot.com/2011/09/pagination-with-relnext-and-relprev.html).
+* Fixed issue with unescaped characters in title and description when updating edit screen.
+* Posts with a canonical set to another URL are no longer included in the XML sitemap.
+
+= 1.0.1 =
+
+* Fixed a bug where canonical would be set to /page/1/ on archives.
+* Fixed an error for blocking files.
+* Fixed a JS error that would cause the link editor in the rich editor not to work.
+* Fixed possible error when reading settings have gone haywire (ie not 'posts' or 'page' on front but something else).
+
+= 1.0 =
+
+* I now dare call this plugin STABLE. This doesn't mean there are no more bugs, it does mean that I think it won't break sites anymore.
+* Fixed the import/export settings functionality.
+* Updated the snippet preview to Google's new snippet design.
+
+= 0.4.3 =
+
+* Heavily, very heavily, reduced memory usage in XML Sitemap generation.
 
 = 0.4.2 =
 

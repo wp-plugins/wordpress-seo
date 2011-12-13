@@ -50,7 +50,7 @@ function wpseo_activate() {
 register_activation_hook( __FILE__, 'wpseo_activate' );
 
 function wpseo_export_settings( $include_taxonomy ) {
-    $content = "; This is a settings export file for the WordPress SEO plugin by Yoast.com - http://yoast.com/wordpress/seo/\r\n"; 
+    $content = "; ".__( "This is a settings export file for the WordPress SEO plugin by Yoast.com", 'wordpress-seo' )." - http://yoast.com/wordpress/seo/ \r\n"; 
 
 	$optarr = get_wpseo_options_arr();
 	
@@ -77,7 +77,9 @@ function wpseo_export_settings( $include_taxonomy ) {
 		$content .= "wpseo_taxonomy_meta = \"".urlencode( json_encode( get_option('wpseo_taxonomy_meta') ) )."\"";
 	}
 
-    if ( !$handle = fopen( WPSEO_UPLOAD_DIR.'settings.ini', 'w' ) )
+	$dir = wp_upload_dir();
+	
+    if ( !$handle = fopen( $dir['path'].'/settings.ini', 'w' ) )
         die();
 
     if ( !fwrite($handle, $content) ) 
@@ -87,15 +89,22 @@ function wpseo_export_settings( $include_taxonomy ) {
 
 	require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
 	
-	chdir(WPSEO_UPLOAD_DIR);
+	chdir( $dir['path'] );
 	$zip = new PclZip('./settings.zip');
 	if ($zip->create('./settings.ini') == 0)
 	  	return false;
 	
-	return WPSEO_UPLOAD_URL.'settings.zip'; 
+	return $dir['url'].'/settings.zip'; 
 }
 
+/**
+ * Adds an SEO admin bar menu with several options. If the current user is an admin he can also go straight to several settings menu's from here.
+ */
 function wpseo_admin_bar_menu() {
+	// If the current user can't write posts, this is all of no use, so let's not output an admin menu
+	if ( !current_user_can('edit_posts') )
+		return;
+		
 	global $wp_admin_bar, $wpseo_front, $post;
 
 	if ( is_object($wpseo_front) ) {
@@ -110,9 +119,9 @@ function wpseo_admin_bar_menu() {
 		$focuskw = '';
 	}
 
-	$wp_admin_bar->add_menu( array( 'id' => 'wpseo-menu', 'title' => __( 'SEO' ), 'href' => get_admin_url('admin.php?page=wpseo_dashboard'), ) );
+	$wp_admin_bar->add_menu( array( 'id' => 'wpseo-menu', 'title' => __( 'SEO', 'wordpress-seo' ), 'href' => get_admin_url('admin.php?page=wpseo_dashboard'), ) );
 
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-kwresearch', 'title' => __( 'Keyword Research' ), '#', ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-kwresearch', 'title' => __( 'Keyword Research', 'wordpress-seo' ), '#', ) );
 
 	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-adwordsexternal', 'title' => __( 'AdWords External' ), 'href' => 'https://adwords.google.com/select/KeywordToolExternal', 'meta' => array('target' => '_blank') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-googleinsights', 'title' => __( 'Google Insights' ), 'href' => 'http://www.google.com/insights/search/#q='.urlencode($focuskw).'&cmpt=q', 'meta' => array('target' => '_blank') ) );
@@ -120,12 +129,12 @@ function wpseo_admin_bar_menu() {
 
 	if ( !is_admin() ) {
 		$cleanurl = preg_replace('/^https?%3A%2F%2F/','', urlencode($url));
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-analysis', 'title' => __( 'Analyze this page' ), '#', ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-y', 'title' => __( 'Check Inlinks (Yahoo!)' ), 'href' => 'https://siteexplorer.search.yahoo.com/search?p='.$cleanurl.'&bwm=i&bwmo=d&bwmf=u', 'meta' => array('target' => '_blank') ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-ose', 'title' => __( 'Check Inlinks (OSE)' ), 'href' => 'http://www.opensiteexplorer.org/'.str_replace('/','%252F',preg_replace('/^https?:\/\//','',$url)).'/a!links', 'meta' => array('target' => '_blank') ) );	
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-kwdensity', 'title' => __( 'Check Keyword Density' ), 'href' => 'http://tools.davidnaylor.co.uk/keyworddensity/index.php?url='.$url.'&keyword='.urlencode($focuskw), 'meta' => array('target' => '_blank') ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-cache', 'title' => __( 'Check Google Cache' ), 'href' => 'http://webcache.googleusercontent.com/search?strip=1&q=cache:'.$url, 'meta' => array('target' => '_blank') ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-header', 'title' => __( 'Check Headers' ), 'href' => 'http://quixapp.com/headers/?r='.urlencode($url), 'meta' => array('target' => '_blank') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-analysis', 'title' => __( 'Analyze this page', 'wordpress-seo'  ), '#', ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-y', 'title' => __( 'Check Inlinks (Yahoo!)', 'wordpress-seo'  ), 'href' => 'https://siteexplorer.search.yahoo.com/search?p='.$cleanurl.'&bwm=i&bwmo=d&bwmf=u', 'meta' => array('target' => '_blank') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-ose', 'title' => __( 'Check Inlinks (OSE)', 'wordpress-seo'  ), 'href' => 'http://www.opensiteexplorer.org/'.str_replace('/','%252F',preg_replace('/^https?:\/\//','',$url)).'/a!links', 'meta' => array('target' => '_blank') ) );	
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-kwdensity', 'title' => __( 'Check Keyword Density', 'wordpress-seo'  ), 'href' => 'http://tools.davidnaylor.co.uk/keyworddensity/index.php?url='.$url.'&keyword='.urlencode($focuskw), 'meta' => array('target' => '_blank') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-cache', 'title' => __( 'Check Google Cache', 'wordpress-seo'  ), 'href' => 'http://webcache.googleusercontent.com/search?strip=1&q=cache:'.$url, 'meta' => array('target' => '_blank') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-header', 'title' => __( 'Check Headers', 'wordpress-seo'  ), 'href' => 'http://quixapp.com/headers/?r='.urlencode($url), 'meta' => array('target' => '_blank') ) );
 	}
 
 	$admin_menu = false;
@@ -148,14 +157,15 @@ function wpseo_admin_bar_menu() {
 	}
 	
 	if ( $admin_menu ) {
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-settings', 'title' => __( 'SEO Settings' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-settings', 'title' => __( 'SEO Settings', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
 
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Titles' ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-indexation', 'title' => __( 'Indexation' ), 'href' => admin_url('admin.php?page=wpseo_indexation'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-xml', 'title' => __( 'XML Sitemaps' ), 'href' => admin_url('admin.php?page=wpseo_xml'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks' ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-internal-links', 'title' => __( 'Internal Links' ), 'href' => admin_url('admin.php?page=wpseo_internal-links'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-rss', 'title' => __( 'RSS' ), 'href' => admin_url('admin.php?page=wpseo_rss'), ) );	
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Titles', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-social', 'title' => __( 'Social', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_social'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-indexation', 'title' => __( 'Indexation', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_indexation'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-xml', 'title' => __( 'XML Sitemaps', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_xml'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-internal-links', 'title' => __( 'Internal Links', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_internal-links'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-rss', 'title' => __( 'RSS', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_rss'), ) );	
 	}	
 }
 add_action( 'admin_bar_menu', 'wpseo_admin_bar_menu', 95 );
