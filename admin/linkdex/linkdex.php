@@ -172,10 +172,10 @@ class Linkdex {
 	}
 	
 	function ScoreKeyword($job, &$results) {
-		$keywordStopWord = sprintf(__("The keyword for this page contains one or more %sstop words%s, consider removing them. Found '\%s'.", 'wordpress-seo' ),"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>");
-		
+		$keywordStopWord = __("The keyword for this page contains one or more %sstop words%s, consider removing them. Found '%s'.", 'wordpress-seo' );
+	
 		if ( wpseo_stopwords_check( $job["keyword"] ) !== false )
-			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, wpseo_stopwords_check( $job["keyword"] ) ) );
+			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord,"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>", wpseo_stopwords_check( $job["keyword"] ) ) );
 	}
 	
 	function ScoreUrl($job, &$results, $statistics) {

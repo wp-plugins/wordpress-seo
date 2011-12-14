@@ -207,7 +207,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$options[$opt] = $_POST['wpseo_ms'][$opt];
 				}
 				update_site_option('wpseo_ms', $options);
-				echo '<div id="message" class="updated">'.__('Settings Updated.', 'wordpress-seo' ).'</div>';
+				echo '<div id="message" class="updated"><p>'.__('Settings Updated.', 'wordpress-seo' ).'</p></div>';
 			}
 			
 			if ( isset( $_POST['wpseo_restore_blog'] ) ) {
@@ -233,7 +233,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					'superadmin' => __( 'Super Admins only', 'wordpress-seo' )
 				), 'wpseo_ms'
 			);
-			$content .= $this->textinput('defaultblog',__('New blogs get the SEO settings from this blog'), 'wordpress-seo' );
+			$content .= $this->textinput('defaultblog', __('New blogs get the SEO settings from this blog', 'wordpress-seo'), 'wpseo_ms' );
 			$content .= '<p>'.__('Enter the Blog ID for the site whose settings you want to use as default for all sites that are added to your network. Leave empty for none.', 'wordpress-seo' ).'</p>';
 			$content .= '<input type="submit" name="wpseo_submit" class="button-primary" value="'.__('Save MultiSite Settings', 'wordpress-seo' ).'"/>';
 			$content .= '</form>';
@@ -242,7 +242,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			$content = '<form method="post">';
 			$content .= '<p>'.__( 'Using this form you can reset a site to the default SEO settings.', 'wordpress-seo'  ).'</p>';
-			$content .= $this->textinput( 'restoreblog', __('Blog ID'), 'wordpress-seo' );
+			$content .= $this->textinput( 'restoreblog', __('Blog ID', 'wordpress-seo'), 'wpseo_ms' );
 			$content .= '<input type="submit" name="wpseo_restore_blog" value="'.__('Restore site to defaults', 'wordpress-seo' ).'" class="button"/>';
 			$content .= '</form>';
 
@@ -500,9 +500,9 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content .= $this->textarea('metadesc-archive',__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
 			$content .= '<br/>';
 			$content .= '<h4>'.__('Search pages', 'wordpress-seo' ).'</h4>';
-			$content .= $this->textinput('title-search','Title template', 'wordpress-seo' );
+			$content .= $this->textinput('title-search',__('Title template', 'wordpress-seo') );
 			$content .= '<h4>'.__('404 pages', 'wordpress-seo' ).'</h4>';
-			$content .= $this->textinput('title-404',__('Title template', 'wordpress-seo' ));
+			$content .= $this->textinput('title-404',__('Title template', 'wordpress-seo' ) );
 			$content .= '<br class="clear"/>';
 			
 			$i = 1;
@@ -782,22 +782,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				} 
 			}
 
-			if ( isset($_POST['submitcachehtaccess']) ) {
-				if (!current_user_can('manage_options')) die(__('You cannot edit the .htaccess file.', 'wordpress-seo'));
-
-				check_admin_referer('wpseo-htaccess-cache');
-
-				if (file_exists(WP_CONTENT_DIR."/cache/.htaccess")) {
-					$htaccess_file = WP_CONTENT_DIR."/cache/.htaccess";
-					$htaccessnew = stripslashes($_POST['cachehtaccessnew']);
-					if (is_writeable($htaccess_file)) {
-						$f = fopen($htaccess_file, 'w+');
-						fwrite($f, $htaccessnew);
-						fclose($f);
-					}
-				} 
-			}
-			
 			$this->admin_header('Files', false, false);
 			if (isset($msg) && !empty($msg)) {
 				echo '<div id="message" style="width:94%;" class="updated fade"><p>'.$msg.'</p></div>';
@@ -844,26 +828,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$content .= '</form>';
 				}
 				$this->postbox('htaccess',__('.htaccess file', 'wordpress-seo'),$content);
-			}
-			
-			if (is_plugin_active('wp-super-cache/wp-cache.php')) {
-				$cachehtaccess = WP_CONTENT_DIR.'/cache/.htaccess';
-				$f = fopen($cachehtaccess, 'r');
-				$cacheht = fread($f, filesize($cachehtaccess));
-				$cacheht = htmlspecialchars($cacheht);
-
-				if (!is_writable($cachehtaccess)) {
-					$content = "<p><em>".__("If your", 'wordpress-seo')." ".WP_CONTENT_DIR."/cache/.htaccess ".__("were writable, you could edit it from here.", 'wordpress-seo')."</em></p>";
-					$content .= '<textarea disabled="disabled" style="width: 90%;" rows="15" name="robotsnew">'.$cacheht.'</textarea><br/>';
-				} else {
-					$content = '<form action="" method="post" id="htaccessform">';
-					$content .= wp_nonce_field('wpseo-htaccess-cache', '_wpnonce', true, false);
-					$content .=  "<p>".__("Edit the content of your cache directory's .htaccess:", 'wordpress-seo')."</p>";
-					$content .= '<textarea style="width: 90%;" rows="15" name="cachehtaccessnew">'.$cacheht.'</textarea><br/>';
-					$content .= '<div class="submit"><input class="button" type="submit" name="submitcachehtaccess" value="'.__('Save changes to .htaccess', 'wordpress-seo').'" /></div>';
-					$content .= '</form>';
-				}
-				$this->postbox('cachehtaccess',__('wp-super-cache cache dir .htaccess file', 'wordpress-seo'),$content);
 			}
 			
 			$this->admin_footer('', false);
@@ -1079,7 +1043,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					
 			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:', 'wordpress-seo' ).'</p>';
 			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'wordpress-seo').'</a>');
-			$content .= $this->textinput('yahooverify','<a target="_blank" href="https://siteexplorer.search.yahoo.com/mysites">'.__('Yahoo! Site Explorer', 'wordpress-seo').'</a>');
 			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'wordpress-seo').'</a>');
 
 			$this->postbox('webmastertools',__('Webmaster Tools', 'wordpress-seo'),$content);

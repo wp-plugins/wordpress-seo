@@ -3,8 +3,8 @@ Contributors: joostdevalk
 Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
-Tested up to: 3.2
-Stable tag: 1.1
+Tested up to: 3.3
+Stable tag: 1.1.1
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -131,6 +131,14 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 7. The advanced section of the WordPress SEO meta box.
 
 == Changelog ==
+
+= 1.1.1 =
+
+* Fixed `sprintf` bug in Linkdex check.
+* Fixed bug that caused inability to edit / save the search page title.
+* Fixed bug that caused inability to edit / save the "parent" blog in multisite settings.
+* Removed ability to edit WP Super Cache .htaccess file as it doesn't seem to be there anymore.
+* Removed Yahoo! Site Explorer.
 
 = 1.1 =
 
