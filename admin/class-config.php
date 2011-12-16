@@ -90,14 +90,19 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				<div class="metabox-holder">	
 					<div class="meta-box-sortables">
 						<?php
-							$this->plugin_like();
-							$this->postbox('donate','<strong class="red">'.__( 'Donate $10, $20 or $50!', 'wordpress-seo' ).'</strong>','<p>'.__( 'This plugin has cost me countless hours of work, if you use it, please donate a token of your appreciation!', 'wordpress-seo' ).'</p><br/><form style="margin-left:30px;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+							$this->postbox('donate','<strong class="red">'.__( 'Help Spread the Word!', 'wordpress-seo' ).'</strong>','<p><strong>'.__( 'Want to help make this plugin even better? All donations are used to improve this plugin, so donate $20, $50 or $100 now!', 'wordpress-seo' ).'</strong></p><form style="width:160px;margin:0 auto;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
 							<input type="hidden" name="cmd" value="_s-xclick">
 							<input type="hidden" name="hosted_button_id" value="83KQ269Q2SR82">
 							<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit">
 							<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-							</form>');
+							</form>'
+							.'<p>'.__('Or you could:','wordpress-seo').'</p>'
+							.'<ul>'
+							.'<li><a href="http://wordpress.org/extend/plugins/wordpress-seo/">'.__('Rate the plugin 5★ on WordPress.org','wordpress-seo').'</a></li>'
+							.'<li><a href="http://yoast.com/wordpress/seo/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=link&utm_campaign=wpseoplugin">'.__('Blog about it & link to the plugin page','wordpress-seo').'</a></li>'
+							.'</ul>');
 							$this->plugin_support();
+							$this->postbox('sitereview','<strong>'.__('Want to Improve your Site?','wordpress-seo').'</strong>','<p>'.sprintf( __('If you want to improve your site, but don\'t know where to start, you should order a %1$swebsite review%2$s from Yoast!','wordpress-seo'), '<a href="http://yoast.com/hire-me/website-review/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=link&utm_campaign=wpseoplugin">', '</a>').'</p>'.'<p>'.__('The results of this review contain a full report of improvements for your site, encompassing my findings for improvements in different key areas such as SEO to Usability to Site Speed & more.','wordpress-seo').'</p>'.'<p><a class="button-secondary" href="http://yoast.com/hire-me/website-review/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=button&utm_campaign=wpseoplugin">'.__('Click here to read more &raquo;','wordpress-seo').'</a></p>');
 							$this->news(); 
 						?>
 					</div>
@@ -1044,6 +1049,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:', 'wordpress-seo' ).'</p>';
 			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'wordpress-seo').'</a>');
 			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'wordpress-seo').'</a>');
+			$content .= $this->textinput('alexaverify','<a target="_blank" href="http://www.alexa.com/pro/subscription">'.__('Alexa Verification ID', 'wordpress-seo').'</a>');
 
 			$this->postbox('webmastertools',__('Webmaster Tools', 'wordpress-seo'),$content);
 			

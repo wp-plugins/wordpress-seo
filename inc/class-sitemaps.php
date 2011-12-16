@@ -355,6 +355,22 @@ class WPSEO_Sitemaps {
 						}
 					}
 				}
+				if ( preg_match_all( '/\[gallery/', $p->post_content, $matches ) ) {
+					$attachments = get_children( array('post_parent' => $p->ID, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image' ) );
+					foreach( $attachments as $att_id => $attachment ) {
+						$src = wp_get_attachment_image_src( $att_id, 'large', false );
+						$src = $src[0];
+						$image = array();
+
+						if ( $alt = get_post_meta( $att_id, '_wp_attachment_image_alt', true) )
+							$image['alt'] = $alt;
+						
+						$image['title'] = $attachment->post_title;
+
+						$url['images'][$src] = $image;
+					}
+				}
+
 				$url['images'] = apply_filters( 'wpseo_sitemap_urlimages', $url['images'], $p->ID );
 
 				if ( !in_array( $url['loc'], $stackedurls ) ) {

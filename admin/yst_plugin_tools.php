@@ -333,19 +333,6 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		}
 
 		/**
-		 * Create a "plugin like" box.
-		 */
-		function plugin_like() {
-			$content = '<p>'.__('Why not do any or all of the following:', 'wordpress-seo' ).'</p>';
-			$content .= '<ul>';
-			$content .= '<li><a href="'.$this->homepage.'">'.__('Link to it so other folks can find out about it.', 'wordpress-seo' ).'</a></li>';
-			$content .= '<li><a href="http://wordpress.org/extend/plugins/'.$this->hook.'/">'.__('Give it a 5 star rating on WordPress.org.', 'wordpress-seo' ).'</a></li>';
-			$content .= '<li><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2017947">'.__('Donate a token of your appreciation.', 'wordpress-seo' ).'</a></li>';
-			$content .= '</ul>';
-			$this->postbox($this->hook.'like', __('Like this plugin?', 'wordpress-seo' ), $content);
-		}	
-		
-		/**
 		 * Info box with link to the support forums.
 		 */
 		function plugin_support() {
@@ -396,8 +383,9 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			    $content .= '<li class="yoast">'.__( 'No news items, feed might be broken...', 'wordpress-seo' ).'</li>';
 			} else {
 			    foreach ( $rss_items as $item ) {
+			    	$url = preg_replace( '/#.*/', '', esc_url( $item->get_permalink(), $protocolls=null, 'display' ) );
 					$content .= '<li class="yoast">';
-					$content .= '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. esc_html( $item->get_title() ) .'</a> ';
+					$content .= '<a class="rsswidget" href="'.$url.'#utm_source=wpadmin&utm_medium=sidebarwidget&utm_term=newsitem&utm_campaign=wpseoplugin">'. esc_html( $item->get_title() ) .'</a> ';
 					$content .= '</li>';
 			    }
 			}						
@@ -432,15 +420,16 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			$rss_items = $this->fetch_rss_items( 3 );
 			
 			echo '<div class="rss-widget">';
-			echo '<a href="http://yoast.com/" title="Go to Yoast.com"><img src="'.WPSEO_URL.'images/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
+			echo '<a href="http://yoast.com/#utm_source=wpadmin&utm_medium=dbwidget&utm_term=logo&utm_campaign=wpseoplugin" title="Go to Yoast.com"><img src="'.WPSEO_URL.'images/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
 			echo '<ul>';
 
 			if ( !$rss_items ) {
 			    echo '<li class="yoast">'.__( 'No news items, feed might be broken...', 'wordpress-seo' ).'</li>';
 			} else {
 			    foreach ( $rss_items as $item ) {
+			    	$url = preg_replace( '/#.*/', '', esc_url( $item->get_permalink(), $protocolls=null, 'display' ) );
 					echo '<li class="yoast">';
-					echo '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. esc_html( $item->get_title() ) .'</a>';
+					echo '<a class="rsswidget" href="'.$url.'#utm_source=wpadmin&utm_medium=dbwidget&utm_term=newsitem&utm_campaign=wpseoplugin">'. esc_html( $item->get_title() ) .'</a>';
 					echo ' <span class="rss-date">'. $item->get_date('F j, Y') .'</span>';
 					echo '<div class="rssSummary">'. esc_html( $this->text_limit( strip_tags( $item->get_description() ), 150 ) ).'</div>';
 					echo '</li>';

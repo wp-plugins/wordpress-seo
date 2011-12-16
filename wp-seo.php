@@ -1,8 +1,8 @@
 <?php 
 /*
 Plugin Name: WordPress SEO
-Version: 1.1.1
-Plugin URI: http://yoast.com/wordpress/seo/
+Version: 1.1.2
+Plugin URI: http://yoast.com/wordpress/seo/#utm_source=wpadmin&utm_medium=plugin&utm_campaign=wpseoplugin
 Description: The first true all-in-one SEO solution for WordPress, including on-page content analysis, XML sitemaps and much more.
 Author: Joost de Valk
 Author URI: http://yoast.com/
@@ -24,7 +24,7 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 	}
 }
 
-define( 'WPSEO_VERSION', '1.1.1' );
+define( 'WPSEO_VERSION', '1.1.2' );
 
 global $wp_version;
 

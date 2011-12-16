@@ -75,7 +75,8 @@ class WPSEO_Metabox {
 			var wpseo_meta_desc_length = '<?php echo $this->wpseo_meta_length; ?>';
 			var wpseo_title_template = '<?php echo esc_attr($title_template); ?>';
 			var wpseo_metadesc_template = '<?php echo esc_attr($metadesc_template); ?>';
-			var wpseo_permalink_template = '<?php echo $sample_permalink; ?>'
+			var wpseo_permalink_template = '<?php echo $sample_permalink; ?>';
+			var wpseo_keyword_suggest_nonce = '<?php echo wp_create_nonce('wpseo-get-suggest'); ?>';
 		</script>
 		<?php
 	}

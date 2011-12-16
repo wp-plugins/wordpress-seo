@@ -38,11 +38,12 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			echo "<meta property='fb:app_id' content='".esc_attr( $this->options['fbadminapp'] )."' />\n";
 		} else if ( isset( $this->options['fbadminpage'] ) && 0 != $this->options['fbadminpage'] ) {
 			echo "<meta property='fb:page_id' content='".esc_attr( $this->options['fbadminpage'] )."'/>\n";
-		} else if ( is_array( $this->options['fb_admins'] && count( $this->options['fb_admins'] ) > 0 ) ) {
+		} else if ( is_array( $this->options['fb_admins'] ) && ( count( $this->options['fb_admins'] ) > 0 )  ) {
 			foreach ( $this->options['fb_admins'] as $admin_id => $admin ) {
-				if ( isset($adminstr) && $adminstr != '' )
-					$adminstr .= ',';
-				$adminstr .= $admin_id;
+				if ( isset($adminstr) )
+					$adminstr .= ','.$admin_id;
+				else
+					$adminstr = $admin_id;
 			}
 			echo "<meta property='fb:admins' content='".esc_attr( $adminstr )."'/>\n";
 		}

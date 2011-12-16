@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -131,6 +131,17 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 7. The advanced section of the WordPress SEO meta box.
 
 == Changelog ==
+
+= 1.1.2 =
+
+* No longer add redirected URLs to the XML Sitemap.
+* Plugin now properly adds images in galleries to the XML Sitemap too.
+* Fixed a bug in home page title logic, affecting blogs with a static front page and a separate posts page, who were unable to set the posts page's title.
+* Fixed a bug in the OpenGraph admin implementation.
+* Google Suggest works again, and properly this time.
+* Using entities in the snippet preview title & description field now still renders a correct "chars left" count.
+* Replaced the last single quotes with double quotes for meta fields, apparently Bing wouldn't verify because of the single quotes in the verification line.
+* Added option to verify your site with Alexa, as a lot of people requested this.
 
 = 1.1.1 =
 

@@ -1,31 +1,3 @@
-/** Google Suggest for jQuery plugin (licensed under GPLv3) by Haochi Chen ( http://ihaochi.com ) - http://code.google.com/p/googlesuggest-jquery/ */
-jQuery.fn.googleSuggest = function(opts){
-  var services = {youtube: 'yt', books: 'bo', products: 'pr', news: 'n', images: 'i'};
-  
-  opts = jQuery.extend({service: '', secure: false}, opts);
-  opts.source = function(request, response){
-    jQuery.ajax({
-      url: 'http'+(opts.secure?'s':'')+'://clients1.google.com/complete/search',
-      dataType: 'jsonp',
-      data: {
-        q: request.term,
-        ds: opts.service in services ? services[opts.service] : '',
-        nolabels: 't'
-      },
-      success: function( data ) {
-        response(jQuery.map(data[1], function(item){
-          return { value: item[0] }
-        }));
-      }
-    });  
-  };
-  
-  return this.each(function(){
-    jQuery(this).autocomplete(opts);
-  });
-}
-// End Google Suggest library
-
 function yst_clean( str, cleanalphanumeric ) { 
 	if ( str == '' || str == undefined )
 		return '';
@@ -79,7 +51,9 @@ function updateTitle( force ) {
 	}
 	if ( title == '' )
 		return;
-		
+
+	title = jQuery('<div />').html(title).text();
+
 	if ( force ) 
 		jQuery('#yoast_wpseo_title').val( title );
 
@@ -226,7 +200,27 @@ jQuery(document).ready(function(){
 	
 	jQuery('#related_keywords_heading').hide();
 	
-	jQuery('#yoast_wpseo_focuskw').googleSuggest();
+	var cache = {}, lastXhr;
+	jQuery('#yoast_wpseo_focuskw').autocomplete({
+		minLength: 3,
+		source: function( request, response ) {
+			var term = request.term;
+			if ( term in cache ) {
+				response( cache[ term ] );
+				return;
+			}
+			request._ajax_nonce = wpseo_keyword_suggest_nonce;
+			request.action = 'wpseo_get_suggest';
+			
+			lastXhr = jQuery.getJSON( ajaxurl, request, function( data, status, xhr ) {
+				cache[ term ] = data;
+				if ( xhr === lastXhr ) {
+					console.log(data);
+					response( data );
+				}
+			});
+		}
+	});
 	
 	jQuery('#yoast_wpseo_title').keyup( function() {
 		updateTitle();		

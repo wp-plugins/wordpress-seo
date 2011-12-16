@@ -76,6 +76,10 @@ class WPSEO_Frontend {
 		return ( is_front_page() && 'page' == get_option('show_on_front') && is_page( get_option('page_on_front') ) );
 	}
 	
+	function is_posts_page() {
+		return ( is_home() && 'page' != get_option('show_on_front') && is_page( get_option('page_for_posts') ) );
+	}
+	
 	function title( $title, $sep = '-', $seplocation = '', $postid = '' ) {
 		if ( trim($sep) == '' )
 			$sep = '-';
@@ -92,7 +96,7 @@ class WPSEO_Frontend {
 			global $post;
 			$title = wpseo_get_value( 'title', $post->ID );
 			if ( '' == $title )
-				$title = $post->post_title.$sep.get_bloginfo('name');
+				$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
 		} else if ( $this->is_home_posts_page() ) {
 			if ( isset($options['title-home']) && $options['title-home'] != '' )
 				$title = wpseo_replace_vars( $options['title-home'], array() );
@@ -102,7 +106,7 @@ class WPSEO_Frontend {
 					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
 				$title .= $sep.get_bloginfo('description');
 			}
-		} else if ( $this->is_home_static_page() ) {
+		} else if ( $this->is_posts_page() ) {
 			$blogpage = get_post( get_option( 'page_for_posts' ) );
 			$fixed_title = wpseo_get_value( 'title', $blogpage->ID );
 			if ( $fixed_title ) { 
@@ -244,15 +248,7 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $google_meta, $match);
 					$google_meta = $match[1];
 				}
-				echo "<meta name='google-site-verification' content='$google_meta' />\n";
-			}
-			if (!empty($options['yahooverify'])) {
-				$yahoo_meta = $options['yahooverify'];
-				if ( strpos($yahoo_meta, 'content') ) {
-					preg_match('/content="([^"]+)"/', $yahoo_meta, $match);
-					$yahoo_meta = $match[1];
-				}				
-				echo "<meta name='y_key' content='$yahoo_meta' />\n";
+				echo "<meta name=\"google-site-verification\" content=\"$google_meta\" />\n";
 			}
 				
 			if (!empty($options['msverify'])) {
@@ -261,9 +257,12 @@ class WPSEO_Frontend {
 					preg_match('/content="([^"]+)"/', $bing_meta, $match);
 					$bing_meta = $match[1];
 				}								
-				echo "<meta name='msvalidate.01' content='$bing_meta' />\n";
+				echo "<meta name=\"msvalidate.01\" content=\"$bing_meta\" />\n";
 			}
-				
+			
+			if (!empty($options['alexaverify'])) {
+				echo "<meta name=\"alexaVerifyID\" content=\"".esc_attr($options['alexaverify'])."\" />\n";
+			}	
 		}
 
 		do_action( 'wpseo_head' );
@@ -488,7 +487,7 @@ class WPSEO_Frontend {
 				$url = user_trailingslashit( trailingslashit( $url ) . $base . $page );
 			}
 		}
-		$link = "<link rel='$rel' href='$url' />\n";
+		$link = "<link rel=\"$rel\" href=\"$url\" />\n";
 		echo apply_filters( $rel."_rel_link", $link );	
 	}
 	
