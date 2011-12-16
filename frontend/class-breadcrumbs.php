@@ -118,7 +118,7 @@ class WPSEO_Breadcrumbs {
 		$home		= ( isset($opt['breadcrumbs-home']) && $opt['breadcrumbs-home'] != '' ) ? $opt['breadcrumbs-home'] : __('Home');
 		$selmenu	= ( isset($opt['breadcrumbs-selectedmenu']) && $opt['breadcrumbs-selectedmenu'] != '' ) ? $opt['breadcrumbs-selectedmenu'] : 0;
 		
-		if ($on_front == "page" && $post->post_type == 'post') {
+		if ( "page" == $on_front && 'post' == get_post_type() ) {
 			$homelink = '<a href="'.get_permalink(get_option('page_on_front')).'">'.$home.'</a>';
 			$bloglink = $homelink;
 			if ( $blog_page && ( !isset($opt['breadcrumbs-blog-remove']) || !$opt['breadcrumbs-blog-remove'] ) )
