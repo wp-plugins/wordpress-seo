@@ -708,7 +708,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 				$taxonomies = get_object_taxonomies($pt);
 				if (count($taxonomies) > 0) {
-					$values = array(0 => 'None');
+					$values = array(0 => __('None','wordpress-seo') );
 					foreach (get_object_taxonomies($pt) as $tax) {
 						$taxobj = get_taxonomy($tax);
 						$values[$tax] = $taxobj->labels->singular_name;
@@ -881,13 +881,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->postbox('directories',__('Robots Meta Settings', 'wordpress-seo'),$content); 
 			
 			$content = '<p>'.__('Some of us like to keep our &lt;heads&gt; clean. The settings below allow you to make it happen.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hidersdlink','Hide RSD Links');
+			$content .= $this->checkbox('hidersdlink',__('Hide RSD Links','wordpress-seo'));
 			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use remote editors.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hidewlwmanifest','Hide WLW Manifest Links');
+			$content .= $this->checkbox('hidewlwmanifest',__('Hide WLW Manifest Links','wordpress-seo'));
 			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use Windows Live Writer.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hideshortlink','Hide Shortlink for posts');
+			$content .= $this->checkbox('hideshortlink',__('Hide Shortlink for posts','wordpress-seo'));
 			$content .= '<p class="desc">'.__('Hides the shortlink for the current post.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hidefeedlinks','Hide RSS Links');
+			$content .= $this->checkbox('hidefeedlinks',__('Hide RSS Links','wordpress-seo'));
 			$content .= '<p class="desc">'.__('Check this box only if you\'re absolutely positive your site doesn\'t need and use RSS feeds.', 'wordpress-seo').'</p>';
 
 			$this->postbox('headsection',__( 'Clean up &lt;head&gt; section', 'wordpress-seo' ),$content);
@@ -1075,7 +1075,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$fbadmin = $options['fb_admins'][$id]['name'];
 					unset( $options['fb_admins'][$id] );
 					update_option('wpseo_social', $options);
-					add_settings_error('yoast_wpseo_social_options','success',sprintf(__('Successfully removed admin %s'), $fbadmin), 'updated');
+					add_settings_error('yoast_wpseo_social_options','success',sprintf(__('Successfully removed admin %s','wordpress-seo'), $fbadmin), 'updated');
 					$error = true;
 				} 
 			}
@@ -1085,7 +1085,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					die("I don't think that's really nice of you!.");
 				unset( $options['fb_admins'], $options['fbpages'], $options['fbapps'], $options['fbadminapp'], $options['fbadminpage'] );
 				update_option('wpseo_social', $options);
-				add_settings_error('yoast_wpseo_social_options','success',sprintf(__('Successfully cleared all Facebook Data'), $fbadmin), 'updated');
+				add_settings_error('yoast_wpseo_social_options','success',sprintf(__('Successfully cleared all Facebook Data','wordpress-seo'), $fbadmin), 'updated');
 			}
 			
 			if ( !isset( $options['fbconnectkey'] ) || empty( $options['fbconnectkey'] ) ) {
@@ -1101,23 +1101,23 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$options['fb_admins'][$id]['name'] = urldecode($_GET['userrealname']);
 					$options['fb_admins'][$id]['link'] = urldecode($_GET['link']);
 					update_option('wpseo_social', $options);
-					add_settings_error('yoast_wpseo_social_options','success',sprintf( __('Successfully added %s as a Facebook Admin!'), '<a href="'.$options['fb_admins'][$id]['link'].'">'.$options['fb_admins'][$id]['name'].'</a>') , 'updated');
+					add_settings_error('yoast_wpseo_social_options','success',sprintf( __('Successfully added %s as a Facebook Admin!','wordpress-seo'), '<a href="'.$options['fb_admins'][$id]['link'].'">'.$options['fb_admins'][$id]['name'].'</a>') , 'updated');
 				} else if ( isset( $_GET['pages'] ) ) {
 					$pages = json_decode( stripslashes( $_GET['pages'] ) );
-					$options['fbpages'] = array( '0' => 'Do not use a Facebook Page as Admin' );
+					$options['fbpages'] = array( '0' => __('Do not use a Facebook Page as Admin', 'wordpress-seo') );
 					foreach ($pages as $page) {
 						$options['fbpages'][$page->page_id] = $page->name;
 					}
 					update_option('wpseo_social', $options);
-					add_settings_error('yoast_wpseo_social_options','success', __('Successfully retrieved your pages from Facebook, now select a page to use as admin.') , 'updated');
+					add_settings_error('yoast_wpseo_social_options','success', __('Successfully retrieved your pages from Facebook, now select a page to use as admin.','wordpress-seo') , 'updated');
 				} else if ( isset( $_GET['apps'] ) ) {
 					$apps = json_decode( stripslashes( $_GET['apps'] ) );
-					$options['fbapps'] = array( '0' => 'Do not use a Facebook App as Admin' );
+					$options['fbapps'] = array( '0' => __('Do not use a Facebook App as Admin','wordpress-seo') );
 					foreach ($apps as $app) {
 						$options['fbapps'][$app->page_id] = $app->name;
 					}
 					update_option('wpseo_social', $options);
-					add_settings_error('yoast_wpseo_social_options','success', __('Successfully retrieved your apps from Facebook, now select an app to use as admin.') , 'updated');
+					add_settings_error('yoast_wpseo_social_options','success', __('Successfully retrieved your apps from Facebook, now select an app to use as admin.','wordpress-seo') , 'updated');
 				}
 				$error = true;
 			}
@@ -1143,7 +1143,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$clearall = true;
 			}
 			
-			$page_button_text = __('Use a Facebook Page as Admin');
+			$page_button_text = __('Use a Facebook Page as Admin','wordpress-seo');
 			if ( isset($options['fbpages']) && is_array($options['fbpages']) ) {
 				$fbconnect .= '<p>'.__('Select a page to use as Facebook admin:', 'wordpress-seo' ).'</p>';
 				$fbconnect .= '<select name="wpseo_social[fbadminpage]" id="fbadminpage">';
@@ -1154,10 +1154,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$fbconnect .= '<option '.$sel.' value="'.$id.'">'.$page.'</option>';
 				}
 				$fbconnect .= '</select>';
-				$page_button_text = __('Update Facebook Pages');
+				$page_button_text = __('Update Facebook Pages','wordpress-seo');
 			}
 			
-			$app_button_text = __('Use a Facebook App as Admin');
+			$app_button_text = __('Use a Facebook App as Admin','wordpress-seo');
 			if ( isset($options['fbapps']) && is_array($options['fbapps']) ) {
 				$fbconnect .= '<p>'.__('Select an app to use as Facebook admin:', 'wordpress-seo' ).'</p>';
 				$fbconnect .= '<select name="wpseo_social[fbadminapp]" id="fbadminapp">';
@@ -1168,7 +1168,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$fbconnect .= '<option '.$sel.' value="'.$id.'">'.$app.'</option>';
 				}
 				$fbconnect .= '</select>';
-				$app_button_text = __('Update Facebook Apps');
+				$app_button_text = __('Update Facebook Apps','wordpress-seo');
 			}
 			
 			if ( (!isset($options['fbadminpage']) || $options['fbadminpage'] == 0) && (!isset($options['fbadminapp']) || $options['fbadminapp'] == 0) ) {

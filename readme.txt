@@ -132,6 +132,13 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.1.3 =
+
+* Fixed more title, description & canonical bugs for non-frontpage blog pages.
+* Fixed some strings that could not be translated.
+* Static frontpages now added to XML sitemap *with* images if it has them, same for interior blog pages.
+* Non-canonical hostnames (like example.com when site setting is www.example.com) now 301 redirect to canonical hostname.
+
 = 1.1.2 =
 
 * No longer add redirected URLs to the XML Sitemap.

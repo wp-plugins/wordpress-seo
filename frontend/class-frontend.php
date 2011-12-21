@@ -77,7 +77,7 @@ class WPSEO_Frontend {
 	}
 	
 	function is_posts_page() {
-		return ( is_home() && 'page' != get_option('show_on_front') && is_page( get_option('page_for_posts') ) );
+		return ( is_home() && 'page' == get_option('show_on_front') );
 	}
 	
 	function title( $title, $sep = '-', $seplocation = '', $postid = '' ) {

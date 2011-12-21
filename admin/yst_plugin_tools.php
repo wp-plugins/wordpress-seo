@@ -337,7 +337,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 */
 		function plugin_support() {
 			$content = '<p>'.__('If you are having problems with this plugin, please talk about them in the', 'wordpress-seo' ).' <a href="http://wordpress.org/tags/'.$this->hook.'">'.__("Support forums", 'wordpress-seo' ).'</a>.</p>';
-			$content .= '<p>'.__("If you're sure you've found a bug, or have a feature request, please submit it in the")." <a href='http://yoast.com/bugs/wordpress-seo/'>".__('bug tracker')."</a>.</p>";
+			$content .= '<p>'.sprintf( __("If you're sure you've found a bug, or have a feature request, please submit it in the %1$sbug tracker%2$s.", "wordpress-seo"), "<a href='http://yoast.com/bugs/wordpress-seo/'>","</a>")."</p>";
 			$this->postbox($this->hook.'support', __('Need support?', 'wordpress-seo' ), $content);
 		}
 

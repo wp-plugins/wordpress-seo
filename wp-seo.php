@@ -8,6 +8,12 @@ Author: Joost de Valk
 Author URI: http://yoast.com/
 */
 
+// Force the right hostname, www. or non-www., whatever is set in site options.
+$hostname = parse_url( get_site_url(), PHP_URL_HOST );
+if ( isset( $_SERVER['HTTP_HOST'] ) && $hostname != $_SERVER['HTTP_HOST'] ) {
+	header( "Location: ".get_site_url().'/'.$_SERVER['REQUEST_URI'], 301 );
+}
+
 define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
 define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
 define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
