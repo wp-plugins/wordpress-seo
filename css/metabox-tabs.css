@@ -87,11 +87,21 @@ ul.wpseo-metabox-tabs li {
 #wpseosnippet {
 	margin: 0 0 10px 0;
 	padding: 0 5px;
-	font-family: Arial, sans-serif;
+	font-family: arial, sans-serif;
 	line-height: 15px !important;
 	font-size: 13px !important;
 	font-style: normal;
 	width: 540px !important;
+}
+
+#wpseosnippet td {
+	padding: 0;
+	margin: 0;
+}
+
+#wpseosnippet cite.url {
+	font-weight: normal;
+	font-style: normal;
 }
 
 #wpseosnippet a {
@@ -110,7 +120,8 @@ ul.wpseo-metabox-tabs li {
 }
 
 #wpseosnippet .url {
-	color: #282;
+	color: #093;
+	font-size: 13px;
 }
 
 #wpseosnippet .meta {

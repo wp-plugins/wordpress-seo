@@ -50,9 +50,11 @@ class WPSEO_Metabox {
 			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
 			$this->wpseo_meta_length_reason = __( ' (because of date display)', 'wordpress-seo' );
 		}
-		unset($date);
 		
-		$wpseo_meta_length = apply_filters('wpseo_metadesc_length', $this->wpseo_meta_length );
+		$this->wpseo_meta_length_reason = apply_filters( 'wpseo_metadesc_length_reason', $this->wpseo_meta_length_reason );
+		$this->wpseo_meta_length = apply_filters('wpseo_metadesc_length', $this->wpseo_meta_length );
+		
+		unset($date);
 
 		$title_template = '';
 		if ( isset( $options['title-'.$post->post_type] ) )
@@ -314,9 +316,13 @@ class WPSEO_Metabox {
 		}
 	
 		$class = '';
-		if (!empty($meta_box['class']))
+		if ( !empty( $meta_box['class'] ) )
 			$class = ' '.$meta_box['class'];
 
+		$placeholder = '';
+		if ( isset( $meta_box['placeholder'] ) && !empty( $meta_box['placeholder'] ) )
+			$placeholder = $meta_box['placeholder'];
+			
 		if( ( !isset($meta_box_value) || empty($meta_box_value) ) && isset($meta_box['std']) )  
 			$meta_box_value = $meta_box['std'];  
 
@@ -332,7 +338,7 @@ class WPSEO_Metabox {
 				$ac = '';
 				if ( isset( $meta_box['autocomplete']) && $meta_box['autocomplete'] == 'off' )
 					$ac = 'autocomplete="off" ';
-				$content .= '<input type="text" id="yoast_wpseo_'.$meta_box['name'].'" '.$ac.'name="yoast_wpseo_'.$meta_box['name'].'" value="'.esc_attr($meta_box_value).'" class="large-text"/><br />';  
+				$content .= '<input type="text" placeholder="'.$placeholder.'" id="yoast_wpseo_'.$meta_box['name'].'" '.$ac.'name="yoast_wpseo_'.$meta_box['name'].'" value="'.esc_attr($meta_box_value).'" class="large-text"/><br />';  
 				break;
 			case "textarea":
 				$rows = 5;
@@ -373,7 +379,7 @@ class WPSEO_Metabox {
 				$checked = '';
 				if ($meta_box_value != 'off')
 					$checked = 'checked="checked"';
-				$content .= '<input type="checkbox" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'" '.$checked.' class="yoast'.$class.'"/><br />';
+				$content .= '<input type="checkbox" id="yoast_wpseo_'.$meta_box['name'].'" name="yoast_wpseo_'.$meta_box['name'].'" '.$checked.' class="yoast'.$class.'"/> '.esc_html($meta_box['expl']).'<br />';
 				break;
 			case "radio":
 				if ($meta_box_value == '')
@@ -411,8 +417,6 @@ class WPSEO_Metabox {
 		
 		$options = get_wpseo_options();
 		
-		$content = '';
-		
 		// TODO: make this configurable per post type.
 		$date = '';
 		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) )
@@ -425,32 +429,16 @@ class WPSEO_Metabox {
 		if (empty($slug))
 			$slug = sanitize_title($title);
 
-		$video = wpseo_get_value('video_meta',$post->ID);
-		if ( $video && $video != 'none' ) {
-			// TODO: improve snippet display of video duration to include seconds for shorter video's
-			// echo '<pre>'.print_r(wpseo_get_value('video_meta'),1).'</pre>';
-		
-		$content .= '<div id="wpseosnippet" class="video">
-				<h4 style="margin:0;font-weight:normal;"><a class="title" href="#"><?php echo $title; ?></a></h4>
-				<div style="margin:5px 10px 10px 0;width:82px;height:62px;float:left;">
-					<img style="border: 1px solid blue;padding: 1px;width:80px;height:60px;" src="'.$video['thumbnail_loc'].'"/>
-					<div style="margin-top:-23px;margin-right:4px;text-align:right"><img src="http://www.google.com/images/icons/sectionized_ui/play_c.gif" alt="" border="0" height="20" style="-moz-opacity:.88;filter:alpha(opacity=88);opacity:.88" width="20"></div>
-				</div>
-				<div style="float:left;width:440px;">
-					<p style="color:#767676;font-size:13px;line-height:15px;">'.number_format($video['duration']/60).' mins - '.$date.'</p>
-					<p style="color:#000;font-size:13px;line-height:15px;" class="desc"><span>'.$desc.'</span></p>
-					<a href="#" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">More videos &raquo;</a>
-				</div>
-			</div>';
-		} else {
-			if ( !empty($date) )
-				$date = '<span style="color: #666;">'.$date.'</span> – ';
-			$content .= '<div id="wpseosnippet">
-				<a class="title" href="#">'.$title.'</a><br/>
-			<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a>
-				<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$date.'<span class="content">'.$desc.'</span></p>
-			</div>';
-		} 
+		if ( !empty($date) )
+			$datestr = '<span style="color: #666;">'.$date.'</span> – ';
+		$content = '<div id="wpseosnippet">
+			<a class="title" href="#">'.$title.'</a><br/>
+		<a href="#" style="font-size: 13px; color: #282; line-height: 15px;" class="url">'.str_replace('http://','',get_bloginfo('url')).'/'.$slug.'/</a> - <a href="#" class="util">Cached</a>
+			<p class="desc" style="font-size: 13px; color: #000; line-height: 15px;">'.$datestr.'<span class="content">'.$desc.'</span></p>
+		</div>';
+
+		$content = apply_filters( 'wpseo_snippet', $content, $post, compact( 'title', 'desc', 'date', 'slug' ) );
+
 		return $content;
 	}
 

@@ -29,7 +29,7 @@ class WPSEO_Sitemaps {
 		add_action( 'wpseo_hit_sitemap_index', array( $this, 'hit_sitemap_index' ) );
 
 		// default stylesheet
-		$this->stylesheet = '<?xml-stylesheet type="text/xsl" href="'.WPSEO_FRONT_URL.'css/xml-sitemap.xsl"?>';
+		$this->stylesheet = '<?xml-stylesheet type="text/xsl" href="'.WPSEO_FRONT_URL.'css/xml-sitemap-xsl.php"?>';
 	}
 
 	/**
@@ -216,18 +216,21 @@ class WPSEO_Sitemaps {
 		$output = '';
 
 		$front_id = get_option('page_on_front');
-		if ( $front_id && $post_type == 'page' ) {
+		if ( ! $front_id && $post_type == 'post' ) {
 			$output .= $this->sitemap_url( array(
 				'loc' => home_url('/'),
 				'pri' => 1,
 				'chf' => 'daily',
 			) );
-		} else if ( ! $front_id && ( $post_type == 'post' || $post_type == 'page' ) ) {
-			$output .= $this->sitemap_url( array(
-				'loc' => home_url('/'),
-				'pri' => 1,
-				'chf' => 'daily',
-			) );
+		} else if ( $front_id && $post_type == 'post' ) {
+			$page_for_posts = get_option('page_for_posts');
+			if ( $page_for_posts ) {
+				$output .= $this->sitemap_url( array(
+					'loc' => get_permalink( $page_for_posts ),
+					'pri' => 1,
+					'chf' => 'daily',
+				) );
+			}
 		}
 
 		if ( function_exists('get_post_type_archive_link') ) {
@@ -291,9 +294,6 @@ class WPSEO_Sitemaps {
 				$p->post_status = 'publish';
 				$p->filter		= 'sample';
 				
-				if ( $p->ID == $front_id )
-					continue;
-
 				if ( wpseo_get_value('meta-robots-noindex', $p->ID) && wpseo_get_value('sitemap-include', $p->ID) != 'always' )
 					continue;
 				if ( wpseo_get_value('sitemap-include', $p->ID) == 'never' )
@@ -325,6 +325,9 @@ class WPSEO_Sitemaps {
 					$url['pri'] = 0.8;
 				else
 					$url['pri'] = 0.6;
+
+				if ( $p->ID == $front_id )
+					$url['pri'] = 1.0;
 
 				$url['images'] = array();
 				if ( preg_match_all( '/<img [^>]+>/', $p->post_content, $matches ) ) {

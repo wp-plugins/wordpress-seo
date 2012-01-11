@@ -986,7 +986,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function config_page() {
 			$options = get_wpseo_options();
 			
-			$this->admin_header('General', false);
+			$this->admin_header('General', false, true, 'yoast_wpseo_options', 'wpseo' );
 			
 			ksort($options);
 			$content = '';

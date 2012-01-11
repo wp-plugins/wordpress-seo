@@ -38,7 +38,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			echo "<meta property='fb:app_id' content='".esc_attr( $this->options['fbadminapp'] )."' />\n";
 		} else if ( isset( $this->options['fbadminpage'] ) && 0 != $this->options['fbadminpage'] ) {
 			echo "<meta property='fb:page_id' content='".esc_attr( $this->options['fbadminpage'] )."'/>\n";
-		} else if ( is_array( $this->options['fb_admins'] ) && ( count( $this->options['fb_admins'] ) > 0 )  ) {
+		} else if ( isset( $this->options['fb_admins'] ) && is_array( $this->options['fb_admins'] ) && ( count( $this->options['fb_admins'] ) > 0 )  ) {
 			foreach ( $this->options['fb_admins'] as $admin_id => $admin ) {
 				if ( isset($adminstr) )
 					$adminstr .= ','.$admin_id;
@@ -164,6 +164,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		} else {
 			$type = 'website';
 		}
+		$type = apply_filters( 'wpseo_opengraph_type', $type );
 		echo "<meta property='og:type' content='".esc_attr( $type )."'/>\n";
 	}
 		
@@ -199,6 +200,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		}
 		if ( ( !isset( $og_image ) || $og_image == '' ) && isset( $this->options['og_default_image'] ) )
 			$og_image = $this->options['og_default_image'];
+		
+		$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
 		
 		if ( isset( $og_image ) && $og_image != '' ) 
 			echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";

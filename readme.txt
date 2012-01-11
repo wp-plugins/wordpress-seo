@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -134,10 +134,11 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 = 1.1.3 =
 
-* Fixed more title, description & canonical bugs for non-frontpage blog pages.
-* Fixed some strings that could not be translated.
-* Static frontpages now added to XML sitemap *with* images if it has them, same for interior blog pages.
+* Fix for the blog homepage title, description etc.
+* Added several filters for use in the soon to be released [Video SEO module](http://yoast.com/wordpress/seo/video-seo/).
+* Change to XSL for XML Sitemaps.
 * Non-canonical hostnames (like example.com when site setting is www.example.com) now 301 redirect to canonical hostname.
+* Static frontpages now added to XML sitemap *with* images if it has them, same for interior blog pages.
 
 = 1.1.2 =
 
