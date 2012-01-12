@@ -1,18 +1,12 @@
 <?php 
 /*
 Plugin Name: WordPress SEO
-Version: 1.1.3
+Version: 1.1.4
 Plugin URI: http://yoast.com/wordpress/seo/#utm_source=wpadmin&utm_medium=plugin&utm_campaign=wpseoplugin
 Description: The first true all-in-one SEO solution for WordPress, including on-page content analysis, XML sitemaps and much more.
 Author: Joost de Valk
 Author URI: http://yoast.com/
 */
-
-// Force the right hostname, www. or non-www., whatever is set in site options.
-$hostname = parse_url( get_site_url(), PHP_URL_HOST );
-if ( isset( $_SERVER['HTTP_HOST'] ) && $hostname != $_SERVER['HTTP_HOST'] ) {
-	header( "Location: ".get_site_url().'/'.$_SERVER['REQUEST_URI'], 301 );
-}
 
 define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
 define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
@@ -30,7 +24,7 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 	}
 }
 
-define( 'WPSEO_VERSION', '1.1.3' );
+define( 'WPSEO_VERSION', '1.1.4' );
 
 global $wp_version;
 
