@@ -17,7 +17,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		var $homepage	= '';
 		var $feed		= 'http://yoast.com/feed/';
 		var $accesslvl	= 'manage_options';
-		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles', 'wpseo_xml');
+		var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_indexation', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles', 'wpseo_xml', 'wpseo_social');
 		
 		function __construct() {
 		}
@@ -45,23 +45,24 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		
 		function register_settings_page() {
 			add_menu_page($this->longname, $this->shortname, $this->accesslvl, 'wpseo_dashboard', array(&$this,'config_page'), WPSEO_URL.'images/yoast-icon.png');
-			add_submenu_page('wpseo_dashboard','Titles','Titles',$this->accesslvl, 'wpseo_titles', array(&$this,'titles_page'));
-			add_submenu_page('wpseo_dashboard','Indexation','Indexation',$this->accesslvl, 'wpseo_indexation', array(&$this,'indexation_page'));
-			add_submenu_page('wpseo_dashboard','XML Sitemaps','XML Sitemaps',$this->accesslvl, 'wpseo_xml', array(&$this,'xml_sitemaps_page'));
-			add_submenu_page('wpseo_dashboard','Permalinks','Permalinks',$this->accesslvl, 'wpseo_permalinks', array(&$this,'permalinks_page'));
-			add_submenu_page('wpseo_dashboard','Internal Links','Internal Links',$this->accesslvl, 'wpseo_internal-links', array(&$this,'internallinks_page'));
-			add_submenu_page('wpseo_dashboard','RSS','RSS',$this->accesslvl, 'wpseo_rss', array(&$this,'rss_page'));
-			add_submenu_page('wpseo_dashboard','Import & Export','Import & Export',$this->accesslvl, 'wpseo_import', array(&$this,'import_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Titles', 'wordpress-seo' ),__( 'Titles', 'wordpress-seo' ),$this->accesslvl, 'wpseo_titles', array(&$this,'titles_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Indexation', 'wordpress-seo' ),__( 'Indexation', 'wordpress-seo' ),$this->accesslvl, 'wpseo_indexation', array(&$this,'indexation_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Social', 'wordpress-seo' ),__( 'Social', 'wordpress-seo' ),$this->accesslvl, 'wpseo_social', array(&$this,'social_page'));
+			add_submenu_page('wpseo_dashboard',__( 'XML Sitemaps', 'wordpress-seo' ),__( 'XML Sitemaps', 'wordpress-seo' ),$this->accesslvl, 'wpseo_xml', array(&$this,'xml_sitemaps_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Permalinks', 'wordpress-seo' ),__( 'Permalinks', 'wordpress-seo' ),$this->accesslvl, 'wpseo_permalinks', array(&$this,'permalinks_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Internal Links', 'wordpress-seo' ),__( 'Internal Links', 'wordpress-seo' ),$this->accesslvl, 'wpseo_internal-links', array(&$this,'internallinks_page'));
+			add_submenu_page('wpseo_dashboard',__( 'RSS', 'wordpress-seo' ),__( 'RSS', 'wordpress-seo' ),$this->accesslvl, 'wpseo_rss', array(&$this,'rss_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Import & Export', 'wordpress-seo' ),__( 'Import & Export', 'wordpress-seo' ),$this->accesslvl, 'wpseo_import', array(&$this,'import_page'));
 			
 			// Make sure on a multi site install only super admins can edit .htaccess and robots.txt
 			if ( !function_exists('is_multisite') || !is_multisite() )
-				add_submenu_page('wpseo_dashboard','Edit files','Edit files',$this->accesslvl, 'wpseo_files', array(&$this,'files_page'));
+				add_submenu_page('wpseo_dashboard',__( 'Edit files', 'wordpress-seo' ),__( 'Edit files', 'wordpress-seo' ),$this->accesslvl, 'wpseo_files', array(&$this,'files_page'));
 			else
-				add_submenu_page('wpseo_dashboard','Edit files','Edit files','delete_users', 'wpseo_files', array(&$this,'files_page'));
+				add_submenu_page('wpseo_dashboard',__( 'Edit files', 'wordpress-seo' ),__( 'Edit files', 'wordpress-seo' ),'delete_users', 'wpseo_files', array(&$this,'files_page'));
 			
 			global $submenu;
 			if ( isset($submenu['wpseo_dashboard']) )
-				$submenu['wpseo_dashboard'][0][0] = 'Dashboard';
+				$submenu['wpseo_dashboard'][0][0] = __( 'Dashboard', 'wordpress-seo' );
 		}
 		
 		function plugin_options_url() {
@@ -75,7 +76,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			static $this_plugin;
 			if( empty($this_plugin) ) $this_plugin = $this->filename;
 			if ( $file == $this_plugin ) {
-				$settings_link = '<a href="' . $this->plugin_options_url() . '">' . __('Settings') . '</a>';
+				$settings_link = '<a href="' . $this->plugin_options_url() . '">' . __('Settings', 'wordpress-seo' ) . '</a>';
 				array_unshift( $links, $settings_link );
 			}
 			return $links;
@@ -332,25 +333,12 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		}
 
 		/**
-		 * Create a "plugin like" box.
-		 */
-		function plugin_like() {
-			$content = '<p>'.__('Why not do any or all of the following:','ystplugin').'</p>';
-			$content .= '<ul>';
-			$content .= '<li><a href="'.$this->homepage.'">'.__('Link to it so other folks can find out about it.','ystplugin').'</a></li>';
-			$content .= '<li><a href="http://wordpress.org/extend/plugins/'.$this->hook.'/">'.__('Give it a 5 star rating on WordPress.org.','ystplugin').'</a></li>';
-			$content .= '<li><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=2017947">'.__('Donate a token of your appreciation.','ystplugin').'</a></li>';
-			$content .= '</ul>';
-			$this->postbox($this->hook.'like', __('Like this plugin?'), $content);
-		}	
-		
-		/**
 		 * Info box with link to the support forums.
 		 */
 		function plugin_support() {
-			$content = '<p>'.__('If you are having problems with this plugin, please talk about them in the','ystplugin').' <a href="http://wordpress.org/tags/'.$this->hook.'">'.__("Support forums",'ystplugin').'</a>.</p>';
-			$content .= '<p>'.__("If you're sure you've found a bug, or have a feature request, please submit it in the")." <a href='http://yoast.com/bugs/wordpress-seo/'>".__('bug tracker')."</a>.</p>";
-			$this->postbox($this->hook.'support', __('Need support?'), $content);
+			$content = '<p>'.__('If you are having problems with this plugin, please talk about them in the', 'wordpress-seo' ).' <a href="http://wordpress.org/tags/'.$this->hook.'">'.__("Support forums", 'wordpress-seo' ).'</a>.</p>';
+			$content .= '<p>'.sprintf( __("If you're sure you've found a bug, or have a feature request, please submit it in the %1$sbug tracker%2$s.", "wordpress-seo"), "<a href='http://yoast.com/bugs/wordpress-seo/'>","</a>")."</p>";
+			$this->postbox($this->hook.'support', __('Need support?', 'wordpress-seo' ), $content);
 		}
 
 		function text_limit( $text, $limit, $finish = '&hellip;') {
@@ -392,18 +380,22 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			
 			$content = '<ul>';
 			if ( !$rss_items ) {
-			    $content .= '<li class="yoast">no news items, feed might be broken...</li>';
+			    $content .= '<li class="yoast">'.__( 'No news items, feed might be broken...', 'wordpress-seo' ).'</li>';
 			} else {
 			    foreach ( $rss_items as $item ) {
+			    	$url = preg_replace( '/#.*/', '', esc_url( $item->get_permalink(), $protocolls=null, 'display' ) );
 					$content .= '<li class="yoast">';
-					$content .= '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. esc_html( $item->get_title() ) .'</a> ';
+					$content .= '<a class="rsswidget" href="'.$url.'#utm_source=wpadmin&utm_medium=sidebarwidget&utm_term=newsitem&utm_campaign=wpseoplugin">'. esc_html( $item->get_title() ) .'</a> ';
 					$content .= '</li>';
 			    }
 			}						
-			$content .= '<li class="rss"><a href="'.$this->feed.'">Subscribe with RSS</a></li>';
-			$content .= '<li class="email"><a href="http://yoast.com/wordpress-newsletter/">Subscribe by email</a></li>';
+			$content .= '<li class="facebook"><a href="https://www.facebook.com/yoastcom">'.__( 'Like Yoast on Facebook', 'wordpress-seo' ).'</a></li>';
+			$content .= '<li class="twitter"><a href="http://twitter.com/yoast">'.__( 'Follow Yoast on Twitter', 'wordpress-seo' ).'</a></li>';
+			$content .= '<li class="googleplus"><a href="https://plus.google.com/115369062315673853712/posts">'.__( 'Circle Yoast on Google+', 'wordpress-seo' ).'</a></li>';
+			$content .= '<li class="rss"><a href="'.$this->feed.'">'.__( 'Subscribe with RSS', 'wordpress-seo' ).'</a></li>';
+			$content .= '<li class="email"><a href="http://yoast.com/wordpress-newsletter/">'.__( 'Subscribe by email', 'wordpress-seo' ).'</a></li>';
 			$content .= '</ul>';
-			$this->postbox('yoastlatest', 'Latest news from Yoast', $content);
+			$this->postbox('yoastlatest', __( 'Latest news from Yoast', 'wordpress-seo' ), $content);
 		}
 
 		/**
@@ -421,22 +413,23 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				update_option('wpseo_yoastdbwidget',$options);
 			}			
 			if ( isset($options['removedbwidget'.$network]) && $options['removedbwidget'.$network] ) {
-				echo "If you reload, this widget will be gone and never appear again, unless you decide to delete the database option 'wpseo_yoastdbwidget'.";
+				echo __( "If you reload, this widget will be gone and never appear again, unless you decide to delete the database option 'wpseo_yoastdbwidget'.", 'wordpress-seo' );
 				return;
 			}
 
 			$rss_items = $this->fetch_rss_items( 3 );
 			
 			echo '<div class="rss-widget">';
-			echo '<a href="http://yoast.com/" title="Go to Yoast.com"><img src="'.WPSEO_URL.'images/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
+			echo '<a href="http://yoast.com/#utm_source=wpadmin&utm_medium=dbwidget&utm_term=logo&utm_campaign=wpseoplugin" title="Go to Yoast.com"><img src="'.WPSEO_URL.'images/yoast-logo-rss.png" class="alignright" alt="Yoast"/></a>';			
 			echo '<ul>';
 
 			if ( !$rss_items ) {
-			    echo '<li class="yoast">no news items, feed might be broken...</li>';
+			    echo '<li class="yoast">'.__( 'No news items, feed might be broken...', 'wordpress-seo' ).'</li>';
 			} else {
 			    foreach ( $rss_items as $item ) {
+			    	$url = preg_replace( '/#.*/', '', esc_url( $item->get_permalink(), $protocolls=null, 'display' ) );
 					echo '<li class="yoast">';
-					echo '<a class="rsswidget" href="'.esc_url( $item->get_permalink(), $protocolls=null, 'display' ).'">'. esc_html( $item->get_title() ) .'</a>';
+					echo '<a class="rsswidget" href="'.$url.'#utm_source=wpadmin&utm_medium=dbwidget&utm_term=newsitem&utm_campaign=wpseoplugin">'. esc_html( $item->get_title() ) .'</a>';
 					echo ' <span class="rss-date">'. $item->get_date('F j, Y') .'</span>';
 					echo '<div class="rssSummary">'. esc_html( $this->text_limit( strip_tags( $item->get_description() ), 150 ) ).'</div>';
 					echo '</li>';
@@ -447,8 +440,8 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			echo '<br class="clear"/><div style="margin-top:10px;border-top: 1px solid #ddd; padding-top: 10px; text-align:center;">';
 			echo '<a href="'.$this->feed.'"><img src="'.get_bloginfo('wpurl').'/wp-includes/images/rss.png" alt=""/> Subscribe with RSS</a>';
 			echo ' &nbsp; &nbsp; &nbsp; ';
-			echo '<a href="http://yoast.com/wordpress-newsletter/"><img src="'.WPSEO_URL.'images/email_sub.png" alt=""/> Subscribe by email</a>';
-			echo '<form class="alignright" method="post"><input type="hidden" name="yoast_removedbwidget" value="true"/><input title="Remove this widget from all users dashboards" class="button" type="submit" value="X"/></form>';
+			echo '<a href="http://yoast.com/wordpress-newsletter/"><img src="'.WPSEO_URL.'images/email_sub.png" alt=""/> '.__( 'Subscribe by email', 'wordpress-seo' ).'</a>';
+			echo '<form class="alignright" method="post"><input type="hidden" name="yoast_removedbwidget" value="true"/><input title="'.__( 'Remove this widget from all users dashboards', 'wordpress-seo' ).'" class="button" type="submit" value="X"/></form>';
 			echo '</div>';
 			echo '</div>';
 		}
@@ -460,7 +453,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 
 			$options = get_option('wpseo_yoastdbwidget');
 			if ( !isset($options['removedbwidget'.$network]) || !$options['removedbwidget'.$network] )
-	    		wp_add_dashboard_widget( 'yoast_db_widget' , 'The Latest From Yoast' , array(&$this, 'db_widget') );
+	    		wp_add_dashboard_widget( 'yoast_db_widget' , __( 'The Latest From Yoast', 'wordpress-seo' ) , array(&$this, 'db_widget') );
 		}
 		
 		function widget_order( $arr ) {

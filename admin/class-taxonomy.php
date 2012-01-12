@@ -53,23 +53,23 @@ class WPSEO_Taxonomy {
 		if ( isset($tax_meta[$taxonomy][$term->term_id]) )
 			$tax_meta = $tax_meta[$taxonomy][$term->term_id];
 
-		echo '<h3>Yoast WordPress SEO Settings</h3>';
+		echo '<h3>'.__( 'Yoast WordPress SEO Settings', 'wordpress-seo' ).'</h3>';
 		echo '<table class="form-table">';
 
-		$this->form_row( 'wpseo_title', 'SEO Title', 'The SEO title is used on the archive page for this term.', $tax_meta );
-		$this->form_row( 'wpseo_desc', 'SEO Description', 'The SEO description is used for the meta description on the archive page for this term.', $tax_meta );
+		$this->form_row( 'wpseo_title', __( 'SEO Title', 'wordpress-seo' ), __( 'The SEO title is used on the archive page for this term.', 'wordpress-seo' ), $tax_meta );
+		$this->form_row( 'wpseo_desc', __( 'SEO Description', 'wordpress-seo' ), __( 'The SEO description is used for the meta description on the archive page for this term.', 'wordpress-seo' ), $tax_meta );
 		if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-			$this->form_row( 'wpseo_metakey', 'Meta Keywords', 'Meta keywords used on the archive page for this term.', $tax_meta );
-		$this->form_row( 'wpseo_canonical', 'Canonical', 'The canonical link is shown on the archive page for this term.', $tax_meta );
-		$this->form_row( 'wpseo_bctitle', 'Breadcrumbs Title', 'The Breadcrumbs title is used in the breadcrumbs where this '.$taxonomy.' appears.', $tax_meta );
+			$this->form_row( 'wpseo_metakey', __( 'Meta Keywords', 'wordpress-seo' ), __( 'Meta keywords used on the archive page for this term.', 'wordpress-seo' ), $tax_meta );
+		$this->form_row( 'wpseo_canonical', __( 'Canonical', 'wordpress-seo' ), __( 'The canonical link is shown on the archive page for this term.', 'wordpress-seo' ), $tax_meta );
+		$this->form_row( 'wpseo_bctitle', __( 'Breadcrumbs Title', 'wordpress-seo' ), sprintf(__( 'The Breadcrumbs title is used in the breadcrumbs where this %s appears.', 'wordpress-seo' ), $taxonomy), $tax_meta );
 
-		$this->form_row( 'wpseo_noindex', 'Noindex this '.$taxonomy, '', $tax_meta, 'checkbox' );
-		$this->form_row( 'wpseo_nofollow', 'Nofollow this '.$taxonomy, '', $tax_meta, 'checkbox' );
+		$this->form_row( 'wpseo_noindex', sprintf(__( 'Noindex this %s', 'wordpress-seo' ), $taxonomy), '', $tax_meta, 'checkbox' );
+		$this->form_row( 'wpseo_nofollow', sprintf(__( 'Nofollow this %s', 'wordpress-seo' ),$taxonomy), '', $tax_meta, 'checkbox' );
 
-		$this->form_row( 'wpseo_sitemap_include', 'Include in sitemap?', '', $tax_meta, 'select', array(
-			"-" => __("Auto detect"),
-			"always" => __("Always include"),
-			"never" => __("Never include"),
+		$this->form_row( 'wpseo_sitemap_include', __( 'Include in sitemap?', 'wordpress-seo' ), '', $tax_meta, 'select', array(
+			"-" => __("Auto detect", 'wordpress-seo' ),
+			"always" => __("Always include", 'wordpress-seo' ),
+			"never" => __("Never include", 'wordpress-seo' ),
 		) );
 
 		echo '</table>';
@@ -101,5 +101,3 @@ class WPSEO_Taxonomy {
 	}
 }
 $wpseo_taxonomy = new WPSEO_Taxonomy();
-
-?>

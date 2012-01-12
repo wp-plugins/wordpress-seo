@@ -16,15 +16,11 @@ function wpseo_get_value( $val, $postid = '' ) {
 }
 
 function wpseo_set_value( $meta, $val, $postid ) {
-	$oldmeta = get_post_meta($postid, '_yoast_wpseo_'.$meta, true);
-	if (!empty($oldmeta)) {
-		delete_post_meta($postid, '_yoast_wpseo_'.$meta, $oldmeta );
-	}
-	add_post_meta($postid, '_yoast_wpseo_'.$meta, $val, true);
+	update_post_meta( $postid, '_yoast_wpseo_'.$meta, $val );
 }
 
 function get_wpseo_options_arr() {
-	$optarr = array('wpseo','wpseo_indexation', 'wpseo_permalinks', 'wpseo_titles', 'wpseo_rss', 'wpseo_internallinks', 'wpseo_xml');
+	$optarr = array('wpseo','wpseo_indexation', 'wpseo_permalinks', 'wpseo_titles', 'wpseo_rss', 'wpseo_internallinks', 'wpseo_xml', 'wpseo_social');
 	return apply_filters( 'wpseo_options', $optarr );
 }
 
