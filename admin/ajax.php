@@ -37,7 +37,7 @@ function wpseo_kill_blocking_files() {
 		$message = 'success';
 		foreach ( $options['blocking_files'] as $k => $file ) {
 			if ( ! @unlink( $file ) )
-				$message = 'Some files could not be removed. Please remove them via FTP.';
+				$message = __( 'Some files could not be removed. Please remove them via FTP.', 'wordpress-seo' );
 			else
 				unset( $options['blocking_files'][$k] );
 		}
@@ -47,3 +47,16 @@ function wpseo_kill_blocking_files() {
 	die( $message );
 }
 add_action('wp_ajax_wpseo_kill_blocking_files', 'wpseo_kill_blocking_files');
+
+function wpseo_get_suggest() {
+	check_ajax_referer('wpseo-get-suggest');
+	
+	$term = urlencode( $_GET['term'] );
+	$result = wp_remote_get( 'http://www.google.com/complete/search?output=toolbar&q='.$term );
+	
+	preg_match_all( '/suggestion data="([^"]+)"\/>/', $result['body'], $matches);
+	
+	echo json_encode( $matches[1] );
+	die(); 
+}
+add_action('wp_ajax_wpseo_get_suggest', 'wpseo_get_suggest');
