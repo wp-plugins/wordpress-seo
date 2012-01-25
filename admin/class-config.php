@@ -31,11 +31,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				
 			add_filter( 'ozh_adminmenu_icon', array(&$this, 'add_ozh_adminmenu_icon' ) );				
 			
-			add_action( 'wp_dashboard_setup', array(&$this,'widget_setup'));	
-			add_action( 'wp_network_dashboard_setup', array(&$this,'widget_setup'));	
-			add_filter( 'wp_dashboard_widgets', array(&$this, 'widget_order'));
-			add_filter( 'wp_network_dashboard_widgets', array(&$this, 'widget_order'));
-			
 			add_action( 'show_user_profile', array(&$this,'wpseo_user_profile'));
 			add_action( 'edit_user_profile', array(&$this,'wpseo_user_profile'));
 			add_action( 'personal_options_update', array(&$this,'wpseo_process_user_option_update'));
