@@ -555,9 +555,9 @@ class WPSEO_Frontend {
 				$metadesc = wpseo_replace_vars($options['metadesc-home'], array() );
 			} else if  ( $this->is_posts_page() ) {
 				$metadesc = wpseo_get_value('metadesc', get_option('page_for_posts') );
-				if ( ($metadesc == '' || !$metadesc) && isset( $options['metadesc-'.$page->post_type] ) ) {
+				if ( ($metadesc == '' || !$metadesc) && isset( $options['metadesc-'.$post->post_type] ) ) {
 					$page = get_post( get_option('page_for_posts') );
-					$metadesc = wpseo_replace_vars( $options['metadesc-'.$page->post_type], (array) $page );
+					$metadesc = wpseo_replace_vars( $options['metadesc-'.$post->post_type], (array) $page );
 				}
 			} else if ( $this->is_home_static_page() ) {
 				global $post;

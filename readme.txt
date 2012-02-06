@@ -132,6 +132,11 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.1.6 =
+
+* Tiny fix to showing meta description on posts page.
+* Fix for showing proper link to bug tracker.
+
 = 1.1.5 =
 
 * Removing the Dashboard widget.
