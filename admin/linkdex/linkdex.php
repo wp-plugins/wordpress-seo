@@ -129,7 +129,7 @@ class Linkdex {
 		}
 		$output .= '</table>';
 		$output .= '<hr/>';
-		$output .= '<p style="font-size: 13px;"><a href="http://yoa.st/linkdex"><img class="alignleft" style="margin: 0 10px 5px 0;" src="'.WPSEO_URL.'images/linkdex-logo.png" alt="Linkdex"/></a>'.sprintf(__( 'This page analysis brought to you by the collaboration of Yoast and %sLinkdex%s. Linkdex is an SEO suite that helps you optimize your site and offers you all the SEO tools you\'ll need. Yoast uses %sLinkdex%s and highly recommends you do too!', 'wordpress-seo' ),'<a href="http://yoa.st/linkdex">','</a>', '<a href="http://yoa.st/linkdex">','</a>').'</p>';
+		$output .= '<p style="font-size: 13px;"><a href="http://yoast.com/out/linkdex/"><img class="alignleft" style="margin: 0 10px 5px 0;" src="'.WPSEO_URL.'images/linkdex-logo.png" alt="Linkdex"/></a>'.sprintf(__( 'This page analysis brought to you by the collaboration of Yoast and %sLinkdex%s. Linkdex is an SEO suite that helps you optimize your site and offers you all the SEO tools you\'ll need. Yoast uses %sLinkdex%s and highly recommends you do too!', 'wordpress-seo' ),'<a href="http://yoast.com/out/linkdex/">','</a>', '<a href="http://yoast.com/out/linkdex/">','</a>').'</p>';
 	
 		unset($results);
 		unset($job);

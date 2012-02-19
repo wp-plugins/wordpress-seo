@@ -40,7 +40,8 @@ class WPSEO_Breadcrumbs {
 	
 	function get_bc_title( $id_or_name, $type = 'post_type' ) {
 		$bctitle = wpseo_get_value( 'bctitle', $id_or_name );
-		return ( !empty($bctitle) ) ? $bctitle : strip_tags( get_the_title( $id_or_name ) );
+		$bctitle = ( !empty($bctitle) ) ? $bctitle : strip_tags( get_the_title( $id_or_name ) );
+		return apply_filters( 'wp_seo_get_bc_title', $bctitle, $id_or_name, $type );
 	}
 	
 	function get_term_parents($term, $taxonomy) {
@@ -200,7 +201,7 @@ class WPSEO_Breadcrumbs {
 					}
 
 					// Reverse the order so it's oldest to newest
-					$ancestors = array_reverse($ancestors);
+					$ancestors = array_reverse( apply_filters( 'wp_seo_get_bc_ancestors', $ancestors ) );
 
 					foreach ( $ancestors as $ancestor ) {
 						$output .= '<a href="'.get_permalink($ancestor).'">'.$this->get_bc_title( $ancestor ).'</a> '.$sep.' ';

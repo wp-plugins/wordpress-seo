@@ -332,7 +332,6 @@ class WPSEO_Sitemaps {
 				$url['images'] = array();
 				if ( preg_match_all( '/<img [^>]+>/', $p->post_content, $matches ) ) {
 					foreach ( $matches[0] as $img ) {
-						// FIXME: get true caption instead of alt / title
 						if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
 							$src = $match[2];
 							if ( strpos($src, 'http') !== 0 ) {
