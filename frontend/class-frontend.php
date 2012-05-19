@@ -356,9 +356,9 @@ class WPSEO_Frontend {
 				if ( get_query_var('page') > 1 ) {
 					global $wp_rewrite;
 					if ( !$wp_rewrite->using_permalinks() ) {
-						$link = add_query_arg( 'page', get_query_var('page'), $link );
+						$canonical = add_query_arg( 'page', get_query_var('page'), $canonical );
 					} else {
-						$link = user_trailingslashit( trailingslashit( $link ) . get_query_var( 'page' ) );
+						$canonical = user_trailingslashit( trailingslashit( $canonical ) . get_query_var( 'page' ) );
 					}
 				}
 			}
