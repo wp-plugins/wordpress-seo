@@ -138,6 +138,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 * Fixes issue with un-paginated canonicals for paged single posts / pages.
 * Fixes %%page%% variable to work in title & description template on paginated singular post(type)s.
+* Add filter `wpseo_locale` for the locale in the opengraph settings. 
 
 = 1.1.6 =
 

@@ -153,7 +153,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	}
 	
 	public function locale() {
-		echo "<meta property='og:locale' content='".esc_attr( get_locale() )."'/>\n";
+		echo "<meta property='og:locale' content='".esc_attr( apply_filters( 'wpseo_locale', get_locale() ) )."'/>\n";
 	}
 	
 	public function type() {
