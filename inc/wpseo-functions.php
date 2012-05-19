@@ -75,14 +75,6 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		'term_id' => '',
 	);
 	
-	$pagenum = get_query_var('paged');
-	if ($pagenum === 0) {
-		if ($wp_query->max_num_pages > 1)
-			$pagenum = 1;
-		else
-			$pagenum = '';
-	}
-	
 	if ( isset( $args['post_content'] ) )
 		$args['post_content'] = wpseo_strip_shortcode( $args['post_content'] );
 	if ( isset( $args['post_excerpt'] ) )
@@ -94,7 +86,25 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 	if ( is_singular() || ( is_front_page() && 'posts' != get_option('show_on_front') ) ) {
 		global $post;
 	}
-	
+
+	$pagenum = 0;
+	$max_num_pages = 0;
+	if ( !is_single() ) {
+		$pagenum = get_query_var('paged');
+		if ($pagenum === 0) {
+			if ($wp_query->max_num_pages > 1)
+				$pagenum = 1;
+			else
+				$pagenum = '';
+		}
+		$max_num_pages = $wp_query->max_num_pages;
+	} else {
+		$pagenum = get_query_var('page');
+		$max_num_pages = substr_count( $post->post_content, '<!--nextpage-->' );
+		if ( $max_num_pages >= 1 )
+			$max_num_pages++;
+	}
+		
 	// Let's do date first as it's a bit more work to get right.
 	if ( $r->post_date != '' ) {
 		$date = mysql2date( get_option('date_format'), $r->post_date );
@@ -129,8 +139,8 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
 		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
 		'%%searchphrase%%'			=> esc_html(get_query_var('s')),
-		'%%page%%'		 			=> ( get_query_var('paged') != 0 ) ? 'Page '.get_query_var('paged').' of '.$wp_query->max_num_pages : '', 
-		'%%pagetotal%%'	 			=> ( $wp_query->max_num_pages > 1 ) ? $wp_query->max_num_pages : '', 
+		'%%page%%'		 			=> ( $max_num_pages != 0 ) ? 'Page '.$pagenum.' of '.$max_num_pages : '', 
+		'%%pagetotal%%'	 			=> ( $max_num_pages > 1 ) ? $max_num_pages : '', 
 		'%%pagenumber%%' 			=> $pagenum,
 		'%%caption%%'				=> $r->post_excerpt,
 	);
