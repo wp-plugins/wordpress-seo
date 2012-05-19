@@ -641,8 +641,8 @@ class WPSEO_Frontend {
 
 	function attachment_redirect() {
 		global $post;
-		if ( is_attachment() && isset($post->post_parent) && is_numeric($post->post_parent) ) {
-			wp_redirect(get_permalink($post->post_parent), 301);
+		if ( is_attachment() && isset($post->post_parent) && is_numeric($post->post_parent) && $post->post_parent != 0 ) {
+			wp_redirect( get_permalink($post->post_parent), 301 );
 			exit;
 		}
 	}
