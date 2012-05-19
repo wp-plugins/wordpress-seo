@@ -389,7 +389,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 					$content .= '</li>';
 			    }
 			}						
-			$content .= '<li class="facebook"><a href="https://www.facebook.com/yoastcom">'.__( 'Like Yoast on Facebook', 'wordpress-seo' ).'</a></li>';
+			$content .= '<li class="facebook"><a href="https://www.facebook.com/yoast">'.__( 'Like Yoast on Facebook', 'wordpress-seo' ).'</a></li>';
 			$content .= '<li class="twitter"><a href="http://twitter.com/yoast">'.__( 'Follow Yoast on Twitter', 'wordpress-seo' ).'</a></li>';
 			$content .= '<li class="googleplus"><a href="https://plus.google.com/115369062315673853712/posts">'.__( 'Circle Yoast on Google+', 'wordpress-seo' ).'</a></li>';
 			$content .= '<li class="rss"><a href="'.$this->feed.'">'.__( 'Subscribe with RSS', 'wordpress-seo' ).'</a></li>';

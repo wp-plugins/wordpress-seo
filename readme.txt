@@ -79,7 +79,7 @@ For more info, check out the following articles:
 * Once you have great SEO, you'll need the [best WordPress Hosting](http://yoast.com/articles/wordpress-hosting/).
 * The [WordPress SEO Plugin](http://yoast.com/wordpress/seo/) official homepage.
 * Other [WordPress Plugins](http://yoast.com/wordpress/) by the same author.
-* Follow Yoast on [Facebook](https://facebook.com/yoastcom) & [Twitter](http://twitter.com/yoast).
+* Follow Yoast on [Facebook](https://facebook.com/yoast) & [Twitter](http://twitter.com/yoast).
 
 == Installation ==
 
@@ -143,6 +143,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Allow - in focus keyword.
 * Removed the option to use a Facebook page as an admin in the Facebook OpenGraph, as Facebook deprecated that.
 * Now adding _all_ the images in a post with an og:image tag, so people can more easily share the right image.
+* Fixed the Yoast Facebook URL.
 
 = 1.1.6 =
 
