@@ -140,6 +140,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Fixes %%page%% variable to work in title & description template on paginated singular post(type)s.
 * Add filter `wpseo_locale` for the locale in the opengraph settings. 
 * Add filter `wpseo_metabox_prio` to allow WP SEO metabox priority to be changed.
+* Allow - in focus keyword.
 
 = 1.1.6 =
 
