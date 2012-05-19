@@ -21,7 +21,7 @@ class WPSEO_Sitemaps {
 		if ( !isset($options['enablexmlsitemap']) || !$options['enablexmlsitemap'] )
 			return;
 
-		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'init', array( $this, 'init' ), 1 );
 		add_action( 'template_redirect', array( $this, 'redirect' ) );
 		add_filter( 'redirect_canonical', array( $this, 'canonical' ) );
 		add_action( 'transition_post_status', array( $this, 'status_transition' ), 10, 3 );
