@@ -189,7 +189,7 @@ class WPSEO_Frontend {
 		} else if ( function_exists('is_post_type_archive') && is_post_type_archive() ) {
 			$post_type = get_post_type();
 			if ( isset($options['title-ptarchive-'.$post_type]) && '' != $options['title-ptarchive-'.$post_type] ) {
-				$title = $options['title-ptarchive-'.$post_type];
+				$title = wpseo_replace_vars( $options['title-ptarchive-'.$post_type], array() );
 			} else {
 				$post_type_obj = get_post_type_object( $post_type );
 				$title = $post_type_obj->labels->menu_name.$sep.get_bloginfo('name');
@@ -641,8 +641,8 @@ class WPSEO_Frontend {
 
 	function attachment_redirect() {
 		global $post;
-		if ( is_attachment() && isset($post->post_parent) && is_numeric($post->post_parent) ) {
-			wp_redirect(get_permalink($post->post_parent), 301);
+		if ( is_attachment() && isset($post->post_parent) && is_numeric($post->post_parent) && $post->post_parent != 0 ) {
+			wp_redirect( get_permalink($post->post_parent), 301 );
 			exit;
 		}
 	}

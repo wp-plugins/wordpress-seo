@@ -21,7 +21,7 @@ class WPSEO_Sitemaps {
 		if ( !isset($options['enablexmlsitemap']) || !$options['enablexmlsitemap'] )
 			return;
 
-		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'init', array( $this, 'init' ), 1 );
 		add_action( 'template_redirect', array( $this, 'redirect' ) );
 		add_filter( 'redirect_canonical', array( $this, 'canonical' ) );
 		add_action( 'transition_post_status', array( $this, 'status_transition' ), 10, 3 );
@@ -330,7 +330,13 @@ class WPSEO_Sitemaps {
 					$url['pri'] = 1.0;
 
 				$url['images'] = array();
-				if ( preg_match_all( '/<img [^>]+>/', $p->post_content, $matches ) ) {
+				
+				$content = $p->post_content;
+				if ( function_exists('get_the_post_thumbnail') ) {
+					$content .= '<p>' . get_the_post_thumbnail( $post->ID, 'full' ) . '</p>';
+				}
+				
+				if ( preg_match_all( '/<img [^>]+>/', $content, $matches ) ) {
 					foreach ( $matches[0] as $img ) {
 						if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
 							$src = $match[2];
@@ -357,6 +363,7 @@ class WPSEO_Sitemaps {
 						}
 					}
 				}
+				
 				if ( preg_match_all( '/\[gallery/', $p->post_content, $matches ) ) {
 					$attachments = get_children( array('post_parent' => $p->ID, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image' ) );
 					foreach( $attachments as $att_id => $attachment ) {
