@@ -4,7 +4,7 @@ Donate link: http://yoast.com/
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -136,6 +136,9 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 * Tiny fix to showing meta description on posts page.
 * Fix for showing proper link to bug tracker.
+* Fix for redirecting attachment pages when they don't have a parent.
+* Fix for titles of custom post type pages.
+* Dozens more tiny bugfixes.
 
 = 1.1.5 =
 
