@@ -32,7 +32,7 @@ class WPSEO_Metabox {
 				continue;
 			if ( isset($options['hideeditbox-'.$posttype]) && $options['hideeditbox-'.$posttype] )
 				continue;
-			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', 'wordpress-seo' ), array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
+			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', 'wordpress-seo' ), array( $this, 'meta_box' ), $posttype, 'normal', apply_filters( 'wpseo_metabox_prio', 'high' ) );
 		}
 	}
 	
