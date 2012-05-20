@@ -146,6 +146,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Fixed the Yoast Facebook URL.
 * Allow regex characters in the focus keyword for the Page Analysis checks.
 * Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
+* Switch feed noindexing from `xhtml:meta` tags to X-Robots-Tag HTTP headers to prevent feed display issues.
 
 = 1.1.6 =
 
