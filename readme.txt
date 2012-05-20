@@ -145,6 +145,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Now adding _all_ the images in a post with an og:image tag, so people can more easily share the right image.
 * Fixed the Yoast Facebook URL.
 * Allow regex characters in the focus keyword for the Page Analysis checks.
+* Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
 
 = 1.1.6 =
 
