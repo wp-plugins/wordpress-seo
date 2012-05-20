@@ -333,7 +333,7 @@ class WPSEO_Sitemaps {
 				
 				$content = $p->post_content;
 				if ( function_exists('get_the_post_thumbnail') ) {
-					$content .= '<p>' . get_the_post_thumbnail( $post->ID, 'full' ) . '</p>';
+					$content .= '<p>' . get_the_post_thumbnail( $p->ID, 'full' ) . '</p>';
 				}
 				
 				if ( preg_match_all( '/<img [^>]+>/', $content, $matches ) ) {
