@@ -134,7 +134,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= 1.1.7 =
+= 1.1.7 (development version) =
 
 * Fixes issue with un-paginated canonicals for paged single posts / pages.
 * Fixes %%page%% variable to work in title & description template on paginated singular post(type)s.
@@ -147,6 +147,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Allow regex characters in the focus keyword for the Page Analysis checks.
 * Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
 * Switch feed noindexing from `xhtml:meta` tags to X-Robots-Tag HTTP headers to prevent feed display issues.
+* Removed the "Other Notes" tab from the plugin page, enough tabs there already.
 
 = 1.1.6 =
 
@@ -826,16 +827,6 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 = 0.1 =
 
 * Initial beta release.
-
-== Other Notes ==
-
-= Usage guides =
-
-* WP Beginner has written a good guide on [how to install and setup WordPress SEO](http://www.wpbeginner.com/plugins/how-to-install-and-setup-wordpress-seo-plugin-by-yoast/)
-
-= Press Mentions =
-
-* I was recently [interview by Mashable](http://mashable.com/2011/02/17/wordpress-seo-interview/) about this plugin, talking about what the plugin does and why I think my plugin is superior to All in One SEO.
 
 == Upgrade Notice ==
 
