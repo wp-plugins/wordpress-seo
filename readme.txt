@@ -144,6 +144,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Removed the option to use a Facebook page as an admin in the Facebook OpenGraph, as Facebook deprecated that.
 * Now adding _all_ the images in a post with an og:image tag, so people can more easily share the right image.
 * Fixed the Yoast Facebook URL.
+* Allow regex characters in the focus keyword for the Page Analysis checks.
 
 = 1.1.6 =
 
