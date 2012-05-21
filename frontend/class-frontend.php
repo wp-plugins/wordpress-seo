@@ -92,7 +92,7 @@ class WPSEO_Frontend {
 		if ( $this->is_home_static_page() ) {
 			global $post;
 			$title = wpseo_get_value( 'title', $post->ID );
-			if ( '' == $title )
+			if ( '' == $title && isset($options['title-'.$post->post_type]) )
 				$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
 		} else if ( $this->is_home_posts_page() ) {
 			if ( isset($options['title-home']) && $options['title-home'] != '' )
@@ -127,7 +127,7 @@ class WPSEO_Frontend {
 			if ( $fixed_title ) { 
 				$title = $fixed_title; 
 			} else {
-				if (isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) ) {
+				if ( isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) ) {
 					$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
 				} else {
 					$title = apply_filters( 'single_post_title', $title);
