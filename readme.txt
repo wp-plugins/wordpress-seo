@@ -134,7 +134,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= 1.1.7 (development version) =
+= 1.1.7 =
 
 * Bugs fixed / Changes:
 	* Fixes issue with un-paginated canonicals for paged single posts / pages.
