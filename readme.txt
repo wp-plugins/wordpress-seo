@@ -142,6 +142,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Allow - in focus keyword.
 	* Removed the option to use a Facebook page as an admin in the Facebook OpenGraph, as Facebook deprecated that.
 	* Force OpenGraph locale to lowercase.
+	* Catch some weird locales and convert them to proper OpenGraph versions.
 	* Now adding _all_ the images in a post with an og:image tag, so people can more easily share the right image.
 	* Allow regex specific characters in the focus keyword for the Page Analysis checks.
 	* Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
@@ -154,6 +155,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 		* Optimized the main query for XML sitemaps per [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion).
 		* Switch feed noindexing from `xhtml:meta` tags to X-Robots-Tag HTTP headers to prevent feed display issues.
 		* Force XML Sitemap descriptions for images to be clean to prevent XML parse errors.
+		* Tiny change in CSS for explanatory text in XSL.
 * New filters:
 	* Add filter `wpseo_locale` for the locale in the opengraph settings. 
 	* Add filter `wpseo_metabox_prio` to allow WP SEO metabox priority to be changed.

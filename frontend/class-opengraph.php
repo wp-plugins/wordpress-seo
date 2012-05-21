@@ -151,7 +151,30 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	}
 	
 	public function locale() {
-		echo "<meta property='og:locale' content='".esc_attr( apply_filters( 'wpseo_locale', strtolower( get_locale() ) ) )."'/>\n";
+		$locale = apply_filters( 'wpseo_locale', strtolower( get_locale() ) );
+		
+		// catch some weird locales served out by WP.
+		switch ( $locale ) {
+			case 'af':
+				$locale = 'af_za';
+				break;
+			case 'ar':
+				$locale = 'ar_ar';
+				break;
+			case 'en':
+				$locale = 'en_us';
+				break;
+			case 'et':
+				$locale = 'et_ee';
+				break;
+			case 'fi':
+				$locale = 'fi_fi';
+				break;
+			default:
+				break;
+		}
+		
+		echo "<meta property='og:locale' content='".esc_attr( $locale )."'/>\n";
 	}
 	
 	public function type() {
