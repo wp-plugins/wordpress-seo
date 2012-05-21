@@ -191,6 +191,8 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 
 	if ( is_object( $term ) )
 		$term = $term->term_id;
+	else
+		return false;
 	
 	$tax_meta = get_option( 'wpseo_taxonomy_meta' );
 	if ( isset($tax_meta[$taxonomy][$term]) )
