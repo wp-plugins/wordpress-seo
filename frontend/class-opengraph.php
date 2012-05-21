@@ -170,12 +170,15 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		if ( is_singular() ) {
 			global $post;
 			
+			$shown_images = array();
+			
 			if ( function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
 				$featured_img = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'full' );
 				
 				if ( $featured_img ) {
 					$img = apply_filters( 'wpseo_opengraph_image', $featured_img[0] );
 					echo "<meta property='og:image' content='".esc_attr( $img )."'/>\n";
+					$shown_images[] = $img;
 				}
 			} 
 			
@@ -183,6 +186,10 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 				foreach ( $matches[0] as $img ) {
 					if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
 						$img = $match[2];
+						
+						if ( in_array( $img, $shown_images ) )
+							continue;
+							
 						if ( strpos($img, 'http') !== 0 ) {
 							if ( $img[0] != '/' )
 								continue;
@@ -195,6 +202,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 						$img = apply_filters( 'wpseo_opengraph_image', $img );
 						
 						echo "<meta property='og:image' content='".esc_attr( $img )."'/>\n";
+						
+						$shown_images[] = $img;
 					}
 				}
 			}
