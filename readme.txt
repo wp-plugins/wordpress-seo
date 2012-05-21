@@ -146,6 +146,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
 	* Removed code to add noindex to login page as that's now in core for long enough.
 	* Fixed several notices.
+	* When a static homepage has no SEO title, default to the site's name + description.
 	* XML Sitemaps & feeds:
 		* Properly fix featured image showing up in XML Sitemap.
 		* Optimized the main query for XML sitemaps per [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion).
