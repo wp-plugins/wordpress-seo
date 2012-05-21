@@ -94,8 +94,11 @@ class WPSEO_Frontend {
 			$title = wpseo_get_value( 'title', $post->ID );
 			if ( '' == $title && isset($options['title-'.$post->post_type]) )
 				$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
-			else if ( '' == $title )
-				$title = get_bloginfo('name').' - '.get_bloginfo('description');
+			else if ( '' == $title ) {
+				$title = get_bloginfo('name');
+				if ( get_bloginfo('description') )
+					$title .= ' - '.get_bloginfo('description');
+			}
 		} else if ( $this->is_home_posts_page() ) {
 			if ( isset($options['title-home']) && $options['title-home'] != '' )
 				$title = wpseo_replace_vars( $options['title-home'], array() );
