@@ -152,6 +152,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 		* Properly fix featured image showing up in XML Sitemap.
 		* Optimized the main query for XML sitemaps per [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion).
 		* Switch feed noindexing from `xhtml:meta` tags to X-Robots-Tag HTTP headers to prevent feed display issues.
+		* Force XML Sitemap descriptions for images to be clean to prevent XML parse errors.
 * New filters:
 	* Add filter `wpseo_locale` for the locale in the opengraph settings. 
 	* Add filter `wpseo_metabox_prio` to allow WP SEO metabox priority to be changed.

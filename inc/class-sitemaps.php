@@ -526,9 +526,9 @@ class WPSEO_Sitemaps {
 				$output .= "\t\t<image:image>\n";
 				$output .= "\t\t\t<image:loc>".htmlspecialchars( $src )."</image:loc>\n";
 				if ( isset($img['title']) )
-					$output .= "\t\t\t<image:title>".htmlspecialchars( $img['title'] )."</image:title>\n";
+					$output .= "\t\t\t<image:title>".ereg_replace( "[^A-Za-z0-9\s\.]", "", $img['title'] )."</image:title>\n";
 				if ( isset($img['alt']) )
-					$output .= "\t\t\t<image:caption>".htmlspecialchars( $img['alt'] )."</image:caption>\n";
+					$output .= "\t\t\t<image:caption>".ereg_replace( "[^A-Za-z0-9\s\.]", "", $img['alt'] )."</image:caption>\n";
 				$output .= "\t\t</image:image>\n";
 			}
 		}
