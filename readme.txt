@@ -141,6 +141,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Fixes %%page%% variable to work in title & description template on paginated singular post(type)s.
 	* Allow - in focus keyword.
 	* Removed the option to use a Facebook page as an admin in the Facebook OpenGraph, as Facebook deprecated that.
+	* Force OpenGraph locale to lowercase.
 	* Now adding _all_ the images in a post with an og:image tag, so people can more easily share the right image.
 	* Allow regex specific characters in the focus keyword for the Page Analysis checks.
 	* Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
