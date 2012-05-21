@@ -15,13 +15,12 @@ class WPSEO_Frontend {
 		
 		add_action( 'wp',array( &$this, 'page_redirect' ), 99, 1 );
 
-		add_action( 'login_head', array( &$this, 'noindex_page' ) );
 		add_action( 'admin_head', array( &$this, 'noindex_page' ) );
 
 		add_action( 'template_redirect', array( &$this, 'noindex_feed' ) );
 
-		add_filter( 'loginout',array( &$this, 'nofollow_link'));
-		add_filter( 'register',array( &$this, 'nofollow_link'));
+		add_filter( 'loginout',array( &$this, 'nofollow_link' ) );
+		add_filter( 'register',array( &$this, 'nofollow_link' ) );
 		add_filter( 'comments_popup_link_attributes', array( &$this, 'echo_nofollow' ) );
 
 		if ( isset($options['hidersdlink']) && $options['hidersdlink'] )

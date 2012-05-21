@@ -636,6 +636,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							<th>%%focuskw%%</th>
 							<td>'.__('Replaced with the posts focus keyword', 'wordpress-seo' ).'</td>
 						</tr>
+						<tr>
+							<th>%%cf_&lt;custom-field-name&gt;%%</th>
+							<td>'.__('Replaced with a posts custom field value', 'wordpress-seo' ).'</td>
+						</tr>
 					</table>';
 			$this->postbox('titleshelp',__('Help on Title Settings', 'wordpress-seo'), $content); 
 			

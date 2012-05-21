@@ -136,20 +136,27 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 = 1.1.7 (development version) =
 
-* Fixes issue with un-paginated canonicals for paged single posts / pages.
-* Fixes %%page%% variable to work in title & description template on paginated singular post(type)s.
-* Add filter `wpseo_locale` for the locale in the opengraph settings. 
-* Add filter `wpseo_metabox_prio` to allow WP SEO metabox priority to be changed.
-* Allow - in focus keyword.
-* Removed the option to use a Facebook page as an admin in the Facebook OpenGraph, as Facebook deprecated that.
-* Now adding _all_ the images in a post with an og:image tag, so people can more easily share the right image.
-* Fixed the Yoast Facebook URL.
-* Allow regex characters in the focus keyword for the Page Analysis checks.
-* Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
-* Switch feed noindexing from `xhtml:meta` tags to X-Robots-Tag HTTP headers to prevent feed display issues.
-* Removed the "Other Notes" tab from the plugin page, enough tabs there already.
-* Properly fix featured image showing up in XML Sitemap.
-* Optimized the main query for XML sitemaps per [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion).
+* Bugs fixed / Changes:
+	* Fixes issue with un-paginated canonicals for paged single posts / pages.
+	* Fixes %%page%% variable to work in title & description template on paginated singular post(type)s.
+	* Allow - in focus keyword.
+	* Removed the option to use a Facebook page as an admin in the Facebook OpenGraph, as Facebook deprecated that.
+	* Now adding _all_ the images in a post with an og:image tag, so people can more easily share the right image.
+	* Allow regex specific characters in the focus keyword for the Page Analysis checks.
+	* Add proper (and i18n compatible) [stop word](http://en.wikipedia.org/wiki/Stop_words) removal.
+	* Removed code to add noindex to login page as that's now in core for long enough.
+	* XML Sitemaps & feeds:
+		* Properly fix featured image showing up in XML Sitemap.
+		* Optimized the main query for XML sitemaps per [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion).
+		* Switch feed noindexing from `xhtml:meta` tags to X-Robots-Tag HTTP headers to prevent feed display issues.
+* New filters:
+	* Add filter `wpseo_locale` for the locale in the opengraph settings. 
+	* Add filter `wpseo_metabox_prio` to allow WP SEO metabox priority to be changed.
+* Documentation:
+	* Removed the "Other Notes" tab from the plugin page, enough tabs there already.
+	* Added %%cf_ options to config page for titles.
+	* Fixed the Yoast Facebook URL.
+	* Changed plugin support link to [the new support URL format](http://wordpress.org/support/plugin/wordpress-seo).
 
 = 1.1.6 =
 
