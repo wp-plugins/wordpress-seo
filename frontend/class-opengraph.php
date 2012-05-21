@@ -154,27 +154,47 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		$locale = apply_filters( 'wpseo_locale', strtolower( get_locale() ) );
 		
 		// catch some weird locales served out by WP.
-		switch ( $locale ) {
-			case 'af':
-				$locale = 'af_za';
-				break;
-			case 'ar':
-				$locale = 'ar_ar';
-				break;
-			case 'ca':
-				$locale = 'ca_es';
-				break;
-			case 'en':
-				$locale = 'en_us';
-				break;
-			case 'et':
-				$locale = 'et_ee';
-				break;
-			case 'fi':
-				$locale = 'fi_fi';
-				break;
-			default:
-				break;
+		if ( strlen( $locale ) == 2 ) {
+			switch ( $locale ) {
+				case 'af':
+					$locale = 'af_za';
+					break;
+				case 'ar':
+					$locale = 'ar_ar';
+					break;
+				case 'ca':
+					$locale = 'ca_es';
+					break;
+				case 'en':
+					$locale = 'en_us';
+					break;
+				case 'el':
+					$locale = 'el_gr';
+					break;
+				case 'et':
+					$locale = 'et_ee';
+					break;
+				case 'fi':
+					$locale = 'fi_fi';
+					break;
+				case 'ja':
+					$locale = 'ja_jp';
+					break;
+				case 'sq':
+					$locale = 'sq_al';
+					break;
+				case 'uk':
+					$locale = 'uk_ua';
+					break;
+				case 'vi':
+					$locale = 'vi_vn';
+					break;
+				case 'zh':
+					$locale = 'zh_cn';
+					break;
+				default:
+					break;
+			}
 		}
 		
 		echo "<meta property='og:locale' content='".esc_attr( $locale )."'/>\n";
