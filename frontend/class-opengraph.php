@@ -161,6 +161,9 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			case 'ar':
 				$locale = 'ar_ar';
 				break;
+			case 'ca':
+				$locale = 'ca_es';
+				break;
 			case 'en':
 				$locale = 'en_us';
 				break;
