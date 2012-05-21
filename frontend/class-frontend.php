@@ -240,7 +240,10 @@ class WPSEO_Frontend {
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
-		$this->adjacent_rel_links();
+
+		// Don't do this for Genesis, as the way Genesis handles homepage functionality is different and causes issues sometimes.
+		if ( !function_exists('genesis') )
+			$this->adjacent_rel_links();
 		$this->robots();
 		
 		if ( is_front_page() ) {

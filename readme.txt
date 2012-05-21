@@ -151,6 +151,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* When a static homepage has no SEO title, default to the site's name + description.
 	* Only show images once in OpenGraph tags.
 	* Prevent a timeout on retrieving term meta.
+	* Don't do next / prev links on the homepage for Genesis based themes as that leads to trouble.
 	* XML Sitemaps & feeds:
 		* Properly fix featured image showing up in XML Sitemap.
 		* Optimized the main query for XML sitemaps per [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion).
