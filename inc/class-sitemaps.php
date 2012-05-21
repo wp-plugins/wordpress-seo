@@ -273,19 +273,33 @@ class WPSEO_Sitemaps {
 		// We grab post_date, post_name, post_author and post_status too so we can throw these objects into get_permalink, which saves a get_post call for each permalink.
 		while( $total > $offset ) {
 			
-			$join_filter = '';
-			$join_filter = apply_filters('wpseo_posts_join', $join_filter, $post_type);
-			$where_filter = '';
-			$where_filter = apply_filters('wpseo_posts_where', $where_filter, $post_type);
+			$join_filter = apply_filters('wpseo_posts_join', '', $post_type);
+			$where_filter = apply_filters('wpseo_posts_where', '', $post_type);
 			
-			$posts = $wpdb->get_results("SELECT ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
+			// Optimized query per this thread: http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion
+			// Also see http://explainextended.com/2009/10/23/mysql-order-by-limit-performance-late-row-lookups/
+
+			$posts = $wpdb->get_results("SELECT l.ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
+			FROM ( 
+				SELECT ID FROM $wpdb->posts {$join_filter}
+						WHERE post_status = 'publish'
+						AND	post_password = ''
+						AND post_type = '$post_type'
+						{$where_filter}
+						ORDER BY post_modified ASC
+						LIMIT $steps OFFSET $offset ) o
+			JOIN $wpdb->posts l
+				ON l.ID = o.ID
+				ORDER BY l.ID");
+			
+/*			$posts = $wpdb->get_results("SELECT ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
 			FROM $wpdb->posts {$join_filter}
 			WHERE post_status = 'publish'
 			AND	post_password = ''
 			AND post_type = '$post_type'
 			{$where_filter}
 			ORDER BY post_modified ASC
-			LIMIT $steps OFFSET $offset");
+			LIMIT $steps OFFSET $offset"); */
 			
 			$offset = $offset + $steps;
 

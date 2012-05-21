@@ -149,6 +149,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Switch feed noindexing from `xhtml:meta` tags to X-Robots-Tag HTTP headers to prevent feed display issues.
 * Removed the "Other Notes" tab from the plugin page, enough tabs there already.
 * Properly fix featured image showing up in XML Sitemap.
+* Optimized the main query for XML sitemaps per [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-performance-suggestion).
 
 = 1.1.6 =
 
