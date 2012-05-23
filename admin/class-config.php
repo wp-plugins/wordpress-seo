@@ -489,7 +489,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			}
 			$content .= '<br/>';
 			$content .= '<h4 class="big">'.__('Special pages', 'wordpress-seo' ).'</h4>';
-			$content .= '<h4>'.__('Author Archives').'</h4>';
+			$content .= '<h4>'.__('Author Archives', 'wordpress-seo').'</h4>';
 			$content .= $this->textinput('title-author',__('Title template', 'wordpress-seo' ));
 			$content .= $this->textarea('metadesc-author',__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
 			if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
@@ -688,7 +688,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 		
 		function internallinks_page() {
-			$this->admin_header(__('Internal Links'), false, true, 'yoast_wpseo_internallinks_options', 'wpseo_internallinks');
+			$this->admin_header(__('Internal Links','wordpress-seo'), false, true, 'yoast_wpseo_internallinks_options', 'wpseo_internallinks');
 
 			$content = $this->checkbox('breadcrumbs-enable',__('Enable Breadcrumbs', 'wordpress-seo' ));
 			$content .= '<br/>';

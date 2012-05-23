@@ -140,6 +140,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Fix the clean slug function to not freak people out and remove chars.
 	* Fixed a couple of notices.
 	* Allow '+' in focus keyword.
+	* A *load* of i18n fixes.
 	
 = 1.1.7 =
 

@@ -123,14 +123,13 @@ function wpseo_admin_bar_menu() {
 
 	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-kwresearch', 'title' => __( 'Keyword Research', 'wordpress-seo' ), '#', ) );
 
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-adwordsexternal', 'title' => __( 'AdWords External' ), 'href' => 'https://adwords.google.com/select/KeywordToolExternal', 'meta' => array('target' => '_blank') ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-googleinsights', 'title' => __( 'Google Insights' ), 'href' => 'http://www.google.com/insights/search/#q='.urlencode($focuskw).'&cmpt=q', 'meta' => array('target' => '_blank') ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-wordtracker', 'title' => __( 'SEO Book' ), 'href' => 'http://tools.seobook.com/keyword-tools/seobook/?keyword='.urlencode($focuskw), 'meta' => array('target' => '_blank') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-adwordsexternal', 'title' => __( 'AdWords External','wordpress-seo' ), 'href' => 'https://adwords.google.com/select/KeywordToolExternal', 'meta' => array('target' => '_blank') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-googleinsights', 'title' => __( 'Google Insights','wordpress-seo' ), 'href' => 'http://www.google.com/insights/search/#q='.urlencode($focuskw).'&cmpt=q', 'meta' => array('target' => '_blank') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-kwresearch', 'id' => 'wpseo-wordtracker', 'title' => __( 'SEO Book','wordpress-seo' ), 'href' => 'http://tools.seobook.com/keyword-tools/seobook/?keyword='.urlencode($focuskw), 'meta' => array('target' => '_blank') ) );
 
 	if ( !is_admin() ) {
 		$cleanurl = preg_replace('/^https?%3A%2F%2F/','', urlencode($url));
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-analysis', 'title' => __( 'Analyze this page', 'wordpress-seo'  ), '#', ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-y', 'title' => __( 'Check Inlinks (Yahoo!)', 'wordpress-seo'  ), 'href' => 'https://siteexplorer.search.yahoo.com/search?p='.$cleanurl.'&bwm=i&bwmo=d&bwmf=u', 'meta' => array('target' => '_blank') ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-inlinks-ose', 'title' => __( 'Check Inlinks (OSE)', 'wordpress-seo'  ), 'href' => 'http://www.opensiteexplorer.org/'.str_replace('/','%252F',preg_replace('/^https?:\/\//','',$url)).'/a!links', 'meta' => array('target' => '_blank') ) );	
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-kwdensity', 'title' => __( 'Check Keyword Density', 'wordpress-seo'  ), 'href' => 'http://tools.davidnaylor.co.uk/keyworddensity/index.php?url='.$url.'&keyword='.urlencode($focuskw), 'meta' => array('target' => '_blank') ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-analysis', 'id' => 'wpseo-cache', 'title' => __( 'Check Google Cache', 'wordpress-seo'  ), 'href' => 'http://webcache.googleusercontent.com/search?strip=1&q=cache:'.$url, 'meta' => array('target' => '_blank') ) );

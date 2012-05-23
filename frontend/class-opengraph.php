@@ -110,7 +110,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			if ( isset($this->options['title-search']) && !empty($this->options['title-search']) )
 				$title = wpseo_replace_vars($this->options['title-search'], (array) $wp_query->get_queried_object() );	
 			else
-				$title = __('Search for "').get_search_query().'"';
+				$title = __('Search for "','wordpress-seo').get_search_query().'"';
 		} else if ( is_author() ) {
 			$author_id = get_query_var('author');
 			$title = get_the_author_meta('wpseo_title', $author_id);
@@ -132,14 +132,14 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		 	if ( isset($this->options['title-archive']) && !empty($this->options['title-archive']) )
 				$title = wpseo_replace_vars($this->options['title-archive'], array('post_title' => $title) );
 			else if ( is_month() ) 
-				$title = single_month_title(' ', false).' '.__('Archives'); 
+				$title = single_month_title(' ', false).' '.__('Archives','wordpress-seo'); 
 			else if ( is_year() )
-				$title = get_query_var('year').' '.__('Archives'); 
+				$title = get_query_var('year').' '.__('Archives','wordpress-seo'); 
 		} else if ( is_404() ) {
 		 	if ( isset($this->options['title-404']) && !empty($this->options['title-404']) )
 				$title = wpseo_replace_vars($this->options['title-404'], array('post_title' => $title) );
 			else
-				$title = __('Page not found');
+				$title = __('Page not found','wordpress-seo');
 		} 
 		echo "<meta property='og:title' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
 		// echo "<meta itemprop='name' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";

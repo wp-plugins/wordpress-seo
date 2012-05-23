@@ -143,7 +143,7 @@ class WPSEO_Frontend {
 			if ( isset($options['title-search']) && !empty($options['title-search']) )
 				$title = wpseo_replace_vars($options['title-search'], (array) $wp_query->get_queried_object() );	
 			else {
-				$title = __( 'Search for "').get_search_query().'"';
+				$title = __( 'Search for "','wordpress-seo').get_search_query().'"';
 				
 				if ( isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'] )
 					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
@@ -201,9 +201,9 @@ class WPSEO_Frontend {
 				$title = wpseo_replace_vars($options['title-archive'], array( 'post_title' => $title) );
 			else {
 				if ( is_month() )
-					$title = single_month_title( ' ', false).' '.__( 'Archives' ); 
+					$title = single_month_title( ' ', false).' '.__( 'Archives','wordpress-seo' ); 
 				else if ( is_year() )
-					$title = get_query_var( 'year').' '.__( 'Archives' ); 
+					$title = get_query_var( 'year').' '.__( 'Archives','wordpress-seo' ); 
 					
 				if ( isset($wp_query->query_vars['paged']) && $wp_query->query_vars['paged'] )
 					$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
@@ -213,7 +213,7 @@ class WPSEO_Frontend {
 		 	if ( isset($options['title-404']) && !empty($options['title-404']) )
 				$title = wpseo_replace_vars($options['title-404'], array( 'post_title' => $title) );
 			else
-				$title = __( 'Page not found').$sep.get_bloginfo( 'name' );
+				$title = __( 'Page not found','wordpress-seo').$sep.get_bloginfo( 'name' );
 		} 
 		return esc_html( strip_tags( stripslashes( apply_filters( 'wpseo_title', $title ) ) ) );
 	}
