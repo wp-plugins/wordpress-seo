@@ -264,14 +264,8 @@ function wpseo_remove_stopwords_from_slug( $slug ) {
 	if ( $slug ) 
 		return $slug;
 	
-	// Lowercase the slug and strip slashes
-	$clean_slug = strtolower( stripslashes( $_POST['post_title'] ) );
-
-	// Remove all weird HTML entities
-	$clean_slug = preg_replace( '/&.+?;/', '', $clean_slug ); 
-
-    // kill anything that is not a letter, digit, space or apostrophe
-    $clean_slug = preg_replace ("/[^a-zA-Z0-9 \']/", "", $clean_slug );
+	// Clean the slug of weirdness
+	$clean_slug = sanitize_title( stripslashes( $_POST['post_title'] ) );
 
     // Turn it to an array and strip stopwords by comparing against an array of stopwords
     $clean_slug_array = array_diff ( split( " ", $clean_slug ), wpseo_stopwords() );

@@ -134,6 +134,12 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.1.8 (development version) =
+
+* Bugs fixed / Changes:
+	* Fix the clean slug function to not freak people out and remove chars.
+	* Fixed a couple of notices.
+	
 = 1.1.7 =
 
 * Bugs fixed / Changes:

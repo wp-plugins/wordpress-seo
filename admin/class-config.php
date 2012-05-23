@@ -944,7 +944,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 			$content = $this->checkbox('enablexmlsitemap',__('Check this box to enable XML sitemap functionality.', 'wordpress-seo' ), false);
 			$content .= '<div id="sitemapinfo">';
-			if ( $options['enablexmlsitemap'] )
+			if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] )
 				$content .= '<p>'.sprintf(__('You can find your XML Sitemap here: %sXML Sitemap%s', 'wordpress-seo' ), '<a target="_blank" class="button-secondary" href="'.home_url($base.'sitemap_index.xml').'">', '</a>').'<br/><br/>'.__( 'You do <strong>not</strong> need to generate the XML sitemap, nor will it take up time to generate after publishing a post.', 'wordpress-seo' ).'</p>';
 			else
 				$content .= '<p>'.__('Save your settings to activate XML Sitemaps.', 'wordpress-seo' ).'</p>';
