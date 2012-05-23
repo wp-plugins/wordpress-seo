@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: 1.1.7
+Stable tag: 1.1.8
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -134,13 +134,13 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= 1.1.8 (development version) =
+= 1.1.8 =
 
 * Bugs fixed / Changes:
 	* Fix the clean slug function to not freak people out and remove chars.
 	* Fixed a couple of notices.
 	* Allow '+' in focus keyword.
-	* A *load* of i18n fixes.
+	* A *load* of i18n fixes (including a new POT file).
 	
 = 1.1.7 =
 
