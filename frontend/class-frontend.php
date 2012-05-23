@@ -507,7 +507,7 @@ class WPSEO_Frontend {
 		if ( is_singular() ) { 
 			global $post;
 			$metakey = wpseo_get_value( 'metakeywords' );
-			if ( isset( $options['metakey-'.$post->post_type] ) && ( !$metakey || empty( $metakey ) ) {
+			if ( isset( $options['metakey-'.$post->post_type] ) && ( !$metakey || empty( $metakey ) ) ) {
 				$metakey = wpseo_replace_vars($options['metakey-'.$post->post_type], (array) $post );
 			}
 		} else {
