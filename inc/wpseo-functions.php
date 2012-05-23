@@ -263,7 +263,10 @@ function wpseo_remove_stopwords_from_slug( $slug ) {
     // Don't to change an existing slug
 	if ( $slug ) 
 		return $slug;
-	
+
+	if ( isset( $_POST['post_title'] ) )
+		return $slug;
+		
 	// Clean the slug of weirdness
 	$clean_slug = sanitize_title( stripslashes( $_POST['post_title'] ) );
 
