@@ -143,6 +143,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Saving the SEO -> Dashboard settings no longer makes you loose the SEO -> Social settings.
 * Added a filter for the meta keywords, `wpseo_metakey`.
 * Tweaks to clean slug functionality.
+* Added the option to display custom taxonomy in titles and descriptions, use `%%ct_<custom-taxname>%%` for a comma separated list or `%%ct_<custom-taxname>%%single%%` for only one taxonomy term.
 
 = 1.1.9 =
 

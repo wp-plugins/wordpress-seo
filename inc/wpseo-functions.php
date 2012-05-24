@@ -161,12 +161,24 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 			$string = str_replace( $match[0], get_post_meta( $post->ID, $match[1], true), $string );
 		}
 	}
+
+	if ( preg_match_all( '/%%ct_([^%]+)%%(single%%)?/', $string, $matches, PREG_SET_ORDER ) ) {
+		global $post;
+		foreach ($matches as $match) {
+			$single = false;
+			if ( isset($match[2]) && $match[2] == 'single%%' )
+				$single = true;
+			$ct_terms = wpseo_get_terms( $r->ID, $match[1], $single );
+
+			$string = str_replace( $match[0], $ct_terms, $string );
+		}
+	}
 	
 	$string = preg_replace( '/\s\s+/',' ', $string );
 	return trim( $string );
 }
 
-function wpseo_get_terms($id, $taxonomy) {
+function wpseo_get_terms($id, $taxonomy, $return_single = false ) {
 	// If we're on a specific tag, category or taxonomy page, return that and bail.
 	if ( is_category() || is_tag() || is_tax() ) {
 		global $wp_query;
@@ -178,6 +190,8 @@ function wpseo_get_terms($id, $taxonomy) {
 	$terms = get_the_terms($id, $taxonomy);
 	if ( $terms ) {
 		foreach ($terms as $term) {
+			if ( $return_single )
+				return $term->name;
 			$output .= $term->name.', ';
 		}
 		return rtrim( trim($output), ',' );
