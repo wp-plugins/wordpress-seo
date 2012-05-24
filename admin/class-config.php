@@ -140,11 +140,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				settings_fields($option); 
 				$this->currentoption = $optionshort;
 				// Set some of the ignore booleans here to prevent unsetting.
-				echo $this->hidden('ignore_blog_public_warning');
-				echo $this->hidden('ignore_tour');
-				echo $this->hidden('ignore_page_comments');
-				echo $this->hidden('ignore_permalink');
-				echo $this->hidden('ms_defaults_set');
 			}
 			if ($expl)
 				$this->postbox('pluginsettings',__('Plugin Settings', 'wordpress-seo'),$this->checkbox('disableexplanation',__('Hide verbose explanations of settings', 'wordpress-seo'))); 
@@ -983,13 +978,21 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 		
 		function config_page() {
-			$options = get_wpseo_options();
-			
+			$options = get_option('wpseo');
+		
 			$this->admin_header('General', false, true, 'yoast_wpseo_options', 'wpseo' );
 			
-			ksort($options);
-			$content = '';
+			echo $this->hidden('ignore_blog_public_warning');
+			echo $this->hidden('ignore_tour');
+			echo $this->hidden('ignore_page_comments');
+			echo $this->hidden('ignore_permalink');
+			echo $this->hidden('ms_defaults_set');
+			echo $this->hidden('version');
 			
+			ksort($options);
+			
+			$content = '';
+						
 			if ( isset($options['blocking_files']) && is_array($options['blocking_files']) && count($options['blocking_files']) > 0 ) {
 				$options['blocking_files'] = array_unique( $options['blocking_files'] );
 				$content .= '<p id="blocking_files" class="wrong">'
@@ -1020,7 +1023,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( '' != $content )
 				$this->postbox('advice',__('Settings Advice', 'wordpress-seo'),$content); 
 			
-			$content = $this->checkbox('usemetakeywords', __( 'Use <code>meta</code> keywords tag?', 'wordpress-seo' ));
+			$content .= $this->checkbox('usemetakeywords', __( 'Use <code>meta</code> keywords tag?', 'wordpress-seo' ));
 			$content .= $this->checkbox('disabledatesnippet', __( 'Disable date in snippet preview for posts', 'wordpress-seo' ));
 			
 			// TODO: make this settable per user level...
@@ -1061,7 +1064,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$options = get_option('wpseo_social');
 			
 			$fbconnect = '<p><strong>'.__('Facebook Insights and Admins', 'wordpress-seo').'</strong><br>';
-			$fbconnect .= sprintf( __('To be able to access your <a href="%s">Facebook Insights</a> for your site, you need to specify a Facebook Admin. This can be a user, but if you have a page or an app for your site, you should use that. The reason is that ownership of those, and thus the stats, is transferable whereas it is not transferable for users.', 'wordpress-seo' ), 'https://www.facebook.com/insights').'</p>';
+			$fbconnect .= sprintf( __('To be able to access your <a href="%s">Facebook Insights</a> for your site, you need to specify a Facebook Admin. This can be a user, but if you have an app for your site, you could use that. For most people a user will be "good enough" though.', 'wordpress-seo' ), 'https://www.facebook.com/insights').'</p>';
 
 			$error = false;
 			$clearall = false;
@@ -1105,7 +1108,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					$apps = json_decode( stripslashes( $_GET['apps'] ) );
 					$options['fbapps'] = array( '0' => __('Do not use a Facebook App as Admin','wordpress-seo') );
 					foreach ($apps as $app) {
-						$options['fbapps'][$app->page_id] = $app->name;
+						$options['fbapps'][$app->app_id] = $app->display_name;
 					}
 					update_option('wpseo_social', $options);
 					add_settings_error('yoast_wpseo_social_options','success', __('Successfully retrieved your apps from Facebook, now select an app to use as admin.','wordpress-seo') , 'updated');
@@ -1113,6 +1116,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$error = true;
 			}
 
+			$options = get_option('wpseo_social');
+			
 			if ( isset($options['fb_admins']) && is_array($options['fb_admins']) ) {
 				foreach($options['fb_admins'] as $id => $admin) {
 					$fbconnect .= '<input type="hidden" name="wpseo_social[fb_admins]['.$id.']" value="'.$admin.'"/>';
@@ -1131,13 +1136,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( isset($options['fbapps']) && is_array($options['fbapps']) ) {
 				$fbconnect .= '<p>'.__('Select an app to use as Facebook admin:', 'wordpress-seo' ).'</p>';
 				$fbconnect .= '<select name="wpseo_social[fbadminapp]" id="fbadminapp">';
+				
 				foreach($options['fbapps'] as $id => $app) {
 					$sel = '';
 					if ( $id == $options['fbadminapp'] )
 						$sel = 'selected="selected"';
 					$fbconnect .= '<option '.$sel.' value="'.$id.'">'.$app.'</option>';
 				}
-				$fbconnect .= '</select>';
+				$fbconnect .= '</select><div class="clear"></div><br/>';
 				$app_button_text = __('Update Facebook Apps','wordpress-seo');
 			}
 			
@@ -1169,11 +1175,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			}
 			$fbconnect .= '</p>';
 			
-			$this->admin_header('Social', true, true, 'yoast_wpseo_social_options', 'wpseo_social');
+			$this->admin_header(__('Social', 'wordpress-seo' ), false, true, 'yoast_wpseo_social_options', 'wpseo_social');
 
 			if ( $error )
 				settings_errors();
-				
+			
 			$content = $this->checkbox('opengraph', '<label for="opengraph">'.__('Add OpenGraph meta data', 'wordpress-seo').'</label>' );
 			$content .= '<p class="desc">'.__('Add OpenGraph meta data to your site\'s &lt;head&gt; section. You can specify some of the ID\'s that are sometimes needed below:', 'wordpress-seo').'</p>';
 			$content .= $fbconnect;

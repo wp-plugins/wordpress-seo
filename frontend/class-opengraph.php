@@ -193,7 +193,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			$shown_images = array();
 			
 			if ( function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
-				$featured_img = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'full' );
+				$featured_img = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'medium' ) );
 				
 				if ( $featured_img ) {
 					$img = apply_filters( 'wpseo_opengraph_image', $featured_img[0] );

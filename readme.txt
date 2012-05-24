@@ -134,6 +134,16 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.1.10 (development version) =
+
+* ereg_replace != preg_replace ; in other words: alt and title tags for images in xml sitemap fixed.
+* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
+* Image size for OpenGraph now defaults to medium for thumbnail image.
+* Selecting a Facebook App as the admin of your site now actually works.
+* Saving the SEO -> Dashboard settings no longer makes you loose the SEO -> Social settings.
+* Added a filter for the meta keywords, `wpseo_metakey`.
+* Tweaks to clean slug functionality.
+
 = 1.1.9 =
 
 * Sigh... Sorry about that.

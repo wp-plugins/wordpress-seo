@@ -415,7 +415,13 @@ class WPSEO_Sitemaps {
 		$this->sitemap = '<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" ';
 		$this->sitemap .= 'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" ';
 		$this->sitemap .= 'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
-		$this->sitemap .= $output . '</urlset>';
+		$this->sitemap .= $output;
+
+		// Filter to allow adding extra URLs, only do this on the first XML sitemap, not on all.
+		if ( $n == 0 ) 
+			$this->sitemap .= apply_filters( 'wpseo_sitemap_'.$post_type.'_content', '' );
+			
+		$this->sitemap .= '</urlset>';
 	}
 
 	/**
@@ -526,9 +532,9 @@ class WPSEO_Sitemaps {
 				$output .= "\t\t<image:image>\n";
 				$output .= "\t\t\t<image:loc>".htmlspecialchars( $src )."</image:loc>\n";
 				if ( isset($img['title']) )
-					$output .= "\t\t\t<image:title>".ereg_replace( "[^A-Za-z0-9\s\.]", "", $img['title'] )."</image:title>\n";
+					$output .= "\t\t\t<image:title>".preg_replace( "[^A-Za-z0-9\s\.]", "", $img['title'] )."</image:title>\n";
 				if ( isset($img['alt']) )
-					$output .= "\t\t\t<image:caption>".ereg_replace( "[^A-Za-z0-9\s\.]", "", $img['alt'] )."</image:caption>\n";
+					$output .= "\t\t\t<image:caption>".preg_replace( "[^A-Za-z0-9\s\.]", "", $img['alt'] )."</image:caption>\n";
 				$output .= "\t\t</image:image>\n";
 			}
 		}

@@ -533,7 +533,8 @@ class WPSEO_Frontend {
 			
 		}
 
-		$metakey = trim( $metakey );
+		$metakey = apply_filters( 'wpseo_metakey', trim( $metakey ) );
+		
 		if ( !empty( $metakey ) ) 
 			echo '<meta name="keywords" content="'.esc_attr( strip_tags( stripslashes( $metakey ) ) ).'"/>'."\n";
 
