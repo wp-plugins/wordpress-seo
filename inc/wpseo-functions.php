@@ -40,7 +40,7 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 	
 	// Let's see if we can bail super early.
 	if ( strpos( $string, '%%' ) === false )
-		return trim( preg_replace('/\s+/',' ', $string) );
+		return trim( preg_replace('/\s+/u',' ', $string) );
 
 	$simple_replacements = array(
 		'%%sitename%%'				=> get_bloginfo('name'),
@@ -57,7 +57,7 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 	
 	// Let's see if we can bail early.
 	if ( strpos( $string, '%%' ) === false )
-		return trim( preg_replace('/\s+/',' ', $string) );
+		return trim( preg_replace('/\s+/u',' ', $string) );
 
 	global $wp_query;
 	
@@ -88,16 +88,14 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 	}
 
 	$pagenum = 0;
-	$max_num_pages = 0;
+	$max_num_pages = 1;
 	if ( !is_single() ) {
 		$pagenum = get_query_var('paged');
-		if ($pagenum === 0) {
-			if ($wp_query->max_num_pages > 1)
-				$pagenum = 1;
-			else
-				$pagenum = '';
-		}
-		$max_num_pages = $wp_query->max_num_pages;
+		if ($pagenum === 0) 
+			$pagenum = 1;
+
+		if ( isset( $wp_query->max_num_pages ) && $wp_query->max_num_pages != '' && $wp_query->max_num_pages != 0 )
+			$max_num_pages = $wp_query->max_num_pages;
 	} else {
 		$pagenum = get_query_var('page');
 		$max_num_pages = substr_count( $post->post_content, '<!--nextpage-->' );
@@ -139,8 +137,8 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
 		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
 		'%%searchphrase%%'			=> esc_html(get_query_var('s')),
-		'%%page%%'		 			=> ( $max_num_pages != 0 ) ? 'Page '.$pagenum.' of '.$max_num_pages : '', 
-		'%%pagetotal%%'	 			=> ( $max_num_pages > 1 ) ? $max_num_pages : '', 
+		'%%page%%'		 			=> sprintf( __('Page %d of %d','wordpress-seo'), $pagenum, $max_num_pages), 
+		'%%pagetotal%%'	 			=> $max_num_pages, 
 		'%%pagenumber%%' 			=> $pagenum,
 		'%%caption%%'				=> $r->post_excerpt,
 	);
@@ -151,18 +149,18 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 	}
 	
 	if ( strpos( $string, '%%' ) === false ) {
-		$string = preg_replace( '/\s\s+/',' ', $string );
+		$string = preg_replace( '/\s+/u',' ', $string );
 		return trim( $string );
 	}
 
-	if ( preg_match_all( '/%%cf_([^%]+)%%/', $string, $matches, PREG_SET_ORDER ) ) {
+	if ( preg_match_all( '/%%cf_([^%]+)%%/u', $string, $matches, PREG_SET_ORDER ) ) {
 		global $post;
 		foreach ($matches as $match) {
 			$string = str_replace( $match[0], get_post_meta( $post->ID, $match[1], true), $string );
 		}
 	}
 
-	if ( preg_match_all( '/%%ct_([^%]+)%%(single%%)?/', $string, $matches, PREG_SET_ORDER ) ) {
+	if ( preg_match_all( '/%%ct_([^%]+)%%(single%%)?/u', $string, $matches, PREG_SET_ORDER ) ) {
 		global $post;
 		foreach ($matches as $match) {
 			$single = false;
@@ -174,7 +172,7 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		}
 	}
 	
-	$string = preg_replace( '/\s\s+/',' ', $string );
+	$string = preg_replace( '/\s+/u',' ', $string );
 	return trim( $string );
 }
 

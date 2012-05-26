@@ -1,24 +1,26 @@
 <?php
 
 function wpseo_load_plugins( $path ) {
-	$allowed_plugins = array('wpseo-local', 'wpseo-video', 'wpseo-news');
+	$allowed_plugins = array('wpseo-local', 'wpseo-news');
 	
-	$dir = @opendir( $path );
-	if ($dir) {
-		while (($entry = @readdir($dir)) !== false) {
-			$full_dir_path = $path . "/" . $entry;
-			if( in_array($entry, $allowed_plugins) && is_readable($full_dir_path) && is_dir($full_dir_path) ) {
-				$module_dir = @opendir( $full_dir_path );
-				if ($module_dir) {
-					while (($module_entry = @readdir($module_dir)) !== false) {
-						if (strrchr($module_entry, '.') === '.php') {
-							require $full_dir_path . '/' . $module_entry;
+	if ( is_dir( $path ) ) {
+		$dir = @opendir( $path );
+		if ($dir) {
+			while (($entry = @readdir($dir)) !== false) {
+				$full_dir_path = $path . "/" . $entry;
+				if( in_array($entry, $allowed_plugins) && is_readable($full_dir_path) && is_dir($full_dir_path) ) {
+					$module_dir = @opendir( $full_dir_path );
+					if ($module_dir) {
+						while (($module_entry = @readdir($module_dir)) !== false) {
+							if (strrchr($module_entry, '.') === '.php') {
+								require $full_dir_path . '/' . $module_entry;
+							}
 						}
 					}
 				}
 			}
+			@closedir($dir);
 		}
-		@closedir($dir);
 	}
 }
 

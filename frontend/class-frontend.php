@@ -92,7 +92,7 @@ class WPSEO_Frontend {
 		if ( $this->is_home_static_page() ) {
 			global $post;
 			$title = wpseo_get_value( 'title', $post->ID );
-			if ( '' == $title && isset($options['title-'.$post->post_type]) )
+			if ( '' == $title && isset($options['title-'.$post->post_type]) && !empty($options['title-'.$post->post_type]) )
 				$title = wpseo_replace_vars($options['title-'.$post->post_type], (array) $post );
 			else if ( '' == $title ) {
 				$title = get_bloginfo('name');
@@ -234,6 +234,8 @@ class WPSEO_Frontend {
 	function head() {
 		$options = get_wpseo_options();
 
+		wp_reset_query();
+		
 		global $wp_query;
 		
 		$this->debug_marker();

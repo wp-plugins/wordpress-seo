@@ -134,16 +134,25 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= 1.1.10 (development version) =
+= 1.2 (development version) =
 
-* ereg_replace != preg_replace ; in other words: alt and title tags for images in xml sitemap fixed.
-* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
-* Image size for OpenGraph now defaults to medium for thumbnail image.
-* Selecting a Facebook App as the admin of your site now actually works.
-* Saving the SEO -> Dashboard settings no longer makes you loose the SEO -> Social settings.
-* Added a filter for the meta keywords, `wpseo_metakey`.
-* Tweaks to clean slug functionality.
-* Added the option to display custom taxonomy in titles and descriptions, use `%%ct_<custom-taxname>%%` for a comma separated list or `%%ct_<custom-taxname>%%single%%` for only one taxonomy term.
+* Bugs fixed:
+	* ereg_replace != preg_replace ; in other words: alt and title tags for images in xml sitemap fixed.
+	* Image size for OpenGraph now defaults to medium for thumbnail image.
+	* Selecting a Facebook App as the admin of your site now actually works.
+	* Saving the SEO -> Dashboard settings no longer makes you loose the SEO -> Social settings.
+	* Tweaks to clean slug functionality.
+	* Fix for UTF-8 terms in titles and descriptions.
+	* Fixed bug where empty but saved title template settings could lead to empty homepage title on blogs with a static front page.
+	* Fixed several bugs around page numbers in titles and descriptions.
+	* Prevented an error in the opendir functionality for WP SEO modules.
+	* Allow ';' in focus keyword.
+* Enhancements:
+	* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
+	* Added a filter for the meta keywords, `wpseo_metakey`.
+	* Added the option to display custom taxonomy in titles and descriptions, use `%%ct_<custom-taxname>%%` for a comma separated list or `%%ct_<custom-taxname>%%single%%` for only one taxonomy term.
+	* Allow for 'Page x of x' to be localized too.
+	* Force the query for the current page to be used instead of the query that a bad plugin or even theme was using by calling `wp_reset_query` before the header functionality.
 
 = 1.1.9 =
 
