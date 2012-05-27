@@ -147,6 +147,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Fixed several bugs around page numbers in titles and descriptions.
 	* Prevented an error in the opendir functionality for WP SEO modules.
 	* Allow ';' in focus keyword.
+	* All sorts of fixes to suggest and keyword check functionality which now should allow for non ascii characters.
 * Enhancements:
 	* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
 	* Added a filter for the meta keywords, `wpseo_metakey`.

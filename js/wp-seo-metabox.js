@@ -1,10 +1,8 @@
-function yst_clean( str, cleanalphanumeric ) { 
+function yst_clean( str ) { 
 	if ( str == '' || str == undefined )
 		return '';
 	
 	try {
-		if ( cleanalphanumeric == true )
-			str = str.replace(/[^a-zA-Z0-9\s-\+;]/, '');
 		str = str.replace(/<\/?[^>]+>/gi, ''); 
 		str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
 	} catch(e) {}
@@ -12,7 +10,7 @@ function yst_clean( str, cleanalphanumeric ) {
 }
 
 function ptest(str, p) {
-	str = yst_clean( str, true );
+	str = yst_clean( str );
 	str = str.toLowerCase();
 	var r = str.match(p);
 	if (r != null)
@@ -29,7 +27,7 @@ function testFocusKw() {
 	var postname = jQuery('#editable-post-name-full').text();
 	var url	= wpseo_permalink_template.replace('%postname%', postname).replace('http://','');
 
-	var p = new RegExp("(^\|[ \n\r\t.,'\"\+!?:-]+)"+focuskw+"($\|[ \n\r\t.,'\"\+!?:-]+)",'gim');
+	var p = new RegExp("(^\|[ \n\r\t.,'\"\+!?:;-]+)"+focuskw+"($\|[ \n\r\t.,'\"\+!?:;-]+)",'gim');
 	var p2 = new RegExp(focuskw.replace(/\s+/g,"[-_\\\//]"),'gim');
 	if (focuskw != '') {
 		var html = '<p>Your focus keyword was found in:<br/>';
@@ -201,8 +199,12 @@ jQuery(document).ready(function(){
 	jQuery('#related_keywords_heading').hide();
 	
 	var cache = {}, lastXhr;
+		
 	jQuery('#yoast_wpseo_focuskw').autocomplete({
 		minLength: 3,
+		formatResult: function(row) {
+			return jQuery('<div/>').html(row).html();
+		},
 		source: function( request, response ) {
 			var term = request.term;
 			if ( term in cache ) {
