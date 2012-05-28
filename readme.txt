@@ -156,7 +156,8 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Loads of Regex Fu to improve keyword bolding.
 	* Activation and deactivation handlers properly specified.
 	* WP Super Cache now properly emptied on update of settings.
-	* Fixes to OpenGraph images.
+	* Fixes to OpenGraph images for homepage.
+	* Fixed a notice in OpenGraph class on 404 pages.
 * Enhancements:
 	* Upon activation, XML sitemaps are automatically enabled.
 	* Upon activation, title templates are pre-filled with sensible defaults.

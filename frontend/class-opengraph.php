@@ -137,7 +137,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 				$title = get_query_var('year').' '.__('Archives','wordpress-seo'); 
 		} else if ( is_404() ) {
 		 	if ( isset($this->options['title-404']) && !empty($this->options['title-404']) )
-				$title = wpseo_replace_vars($this->options['title-404'], array('post_title' => $title) );
+				$title = wpseo_replace_vars($this->options['title-404'], array('post_title' => '') );
 			else
 				$title = __('Page not found','wordpress-seo');
 		} 

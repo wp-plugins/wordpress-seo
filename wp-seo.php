@@ -25,8 +25,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-define( 'WPSEO_URL', plugin_dir_url(__FILE__) );
-define( 'WPSEO_PATH', plugin_dir_path(__FILE__) );
+define( 'WPSEO_URL', plugin_dir_url( __FILE__ ) );
+define( 'WPSEO_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
 
 load_plugin_textdomain( 'wordpress-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
