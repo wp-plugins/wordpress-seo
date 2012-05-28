@@ -351,6 +351,8 @@ class WPSEO_Sitemaps {
 					$content .= '<p>' . get_the_post_thumbnail( $p->ID, 'full' ) . '</p>';
 				}
 				
+				$host = str_replace( 'www.', '', parse_url( get_bloginfo('url'), PHP_URL_HOST ) );
+				
 				if ( preg_match_all( '/<img [^>]+>/', $content, $matches ) ) {
 					foreach ( $matches[0] as $img ) {
 						if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
@@ -361,12 +363,17 @@ class WPSEO_Sitemaps {
 								$src = get_bloginfo('url') . $src;
 							}
 
+							if ( strpos( $src, $host ) === false )
+								continue;
+
 							if ( $src != esc_url( $src ) )
 								continue;
 
 							if ( isset( $url['images'][$src] ) )
 								continue;
-
+							
+							$src = apply_filters( 'wpseo_xml_sitemap_img_src', $src );
+							
 							$image = array();
 							if ( preg_match( '/title=("|\')([^"\']+)("|\')/', $img, $match ) )
 								$image['title'] = str_replace( array('-','_'), ' ', $match[2] );
