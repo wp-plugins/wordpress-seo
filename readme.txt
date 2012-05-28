@@ -136,6 +136,8 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 = 1.2 (development version) =
 
+Major improvements: all sorts of fixes to suggest and keyword check functionality which now should allow for non-ascii stuff, like Greek, Arabic, but even "weird" chars in western-European languages.
+
 * Bugs fixed:
 	* ereg_replace != preg_replace ; in other words: alt and title tags for images in xml sitemap fixed.
 	* Image size for OpenGraph now defaults to medium for thumbnail image.
@@ -147,7 +149,11 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Fixed several bugs around page numbers in titles and descriptions.
 	* Prevented an error in the opendir functionality for WP SEO modules.
 	* Allow ';' in focus keyword.
-	* All sorts of fixes to suggest and keyword check functionality which now should allow for non ascii characters.
+	* Don't double encode characters in suggest functionality.
+	* Don't remove non-alphanumeric values for keyword checks.
+	* Fixed a bug in snippet preview occurring when content was shorter than max snippet length.
+	* Fixed keyword count in content for cases where keyword was surrounded by parentheses and some other characters.
+	* Loads of Regex Fu to improve keyword bolding.
 * Enhancements:
 	* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
 	* Added a filter for the meta keywords, `wpseo_metakey`.

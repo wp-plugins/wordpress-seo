@@ -6,6 +6,7 @@ function yst_clean( str ) {
 		str = str.replace(/<\/?[^>]+>/gi, ''); 
 		str = str.replace(/\[(.+?)\](.+?\[\/\\1\])?/, '');
 	} catch(e) {}
+	
 	return str;
 }
 
@@ -26,9 +27,9 @@ function testFocusKw() {
 	
 	var postname = jQuery('#editable-post-name-full').text();
 	var url	= wpseo_permalink_template.replace('%postname%', postname).replace('http://','');
-
-	var p = new RegExp("(^\|[ \n\r\t.,'\"\+!?:;-]+)"+focuskw+"($\|[ \n\r\t.,'\"\+!?:;-]+)",'gim');
-	var p2 = new RegExp(focuskw.replace(/\s+/g,"[-_\\\//]"),'gim');
+	
+	p = new RegExp("(^|[ \s\n\r\t\.,'\(\"\+;!?:\-])"+focuskw+"($|[ \s\n\r\t.,'\)\"\+!?:;\-])",'gim');
+	p2 = new RegExp(focuskw.replace(/\s+/g,"[-_\\\//]"),'gim');
 	if (focuskw != '') {
 		var html = '<p>Your focus keyword was found in:<br/>';
 		html += 'Article Heading: ' + ptest( jQuery('#title').val(), p ) + '<br/>';
@@ -47,8 +48,11 @@ function updateTitle( force ) {
 	} else {
 		var title = wpseo_title_template.replace('%%title%%', jQuery('#title').val() );
 	}
-	if ( title == '' )
+	if ( title == '' ) {
+		jQuery('#wpseosnippet .title').html( '' );
+		jQuery('#yoast_wpseo_title-length').html( '' );
 		return;
+	}
 
 	title = jQuery('<div />').html(title).text();
 
@@ -92,10 +96,11 @@ function updateDesc( desc ) {
 		if ( desc == '' ) {
 			desc = jQuery("#content").val();
 			desc = yst_clean( desc );
+			
 			var focuskw = jQuery.trim( jQuery('#yoast_wpseo_focuskw').val() );
 			if ( focuskw != '' ) {
 				var descsearch = new RegExp( focuskw, 'gim');
-				if ( desc.search(descsearch) != -1 ) {
+				if ( desc.search(descsearch) != -1 && desc.length > wpseo_meta_desc_length ) {
 					desc = desc.substr( desc.search(descsearch), wpseo_meta_desc_length );
 				} else {
 					desc = desc.substr( 0, wpseo_meta_desc_length );
@@ -119,7 +124,10 @@ function updateDesc( desc ) {
 		len = '<span class="good">'+len+'</span>';
 
 	if ( autogen || desc.length > wpseo_meta_desc_length ) {
-		var space = desc.lastIndexOf( " ", ( wpseo_meta_desc_length - 3 ) );
+		if ( desc.length > wpseo_meta_desc_length )
+			var space = desc.lastIndexOf( " ", ( wpseo_meta_desc_length - 3 ) );
+		else
+			var space = wpseo_meta_desc_length;
 		desc = desc.substring( 0, space ).concat( ' <strong>...</strong>' );
 	}
 
@@ -156,7 +164,7 @@ function boldKeywords( str, url ) {
 			var kw 	= kw.replace(' ','-').toLowerCase();
 			kwregex = new RegExp( "([-/])("+kw+")([-/])?" );
 		} else {
-			kwregex = new RegExp( "(^\|[ \n\r\t.,'\"\+!?:-]+)("+kw+")($\|[ \n\r\t.,'\"\+!?:-]+)", 'gim' );
+			kwregex = new RegExp( "(^|[ \s\n\r\t\.,'\(\"\+;!?:\-]+)("+kw+")($|[\s\n\r\t.,'\)\"\+;!?:\-]+)", 'gim' );
 		}
 		str 	= str.replace( kwregex, "$1<strong>$2</strong>$3" );
 	}
