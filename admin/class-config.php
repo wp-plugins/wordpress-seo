@@ -37,7 +37,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_action( 'edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
 
 			if ( '0' == get_option('blog_public') )
-				add_action('admin_footer', array(&$this,'blog_public_warning'));
+				add_action('admin_footer', array(&$this,'blog_public_warning'));				
 		}
 
 		function options_init() {
@@ -117,7 +117,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 					if ( function_exists('w3tc_pgcache_flush') ) {
 						w3tc_pgcache_flush();
 						$msg .= __(' &amp; W3 Total Cache Page Cache flushed', 'wordpress-seo' );
-					} else if (function_exists('wp_cache_clear_cache() ')) {
+					} else if (function_exists('wp_cache_clear_cache')) {
 						wp_cache_clear_cache();
 						$msg .= __(' &amp; WP Super Cache flushed', 'wordpress-seo' );
 					}

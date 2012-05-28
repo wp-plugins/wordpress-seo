@@ -37,19 +37,130 @@ function wpseo_get_country_arr(){
 }
 
 function wpseo_flush_rules() {
-	global $wpseo_rewrite;
-	$wpseo_rewrite->flush_rules();
+	global $wp_rewrite;
+	$wp_rewrite->flush_rules();
+}
+
+function wpseo_activate() {
+	
+	// Enable XML sitemaps by default
+	if ( get_option('wpseo_xml') == false ) {
+		$xml_opt = array (
+			'enablexmlsitemap' => 'on',
+		);
+		update_option( 'wpseo_xml', $xml_opt );
+	} 
+	
+	if ( get_option('wpseo_titles') == false ) {
+		$title_settings = array (
+		  'title-post' => '%%title%% - %%sitename%%',
+		  'title-page' => '%%title%% - %%sitename%%',
+		  'title-attachment' => '%%title%% - %%sitename%%',
+		  'title-category' => '%%term_title%% '.__('Archives','wordpress-seo').' - %%page%% %%sitename%%',
+		  'title-post_tag' => '%%term_title%% '.__('Archives','wordpress-seo').' - %%page%% %%sitename%%',
+		  'title-author' => '%%name%% - '.__('Author at','wordpress-seo').' %%sitename%%',
+		  'title-archive' => '%%date%% - %%sitename%%',
+		  'title-search' => __('You searched for', 'wordpress-seo').' %%searchphrase%% - %%sitename%%',
+		  'title-404' => __('Page Not Found', 'wordpress-seo').' - %%sitename%%',
+		);
+		update_option( 'wpseo_titles', $title_settings );
+	}
+	wpseo_flush_rules();
+		
+	// Force WooThemes to use WordPress SEO data.
+	if ( function_exists( 'woo_version_init' ) ) {
+		update_option( 'seo_woo_use_third_party_data', 'true' );
+	}
+
+	// Clear cache so the changes are obvious.
+	if ( function_exists('w3tc_pgcache_flush') ) {
+		w3tc_pgcache_flush();
+	} else if (function_exists('wp_cache_clear_cache')) {
+		wp_cache_clear_cache();
+	}
 }
 
 function wpseo_deactivate() {
 	wpseo_flush_rules();
-}
-register_deactivation_hook(__FILE__,'wpseo_deactivate');
 
-function wpseo_activate() {
-	wpseo_flush_rules();
+	// Clear cache so the changes are obvious.
+	if ( function_exists('w3tc_pgcache_flush') ) {
+		w3tc_pgcache_flush();
+	} else if (function_exists('wp_cache_clear_cache')) {
+		wp_cache_clear_cache();
+	}
 }
-register_activation_hook( __FILE__, 'wpseo_activate' );
+
+function wpseo_maybe_upgrade() {
+	$options = get_option( 'wpseo' );
+	$current_version = isset($options['version']) ? $options['version'] : 0;
+
+	if ( version_compare( $current_version, WPSEO_VERSION, '==' ) )
+		return;
+
+	// <= 0.3.5: flush rewrite rules for new XML sitemaps
+	if ( $current_version == 0 ) {
+		flush_rewrite_rules();
+	}
+
+	if ( version_compare( $current_version, '0.4.2', '<' ) ) {
+		$xml_opt = array();
+		// Move XML Sitemap settings from general array to XML specific array, general settings first
+		foreach ( array('enablexmlsitemap', 'xml_include_images', 'xml_ping_google', 'xml_ping_bing', 'xml_ping_yahoo', 'xml_ping_ask', 'xmlnews_posttypes') as $opt ) {
+			if ( isset( $options[$opt] ) ) {
+				$xml_opt[$opt] = $options[$opt];
+				unset( $options[$opt] );
+			}
+		}
+		// Per post type settings
+		foreach ( get_post_types() as $post_type ) {
+			if ( in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) 
+				continue;
+
+			if ( isset( $options['post_types-'.$post_type.'-not_in_sitemap'] ) ) {
+				$xml_opt['post_types-'.$post_type.'-not_in_sitemap'] = $options['post_types-'.$post_type.'-not_in_sitemap'];
+				unset( $options['post_types-'.$post_type.'-not_in_sitemap'] );
+			}
+		}
+		// Per taxonomy settings
+		foreach ( get_taxonomies() as $taxonomy ) {
+			if ( in_array( $taxonomy, array('nav_menu','link_category','post_format') ) )
+				continue;
+
+			if ( isset( $options['taxonomies-'.$taxonomy.'-not_in_sitemap'] ) ) {
+				$xml_opt['taxonomies-'.$taxonomy.'-not_in_sitemap'] = $options['taxonomies-'.$taxonomy.'-not_in_sitemap'];
+				unset( $options['taxonomies-'.$taxonomy.'-not_in_sitemap'] );
+			}
+		}
+		if ( get_option('wpseo_xml') === false )
+			update_option( 'wpseo_xml', $xml_opt );
+		unset( $xml_opt );
+
+		// Clean up other no longer used settings
+		unset( $options['wpseodir'], $options['wpseourl'] );
+	}
+
+	if ( version_compare( $current_version, '1.0.2.2', '<' ) ) {
+		$opt = (array) get_option( 'wpseo_indexation' );		
+		unset( $opt['hideindexrel'], $opt['hidestartrel'], $opt['hideprevnextpostlink'], $opt['hidewpgenerator'] );
+		update_option( 'wpseo_indexation', $opt );
+	}
+
+	if ( version_compare( $current_version, '1.0.4', '<' ) ) {
+		$opt = (array) get_option( 'wpseo_indexation' );
+		$newopt = array(
+			'opengraph' => isset( $opt['opengraph'] ) ? $opt['opengraph'] : '',
+			'fb_adminid' => isset( $opt['fb_adminid'] ) ? $opt['fb_adminid'] : '',
+			'fb_appid' => isset( $opt['fb_appid'] ) ? $opt['fb_appid'] : '',
+		);
+		update_option('wpseo_social', $newopt);
+		unset($opt['opengraph'], $opt['fb_pageid'], $opt['fb_adminid'], $opt['fb_appid']);
+		update_option('wpseo_indexation', $opt);
+	}
+	
+	$options['version'] = WPSEO_VERSION;
+	update_option( 'wpseo', $options );
+}
 
 function wpseo_export_settings( $include_taxonomy ) {
     $content = "; ".__( "This is a settings export file for the WordPress SEO plugin by Yoast.com", 'wordpress-seo' )." - http://yoast.com/wordpress/seo/ \r\n"; 

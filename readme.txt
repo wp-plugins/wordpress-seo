@@ -154,12 +154,19 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Fixed a bug in snippet preview occurring when content was shorter than max snippet length.
 	* Fixed keyword count in content for cases where keyword was surrounded by parentheses and some other characters.
 	* Loads of Regex Fu to improve keyword bolding.
+	* Activation and deactivation handlers properly specified.
+	* WP Super Cache now properly emptied on update of settings.
 * Enhancements:
+	* Upon activation, XML sitemaps are automatically enabled.
+	* Upon activation, title templates are pre-filled with sensible defaults.
+	* On activation, W3 Total Cache or WP Super Cache cache gets cleared automatically.
+	* Added an uninstall handler, deleting the plugin through the WP backend will now delete options from the DB too.
 	* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
 	* Added a filter for the meta keywords, `wpseo_metakey`.
 	* Added the option to display custom taxonomy in titles and descriptions, use `%%ct_<custom-taxname>%%` for a comma separated list or `%%ct_<custom-taxname>%%single%%` for only one taxonomy term.
 	* Allow for 'Page x of x' to be localized too.
 	* Force the query for the current page to be used instead of the query that a bad plugin or even theme was using by calling `wp_reset_query` before the header functionality.
+	* If you're a Woothemes user and you activate WordPress SEO, the "use 3rd party plugins data" checkbox will be checked on upon activation.
 
 = 1.1.9 =
 

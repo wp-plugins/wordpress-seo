@@ -12,6 +12,7 @@ class WPSEO_Frontend {
 		add_filter( 'wp_title', array( &$this, 'title' ), 10, 3 );
 		add_filter( 'thematic_doctitle', array( &$this, 'force_wp_title' ) );
 		add_filter( 'headway_title', array( &$this, 'force_wp_title' ) );
+		add_filter( 'woo_title', array( &$this, 'force_wp_title' ) );
 		
 		add_action( 'wp',array( &$this, 'page_redirect' ), 99, 1 );
 
