@@ -59,7 +59,7 @@ function wpseo_get_suggest() {
 	$return_arr = array();
 
 	foreach ( $matches[1] as $match ) {
-		$return_arr[] = preg_replace_callback("/(&#[a-zA-Z0-9]+;)/", function($m) { return html_entity_decode($m[1], ENT_COMPAT, "UTF-8"); }, $match ); 	
+		$return_arr[] = html_entity_decode( $match, ENT_COMPAT, "UTF-8" );
 	}
 	echo json_encode( $return_arr );
 	die(); 
