@@ -115,14 +115,10 @@ class WPSEO_Frontend {
 			if ( $fixed_title ) { 
 				$title = wpseo_replace_vars( $fixed_title, (array) $blogpage ); 
 			} else {
-				if (isset($options['title-'.$blogpage->post_type]) && !empty($options['title-'.$blogpage->post_type]) )
+				if ( isset($options['title-'.$blogpage->post_type]) && !empty($options['title-'.$blogpage->post_type]) )
 					$title = wpseo_replace_vars($options['title-'.$blogpage->post_type], (array) $blogpage );
-				else {
-					$title = get_bloginfo( 'name' );
-					if ( $wp_query->query_vars['paged'] )
-						$title .= $sep.$wp_query->query_vars['paged'].'/'.$wp_query->max_num_pages;
-					$title .= $sep.get_bloginfo( 'description' );
-				}
+				else
+					$title = wpseo_replace_vars( '%%title%% %%page%% - %%sitename%%', (array) $blogpage );
 			}
 		} else if ( is_singular() ) {
 			global $post;

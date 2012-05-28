@@ -137,7 +137,7 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
 		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
 		'%%searchphrase%%'			=> esc_html(get_query_var('s')),
-		'%%page%%'		 			=> sprintf( __('Page %d of %d','wordpress-seo'), $pagenum, $max_num_pages), 
+		'%%page%%'		 			=> ( $max_num_pages > 1) ? sprintf( __('Page %d of %d','wordpress-seo'), $pagenum, $max_num_pages) : '', 
 		'%%pagetotal%%'	 			=> $max_num_pages, 
 		'%%pagenumber%%' 			=> $pagenum,
 		'%%caption%%'				=> $r->post_excerpt,
@@ -294,3 +294,74 @@ function wpseo_remove_stopwords_from_slug( $slug ) {
 	return $clean_slug;
 }
 add_filter( 'name_save_pre', 'wpseo_remove_stopwords_from_slug', 0 );
+
+function wpseo_maybe_upgrade() {
+	$options = get_option( 'wpseo' );
+	$current_version = isset($options['version']) ? $options['version'] : 0;
+
+	if ( version_compare( $current_version, WPSEO_VERSION, '==' ) )
+		return;
+
+	// <= 0.3.5: flush rewrite rules for new XML sitemaps
+	if ( $current_version == 0 ) {
+		flush_rewrite_rules();
+	}
+
+	if ( version_compare( $current_version, '0.4.2', '<' ) ) {
+		$xml_opt = array();
+		// Move XML Sitemap settings from general array to XML specific array, general settings first
+		foreach ( array('enablexmlsitemap', 'xml_include_images', 'xml_ping_google', 'xml_ping_bing', 'xml_ping_yahoo', 'xml_ping_ask', 'xmlnews_posttypes') as $opt ) {
+			if ( isset( $options[$opt] ) ) {
+				$xml_opt[$opt] = $options[$opt];
+				unset( $options[$opt] );
+			}
+		}
+		// Per post type settings
+		foreach ( get_post_types() as $post_type ) {
+			if ( in_array( $post_type, array('revision','nav_menu_item','attachment') ) ) 
+				continue;
+
+			if ( isset( $options['post_types-'.$post_type.'-not_in_sitemap'] ) ) {
+				$xml_opt['post_types-'.$post_type.'-not_in_sitemap'] = $options['post_types-'.$post_type.'-not_in_sitemap'];
+				unset( $options['post_types-'.$post_type.'-not_in_sitemap'] );
+			}
+		}
+		// Per taxonomy settings
+		foreach ( get_taxonomies() as $taxonomy ) {
+			if ( in_array( $taxonomy, array('nav_menu','link_category','post_format') ) )
+				continue;
+
+			if ( isset( $options['taxonomies-'.$taxonomy.'-not_in_sitemap'] ) ) {
+				$xml_opt['taxonomies-'.$taxonomy.'-not_in_sitemap'] = $options['taxonomies-'.$taxonomy.'-not_in_sitemap'];
+				unset( $options['taxonomies-'.$taxonomy.'-not_in_sitemap'] );
+			}
+		}
+		if ( get_option('wpseo_xml') === false )
+			update_option( 'wpseo_xml', $xml_opt );
+		unset( $xml_opt );
+
+		// Clean up other no longer used settings
+		unset( $options['wpseodir'], $options['wpseourl'] );
+	}
+
+	if ( version_compare( $current_version, '1.0.2.2', '<' ) ) {
+		$opt = (array) get_option( 'wpseo_indexation' );		
+		unset( $opt['hideindexrel'], $opt['hidestartrel'], $opt['hideprevnextpostlink'], $opt['hidewpgenerator'] );
+		update_option( 'wpseo_indexation', $opt );
+	}
+
+	if ( version_compare( $current_version, '1.0.4', '<' ) ) {
+		$opt = (array) get_option( 'wpseo_indexation' );
+		$newopt = array(
+			'opengraph' => isset( $opt['opengraph'] ) ? $opt['opengraph'] : '',
+			'fb_adminid' => isset( $opt['fb_adminid'] ) ? $opt['fb_adminid'] : '',
+			'fb_appid' => isset( $opt['fb_appid'] ) ? $opt['fb_appid'] : '',
+		);
+		update_option('wpseo_social', $newopt);
+		unset($opt['opengraph'], $opt['fb_pageid'], $opt['fb_adminid'], $opt['fb_appid']);
+		update_option('wpseo_indexation', $opt);
+	}
+	
+	$options['version'] = WPSEO_VERSION;
+	update_option( 'wpseo', $options );
+}

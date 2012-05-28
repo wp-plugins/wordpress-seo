@@ -156,6 +156,7 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Loads of Regex Fu to improve keyword bolding.
 	* Activation and deactivation handlers properly specified.
 	* WP Super Cache now properly emptied on update of settings.
+	* Fixes to OpenGraph images.
 * Enhancements:
 	* Upon activation, XML sitemaps are automatically enabled.
 	* Upon activation, title templates are pre-filled with sensible defaults.
@@ -167,6 +168,7 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Allow for 'Page x of x' to be localized too.
 	* Force the query for the current page to be used instead of the query that a bad plugin or even theme was using by calling `wp_reset_query` before the header functionality.
 	* If you're a Woothemes user and you activate WordPress SEO, the "use 3rd party plugins data" checkbox will be checked on upon activation.
+	* Non front page blog pages now have a title template: `%%title%% %%page%% - %%sitename%%` if they don't have a specific SEO title and there is no page template.
 
 = 1.1.9 =
 

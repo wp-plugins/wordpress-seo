@@ -188,9 +188,20 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		
 	public function image( $image = '' ) {
 		if ( is_singular() ) {
-			global $post;
-			
 			$shown_images = array();
+
+			if ( is_front_page() ) {
+				if ( is_front_page() ) {
+					if ( isset( $this->options['og_frontpage_image'] ) )
+						$og_image = $this->options['og_frontpage_image'];
+						
+					$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
+
+					if ( isset( $og_image ) && $og_image != '' ) 
+						echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
+				}				
+			} 
+			global $post;
 			
 			if ( function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
 				$featured_img = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'medium' ) );
