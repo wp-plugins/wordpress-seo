@@ -35,7 +35,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	
 	public function id() {
 		if ( isset( $this->options['fbadminapp'] ) && 0 != $this->options['fbadminapp'] ) {
-			echo "<meta property='fb:app_id' content='".esc_attr( $this->options['fbadminapp'] )."' />\n";
+			echo "<meta property='fb:app_id' content='".esc_attr( $this->options['fbadminapp'] )."'/>\n";
 		} else if ( isset( $this->options['fb_admins'] ) && is_array( $this->options['fb_admins'] ) && ( count( $this->options['fb_admins'] ) > 0 )  ) {
 			foreach ( $this->options['fb_admins'] as $admin_id => $admin ) {
 				if ( isset($adminstr) )

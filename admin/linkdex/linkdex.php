@@ -11,8 +11,12 @@ class Linkdex {
 		
 		$options = get_wpseo_options();
 
-		if ( is_int( $post ) )
-			$post = get_post( $post );
+		if ( isset( $_GET['post'] ) ) {
+			$post_id = (int) $_GET['post'];
+			$post = get_post( $post_id );
+		} else if ( is_int( $post->ID ) ) {
+			$post = get_post( $post->ID );
+		}
 		if ( !$post )
 			return; 
 

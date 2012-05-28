@@ -1139,6 +1139,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				
 				foreach($options['fbapps'] as $id => $app) {
 					$sel = '';
+
+					if ( !isset($options['fbadminapp']) )
+						$options['fbadminapp'] = 0;
+
 					if ( $id == $options['fbadminapp'] )
 						$sel = 'selected="selected"';
 					$fbconnect .= '<option '.$sel.' value="'.$id.'">'.$app.'</option>';

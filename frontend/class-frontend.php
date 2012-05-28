@@ -438,10 +438,10 @@ class WPSEO_Frontend {
 					$paged = 1;
 
 				if ( $paged > 1 ) 
-					$this->get_adjacent_rel_link( "prev", $url, $paged-1, true );
+					$this->adjacent_rel_link( "prev", $url, $paged-1, true );
 
 				if ( $paged < $wp_query->max_num_pages )
-					$this->get_adjacent_rel_link( "next", $url, $paged+1, true );
+					$this->adjacent_rel_link( "next", $url, $paged+1, true );
 			}
 		} else {
 			$numpages = substr_count( $wp_query->post->post_content, '<!--nextpage-->' ) + 1;
@@ -459,9 +459,9 @@ class WPSEO_Frontend {
 					$usebase = false;
 
 				if ( $page > 1 )
-					$this->get_adjacent_rel_link( "prev", $url, $page-1, $usebase, 'single_paged' );
+					$this->adjacent_rel_link( "prev", $url, $page-1, $usebase, 'single_paged' );
 				if ( $page < $numpages )
-					$this->get_adjacent_rel_link( "next", $url, $page+1, $usebase, 'single_paged' );
+					$this->adjacent_rel_link( "next", $url, $page+1, $usebase, 'single_paged' );
 			}
 		}
 	}
@@ -477,7 +477,7 @@ class WPSEO_Frontend {
 	 *
 	 * @since 1.0.2
 	 */
-	function get_adjacent_rel_link( $rel, $url, $page, $incl_pagination_base ) {
+	function adjacent_rel_link( $rel, $url, $page, $incl_pagination_base ) {
 		global $wp_rewrite;
 		if ( !$wp_rewrite->using_permalinks() ) {
 			if ( $page > 1 )
@@ -490,8 +490,10 @@ class WPSEO_Frontend {
 				$url = user_trailingslashit( trailingslashit( $url ) . $base . $page );
 			}
 		}
-		$link = "<link rel=\"$rel\" href=\"$url\" />\n";
-		echo apply_filters( $rel."_rel_link", $link );	
+		$link = apply_filters( "wpseo_".$rel."_rel_link", "<link rel=\"$rel\" href=\"$url\" />\n" );
+
+		if ( $link )
+			echo $link;	
 	}
 	
 	function metakeywords() {
