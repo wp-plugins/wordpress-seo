@@ -27,6 +27,7 @@ class WPSEO_Sitemaps {
 		add_action( 'transition_post_status', array( $this, 'status_transition' ), 10, 3 );
 		add_action( 'admin_init', array( $this, 'delete_sitemaps' ) );
 		add_action( 'wpseo_hit_sitemap_index', array( $this, 'hit_sitemap_index' ) );
+		add_action( 'wpseo_ping_search_engines', array( $this, 'ping_search_engines' ) );
 
 		// default stylesheet
 		$this->stylesheet = '<?xml-stylesheet type="text/xsl" href="'.WPSEO_FRONT_URL.'css/xml-sitemap-xsl.php"?>';
@@ -546,7 +547,7 @@ class WPSEO_Sitemaps {
 	 * Notify search engines of the updated sitemap.
 	 */
 	function ping_search_engines() {
-		$options = get_wpseo_options();
+		$options = get_option('wpseo_xml');
 		$base = $GLOBALS['wp_rewrite']->using_index_permalinks() ? 'index.php/' : '';
 		$sitemapurl = urlencode( home_url( $base . 'sitemap_index.xml' ) );
 
@@ -581,8 +582,9 @@ class WPSEO_Sitemaps {
 		if ( WP_CACHE )
 			wp_schedule_single_event( time(), 'wpseo_hit_sitemap_index' );
 
+		// Allow the pinging to happen slightly after the hit sitemap index so the sitemap is fully regenerated when the ping happens.
 		if ( wpseo_get_value( 'sitemap-include', $post->ID ) != 'never' )
-			$this->ping_search_engines();
+			wp_schedule_single_event( ( time() + 10 ), 'wpseo_ping_search_engines' );
 	}
 
 	/**

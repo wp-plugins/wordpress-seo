@@ -170,6 +170,7 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Force the query for the current page to be used instead of the query that a bad plugin or even theme was using by calling `wp_reset_query` before the header functionality.
 	* If you're a Woothemes user and you activate WordPress SEO, the "use 3rd party plugins data" checkbox will be checked on upon activation.
 	* Non front page blog pages now have a title template: `%%title%% %%page%% - %%sitename%%` if they don't have a specific SEO title and there is no page template.
+	* Pinging search engines on post of new content now moved to cron to prevent lag.
 * API Improvements:
 	* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
 	* Added a filter for the meta keywords, `wpseo_metakey`.

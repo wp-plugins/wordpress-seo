@@ -37,7 +37,13 @@ class WPSEO_Metabox {
 	}
 	
 	public function script() {
-		global $post;
+		if ( isset( $_GET['post'] ) ) {
+			$post_id = (int) $_GET['post'];
+			$post = get_post( $post_id );
+		} else {
+			global $post;
+		}
+
 		if ( !isset($post) )
 			return;
 			
@@ -266,7 +272,12 @@ class WPSEO_Metabox {
 	}
 
 	function meta_box() {
-		global $post;
+		if ( isset( $_GET['post'] ) ) {
+			$post_id = (int) $_GET['post'];
+			$post = get_post( $post_id );
+		} else {
+			global $post;
+		}
 
 		$options = get_wpseo_options();
 		
@@ -305,7 +316,12 @@ class WPSEO_Metabox {
 	}
 
 	function do_meta_box( $meta_box ) {
-		global $post;
+		if ( isset( $_GET['post'] ) ) {
+			$post_id = (int) $_GET['post'];
+			$post = get_post( $post_id );
+		} else {
+			global $post;
+		}
 
 		$content = '';
 
@@ -413,7 +429,12 @@ class WPSEO_Metabox {
 	}
 	
 	function snippet() {
-		global $post;
+		if ( isset( $_GET['post'] ) ) {
+			$post_id = (int) $_GET['post'];
+			$post = get_post( $post_id );
+		} else {
+			global $post;
+		}
 		
 		$options = get_wpseo_options();
 		
