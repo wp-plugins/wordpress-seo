@@ -217,7 +217,7 @@ class WPSEO_Sitemaps {
 		$output = '';
 
 		$front_id = get_option('page_on_front');
-		if ( ! $front_id && $post_type == 'post' ) {
+		if ( ! $front_id && ( $post_type == 'post' || $post_type == 'page' ) ) {
 			$output .= $this->sitemap_url( array(
 				'loc' => home_url('/'),
 				'pri' => 1,

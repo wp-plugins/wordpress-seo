@@ -172,6 +172,7 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Non front page blog pages now have a title template: `%%title%% %%page%% - %%sitename%%` if they don't have a specific SEO title and there is no page template.
 	* Pinging search engines on post of new content now moved to cron to prevent lag.
 	* Only embed images in the XML sitemap that match the main domain, subdomains should not matter but images from other domains are now ignored.
+	* Fixed a bug where homepage wouldn't be in the XML sitemap when there are no posts, yet the homepage is set to display recent posts.
 * API Improvements:
 	* Added a filter to allow adding URLs to specific XML sitemaps, see [this thread](http://wordpress.org/support/topic/plugin-wordpress-seo-by-yoast-how-to-add-a-non-wordpress-page-to-the-sitemap). The filter is `wpseo_sitemap_<$post_type>_content`.
 	* Added a filter for the meta keywords, `wpseo_metakey`.
