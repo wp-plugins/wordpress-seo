@@ -160,6 +160,14 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		}
 	}
 
+	if ( preg_match_all( '/%%ct_desc_([^%]+)?%%/u', $string, $matches, PREG_SET_ORDER ) ) {
+		global $post;
+		foreach ($matches as $match) {
+			$terms = get_the_terms( $post->ID, $match[1] );
+			$string = str_replace( $match[0], get_term_field( 'description', $terms[0]->term_id, $match[1] ), $string );
+		}
+	}
+
 	if ( preg_match_all( '/%%ct_([^%]+)%%(single%%)?/u', $string, $matches, PREG_SET_ORDER ) ) {
 		global $post;
 		foreach ($matches as $match) {

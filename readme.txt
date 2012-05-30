@@ -160,12 +160,15 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Fixed a notice in OpenGraph class on 404 pages.
 	* Fixed notices in OpenGraph admin when selecting Facebook app as admin.
 	* Fixed a bug where half the Linkdex analyses wouldn't work when the visual editor is disabled.
+	* Changed the mime type of the XSL file for XML sitemaps to text/xml, so Firefox will display them properly.
+	* Made sure the default OpenGraph image will always show up when there's no other image.
 * Enhancements:
 	* Upon activation, XML sitemaps are automatically enabled.
 	* Upon activation, title templates are pre-filled with sensible defaults.
 	* On activation, W3 Total Cache or WP Super Cache cache gets cleared automatically.
 	* Added an uninstall handler, deleting the plugin through the WP backend will now delete options from the DB too.
 	* Added the option to display custom taxonomy in titles and descriptions, use `%%ct_<custom-taxname>%%` for a comma separated list or `%%ct_<custom-taxname>%%single%%` for only one taxonomy term.
+	* Added the option to display custom taxonomy descriptions in post description fields, use `%%ct_desc_<custom-taxname>%%`.
 	* Allow for 'Page x of x' to be localized too.
 	* Force the query for the current page to be used instead of the query that a bad plugin or even theme was using by calling `wp_reset_query` before the header functionality.
 	* If you're a Woothemes user and you activate WordPress SEO, the "use 3rd party plugins data" checkbox will be checked on upon activation.

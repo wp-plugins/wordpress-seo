@@ -245,14 +245,15 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 				if ( isset( $this->options['gp_frontpage_image'] ) )
 					$gp_image = $this->options['gp_frontpage_image'];
 			}
-			if ( ( !isset( $og_image ) || $og_image == '' ) && isset( $this->options['og_default_image'] ) )
-				$og_image = $this->options['og_default_image'];
-		
-			$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
-		
-			if ( isset( $og_image ) && $og_image != '' ) 
-				echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
 		}
+
+		if ( ( !isset( $og_image ) || $og_image == '' ) && isset( $this->options['og_default_image'] ) )
+			$og_image = $this->options['og_default_image'];
+	
+		$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
+	
+		if ( isset( $og_image ) && $og_image != '' ) 
+			echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
 	}
 		
 	public function description() {
