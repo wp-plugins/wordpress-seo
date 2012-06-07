@@ -257,18 +257,23 @@ function wpseo_title_test() {
 	}
 
 	$resp = wp_remote_get( get_bloginfo('url') );
-	preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
-	
-	if ( $matches[1] != $expected_title ) {
-		$options['forcerewritetitle'] = 'on';
-		update_option('wpseo_titles', $options);
-
-		$resp = wp_remote_get( get_bloginfo('url') );
+	if ( $resp ) {
 		preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
-	}
+	
+		if ( $matches[1] != $expected_title ) {
+			$options['forcerewritetitle'] = 'on';
+			update_option('wpseo_titles', $options);
 
-	if ( $matches[1] != $expected_title ) {
-		unset( $options['forcerewritetitle'] ); 
+			$resp = wp_remote_get( get_bloginfo('url') );
+			preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
+		}
+
+		if ( $matches[1] != $expected_title ) {
+			unset( $options['forcerewritetitle'] ); 
+			update_option('wpseo_titles', $options);
+		}
+	} else {
+		$options['forcerewritetitle'] = 'on';
 		update_option('wpseo_titles', $options);
 	}
 }
