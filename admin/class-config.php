@@ -42,7 +42,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 		function options_init() {
 			register_setting( 'yoast_wpseo_options', 'wpseo' );
-			register_setting( 'yoast_wpseo_indexation_options', 'wpseo_indexation' );
 			register_setting( 'yoast_wpseo_permalinks_options', 'wpseo_permalinks' );
 			register_setting( 'yoast_wpseo_titles_options', 'wpseo_titles' );
 			register_setting( 'yoast_wpseo_rss_options', 'wpseo_rss' );
@@ -81,26 +80,23 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		
 		function admin_sidebar() {
 		?>
-			<div class="postbox-container" style="width:20%;">
-				<div class="metabox-holder">	
-					<div class="meta-box-sortables">
+			<div class="postbox-container" style="width:25%;max-width:250px;">
+				<div id="sidebar">	
 						<?php
-							$this->postbox('donate','<strong class="red">'.__( 'Help Spread the Word!', 'wordpress-seo' ).'</strong>','<p><strong>'.__( 'Want to help make this plugin even better? All donations are used to improve this plugin, so donate $20, $50 or $100 now!', 'wordpress-seo' ).'</strong></p><form style="width:160px;margin:0 auto;" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+							$this->postbox('sitereview','<span class="promo">'.__('Improve your Site!','wordpress-seo').'</span>','<p>'.sprintf( __('Don\'t know where to start? Order a %1$swebsite review%2$s from Yoast!','wordpress-seo'), '<a href="http://yoast.com/hire-me/website-review/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=link&utm_campaign=wpseoplugin">', '</a>').'</p>'.'<p><a class="button-primary" href="http://yoast.com/hire-me/website-review/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=button&utm_campaign=wpseoplugin">'.__('Read more &raquo;','wordpress-seo').'</a></p>');
+							$this->plugin_support();
+							$this->postbox('donate','<span class="promo">'.__( 'Spread the Word!', 'wordpress-seo' ).'</span>','<p>'.__( 'Want to help make this plugin even better? All donations are used to improve this plugin, so donate $10, $20 or $50 now!', 'wordpress-seo' ).'</p><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 							<input type="hidden" name="cmd" value="_s-xclick">
 							<input type="hidden" name="hosted_button_id" value="83KQ269Q2SR82">
 							<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit">
-							<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 							</form>'
 							.'<p>'.__('Or you could:','wordpress-seo').'</p>'
 							.'<ul>'
 							.'<li><a href="http://wordpress.org/extend/plugins/wordpress-seo/">'.__('Rate the plugin 5★ on WordPress.org','wordpress-seo').'</a></li>'
 							.'<li><a href="http://yoast.com/wordpress/seo/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=link&utm_campaign=wpseoplugin">'.__('Blog about it & link to the plugin page','wordpress-seo').'</a></li>'
 							.'</ul>');
-							$this->plugin_support();
-							$this->postbox('sitereview','<strong>'.__('Want to Improve your Site?','wordpress-seo').'</strong>','<p>'.sprintf( __('If you want to improve your site, but don\'t know where to start, you should order a %1$swebsite review%2$s from Yoast!','wordpress-seo'), '<a href="http://yoast.com/hire-me/website-review/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=link&utm_campaign=wpseoplugin">', '</a>').'</p>'.'<p>'.__('The results of this review contain a full report of improvements for your site, encompassing my findings for improvements in different key areas such as SEO to Usability to Site Speed & more.','wordpress-seo').'</p>'.'<p><a class="button-secondary" href="http://yoast.com/hire-me/website-review/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=button&utm_campaign=wpseoplugin">'.__('Click here to read more &raquo;','wordpress-seo').'</a></p>');
 							$this->news(); 
 						?>
-					</div>
 					<br/><br/><br/>
 				</div>
 			</div>
@@ -131,7 +127,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				?>
 				<a href="http://yoast.com/"><div id="yoast-icon" style="background: url(<?php echo WPSEO_URL; ?>images/wordpress-SEO-32x32.png) no-repeat;" class="icon32"><br /></div></a>
 				<h2 id="wpseo-title"><?php _e("Yoast WordPress SEO: ", 'wordpress-seo' ); echo $title; ?></h2>
-				<div id="wpseo_content_top" class="postbox-container" style="width:70%;">
+				<div id="wpseo_content_top" class="postbox-container" style="width:75%;">
 					<div class="metabox-holder">	
 						<div class="meta-box-sortables">
 			<?php
@@ -438,94 +434,173 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 
 		function titles_page() {
-			$this->admin_header(__('Titles', 'wordpress-seo' ), false, true, 'yoast_wpseo_titles_options', 'wpseo_titles');
-			$options = get_wpseo_options();
-			$content = '<p>'.__('Be aware that for WordPress SEO to be able to modify your page titles, the title section of your header.php file should look like this:', 'wordpress-seo' ).'</p>';
-			$content .= '<pre>&lt;title&gt;&lt;?php wp_title(&#x27;&#x27;); ?&gt;&lt;/title&gt;</pre>';
-			$content .= '<p>'.__('If you can\'t modify or don\'t know how to modify your template, check the box below. Be aware that changing your template will be faster.', 'wordpress-seo' ).'</p>';
-			$content .= $this->checkbox('forcerewritetitle',__('Force rewrite titles', 'wordpress-seo'));
-			$content .= '<h4 class="big">'.__('Singular pages', 'wordpress-seo' ).'</h4>';
-			$content .= '<p>'.__("For some pages, like the homepage, you'll want to set a fixed title in some occasions. For others, you can define a template here.", 'wordpress-seo' ).'</p>';
-			if ( 'page' != get_option('show_on_front') ) {
-				$content .= '<h4>'.__('Homepage', 'wordpress-seo' ).'</h4>';
-				$content .= $this->textinput('title-home',__('Title template', 'wordpress-seo' ));
-				$content .= $this->textarea('metadesc-home',__('Meta description template', 'wordpress-seo' ), '', 'metadesc');
-				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-home',__('Meta keywords template', 'wordpress-seo' ));
-			} else {
-				$content .= '<h4>'.__('Homepage &amp; Front page', 'wordpress-seo' ).'</h4>';
-				$content .= '<p>'.sprintf( __('You can determine the title and description for the front page by %sediting the front page itself &raquo;%s', 'wordpress-seo' ), '<a href="'.get_edit_post_link( get_option('page_on_front') ).'">', '</a>').'.</p>';
-				if ( is_numeric( get_option('page_for_posts') ) )
-				$content .= '<p>' . sprintf( __('You can determine the title and description for the blog page by %sediting the blog page itself &raquo;%s', 'wordpress-seo' ), '<a href="'.get_edit_post_link( get_option('page_for_posts') ).'">', '</a>' ) . '</p>';
-			}
-			foreach (get_post_types() as $posttype) {
-				if ( in_array($posttype, array('revision','nav_menu_item') ) )
-					continue;
-				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
-					continue;
-				$content .= '<h4 id="'.$posttype.'">'.ucfirst($posttype).'</h4>';
-				$content .= $this->textinput('title-'.$posttype,__('Title template', 'wordpress-seo' ));
-				$content .= $this->textarea('metadesc-'.$posttype,__('Meta description template', 'wordpress-seo' ), '', 'metadesc');
-				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$posttype,__('Meta keywords template', 'wordpress-seo' ));
-				$content .= '<br/>';
-			}
-			$content .= '<br/>';
-			$content .= '<h4 class="big">'.__('Taxonomies', 'wordpress-seo' ).'</h4>';
-			foreach (get_taxonomies() as $taxonomy) {
-				if ( in_array($taxonomy, array('link_category','nav_menu','post_format') ) )
-					continue;				
-				$content .= '<h4>'.ucfirst($taxonomy).'</h4>';
-				$content .= $this->textinput('title-'.$taxonomy,__('Title template', 'wordpress-seo' ));
-				$content .= $this->textarea('metadesc-'.$taxonomy,__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
-				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					$content .= $this->textinput('metakey-'.$taxonomy,__('Meta keywords template', 'wordpress-seo' ));
-				$content .= '<br/>';				
-			}
-			$content .= '<br/>';
-			$content .= '<h4 class="big">'.__('Special pages', 'wordpress-seo' ).'</h4>';
-			$content .= '<h4>'.__('Author Archives', 'wordpress-seo').'</h4>';
-			$content .= $this->textinput('title-author',__('Title template', 'wordpress-seo' ));
-			$content .= $this->textarea('metadesc-author',__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
-			if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-				$content .= $this->textinput('metakey-author',__('Meta keywords template', 'wordpress-seo' ));
-			$content .= '<br/>';
-			$content .= '<h4>'.__('Date Archives', 'wordpress-seo' ).'</h4>';
-			$content .= $this->textinput('title-archive',__('Title template', 'wordpress-seo' ));
-			$content .= $this->textarea('metadesc-archive',__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
-			$content .= '<br/>';
-			$content .= '<h4>'.__('Search pages', 'wordpress-seo' ).'</h4>';
-			$content .= $this->textinput('title-search',__('Title template', 'wordpress-seo') );
-			$content .= '<h4>'.__('404 pages', 'wordpress-seo' ).'</h4>';
-			$content .= $this->textinput('title-404',__('Title template', 'wordpress-seo' ) );
-			$content .= '<br class="clear"/>';
 			
-			$i = 1;
-			foreach ( get_post_types() as $post_type ) {
-				if ( in_array($post_type, array('post','page','attachment','revision','nav_menu_item') ) )
-					continue;
-				$pt = get_post_type_object($post_type);
-				if ( !$pt->has_archive )
-					continue;
+			$options = get_option('wpseo_titles');
+			
+			?>
+			<div class="wrap">
+				<?php 
+				if ( (isset($_GET['updated']) && $_GET['updated'] == 'true') || (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true') ) {
+					$msg = __('Settings updated', 'wordpress-seo' );
 
-				if ( $i == 1 ) {
-					$content .= '<h4 class="big">'.__('Custom Post Type Archives', 'wordpress-seo' ).'</h4>';
-					$content .= '<p>'.__('Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.', 'wordpress-seo' ).'</p>';
+					if ( function_exists('w3tc_pgcache_flush') ) {
+						w3tc_pgcache_flush();
+						$msg .= __(' &amp; W3 Total Cache Page Cache flushed', 'wordpress-seo' );
+					} else if (function_exists('wp_cache_clear_cache')) {
+						wp_cache_clear_cache();
+						$msg .= __(' &amp; WP Super Cache flushed', 'wordpress-seo' );
+					}
+
+					echo '<div id="message" style="width:94%;" class="message updated"><p><strong>'.$msg.'.</strong></p></div>';
 				}
 				
-				$content .= '<h4>'.$pt->labels->name.'</h4>';
-				$content .= $this->textinput( 'title-ptarchive-' . $post_type, __('Title', 'wordpress-seo' ) );
-				$content .= $this->textarea( 'metadesc-ptarchive-' . $post_type, __('Meta description', 'wordpress-seo' ), '', 'metadesc' );
-				if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
-					$content .= $this->textinput( 'bctitle-ptarchive-' . $post_type, __('Breadcrumbs Title', 'wordpress-seo' ) );
-				$i++;
+				?>
+				<a href="http://yoast.com/"><div id="yoast-icon" style="background: url(<?php echo WPSEO_URL; ?>images/wordpress-SEO-32x32.png) no-repeat;" class="icon32"><br /></div></a>
+				<h2 id="wpseo-title"><?php _e("Yoast WordPress SEO: Meta Settings", 'wordpress-seo' ); ?></h2>
+				<div id="wpseo_content_top" class="postbox-container" style="width:75%;">
+					<div class="metabox-holder">	
+						<div class="meta-box-sortables">
+							
+							<h2 class="nav-tab-wrapper" id="wpseo-tabs">
+								<a class="nav-tab" id="general-tab" href="#general-tab">General</a>
+								<a class="nav-tab" id="home-tab" href="#home-tab">Home</a>
+								<a class="nav-tab" id="post_types-tab" href="#post_types-tab">Post Types</a>
+								<a class="nav-tab" id="taxonomies-tab" href="#taxonomies-tab">Taxonomies</a>
+								<a class="nav-tab" id="archives-tab" href="#archives-tab">Other</a>
+								<a class="nav-tab" id="template_help-tab" href="#template_help-tab">Help</a>
+							</h2>
+							
+							<div id="general" class="wpseotab">
+			<?php
+				echo '<form action="'.admin_url('options.php').'" method="post" id="wpseo-conf">';
+				settings_fields('yoast_wpseo_titles_options'); 
+				$this->currentoption = 'wpseo_titles';	
+			
+				echo '<h2>'.__('Title settings','wordpress-seo').'</h2>';
+				echo '<p>'.__('WordPress SEO has auto-detected whether it needs to force rewrite the titles for your pages, if you think it\'s wrong and you know what you\'re doing, you can change the setting here:','wordpress-seo').'</p>';
+				echo $this->checkbox('forcerewritetitle',__('Force rewrite titles', 'wordpress-seo'), false);
+								
+				echo '<h2>'.__('Sitewide meta settings','wordpress-seo').'</h2>';
+				echo '<p>'.__('If you want to prevent /page/2/ and further of any archive to show up in the search results, enable this:').'</p>';
+				echo $this->checkbox('noindex-subpages',__('Noindex subpages of archives', 'wordpress-seo'), false);
+				
+				echo '<p>'.__('I don\'t know why you\'d want to use meta keywords, but if you want to, check this box:').'</p>';
+				echo $this->checkbox('usemetakeywords', __( 'Use <code>meta</code> keywords tag?', 'wordpress-seo' ), false );
+				
+				echo '<p>'.__("You can add all these on a per post / page basis from the edit screen, by clicking on advanced. Should you wish to use any of these sitewide, you can do so here. (This is <em>not</em> recommended.)", 'wordpress-seo' ).'</p>';
+				echo $this->checkbox('noodp',__('Add <code>noodp</code> meta robots tag sitewide', 'wordpress-seo') );
+				echo '<p class="desc">'.__('Prevents search engines from using the DMOZ description for pages from this site in the search results.', 'wordpress-seo').'</p>';
+				echo $this->checkbox('noydir',__('Add <code>noydir</code> meta robots tag sitewide', 'wordpress-seo') );
+				echo '<p class="desc">'.__('Prevents search engines from using the Yahoo! directory description for pages from this site in the search results.', 'wordpress-seo').'</p>';
+			
+				echo '<h2>'.__('Clean up the &lt;head&gt;', 'wordpress-seo' ).'</h2>';
+				echo $this->checkbox('hide-rsdlink',__('Hide RSD Links','wordpress-seo'));
+				echo $this->checkbox('hide-wlwmanifest',__('Hide WLW Manifest Links','wordpress-seo'));
+				echo $this->checkbox('hide-shortlink',__('Hide Shortlink for posts','wordpress-seo'));
+				echo $this->checkbox('hide-feedlinks',__('Hide RSS Links','wordpress-seo'));
+			?>
+				</div>
+				<div id="home" class="wpseotab">
+			<?php
+			if ( 'page' != get_option('show_on_front') ) {
+				echo '<h2>'.__('Homepage', 'wordpress-seo' ).'</h2>';
+				echo $this->textinput('title-home',__('Title template', 'wordpress-seo' ));
+				echo $this->textarea('metadesc-home',__('Meta description template', 'wordpress-seo' ), '', 'metadesc');
+				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+					echo $this->textinput('metakey-home',__('Meta keywords template', 'wordpress-seo' ));
+			} else {
+				echo '<h2>'.__('Homepage &amp; Front page', 'wordpress-seo' ).'</h2>';
+				echo '<p>'.sprintf( __('You can determine the title and description for the front page by %sediting the front page itself &raquo;%s', 'wordpress-seo' ), '<a href="'.get_edit_post_link( get_option('page_on_front') ).'">', '</a>') . '</p>';
+				if ( is_numeric( get_option('page_for_posts') ) )
+				echo '<p>' . sprintf( __('You can determine the title and description for the blog page by %sediting the blog page itself &raquo;%s', 'wordpress-seo' ), '<a href="'.get_edit_post_link( get_option('page_for_posts') ).'">', '</a>' ) . '</p>';
 			}
-			unset($i, $pt, $post_type);
 			
-			$this->postbox('titles',__('Title Settings', 'wordpress-seo'), $content); 
+			?>
+				</div>
+				<div id="post_types" class="wpseotab">
+			<?php
+			foreach ( get_post_types( array('public' => true ), 'objects' ) as $posttype) {
+				if (isset($options['redirectattachment']) && $options['redirectattachment'] && $posttype == 'attachment')
+					continue;
+				$name = $posttype->name;
+				echo '<h4 id="'.$name.'">'.ucfirst($posttype->labels->name).'</h4>';
+				echo $this->textinput('title-'.$name,__('Title template', 'wordpress-seo' ));
+				echo $this->textarea('metadesc-'.$name,__('Meta description template', 'wordpress-seo' ), '', 'metadesc');
+				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+					echo $this->textinput('metakey-'.$name,__('Meta keywords template', 'wordpress-seo' ));
+				echo $this->checkbox('noindex-'.$name, __('Noindex, follow', 'wordpress-seo' ), __('Meta Robots','wordpress-seo') );
+				echo $this->checkbox('hideeditbox-'.$name, __('Hide','wordpress-seo'), __('WordPress SEO Meta Box','wordpress-seo') );
+				echo '<br/>';
+			}
+
+			echo '<h4 class="big">'.__('Custom Post Type Archives', 'wordpress-seo' ).'</h4>';
+			echo '<p>'.__('Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.', 'wordpress-seo' ).'</p>';
+
+			foreach ( get_post_types( array('public' => true, '_builtin' => false ), 'objects' ) as $pt ) {
+				if ( !$pt->has_archive )
+					continue;
+				
+				$name = $pt->name;
+				
+				echo '<h4>'.ucfirst($pt->labels->name).'</h4>';
+				echo $this->textinput( 'title-ptarchive-' . $name, __('Title', 'wordpress-seo' ) );
+				echo $this->textarea( 'metadesc-ptarchive-' . $name, __('Meta description', 'wordpress-seo' ), '', 'metadesc' );
+				if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
+					echo $this->textinput( 'bctitle-ptarchive-' . $name, __('Breadcrumbs Title', 'wordpress-seo' ) );
+				echo $this->checkbox('noindex-ptarchive-'.$name,__('Noindex, follow', 'wordpress-seo' ), __('Meta Robots','wordpress-seo') );
+			}
+			unset($pt, $post_type);			
 			
+			?>
+				</div>
+				<div id="taxonomies" class="wpseotab">
+			<?php
+			foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $taxonomy) {
+				echo '<h4>'.$taxonomy->labels->name.'</h4>';
+				$name =  $taxonomy->name;
+				echo $this->textinput('title-'.$name,__('Title template', 'wordpress-seo' ));
+				echo $this->textarea('metadesc-'.$name,__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
+				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+					echo $this->textinput('metakey-'.$name,__('Meta keywords template', 'wordpress-seo' ));
+				echo $this->checkbox('noindex-'.$name,__('Noindex, follow', 'wordpress-seo' ), __('Meta Robots','wordpress-seo') );
+				echo $this->checkbox('tax-hideeditbox-'.$name, __('Hide','wordpress-seo'), __('WordPress SEO Meta Box','wordpress-seo') );
+				echo '<br/>';
+			}
+			
+			?>
+				</div>
+				<div id="archives" class="wpseotab">
+			<?php
+				echo '<h4>'.__('Author Archives', 'wordpress-seo').'</h4>';
+				echo $this->textinput('title-author',__('Title template', 'wordpress-seo' ));
+				echo $this->textarea('metadesc-author',__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
+				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
+					echo $this->textinput('metakey-author',__('Meta keywords template', 'wordpress-seo' ));
+				echo $this->checkbox('noindex-author',__('Noindex, follow', 'wordpress-seo' ), __('Meta Robots','wordpress-seo') );
+				echo $this->checkbox('disable-author',__('Disable the author archives', 'wordpress-seo'), '' );
+				echo '<p class="desc">'.__('If you\'re running a one author blog, the author archive will always look exactly the same as your homepage. And even though you may not link to it, others might, to do you harm. Disabling them here will make sure any link to those archives will be 301 redirected to the blog homepage.', 'wordpress-seo').'</p>';
+				echo '<br/>';
+				echo '<h4>'.__('Date Archives', 'wordpress-seo' ).'</h4>';
+				echo $this->textinput('title-archive',__('Title template', 'wordpress-seo' ));
+				echo $this->textarea('metadesc-archive',__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
+				echo '<br/>';
+				echo $this->checkbox('noindex-archive',__('Noindex, follow', 'wordpress-seo' ), __('Meta Robots','wordpress-seo') );
+				echo $this->checkbox('disable-date',__('Disable the date-based archives', 'wordpress-seo'), '' );
+				echo '<p class="desc">'.__('For the date based archives, the same applies: they probably look a lot like your homepage, and could thus be seen as duplicate content.', 'wordpress-seo').'</p>';
+
+				echo '<h4 class="big">'.__('Special Pages', 'wordpress-seo' ).'</h4>';
+				echo '<p>'.__('These pages will be noindex, followed by default, so they will never show up in search results.').'</p>';
+				echo '<h4>'.__('Search pages', 'wordpress-seo' ).'</h4>';
+				echo $this->textinput('title-search',__('Title template', 'wordpress-seo') );
+				echo '<h4>'.__('404 pages', 'wordpress-seo' ).'</h4>';
+				echo $this->textinput('title-404',__('Title template', 'wordpress-seo' ) );
+				echo '<br class="clear"/>';
+			?>
+			</div>
+			<div id="template_help" class="wpseotab">
+			<?php
 			$content = '
-				<p>'.__( 'These tags can be included and will be replaced by Yoast WordPress SEO when a page is displayed. For convenience sake, they\'re the same as HeadSpace2 uses.', 'wordpress-seo' ).'</p>
+				<p>'.__( 'These tags can be included in templates and will be replaced by WordPress SEO by Yoast when a page is displayed.', 'wordpress-seo' ).'</p>
 					<table class="yoast_help">
 						<tr>
 							<th>%%date%%</th>
@@ -636,9 +711,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							<td>'.__('Replaced with a posts custom field value', 'wordpress-seo' ).'</td>
 						</tr>
 					</table>';
-			$this->postbox('titleshelp',__('Help on Title Settings', 'wordpress-seo'), $content); 
-			
-			$this->admin_footer('Titles');
+
+			echo '<h2>'.__('Variables', 'wordpress-seo').'</h2>';
+			echo $content;
+			?>
+			</div>
+			<?php
+			$this->admin_footer('Metas');
 		}
 				
 		function settings_advice_page() {
@@ -832,63 +911,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			$this->admin_footer('', false);
 		}
 		
-		function indexation_page() {
-			$this->admin_header('Indexation', true, true, 'yoast_wpseo_indexation_options', 'wpseo_indexation');
-					
-			$content = '<p>'.__("Below you'll find checkboxes for each of the sections of your site that you might want to disallow the search engines from indexing. Be aware that this is a powerful tool, blocking category archives, for instance, really blocks all category archives from showing up in the index.", 'wordpress-seo' ).'</p>';
-			$content .= $this->checkbox('noindexsubpages',__('Subpages of archives and taxonomies', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('Prevent the search engines from indexing (not from crawling and following the links) your taxonomies & archives subpages.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('noindexauthor',__('Author archives', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('By default, WordPress creates author archives for each user, usually available under <code>/author/username</code>. If you have sufficient other archives, or yours is a one person blog, there\'s no need and you can best disable them or prevent search engines from indexing them.', 'wordpress-seo').'</p>';
-			
-			$content .= $this->checkbox('noindexdate',__('Date-based archives', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('If you want to offer your users the option of crawling your site by date, but have ample other ways for the search engines to find the content on your site, I highly encourage you to prevent your date-based archives from being indexed.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('noindexcat',__('Category archives', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('If you\'re using tags as your only way of structure on your site, you would probably be better off when you prevent your categories from being indexed.', 'wordpress-seo').'</p>';
-
-			$content .= $this->checkbox('noindextag',__('Tag archives', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('Read the categories explanation above for categories and switch the words category and tag around ;)', 'wordpress-seo').'</p>';
-
-			if ( current_theme_supports('post-formats') ) {
-				$content .= $this->checkbox('noindexpostformat',__('Post Formats archives', 'wordpress-seo') );
-				$content .= '<p class="desc">'.__('Post formats have publicly queriable archives by default that should be disabled below or noindexed here.', 'wordpress-seo').'</p>';
-			}
-				
-			$this->postbox('preventindexing',__('Indexation Rules', 'wordpress-seo'),$content);
-			
-			$content = $this->checkbox('disableauthor',__('Disable the author archives', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('If you\'re running a one author blog, the author archive will always look exactly the same as your homepage. And even though you may not link to it, others might, to do you harm. Disabling them here will make sure any link to those archives will be 301 redirected to the blog homepage.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('disabledate',__('Disable the date-based archives', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('For the date based archives, the same applies: they probably look a lot like your homepage, and could thus be seen as duplicate content.', 'wordpress-seo').'</p>';
-			if ( current_theme_supports('post-formats') ) {
-				$content .= $this->checkbox('disablepostformats',__('Disable the post format archives', 'wordpress-seo') );
-				$content .= '<p class="desc">'.__('This completely disables the archives for post formats.', 'wordpress-seo').'</p>';
-			}
-			$this->postbox('archivesettings',__('Archive Settings', 'wordpress-seo'),$content);
-					
-			$content = '<p>'.__("You can add all these on a per post / page basis from the edit screen, by clicking on advanced. Should you wish to use any of these sitewide, you can do so here. (This is <em>not</em> recommended.)", 'wordpress-seo' ).'</p>';
-			$content .= $this->checkbox('noodp',__('Add <code>noodp</code> meta robots tag sitewide', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('Prevents search engines from using the DMOZ description for pages from this site in the search results.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('noydir',__('Add <code>noydir</code> meta robots tag sitewide', 'wordpress-seo') );
-			$content .= '<p class="desc">'.__('Prevents search engines from using the Yahoo! directory description for pages from this site in the search results.', 'wordpress-seo').'</p>';
-			
-			$this->postbox('directories',__('Robots Meta Settings', 'wordpress-seo'),$content); 
-			
-			$content = '<p>'.__('Some of us like to keep our &lt;heads&gt; clean. The settings below allow you to make it happen.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hidersdlink',__('Hide RSD Links','wordpress-seo'));
-			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use remote editors.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hidewlwmanifest',__('Hide WLW Manifest Links','wordpress-seo'));
-			$content .= '<p class="desc">'.__('Might be necessary if you or other people on this site use Windows Live Writer.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hideshortlink',__('Hide Shortlink for posts','wordpress-seo'));
-			$content .= '<p class="desc">'.__('Hides the shortlink for the current post.', 'wordpress-seo').'</p>';
-			$content .= $this->checkbox('hidefeedlinks',__('Hide RSS Links','wordpress-seo'));
-			$content .= '<p class="desc">'.__('Check this box only if you\'re absolutely positive your site doesn\'t need and use RSS feeds.', 'wordpress-seo').'</p>';
-
-			$this->postbox('headsection',__( 'Clean up &lt;head&gt; section', 'wordpress-seo' ),$content);
-			
-			$this->admin_footer('Indexation');
-		}
-
 		function rss_page() {
 			$options = get_wpseo_options();
 			$this->admin_header('RSS', false, true, 'yoast_wpseo_rss_options', 'wpseo_rss');
@@ -991,70 +1013,46 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			
 			ksort($options);
 			
-			$content = '';
-						
 			if ( isset($options['blocking_files']) && is_array($options['blocking_files']) && count($options['blocking_files']) > 0 ) {
 				$options['blocking_files'] = array_unique( $options['blocking_files'] );
-				$content .= '<p id="blocking_files" class="wrong">'
+				echo '<p id="blocking_files" class="wrong">'
 				.'<a href="javascript:wpseo_killBlockingFiles(\''.wp_create_nonce('wpseo-blocking-files').'\')" class="button fixit">'.__('Fix it.', 'wordpress-seo' ).'</a>'
 				.__( 'The following file(s) is/are blocking your XML sitemaps from working properly:', 'wordpress-seo' ).'<br />';
 				foreach($options['blocking_files'] as $file) {
-					$content .= esc_html( $file ) . '<br/>';
+					echo esc_html( $file ) . '<br/>';
 				}
-				$content .= __( 'Either delete them (this can be done with the "Fix it" button) or disable WP SEO XML sitemaps.', 'wordpress-seo' );
-				$content .= '</p>';
+				echo __( 'Either delete them (this can be done with the "Fix it" button) or disable WP SEO XML sitemaps.', 'wordpress-seo' );
+				echo '</p>';
 			}
 			
 			if ( strpos( get_option('permalink_structure'), '%postname%' ) === false && !isset( $options['ignore_permalink'] )  )
-				$content .= '<p id="wrong_permalink" class="wrong">'
+				echo '<p id="wrong_permalink" class="wrong">'
 				.'<a href="'.admin_url('options-permalink.php').'" class="button fixit">'.__('Fix it.', 'wordpress-seo' ).'</a>'
 				.'<a href="javascript:wpseo_setIgnore(\'permalink\',\'wrong_permalink\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.', 'wordpress-seo' ).'</a>'
 				.__('You do not have your postname in the URL of your posts and pages, it is highly recommended that you do. Consider setting your permalink structure to <strong>/%postname%/</strong>.', 'wordpress-seo' ).'</p>';
 
 			if ( get_option('page_comments') && !isset( $options['ignore_page_comments'] ) )
-				$content .= '<p id="wrong_page_comments" class="wrong">'
+				echo '<p id="wrong_page_comments" class="wrong">'
 				.'<a href="javascript:setWPOption(\'page_comments\',\'0\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-setoption').'\');" class="button fixit">'.__('Fix it.', 'wordpress-seo' ).'</a>'
 				.'<a href="javascript:wpseo_setIgnore(\'page_comments\',\'wrong_page_comments\',\''.wp_create_nonce('wpseo-ignore').'\');" class="button fixit">'.__('Ignore.', 'wordpress-seo' ).'</a>'
 				.__('Paging comments is enabled, this is not needed in 999 out of 1000 cases, so the suggestion is to disable it, to do that, simply uncheck the box before "Break comments into pages..."', 'wordpress-seo' ).'</p>';
 
-			if ( isset($options['ignore_tour'] ) && $options['ignore_tour'] )
-				$content .= '<p><a class="button-secondary" href="'.admin_url('admin.php?page=wpseo_dashboard&wpseo_restart_tour').'">'.__('Start Introduction Tour', 'wordpress-seo' ).'</a></p>';
-			
-			if ( '' != $content )
-				$this->postbox('advice',__('Settings Advice', 'wordpress-seo'),$content); 
-			
-			$content .= $this->checkbox('usemetakeywords', __( 'Use <code>meta</code> keywords tag?', 'wordpress-seo' ));
-			$content .= $this->checkbox('disabledatesnippet', __( 'Disable date in snippet preview for posts', 'wordpress-seo' ));
-			
-			// TODO: make this settable per user level...
-			$content .= $this->checkbox('disableadvanced_meta', __('Disable the Advanced part of the WordPress SEO meta box', 'wordpress-seo' ));
-			
-			
-			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following post types:', 'wordpress-seo' ).'</strong></p>';
-			foreach ( get_post_types() as $posttype ) {
-				if ( in_array( $posttype, array('revision','nav_menu_item') ) )
-					continue;
-				$content .= $this->checkbox('hideeditbox-'.$posttype, $posttype);
-			}	
-
-			$content .= '<p><strong>'.__('Hide WordPress SEO box on edit pages for the following taxonomies:', 'wordpress-seo' ).'</strong></p>';
-			foreach (get_taxonomies() as $taxonomy) {
-				if ( !in_array( $taxonomy, array('nav_menu','link_category','post_format') ) ) {
-					$tax = get_taxonomy($taxonomy);
-					if ( isset( $tax->labels->name ) && trim($tax->labels->name) != '' )
-						$content .= $this->checkbox('tax-hideeditbox-'.$taxonomy, $tax->labels->name);
-				}
+			if ( isset($options['ignore_tour'] ) && $options['ignore_tour'] ) {
+				echo '<h2>'.__('Introduction Tour','wordpress-seo').'</h2>';
+				echo '<p>'.__('Take this tour to quickly learn about the uses of this plugin.','wordpress-seo').'</p>';
+				echo '<p><a class="button-secondary" href="'.admin_url('admin.php?page=wpseo_dashboard&wpseo_restart_tour').'">'.__('Start Introduction Tour', 'wordpress-seo' ).'</a></p>';
 			}
-			$this->postbox('general-settings',__('General Settings', 'wordpress-seo'),$content); 
 			
-					
-			$content = '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:', 'wordpress-seo' ).'</p>';
-			$content .= $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'wordpress-seo').'</a>');
-			$content .= $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'wordpress-seo').'</a>');
-			$content .= $this->textinput('alexaverify','<a target="_blank" href="http://www.alexa.com/pro/subscription">'.__('Alexa Verification ID', 'wordpress-seo').'</a>');
-
-			$this->postbox('webmastertools',__('Webmaster Tools', 'wordpress-seo'),$content);
+			echo '<h2>'.__('Security','wordpress-seo').'</h2>';
+			echo '<p>'.__('Unchecking the box below allows authors and editors to redirect posts, noindex them and do other things you might not want if you don\'t trust your authors.','wordpress-seo').'</p>';
+			echo $this->checkbox('disableadvanced_meta', __('Disable the Advanced part of the WordPress SEO meta box', 'wordpress-seo' ));
 			
+			echo '<h2>'.__('Webmaster Tools', 'wordpress-seo' ).'</h2>';
+			echo '<p>'.__('You can use the boxes below to verify with the different Webmaster Tools, if your site is already verified, you can just forget about these. Enter the verify meta values for:', 'wordpress-seo' ).'</p>';
+			echo $this->textinput('googleverify', '<a target="_blank" href="https://www.google.com/webmasters/tools/dashboard?hl=en&amp;siteUrl='.urlencode(get_bloginfo('url')).'%2F">'.__('Google Webmaster Tools', 'wordpress-seo').'</a>');
+			echo $this->textinput('msverify','<a target="_blank" href="http://www.bing.com/webmaster/?rfp=1#/Dashboard/?url='.str_replace('http://','',get_bloginfo('url')).'">'.__('Bing Webmaster Tools', 'wordpress-seo').'</a>');
+			echo $this->textinput('alexaverify','<a target="_blank" href="http://www.alexa.com/pro/subscription">'.__('Alexa Verification ID', 'wordpress-seo').'</a>');
+							
 			do_action('wpseo_dashboard', $this);
 			
 			$this->admin_footer('');

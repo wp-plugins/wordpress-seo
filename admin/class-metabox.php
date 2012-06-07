@@ -50,7 +50,7 @@ class WPSEO_Metabox {
 		$options = get_wpseo_options();
 		
 		$date = '';
-		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) ) {
+		if ( $post->post_type == 'post' ) {
 			$date = $this->get_post_date( $post );
 
 			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
@@ -440,7 +440,7 @@ class WPSEO_Metabox {
 		
 		// TODO: make this configurable per post type.
 		$date = '';
-		if ( $post->post_type == 'post' && ( !isset($options['disabledatesnippet']) || !$options['disabledatesnippet'] ) )
+		if ( $post->post_type == 'post' )
 			$date = $this->get_post_date( $post );
 		
 		$title = wpseo_get_value('title');

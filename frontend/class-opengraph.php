@@ -130,7 +130,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			}
 		} else if ( is_archive() ) {
 		 	if ( isset($this->options['title-archive']) && !empty($this->options['title-archive']) )
-				$title = wpseo_replace_vars($this->options['title-archive'], array('post_title' => $title) );
+				$title = wpseo_replace_vars($this->options['title-archive'], array() );
 			else if ( is_month() ) 
 				$title = single_month_title(' ', false).' '.__('Archives','wordpress-seo'); 
 			else if ( is_year() )

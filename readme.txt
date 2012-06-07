@@ -136,8 +136,6 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 = 1.2 (development version) =
 
-Major improvements: all sorts of fixes to suggest and keyword check functionality which now should allow for non-ascii stuff, like Greek, Arabic, but even "weird" chars in western-European languages.
-
 * Bugs fixed:
 	* ereg_replace != preg_replace ; in other words: alt and title tags for images in xml sitemap fixed.
 	* Image size for OpenGraph now defaults to medium for thumbnail image.
@@ -162,9 +160,14 @@ Major improvements: all sorts of fixes to suggest and keyword check functionalit
 	* Fixed a bug where half the Linkdex analyses wouldn't work when the visual editor is disabled.
 	* Changed the mime type of the XSL file for XML sitemaps to text/xml, so Firefox will display them properly.
 	* Made sure the default OpenGraph image will always show up when there's no other image.
+	* Updated tablesorting JS used in XML Sitemaps.
 * Enhancements:
 	* Upon activation, XML sitemaps are automatically enabled.
 	* Upon activation, title templates are pre-filled with sensible defaults.
+	* Plugin now auto-detects whether titles need to be force-rewritten (using output buffering) or not.
+	* Redesign of the admin, removal of the indexations page and renaming the Titles page into Meta Settings page.
+	* Allow noindex-following per custom taxonomy and custom post type.
+	* No longer show non-public post types on meta settings page.
 	* On activation, W3 Total Cache or WP Super Cache cache gets cleared automatically.
 	* Added an uninstall handler, deleting the plugin through the WP backend will now delete options from the DB too.
 	* Added the option to display custom taxonomy in titles and descriptions, use `%%ct_<custom-taxname>%%` for a comma separated list or `%%ct_<custom-taxname>%%single%%` for only one taxonomy term.

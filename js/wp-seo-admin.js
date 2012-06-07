@@ -58,3 +58,20 @@ function wpseo_killBlockingFiles( nonce ) {
 			jQuery('#block_files').html(data);
 	});
 }
+
+jQuery(document).ready(function(){	
+	var active_tab = window.location.hash.replace('#','').replace('-tab','');
+	if ( active_tab == '' )
+		active_tab = 'general';
+	jQuery('#'+active_tab).addClass('active');
+	jQuery('#'+active_tab+'-tab').addClass('nav-tab-active');
+	
+	jQuery('#wpseo-tabs a').click(function(i) {
+		jQuery('#wpseo-tabs a').removeClass('nav-tab-active');
+		jQuery('.wpseotab').removeClass('active');
+	
+		var id = jQuery(this).attr('id').replace('-tab','');
+		jQuery('#'+id).addClass('active');
+		jQuery(this).addClass('nav-tab-active');
+	});
+});

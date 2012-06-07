@@ -24,7 +24,7 @@ tr.yst_row.even {
 	background-color: #f6f6f6;
 }
 
-div.inside ul {
+div.yoastbox ul {
 	margin-left: 20px;
 }
 
@@ -55,8 +55,9 @@ textarea.import {
 	height: 100px;
 }
 
-label.textinput, label.select {
-	width: 200px;
+label.textinput, label.select, label.checkbox {
+	width: 180px;
+	background-color: transparent;
 }
 
 label.radio {
@@ -67,41 +68,40 @@ label.radio {
 	line-height: 150%;	
 }
 
-div.inside ul li {
+div.yoastbox ul li {
 	list-style: square;
 	line-height:16px;
 	font-size: 11px;
 }
 
-div.inside a, div.inside a.rsswidget {
-	font-family: 'Lucida Grande', Verdana, Arial, 'Bitstream Vera Sans', sans-serif;
-	text-decoration: none;
-	font-size: 11px;
+div.yoastbox a, div.yoastbox a.rsswidget {
+	font-family: sans-serif;
+	font-size: 12px;
 }
-div.inside a:hover, div.inside a.rsswidget:hover {
+div.yoastbox a:hover, div.yoastbox a.rsswidget:hover {
 	text-decoration: underline;
 }
-div.inside ul li.rss {
+div.yoastbox ul li.rss {
 	list-style-image: url(../images/rss.png);
 }
 
-div.inside ul li.twitter {
+div.yoastbox ul li.twitter {
 	list-style-image: url(../images/twitter-icon.png);
 }
 
-div.inside ul li.facebook {
+div.yoastbox ul li.facebook {
 	list-style-image: url(../images/facebook-icon.png);
 }
 
-div.inside ul li.googleplus {
+div.yoastbox ul li.googleplus {
 	list-style-image: url(../images/google-plus-icon.png);
 }
 
-div.inside ul li.email {
+div.yoastbox ul li.email {
 	list-style-image: url(../images/email_sub.png);
 }
 
-div.inside ul li.yoast {
+div.yoastbox ul li.yoast {
 	list-style-image: url(../images/yoast-16x16.png); 
 }
 
@@ -113,7 +113,7 @@ div.inside ul li.yoast {
 	font-size: 11px;
 }
 
-div.inside .button:hover, div.inside .button-primary:hover {
+div.yoastbox .button:hover, div.yoastbox .button-primary:hover {
 	text-decoration: none;
 }
 
@@ -171,4 +171,31 @@ strong.red {
 .postbox#donate {
 	border-color: green;
 	border-width: 2px;
+}
+
+.wpseotab {
+	display: none;
+	max-width: 600px !important;
+}
+.wpseotab.active {
+	display: block;
+}
+
+#sidebar .yoastbox {
+	border: 1px solid #CCC;
+	border-radius: 5px 25px;
+	margin: 0 0 10px 0;
+	padding: 10px 15px;
+}
+
+#sidebar .yoastbox h2 {
+	font-size: 16px;
+}
+
+#sidebar .promo {
+	color: #000;
+}
+#donate.yoastbox, #sitereview.yoastbox {
+	border-color: green;
+	background-color: #cfc;
 }

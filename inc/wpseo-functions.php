@@ -20,7 +20,7 @@ function wpseo_set_value( $meta, $val, $postid ) {
 }
 
 function get_wpseo_options_arr() {
-	$optarr = array('wpseo','wpseo_indexation', 'wpseo_permalinks', 'wpseo_titles', 'wpseo_rss', 'wpseo_internallinks', 'wpseo_xml', 'wpseo_social');
+	$optarr = array('wpseo', 'wpseo_permalinks', 'wpseo_titles', 'wpseo_rss', 'wpseo_internallinks', 'wpseo_xml', 'wpseo_social');
 	return apply_filters( 'wpseo_options', $optarr );
 }
 
@@ -42,7 +42,12 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 	if ( strpos( $string, '%%' ) === false )
 		return trim( preg_replace('/\s+/u',' ', $string) );
 
+	global $sep;
+	if ( !isset( $sep ) || empty( $sep ) )
+		$sep = '-';
+		
 	$simple_replacements = array(
+		'%%sep%%'					=> $sep,
 		'%%sitename%%'				=> get_bloginfo('name'),
 		'%%sitedesc%%'				=> get_bloginfo('description'),
 		'%%currenttime%%'			=> date('H:i'),
@@ -137,7 +142,7 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
 		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
 		'%%searchphrase%%'			=> esc_html(get_query_var('s')),
-		'%%page%%'		 			=> ( $max_num_pages > 1) ? sprintf( __('Page %d of %d','wordpress-seo'), $pagenum, $max_num_pages) : '', 
+		'%%page%%'		 			=> ( $max_num_pages > 1) ? sprintf( $sep . ' ' . __('Page %d of %d','wordpress-seo'), $pagenum, $max_num_pages) : '', 
 		'%%pagetotal%%'	 			=> $max_num_pages, 
 		'%%pagenumber%%' 			=> $pagenum,
 		'%%caption%%'				=> $r->post_excerpt,
@@ -370,6 +375,27 @@ function wpseo_maybe_upgrade() {
 		update_option('wpseo_indexation', $opt);
 	}
 	
+	if ( version_compare( $current_version, '1.2', '<' ) ) {
+		$opt = get_option( 'wpseo_indexation' );
+		$metaopt = get_option('wpseo_titles');
+
+		$metaopt['noindex-author'] 			= isset( $opt['noindexauthor'] ) 		? $opt['noindexauthor'] 		: '';
+		$metaopt['disable-author'] 			= isset( $opt['disableauthor'] ) 		? $opt['disableauthor'] 		: '';
+		$metaopt['noindex-archive'] 		= isset( $opt['noindexdate'] ) 			? $opt['noindexdate'] 			: '';
+		$metaopt['noindex-category'] 		= isset( $opt['noindexcat'] ) 			? $opt['noindexcat'] 			: '';
+		$metaopt['noindex-post_tag'] 		= isset( $opt['noindextag'] ) 			? $opt['noindextag'] 			: '';
+		$metaopt['noindex-post_format'] 	= isset( $opt['noindexpostformat'] ) 	? $opt['noindexpostformat'] 	: '';
+		$metaopt['noindex-subpages']		= isset( $opt['noindexsubpages'] ) 		? $opt['noindexsubpages'] 		: '';
+		$metaopt['hide-rsdlink']			= isset( $opt['hidersdlink'] ) 			? $opt['hidersdlink'] 			: '';
+		$metaopt['hide-feedlinks']			= isset( $opt['hidefeedlinks'] ) 		? $opt['hidefeedlinks'] 		: '';
+		$metaopt['hide-wlwmanifest']		= isset( $opt['hidewlwmanifest'] ) 		? $opt['hidewlwmanifest'] 		: '';
+		$metaopt['hide-shortlink']			= isset( $opt['hideshortlink'] ) 		? $opt['hideshortlink'] 		: '';
+		   
+		update_option('wpseo_titles', $metaopt);
+
+		delete_option('wpseo_indexation');
+	}
+		
 	$options['version'] = WPSEO_VERSION;
 	update_option( 'wpseo', $options );
 }
