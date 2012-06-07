@@ -330,6 +330,7 @@ class WPSEO_Frontend {
 		if ( !function_exists('genesis') )
 			$this->adjacent_rel_links();
 		$this->robots();
+		$this->author();
 		
 		if ( is_front_page() ) {
 			if (!empty($options['googleverify'])) {
@@ -583,6 +584,17 @@ class WPSEO_Frontend {
 
 		if ( $link )
 			echo $link;	
+	}
+	
+	function author() {
+		if ( is_singular() ) {
+			global $post;
+			echo '<link rel="author" href="' . get_the_author_meta( 'googleplus', $post->post_author ) . '"/>' . "\n";
+		} else if ( is_home() ) {
+			$options = get_wpseo_options();
+			if ( isset( $options['plus-author'] ) )
+				echo '<link rel="author" href="' . get_the_author_meta( 'googleplus', $options['plus-author'] ) . '"/>' . "\n";
+		}
 	}
 	
 	function metakeywords() {

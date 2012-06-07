@@ -36,6 +36,8 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_action( 'personal_options_update', array(&$this,'wpseo_process_user_option_update'));
 			add_action( 'edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
 
+			add_filter( 'user_contactmethods', array(&$this,'add_google_plus_contactmethod'), 10, 1 );
+			
 			if ( '0' == get_option('blog_public') )
 				add_action('admin_footer', array(&$this,'blog_public_warning'));				
 		}
@@ -513,6 +515,12 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				echo '<p>'.sprintf( __('You can determine the title and description for the front page by %sediting the front page itself &raquo;%s', 'wordpress-seo' ), '<a href="'.get_edit_post_link( get_option('page_on_front') ).'">', '</a>') . '</p>';
 				if ( is_numeric( get_option('page_for_posts') ) )
 				echo '<p>' . sprintf( __('You can determine the title and description for the blog page by %sediting the blog page itself &raquo;%s', 'wordpress-seo' ), '<a href="'.get_edit_post_link( get_option('page_for_posts') ).'">', '</a>' ) . '</p>';
+			}
+			
+			if ( 'page' != get_option('show_on_front') ) {
+				echo '<h2>'.__('Author metadata', 'wordpress-seo' ).'</h2>';
+				echo '<p>'.__('Choose the user that should be used for the rel="author" on the homepage.', 'wordpress-seo' ).'</p>';
+				wp_dropdown_users( array( 'show_option_none' => "Don't show", 'name' => 'wpseo_titles[plus-author]' ) );
 			}
 			
 			?>
@@ -1227,6 +1235,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			update_user_meta($user_id, 'wpseo_title', ( isset($_POST['wpseo_author_title']) ? $_POST['wpseo_author_title'] : '' ) );
 			update_user_meta($user_id, 'wpseo_metadesc', ( isset($_POST['wpseo_author_metadesc']) ? $_POST['wpseo_author_metadesc'] : '' ) );
 			update_user_meta($user_id, 'wpseo_metakey', ( isset($_POST['wpseo_author_metakey']) ? $_POST['wpseo_author_metakey'] : '' ) );
+		}
+		
+		function add_google_plus_contactmethod( $contactmethods ) {
+		  // Add Twitter
+		  $contactmethods['googleplus'] = 'Google+';
+
+		  return $contactmethods;
 		}
 		
 	} // end class WPSEO_Admin

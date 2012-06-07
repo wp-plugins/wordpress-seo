@@ -197,6 +197,9 @@ function wpseo_get_terms($id, $taxonomy, $return_single = false ) {
 		return $term->name;
 	}
 	
+	if ( empty($id) || empty($taxonomy) )
+		return '';
+		
 	$output = '';
 	$terms = get_the_terms($id, $taxonomy);
 	if ( $terms ) {

@@ -53,15 +53,15 @@ function wpseo_activate() {
 	
 	if ( get_option('wpseo_titles') == false ) {
 		$title_settings = array (
-		  'title-post' => '%%title%% - %%sitename%%',
-		  'title-page' => '%%title%% - %%sitename%%',
-		  'title-attachment' => '%%title%% - %%sitename%%',
-		  'title-category' => '%%term_title%% '.__('Archives','wordpress-seo').' - %%page%% %%sitename%%',
-		  'title-post_tag' => '%%term_title%% '.__('Archives','wordpress-seo').' - %%page%% %%sitename%%',
-		  'title-author' => '%%name%% - '.__('Author at','wordpress-seo').' %%sitename%%',
-		  'title-archive' => '%%date%% - %%sitename%%',
-		  'title-search' => __('You searched for', 'wordpress-seo').' %%searchphrase%% - %%sitename%%',
-		  'title-404' => __('Page Not Found', 'wordpress-seo').' - %%sitename%%',
+		  'title-post' => '%%title%% %%sep%% %%sitename%%',
+		  'title-page' => '%%title%% %%sep%% %%sitename%%',
+		  'title-attachment' => '%%title%% %%sep%% %%sitename%%',
+		  'title-category' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
+		  'title-post_tag' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
+		  'title-author' => '%%name%% %%sep%% '.__('Author at','wordpress-seo').' %%sitename%%',
+		  'title-archive' => '%%date%% %%sep%% %%sitename%%',
+		  'title-search' => __('You searched for', 'wordpress-seo').' %%searchphrase%% %%sep%% %%sitename%%',
+		  'title-404' => __('Page Not Found', 'wordpress-seo').' %%sep%% %%sitename%%',
 		);
 		update_option( 'wpseo_titles', $title_settings );
 	}

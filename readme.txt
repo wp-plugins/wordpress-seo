@@ -162,6 +162,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Made sure the default OpenGraph image will always show up when there's no other image.
 	* Updated tablesorting JS used in XML Sitemaps.
 * Enhancements:
+	* Automatically check whether force rewrite needs to be enabled.
 	* Upon activation, XML sitemaps are automatically enabled.
 	* Upon activation, title templates are pre-filled with sensible defaults.
 	* Plugin now auto-detects whether titles need to be force-rewritten (using output buffering) or not.
