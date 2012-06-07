@@ -520,7 +520,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			if ( 'page' != get_option('show_on_front') ) {
 				echo '<h2>'.__('Author metadata', 'wordpress-seo' ).'</h2>';
 				echo '<p>'.__('Choose the user that should be used for the rel="author" on the homepage.', 'wordpress-seo' ).'</p>';
-				wp_dropdown_users( array( 'show_option_none' => "Don't show", 'name' => 'wpseo_titles[plus-author]' ) );
+				wp_dropdown_users( array( 'show_option_none' => "Don't show", 'name' => 'wpseo_titles[plus-author]', 'selected' => $options['plus-author'] ) );
 			}
 			
 			?>
