@@ -587,14 +587,21 @@ class WPSEO_Frontend {
 	}
 	
 	function author() {
+		$gplus = false;
+		
 		if ( is_singular() ) {
 			global $post;
-			echo '<link rel="author" href="' . get_the_author_meta( 'googleplus', $post->post_author ) . '"/>' . "\n";
+			$gplus = get_the_author_meta( 'googleplus', $post->post_author );
 		} else if ( is_home() ) {
 			$options = get_wpseo_options();
 			if ( isset( $options['plus-author'] ) )
-				echo '<link rel="author" href="' . get_the_author_meta( 'googleplus', $options['plus-author'] ) . '"/>' . "\n";
+				$gplus = get_the_author_meta( 'googleplus', $options['plus-author'] );
 		}
+
+		$gplus = apply_filters( 'wpseo_author_link', $gplus );
+		
+		if ( $gplus )
+			echo '<link rel="author" href="' . $gplus . '"/>' . "\n";
 	}
 	
 	function metakeywords() {
