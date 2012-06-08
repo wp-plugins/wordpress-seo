@@ -317,17 +317,19 @@ class WPSEO_Frontend {
 	function head() {
 		$options = get_wpseo_options();
 
-		wp_reset_query();
-		
 		global $wp_query;
 		
+		$old_wp_query = $wp_query;
+		
+		wp_reset_query();
+				
 		$this->debug_marker();
 		$this->metadesc();
 		$this->metakeywords();
 		$this->canonical();
 
 		// Don't do this for Genesis, as the way Genesis handles homepage functionality is different and causes issues sometimes.
-		if ( !function_exists('genesis') )
+		if ( !is_home() || !function_exists('genesis') )
 			$this->adjacent_rel_links();
 		$this->robots();
 		$this->author();
@@ -359,6 +361,8 @@ class WPSEO_Frontend {
 		do_action( 'wpseo_head' );
 		
 		echo "<!-- / Yoast WordPress SEO plugin. -->\n\n";
+		
+		$wp_query = $old_wp_query;
 	}
 
 	function robots() {

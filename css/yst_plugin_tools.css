@@ -3,17 +3,14 @@ h4 {
 	margin: 2em 0 0 0;	
 }
 
-h4.big {
-	font-size: 120%;
-	margin: 2em 0 0 0;
-	padding: 0;
+p.desc {
+	padding: 0 0 8px 22px;
+	margin: 6px 0 10px 0;
+	border-bottom: 1px solid #ddd;
 }
-
-td.yst_desc {
-	font-weight: normal;
-	font-size: 12px;
-	line-height: 12px;
-	color:#777;	
+p.desc.label {
+	padding: 2px 0 10px 180px;
+	margin-bottom: 20px;
 }
 
 tr.yst_row {
@@ -32,18 +29,18 @@ div.yoastbox ul {
 	margin: 10px 10px 0 0;	
 }
 
-.postbox .inside p, .postbox .inside label, .postbox .inside li, .postbox .inside a {
-	font-size: 12px;
-}
-
-.textinput, .select, .checkbox, label {
+label {
 	float: left;
-	margin: 5px 10px 5px 0;
-	line-height: 12px;
 }
 
-.textinput, .select {
+input.textinput, textarea, select {
 	width: 400px;
+}
+
+input.textinput, textarea.textinput, select.select, input.checkbox {
+	float: left;
+	margin: 5px 3px 0 0;
+	padding: 5px;
 }
 
 .textinput.metadesc {
@@ -58,6 +55,7 @@ textarea.import {
 label.textinput, label.select, label.checkbox {
 	width: 180px;
 	background-color: transparent;
+	margin: 5px 0 0 0;
 }
 
 label.radio {
@@ -109,10 +107,6 @@ div.yoastbox ul li.yoast {
 	width: 250px;
 }
 
-.side .postbox p, .side .postbox a, .side .postbox a.rsswidget {
-	font-size: 11px;
-}
-
 div.yoastbox .button:hover, div.yoastbox .button-primary:hover {
 	text-decoration: none;
 }
@@ -124,7 +118,7 @@ div.yoastbox .button:hover, div.yoastbox .button-primary:hover {
 table.yoast_help, table.yoast_help th, table.yoast_help td {
 	border: 1px solid #ddd;
 	border-collapse: collapse;
-	font-size: 11px;
+	font-size: 12px;
 }
 table.yoast_help th, table.yoast_help td {
 	vertical-align: text-top;
@@ -162,12 +156,6 @@ table.yoast_help tr:hover {
 	color: #000 !important;
 }
 
-strong.red {
-	color: green;
-	font-weight: bold;
-	font-size: 105%;
-}
-
 .postbox#donate {
 	border-color: green;
 	border-width: 2px;
@@ -198,4 +186,10 @@ strong.red {
 #donate.yoastbox, #sitereview.yoastbox {
 	border-color: green;
 	background-color: #cfc;
+}
+h2 {
+	margin-bottom: 20px;
+}
+h2 code {
+	font-size: 23px;
 }

@@ -45,7 +45,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		
 		function register_settings_page() {
 			add_menu_page($this->longname, $this->shortname, $this->accesslvl, 'wpseo_dashboard', array(&$this,'config_page'), WPSEO_URL.'images/yoast-icon.png');
-			add_submenu_page('wpseo_dashboard',__( 'Meta Settings', 'wordpress-seo' ),__( 'Meta Settings', 'wordpress-seo' ),$this->accesslvl, 'wpseo_titles', array(&$this,'titles_page'));
+			add_submenu_page('wpseo_dashboard',__( 'Titles &amp; Meta\'s', 'wordpress-seo' ),__( 'Titles &amp; Meta\'s', 'wordpress-seo' ),$this->accesslvl, 'wpseo_titles', array(&$this,'titles_page'));
 			add_submenu_page('wpseo_dashboard',__( 'Social', 'wordpress-seo' ),__( 'Social', 'wordpress-seo' ),$this->accesslvl, 'wpseo_social', array(&$this,'social_page'));
 			add_submenu_page('wpseo_dashboard',__( 'XML Sitemaps', 'wordpress-seo' ),__( 'XML Sitemaps', 'wordpress-seo' ),$this->accesslvl, 'wpseo_xml', array(&$this,'xml_sitemaps_page'));
 			add_submenu_page('wpseo_dashboard',__( 'Permalinks', 'wordpress-seo' ),__( 'Permalinks', 'wordpress-seo' ),$this->accesslvl, 'wpseo_permalinks', array(&$this,'permalinks_page'));

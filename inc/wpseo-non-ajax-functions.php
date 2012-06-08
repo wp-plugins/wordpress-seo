@@ -42,44 +42,10 @@ function wpseo_flush_rules() {
 }
 
 function wpseo_activate() {
-	
-	// Enable XML sitemaps by default
-	if ( get_option('wpseo_xml') == false ) {
-		$xml_opt = array (
-			'enablexmlsitemap' => 'on',
-		);
-		update_option( 'wpseo_xml', $xml_opt );
-	} 
-	
-	if ( get_option('wpseo_titles') == false ) {
-		$title_settings = array (
-		  'title-post' => '%%title%% %%sep%% %%sitename%%',
-		  'title-page' => '%%title%% %%sep%% %%sitename%%',
-		  'title-attachment' => '%%title%% %%sep%% %%sitename%%',
-		  'title-category' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
-		  'title-post_tag' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
-		  'title-author' => '%%name%% %%sep%% '.__('Author at','wordpress-seo').' %%sitename%%',
-		  'title-archive' => '%%date%% %%sep%% %%sitename%%',
-		  'title-search' => __('You searched for', 'wordpress-seo').' %%searchphrase%% %%sep%% %%sitename%%',
-		  'title-404' => __('Page Not Found', 'wordpress-seo').' %%sep%% %%sitename%%',
-		);
-		update_option( 'wpseo_titles', $title_settings );
-	}
-	
-	if ( get_option('wpseo') == false ) {
-		$settings = array(
-			'disableadvanced_meta' => 'on'
-		);
-		update_option( 'wpseo', $settings );
-	}
+	wpseo_defaults();
 	
 	wpseo_flush_rules();
 		
-	// Force WooThemes to use WordPress SEO data.
-	if ( function_exists( 'woo_version_init' ) ) {
-		update_option( 'seo_woo_use_third_party_data', 'true' );
-	}
-
 	// Clear cache so the changes are obvious.
 	if ( function_exists('w3tc_pgcache_flush') ) {
 		w3tc_pgcache_flush();
@@ -88,6 +54,68 @@ function wpseo_activate() {
 	}
 	
 	wpseo_title_test();
+}
+
+function wpseo_reset_defaults() {
+	foreach ( get_wpseo_options_arr() as $opt ) {
+		delete_option( $opt );
+	}
+	wpseo_defaults();
+	
+	wpseo_title_test();
+}
+
+function wpseo_defaults() {
+	if ( !is_array( get_option('wpseo') ) ) {
+		$opt = array(
+			'disableadvanced_meta' => 'on',
+			'version' => WPSEO_VERSION,
+		);
+		update_option( 'wpseo', $opt );
+	}
+	
+	if ( !is_array( get_option('wpseo_titles') ) ) {
+		$opt = array (
+			'title-post' => '%%title%% %%sep%% %%sitename%%',
+			'title-page' => '%%title%% %%sep%% %%sitename%%',
+			'title-attachment' => '%%title%% %%sep%% %%sitename%%',
+			'title-category' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
+			'title-post_tag' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
+			'title-author' => '%%name%% %%sep%% '.__('Author at','wordpress-seo').' %%sitename%%',
+			'title-archive' => '%%date%% %%sep%% %%sitename%%',
+			'title-search' => sprintf( __('You searched for %s', 'wordpress-seo'), '%%searchphrase%%' ).' %%sep%% %%sitename%%',
+			'title-404' => __('Page Not Found', 'wordpress-seo').' %%sep%% %%sitename%%',
+			'noindex-archive' => 'on',
+			'noindex-post_format' => 'on',
+		);
+		update_option( 'wpseo_titles', $opt );
+	}
+	
+	if ( !is_array( get_option('wpseo_xml') ) ) {
+		$opt = array (
+			'enablexmlsitemap' => 'on',
+		);
+		update_option( 'wpseo_xml', $opt );
+	} 
+
+	if ( !is_array( get_option('wpseo_social') ) ) {
+		$opt = array (
+			'opengraph' => 'on',
+		);
+		update_option( 'wpseo_social', $opt );
+	} 
+
+	if ( !is_array( get_option('wpseo_rss') ) ) {
+		$opt = array (
+			'rssafter' => sprintf( __( 'The post %s appeared first on %s.', 'wordpress-seo' ), '%%POSTLINK%%', '%%BLOGLINK%%' ),
+		);
+		update_option( 'wpseo_rss', $opt );
+	} 
+	
+	// Force WooThemes to use WordPress SEO data.
+	if ( function_exists( 'woo_version_init' ) ) {
+		update_option( 'seo_woo_use_third_party_data', 'true' );
+	}
 }
 
 function wpseo_deactivate() {
@@ -209,7 +237,7 @@ function wpseo_admin_bar_menu() {
 	
 	if ( $admin_menu ) {
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-settings', 'title' => __( 'SEO Settings', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Meta Settings', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( 'Head Settings', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-social', 'title' => __( 'Social', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_social'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-xml', 'title' => __( 'XML Sitemaps', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_xml'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
@@ -257,7 +285,7 @@ function wpseo_title_test() {
 	}
 
 	$resp = wp_remote_get( get_bloginfo('url') );
-	if ( $resp ) {
+	if ( $resp && !is_wp_error( $resp ) ) {
 		preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
 	
 		if ( $matches[1] != $expected_title ) {
@@ -273,6 +301,7 @@ function wpseo_title_test() {
 			update_option('wpseo_titles', $options);
 		}
 	} else {
+		// If that dies, let's make sure the titles are correct and force the output.
 		$options['forcerewritetitle'] = 'on';
 		update_option('wpseo_titles', $options);
 	}

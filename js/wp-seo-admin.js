@@ -60,7 +60,7 @@ function wpseo_killBlockingFiles( nonce ) {
 }
 
 jQuery(document).ready(function(){	
-	var active_tab = window.location.hash.replace('#','').replace('-tab','');
+	var active_tab = window.location.hash.replace('#top#','');
 	if ( active_tab == '' )
 		active_tab = 'general';
 	jQuery('#'+active_tab).addClass('active');
