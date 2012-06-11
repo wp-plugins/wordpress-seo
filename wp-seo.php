@@ -68,7 +68,6 @@ if ( is_admin() ) {
 		require WPSEO_PATH.'admin/yst_plugin_tools.php';
 		require WPSEO_PATH.'admin/class-config.php';
 		require WPSEO_PATH.'admin/class-metabox.php';
-		require WPSEO_PATH.'admin/linkdex/linkdex.php';
 		require WPSEO_PATH.'admin/class-taxonomy.php';
 		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
 			require WPSEO_PATH.'admin/class-opengraph-admin.php';
