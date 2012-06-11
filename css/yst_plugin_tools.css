@@ -31,6 +31,7 @@ div.yoastbox ul {
 
 label {
 	float: left;
+	margin-left: 6px;
 }
 
 input.textinput, textarea, select {
@@ -55,7 +56,7 @@ textarea.import {
 label.textinput, label.select, label.checkbox {
 	width: 180px;
 	background-color: transparent;
-	margin: 5px 0 0 0;
+	margin: 10px 0;
 }
 
 label.radio {
@@ -192,4 +193,8 @@ h2 {
 }
 h2 code {
 	font-size: 23px;
+}
+
+#wpseo-conf {
+	max-width: 600px;
 }

@@ -18,6 +18,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 		
 		function init() {
+			if ( isset( $_GET['wpseo_reset_defaults']) ) {
+				wpseo_reset_defaults();
+				wp_redirect( admin_url('admin.php?page=wpseo_dashboard') );
+			}
+			
 			if ( $this->grant_access() ) {
 				add_action( 'admin_init', array(&$this, 'options_init') );
 				add_action( 'admin_menu', array(&$this, 'register_settings_page') );
@@ -36,6 +41,9 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_action( 'personal_options_update', array(&$this,'wpseo_process_user_option_update'));
 			add_action( 'edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
 
+			add_action( 'init', array(&$this, 'custom_category_descriptions_allow_html' ) );
+			add_filter( 'category_description', array(&$this, 'custom_category_descriptions_add_shortcode_support' ) );
+			
 			add_filter( 'user_contactmethods', array(&$this,'add_google_plus_contactmethod'), 10, 1 );
 			
 			if ( '0' == get_option('blog_public') )
@@ -989,9 +997,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		}
 		
 		function config_page() {
-			if ( isset( $_GET['wpseo_reset_defaults']) )
-				wpseo_reset_defaults();
-
 			$options = get_option('wpseo');
 		
 			$this->admin_header('General', false, true, 'yoast_wpseo_options', 'wpseo' );
@@ -1232,7 +1237,31 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 
 		  return $contactmethods;
 		}
-		
+
+		/**
+		 * Allows HTML in descriptions
+		 */
+		function custom_category_descriptions_allow_html() {
+			$filters = array(
+				'pre_term_description',
+			    'pre_link_description',
+			    'pre_link_notes',
+			    'pre_user_description'
+			);
+
+			foreach ( $filters as $filter ) {
+			    remove_filter( $filter, 'wp_filter_kses' );
+			}
+			remove_filter( 'term_description', 'wp_kses_data' );
+		}
+
+		/**
+		 * Adds shortcode support to category descriptions.
+		 */
+		function custom_category_descriptions_add_shortcode_support( $desc, $cat_id ) {
+		    return do_shortcode( $desc );
+		}
+
 	} // end class WPSEO_Admin
 	$wpseo_admin = new WPSEO_Admin();
 }

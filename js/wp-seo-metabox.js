@@ -178,26 +178,27 @@ function updateSnippet() {
 }
 
 jQuery(document).ready(function(){	
-	// Tabs, based on code by Pete Mall - https://github.com/PeteMall/Metabox-Tabs
-	jQuery('.wpseo-metabox-tabs li a').each(function(i) {
-		var thisTab = jQuery(this).parent().attr('class').replace(/active /, '');
-
-		if ( 'active' != jQuery(this).attr('class') )
-			jQuery('div.' + thisTab).hide();
-
-		jQuery('div.' + thisTab).addClass('wpseo-tab-content');
-
-		jQuery(this).click(function(){
-			// hide all child content
-			jQuery(this).parent().parent().parent().children('div').hide();
-
-			// remove all active tabs
-			jQuery(this).parent().parent('ul').find('li.active').removeClass('active');
-
-			// show selected content
-			jQuery(this).parent().parent().parent().find('div.'+thisTab).show();
-			jQuery(this).parent().parent().parent().find('li.'+thisTab).addClass('active');
-		});
+	var active_tab = window.location.hash;
+	if ( active_tab == '' || active_tab.search('wpseo') == -1 )
+		active_tab = 'general';
+	else
+		active_tab = active_tab.replace('#wpseo_','');
+	jQuery('.'+active_tab).addClass('active');
+	
+	jQuery('a.wpseo_tablink').click( function($) {
+		jQuery('.wpseo-metabox-tabs li').removeClass('active');
+		jQuery('.wpseotab').removeClass('active');
+	
+		var id = jQuery(this).attr('href').replace('#wpseo_','');
+		jQuery('.'+id).addClass('active');
+		jQuery(this).parent().addClass('active');
+		
+		if ( jQuery(this).hasClass('scroll') ) {
+			var scrollto = jQuery(this).attr('href').replace('wpseo_','');
+			jQuery( "html, body" ).animate({
+				scrollTop: jQuery( scrollto ).offset().top
+			}, 500);
+		}
 	});
 
 	jQuery('.wpseo-heading').hide();

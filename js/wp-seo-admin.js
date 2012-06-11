@@ -1,11 +1,4 @@
 jQuery(document).ready(function () {
-	jQuery("#disableexplanation").change(function() {
-		if (jQuery("#disableexplanation").is(':checked')) {
-			jQuery("p.desc").css("display","none");
-		} else {
-			jQuery("p.desc").css("display","block");
-		}
-	}).change();
 	jQuery("#enablexmlsitemap").change(function() {
 		if (jQuery("#enablexmlsitemap").is(':checked')) {
 			jQuery("#sitemapinfo").css("display","block");
@@ -66,7 +59,7 @@ jQuery(document).ready(function(){
 	jQuery('#'+active_tab).addClass('active');
 	jQuery('#'+active_tab+'-tab').addClass('nav-tab-active');
 	
-	jQuery('#wpseo-tabs a').click(function(i) {
+	jQuery('#wpseo-tabs a').click(function() {
 		jQuery('#wpseo-tabs a').removeClass('nav-tab-active');
 		jQuery('.wpseotab').removeClass('active');
 	

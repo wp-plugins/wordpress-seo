@@ -22,7 +22,6 @@ class WPSEO_Frontend {
 
 		add_filter( 'loginout',array( &$this, 'nofollow_link' ) );
 		add_filter( 'register',array( &$this, 'nofollow_link' ) );
-		add_filter( 'comments_popup_link_attributes', array( &$this, 'echo_nofollow' ) );
 
 		if ( isset($options['hide-rsdlink']) && $options['hide-rsdlink'] )
 			remove_action( 'wp_head', 'rsd_link' );
@@ -745,10 +744,6 @@ class WPSEO_Frontend {
 
 	function nofollow_link($output) {
 		return str_replace( '<a ','<a rel="nofollow" ',$output);
-	}
-
-	function echo_nofollow() {
-		return ' rel="nofollow"';
 	}
 
 	function archive_redirect() {
