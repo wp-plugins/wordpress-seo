@@ -164,7 +164,7 @@ function boldKeywords( str, url ) {
 			var kw 	= kw.replace(' ','-').toLowerCase();
 			kwregex = new RegExp( "([-/])("+kw+")([-/])?" );
 		} else {
-			kwregex = new RegExp( "(^|[ \s\n\r\t\.,'\(\"\+;!?:\-]+)("+kw+")($|[\s\n\r\t.,'\)\"\+;!?:\-]+)", 'gim' );
+			kwregex = new RegExp( "(^|[ \s\n\r\t\.,'\(\"\+;!?:\-]+)("+kw+")($|[ \s\n\r\t\.,'\)\"\+;!?:\-]+)", 'gim' );
 		}
 		str 	= str.replace( kwregex, "$1<strong>$2</strong>$3" );
 	}
