@@ -237,7 +237,7 @@ function wpseo_admin_bar_menu() {
 	
 	if ( $admin_menu ) {
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-menu', 'id' => 'wpseo-settings', 'title' => __( 'SEO Settings', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
-		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( "Title's & Meta's", 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-titles', 'title' => __( "Titles & Metas", 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_titles'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-social', 'title' => __( 'Social', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_social'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-xml', 'title' => __( 'XML Sitemaps', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_xml'), ) );
 		$wp_admin_bar->add_menu( array( 'parent' => 'wpseo-settings', 'id' => 'wpseo-permalinks', 'title' => __( 'Permalinks', 'wordpress-seo'  ), 'href' => admin_url('admin.php?page=wpseo_permalinks'), ) );
