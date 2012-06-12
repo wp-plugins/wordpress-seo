@@ -73,7 +73,7 @@ class WPSEO_Taxonomy {
 			'default' => sprintf( __('Use %s default (Currently: %s)','wordpress-seo'), $taxonomy, $current),
 			'index' => __('Always index','wordpress-seo'),
 			'noindex' => __('Always noindex','wordpress-seo') );
-		$this->form_row( 'wpseo_noindex', sprintf( __('Noindex this %s', 'wordpress-seo'), $taxonomy ), sprintf( __('This %s follows the indexation rules set under Meta\'s and Titles, you can override it here.','wordpress-seo'), $taxonomy ), $tax_meta, 'select', $noindex_options );
+		$this->form_row( 'wpseo_noindex', sprintf( __('Noindex this %s', 'wordpress-seo'), $taxonomy ), sprintf( __('This %s follows the indexation rules set under Metas and Titles, you can override it here.','wordpress-seo'), $taxonomy ), $tax_meta, 'select', $noindex_options );
 		
 		$this->form_row( 'wpseo_sitemap_include', __( 'Include in sitemap?', 'wordpress-seo' ), '', $tax_meta, 'select', array(
 			"-" => __("Auto detect", 'wordpress-seo' ),
