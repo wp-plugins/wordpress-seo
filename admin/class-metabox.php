@@ -626,6 +626,8 @@ class WPSEO_Metabox {
 	
 	function column_sort( $columns ) {
 		$columns['wpseo-score'] = 'wpseo-score';
+		$columns['wpseo-metadesc'] = 'wpseo-metadesc';
+		$columns['wpseo-focuskw'] = 'wpseo-focuskw';
 		return $columns;
 	}
 	
@@ -634,6 +636,18 @@ class WPSEO_Metabox {
 			$vars = array_merge( $vars, array(
 				'meta_key' => '_yoast_wpseo_linkdex',
 				'orderby' => 'meta_value_num'
+			) );
+		}
+		if ( isset( $vars['orderby'] ) && 'wpseo-metadesc' == $vars['orderby'] ) {
+			$vars = array_merge( $vars, array(
+				'meta_key' => '_yoast_wpseo_metadesc',
+				'orderby' => 'meta_value'
+			) );
+		}
+		if ( isset( $vars['orderby'] ) && 'wpseo-focuskw' == $vars['orderby'] ) {
+			$vars = array_merge( $vars, array(
+				'meta_key' => '_yoast_wpseo_focuskw',
+				'orderby' => 'meta_value'
 			) );
 		}
 
@@ -679,9 +693,9 @@ class WPSEO_Metabox {
 				break;
 			case 5:
 			case 6:
+			case 7:
 				$score = 'ok';
 				break;
-			case 7:
 			case 8:
 			case 9:
 			case 10:
@@ -1209,10 +1223,10 @@ class WPSEO_Metabox {
 				$score = 9;
 			} else if ( $flesch >= 80 ) {
 				$level = __('easy','wordpress-seo');
-				$score = 8;
+				$score = 9;
 			} else if ( $flesch >= 70 ) {
 				$level = __('fairly easy','wordpress-seo');
-				$score = 7;
+				$score = 8;
 			} else if ( $flesch >= 60 ) {
 				$level = __('OK','wordpress-seo');
 				$score = 7;
