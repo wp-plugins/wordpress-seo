@@ -48,7 +48,7 @@ class WPSEO_Metabox {
 			$score = 'noindex';
 			$title = __('Post is set to noindex.','wordpress-seo');
 		} else if ( $perc_score = wpseo_get_value('linkdex') ) {
-			$score = $this->translate_score( $perc_score );
+			$score = $this->translate_score( round( $perc_score / 10 ) );
 		} else {
 			if ( isset( $_GET['post'] ) ) {
 				$post_id = (int) $_GET['post'];
@@ -70,8 +70,6 @@ class WPSEO_Metabox {
 
 		echo 'SEO: '.$result.' <a class="wpseo_tablink scroll" href="#wpseo_linkdex">Check</a>';
 		
-		// if ( WP_DEBUG )
-		// 	echo ' <small>('.$perc_score.'%)</small>';
 		echo '</div>';
 	}
 	
@@ -223,6 +221,12 @@ class WPSEO_Metabox {
 	function get_advanced_meta_boxes() {
 		global $post;
 		
+		$post_type = '';
+		if ( isset($post->post_type) )
+			$post_type = $post->post_type;
+		else if ( !isset($post->post_type) && isset( $_GET['post_type'] ) )
+			$post_type = $_GET['post_type'];
+			
 		$options = get_wpseo_options();
 		
 		$mbs = array();
@@ -233,7 +237,7 @@ class WPSEO_Metabox {
 			"title" => __("Meta Robots Index", 'wordpress-seo' ),
 			"type" => "select",
 			"options" => array(
-				"0" => sprintf( __( "Default for post type, currently: %s", 'wordpress-seo'), ( isset( $options['noindex-' . $post->post_type ] ) && $options['noindex-' . $post->post_type ] ) ? 'noindex' : 'index' ),
+				"0" => sprintf( __( "Default for post type, currently: %s", 'wordpress-seo'), ( isset( $options['noindex-' . $post_type ] ) && $options['noindex-' . $post->post_type ] ) ? 'noindex' : 'index' ),
 				"2" => "index",
 				"1" => "noindex",
 			),
@@ -596,7 +600,7 @@ class WPSEO_Metabox {
 				if ( wpseo_get_value('meta-robots-noindex', $id) !== 0 )
 					update_post_meta( $id, '_yoast_wpseo_linkdex', 0 );
 			} else if ( $score = wpseo_get_value('linkdex', $id) ) {
-				$score = $this->translate_score( $score );
+				$score = $this->translate_score( round( $score / 10 ) );
 				$title = $score;
 			} else {
 				$this->calculateResults( get_post( $id ) );
@@ -683,8 +687,6 @@ class WPSEO_Metabox {
 	}
 
 	function translate_score( $val ) {
-		if ( $val >= 10 )
-			$val = round( $val / 10 );
 		$score = 'bad';
 		switch ( $val ) {
 			case 3:
@@ -736,6 +738,9 @@ class WPSEO_Metabox {
 		$output .= '<hr/>';
 		$output .= '<p style="font-size: 13px;"><a href="http://yoast.com/out/linkdex/"><img class="alignleft" style="margin: 0 10px 5px 0;" src="'.WPSEO_URL.'images/linkdex-logo.png" alt="Linkdex"/></a>'.sprintf(__( 'This page analysis brought to you by the collaboration of Yoast and %sLinkdex%s. Linkdex is an SEO suite that helps you optimize your site and offers you all the SEO tools you\'ll need. Yoast uses %sLinkdex%s and highly recommends you do too!', 'wordpress-seo' ),'<a href="http://yoast.com/out/linkdex/">','</a>', '<a href="http://yoast.com/out/linkdex/">','</a>').'</p>';
 
+		if ( WP_DEBUG )
+			$output .= '<p><small>('.$perc_score.'%)</small></p>';
+		
 		$output = '<div class="wpseo_msg"><p>'.__('To update this page analysis, save as draft or update and check this tab again', 'wordpress-seo' ).'.</p></div>'.$output;
 	
 		unset( $results, $job );

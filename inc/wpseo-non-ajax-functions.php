@@ -256,7 +256,7 @@ function wpseo_stopwords_check( $haystack, $checkingUrl = false ) {
 			$stopWord = str_replace( "'", "", $stopWord );
 
 		// Check whether the stopword appears as a whole word
-		$res = preg_match( "/\b". preg_quote( $stopWord ) ."\b/i", $haystack, $match );
+		$res = preg_match( "/(^|[ \n\r\t\.,'\(\)\"\+;!?:])". preg_quote( $stopWord ) ."($|[ \n\r\t\.,'\(\)\"\+;!?:])/i", $haystack, $match );
 		if ( $res > 0 )
 			return $stopWord;
 	}
