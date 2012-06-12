@@ -265,17 +265,18 @@ function wpseo_stopwords_check( $haystack, $checkingUrl = false ) {
 }
 
 function wpseo_title_test() {
-	$options = get_wpseo_options();
+	$options = get_option('wpseo_titles');
 	
 	if ( isset( $options['forcerewritetitle'] ) ) {
 		unset( $options['forcerewritetitle'] ); 
 		update_option('wpseo_titles', $options);
 	}
 	
-	if ( !isset( $options['title-home'] ) ) {
-		$options['title-home'] = '%%sitename%% %%sep%% %%sitedesc%%';
-		update_option('wpseo_titles', $options);
-	}
+	if ( isset( $options['title-home'] ) )
+		$old_home_setting = $options['title-home'];
+	
+	$options['title-home'] = '%%sitename%% - %%sitedesc%% - 12345';
+	update_option('wpseo_titles', $options);
 
 	if ( 'page' != get_option('show_on_front') ) {
 		$expected_title = wpseo_replace_vars( $options['title-home'], array() );
@@ -285,10 +286,10 @@ function wpseo_title_test() {
 	}
 
 	$resp = wp_remote_get( get_bloginfo('url') );
-	if ( $resp && !is_wp_error( $resp ) ) {
-		preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
+	if ( $resp && !is_wp_error( $resp ) && 200 == $resp['response']['code'] ) {
+		$res = preg_match('/<title>([^<]+)<\/title>/im', $resp['body'], $matches);
 	
-		if ( $matches[1] != $expected_title ) {
+		if ( $res && $matches[1] != $expected_title ) {
 			$options['forcerewritetitle'] = 'on';
 			update_option('wpseo_titles', $options);
 
@@ -296,13 +297,18 @@ function wpseo_title_test() {
 			preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
 		}
 
-		if ( $matches[1] != $expected_title ) {
+		if ( !$res || $matches[1] != $expected_title ) {
 			unset( $options['forcerewritetitle'] ); 
 			update_option('wpseo_titles', $options);
 		}
 	} else {
 		// If that dies, let's make sure the titles are correct and force the output.
 		$options['forcerewritetitle'] = 'on';
+		update_option('wpseo_titles', $options);
+	}
+	
+	if ( isset($old_home_setting) ) {
+		$options['title-home'] = $old_home_setting;
 		update_option('wpseo_titles', $options);
 	}
 }

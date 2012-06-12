@@ -1212,7 +1212,7 @@ class WPSEO_Metabox {
 		$firstp = wpseo_strtolower_utf8( $firstp );
 		
 		// First Paragraph Test
-		if ( stripos( $firstp, $job["keyword"] ) === false && strpos( $firstp, $job["keyword_folded"] ) === false ) {
+		if ( stripos( $firstp, $job["keyword"] ) === false && stripos( $firstp, $job["keyword_folded"] ) === false ) {
 			$this->SaveScoreResult( $results, 3, $scoreFirstParagraphLow );
 		} else {
 			$this->SaveScoreResult( $results, 9, $scoreFirstParagraphHigh );		

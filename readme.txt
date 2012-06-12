@@ -134,6 +134,12 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.2.1 (development version) =
+
+* Bugs fixed:
+	* Trim the focus keyword before running tests.
+	* Title's should be (and now is) Titles.
+	
 = 1.2 =
 
 * Bugs fixed:

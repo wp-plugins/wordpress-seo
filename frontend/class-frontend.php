@@ -301,9 +301,7 @@ class WPSEO_Frontend {
  	}
 	
 	function force_wp_title() {
-		wp_reset_query();
-		global $sep;
-		return wp_title( $sep, true, 'right' );
+		return $this->title( '', '', false );
 	}
 	
 	function fix_generator($generator) {
@@ -395,6 +393,7 @@ class WPSEO_Frontend {
 				$robots['index']  = 'noindex';
 			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
+				echo '<pre>'.print_r($term,1).'</pre>';
 				if ( isset( $options[ 'noindex-' . $term->taxonomy ] ) && $options[ 'noindex-' . $term->taxonomy ] )
 					$robots['index'] = 'noindex';
 
@@ -402,7 +401,8 @@ class WPSEO_Frontend {
 				$term_meta = wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' );
 				if ( 'noindex' == $term_meta || 'on' == $term_meta ) // on is for backwards compatibility
 					$robots['index'] = 'noindex';
-				else if ( 'index' == $term_meta )
+				
+				if ( 'index' == $term_meta )
 					$robots['index'] = 'index';				
 			} else if ( 
 				(is_author() 	&& isset($options['noindex-author']) && $options['noindex-author']) || 
