@@ -770,7 +770,7 @@ class WPSEO_Metabox {
 		$sampleurl = get_sample_permalink( $post );
 		$job["pageUrl"] = preg_replace( '/%(post|page)name%/', $sampleurl[1], $sampleurl[0] );
 		$job["pageSlug"] = urldecode( $post->post_name );
-		$job["keyword"]	= wpseo_get_value('focuskw');
+		$job["keyword"]	= trim( wpseo_get_value('focuskw') );
 		$job["keyword_folded"] = $this->strip_separators_and_fold( $job["keyword"] );
 
 		$dom = new domDocument; 
@@ -890,7 +890,7 @@ class WPSEO_Metabox {
 		// standardise whitespace again
 		$inputString = preg_replace('/\s+/',' ',$inputString);
 
-		return $inputString;
+		return trim( $inputString );
 	}
 	
 	function ScoreKeyword($job, &$results) {
@@ -952,9 +952,10 @@ class WPSEO_Metabox {
 			// TODO MA Keyword/Title matching is exact match with separators removed, but should extend to distributed match
 			$needle_position = stripos( $title, $job["keyword_folded"] );
 
-			if ( $needle_position === false )
+			if ( $needle_position === false ) {
 				$needle_position = stripos( $title, $job["keyword"] );
-
+			}
+			
 			if ( $needle_position === false )
 				$this->SaveScoreResult( $results, 2, sprintf( $scoreTitleKeywordMissing, $job["keyword_folded"] ) );
 
