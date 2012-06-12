@@ -1144,11 +1144,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$fbconnect .= '<p>'.__('Select an app to use as Facebook admin:', 'wordpress-seo' ).'</p>';
 				$fbconnect .= '<select name="wpseo_social[fbadminapp]" id="fbadminapp">';
 				
+				if ( !isset($options['fbadminapp']) )
+					$options['fbadminapp'] = 0;
+
 				foreach($options['fbapps'] as $id => $app) {
 					$sel = '';
-
-					if ( !isset($options['fbadminapp']) )
-						$options['fbadminapp'] = 0;
 
 					if ( $id == $options['fbadminapp'] )
 						$sel = 'selected="selected"';
