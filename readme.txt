@@ -137,8 +137,10 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 = 1.2.1 (development version) =
 
 * Bugs fixed:
-	* Trim the focus keyword before running tests.
+	* Trim the focus keyword before running page analysis tests.
 	* Title's should be (and now is) Titles.
+	* Fixes to Theme integrations for Woo, Genesis and Thematic.
+	* Enhancement to force rewrite title test.
 	
 = 1.2 =
 

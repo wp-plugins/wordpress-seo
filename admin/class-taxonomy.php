@@ -12,8 +12,7 @@ class WPSEO_Taxonomy {
 		add_action('edit_term', array(&$this,'update_term'), 10, 3 );
 		
 		add_action( 'init', array(&$this, 'custom_category_descriptions_allow_html' ) );
-		add_filter( 'category_description', array(&$this, 'custom_category_descriptions_add_shortcode_support' ) );
-		
+		add_filter( 'category_description', array(&$this, 'custom_category_descriptions_add_shortcode_support' ), 10, 2 );
 	}
 	
 	function form_row( $id, $label, $desc, $tax_meta, $type = 'text', $options = '' ) {

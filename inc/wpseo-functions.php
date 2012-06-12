@@ -398,7 +398,9 @@ function wpseo_maybe_upgrade() {
 
 		delete_option('wpseo_indexation');
 	}
-		
+	
+	wpseo_title_test();
+	
 	$options['version'] = WPSEO_VERSION;
 	update_option( 'wpseo', $options );
 }

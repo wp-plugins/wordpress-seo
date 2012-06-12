@@ -483,20 +483,20 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				$this->currentoption = 'wpseo_titles';	
 			
 				echo '<h2>'.__('Title settings','wordpress-seo').'</h2>';
-				echo $this->checkbox('forcerewritetitle',__('Force rewrite titles', 'wordpress-seo'), false);
+				echo $this->checkbox( 'forcerewritetitle', __('Force rewrite titles', 'wordpress-seo') );
 				echo '<p class="desc">'.__('WordPress SEO has auto-detected whether it needs to force rewrite the titles for your pages, if you think it\'s wrong and you know what you\'re doing, you can change the setting here.','wordpress-seo').'</p>';
 								
 				echo '<h2>'.__('Sitewide <code>meta</code> settings','wordpress-seo').'</h2>';
-				echo $this->checkbox('noindex-subpages',__('Noindex subpages of archives', 'wordpress-seo'), false);
+				echo $this->checkbox( 'noindex-subpages', __('Noindex subpages of archives', 'wordpress-seo') );
 				echo '<p class="desc">'.__('If you want to prevent /page/2/ and further of any archive to show up in the search results, enable this.').'</p>';
 				
-				echo $this->checkbox('usemetakeywords', __( 'Use <code>meta</code> keywords tag?', 'wordpress-seo' ), false );
+				echo $this->checkbox( 'usemetakeywords', __( 'Use <code>meta</code> keywords tag?', 'wordpress-seo' ) );
 				echo '<p class="desc">'.__('I don\'t know why you\'d want to use meta keywords, but if you want to, check this box.').'</p>';
 				
-				echo $this->checkbox('noodp',__('Add <code>noodp</code> meta robots tag sitewide', 'wordpress-seo') );
+				echo $this->checkbox( 'noodp', __('Add <code>noodp</code> meta robots tag sitewide', 'wordpress-seo' ) );
 				echo '<p class="desc">'.__('Prevents search engines from using the DMOZ description for pages from this site in the search results.', 'wordpress-seo').'</p>';
 				
-				echo $this->checkbox('noydir',__('Add <code>noydir</code> meta robots tag sitewide', 'wordpress-seo') );
+				echo $this->checkbox( 'noydir', __('Add <code>noydir</code> meta robots tag sitewide', 'wordpress-seo' ) );
 				echo '<p class="desc">'.__('Prevents search engines from using the Yahoo! directory description for pages from this site in the search results.', 'wordpress-seo').'</p>';
 			
 				echo '<h2>'.__('Clean up the <code>&lt;head&gt;</code>', 'wordpress-seo' ).'</h2>';

@@ -183,7 +183,9 @@ jQuery(document).ready(function(){
 		active_tab = 'general';
 	else
 		active_tab = active_tab.replace('#wpseo_','');
+				
 	jQuery('.'+active_tab).addClass('active');
+
 	
 	jQuery('a.wpseo_tablink').click( function($) {
 		jQuery('.wpseo-metabox-tabs li').removeClass('active');

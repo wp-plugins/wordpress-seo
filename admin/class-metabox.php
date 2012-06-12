@@ -48,7 +48,7 @@ class WPSEO_Metabox {
 			$score = 'noindex';
 			$title = __('Post is set to noindex.','wordpress-seo');
 		} else if ( $perc_score = wpseo_get_value('linkdex') ) {
-			$score = $this->translate_score( round( $perc_score / 10 ) );
+			$score = wpseo_translate_score( round( $perc_score / 10 ) );
 		} else {
 			if ( isset( $_GET['post'] ) ) {
 				$post_id = (int) $_GET['post'];
@@ -584,7 +584,6 @@ class WPSEO_Metabox {
 
 			wp_enqueue_script( 'jquery-ui-autocomplete', WPSEO_URL.'js/jquery-ui-autocomplete.min.js', array( 'jquery', 'jquery-ui-core' ), WPSEO_VERSION, true );		
 			wp_enqueue_script( 'wp-seo-metabox', WPSEO_URL.'js/wp-seo-metabox.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-autocomplete' ), WPSEO_VERSION, true );
-			
 		}
 	}
 
@@ -600,7 +599,7 @@ class WPSEO_Metabox {
 				if ( wpseo_get_value('meta-robots-noindex', $id) !== 0 )
 					update_post_meta( $id, '_yoast_wpseo_linkdex', 0 );
 			} else if ( $score = wpseo_get_value('linkdex', $id) ) {
-				$score = $this->translate_score( round( $score / 10 ) );
+				$score = wpseo_translate_score( round( $score / 10 ) );
 				$title = $score;
 			} else {
 				$this->calculateResults( get_post( $id ) );
@@ -609,7 +608,7 @@ class WPSEO_Metabox {
 					$score = 'na';
 					$title = __('Focus keyword not set.','wordpress-seo');
 				} else {
-					$score = $this->translate_score( $score );
+					$score = wpseo_translate_score( $score );
 					$title = $score;
 				}
 			}
@@ -686,27 +685,6 @@ class WPSEO_Metabox {
 	    $array=$ret;
 	}
 
-	function translate_score( $val ) {
-		$score = 'bad';
-		switch ( $val ) {
-			case 3:
-			case 4:
-				$score = 'poor';
-				break;
-			case 5:
-			case 6:
-			case 7:
-				$score = 'ok';
-				break;
-			case 8:
-			case 9:
-			case 10:
-				$score = 'good';
-				break;
-		}
-		return $score;
-	}
-	
 	function linkdex_output( $post ) {
 		
 		if ( isset( $_GET['post'] ) ) {
@@ -731,7 +709,7 @@ class WPSEO_Metabox {
 		$perc_score = wpseo_get_value('linkdex');
 		
 		foreach ($results as $result) {
-			$score = $this->translate_score( $result['val'] );
+			$score = wpseo_translate_score( $result['val'] );
 			$output .= '<tr><td class="score"><div class="wpseo_score_img '.$score.'"></div></td><td>'.$result['msg'].'</td></tr>';
 		}
 		$output .= '</table>';
@@ -1288,8 +1266,10 @@ class WPSEO_Metabox {
 
 	function GetFirstParagraph( $post ) {
 		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.		
-		preg_match( '/<p>(.*)<\/p>/', wpautop( $post->post_content ), $matches );
-		return $matches[1];
+		$res = preg_match( '/<p>(.*)<\/p>/', wpautop( $post->post_content ), $matches );
+		if ( $res )
+			return $matches[1];
+		return false;
 	}
 }
 $wpseo_metabox = new WPSEO_Metabox();

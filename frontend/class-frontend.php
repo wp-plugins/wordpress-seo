@@ -110,7 +110,7 @@ class WPSEO_Frontend {
 		$title = get_the_author_meta('wpseo_title', $author_id);
 		
 		if ( !empty($title) )
-			return wpseo_replace_vars( $title );
+			return wpseo_replace_vars( $title, array() );
 		
 		return $this->get_title_from_options( 'title-author' );
 	}
@@ -393,7 +393,6 @@ class WPSEO_Frontend {
 				$robots['index']  = 'noindex';
 			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
-				echo '<pre>'.print_r($term,1).'</pre>';
 				if ( isset( $options[ 'noindex-' . $term->taxonomy ] ) && $options[ 'noindex-' . $term->taxonomy ] )
 					$robots['index'] = 'noindex';
 
