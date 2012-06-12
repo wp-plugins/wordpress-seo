@@ -22,6 +22,8 @@ class WPSEO_Metabox {
 		add_action( 'wp_insert_post', array($this,'save_postdata') );
 		
 		add_action( 'admin_init', array(&$this, 'register_columns') );
+		add_filter( 'request', array(&$this, 'column_sort_orderby') );
+		
 		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
 	}
 
@@ -33,6 +35,7 @@ class WPSEO_Metabox {
 				continue;
 			add_filter( 'manage_'.$pt.'_posts_columns', array( $this, 'column_heading' ), 10, 1 );
 			add_action( 'manage_'.$pt.'_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
+			add_action( 'manage_edit-'.$pt.'_sortable_columns', array( $this, 'column_sort' ), 10, 2 );
 		}
 	}
 	
@@ -590,6 +593,8 @@ class WPSEO_Metabox {
 			if ( wpseo_get_value('meta-robots-noindex', $id) == 1 ) {
 				$score = 'noindex';
 				$title = __('Post is set to noindex.','wordpress-seo');
+				if ( wpseo_get_value('meta-robots-noindex', $id) !== 0 )
+					update_post_meta( $id, '_yoast_wpseo_linkdex', 0 );
 			} else if ( $score = wpseo_get_value('linkdex', $id) ) {
 				$score = $this->translate_score( $score );
 				$title = $score;
@@ -617,6 +622,22 @@ class WPSEO_Metabox {
 			$focuskw = wpseo_get_value( 'focuskw', $id );
 			echo $focuskw;
 		}
+	}
+	
+	function column_sort( $columns ) {
+		$columns['wpseo-score'] = 'wpseo-score';
+		return $columns;
+	}
+	
+	function column_sort_orderby( $vars ) {
+		if ( isset( $vars['orderby'] ) && 'wpseo-score' == $vars['orderby'] ) {
+			$vars = array_merge( $vars, array(
+				'meta_key' => '_yoast_wpseo_linkdex',
+				'orderby' => 'meta_value_num'
+			) );
+		}
+
+		return $vars;
 	}
 	
 	function page_title( $postid ) {
@@ -648,7 +669,7 @@ class WPSEO_Metabox {
 	}
 
 	function translate_score( $val ) {
-		if ( $val > 10 )
+		if ( $val >= 10 )
 			$val = round( $val / 10 );
 		$score = 'bad';
 		switch ( $val ) {
@@ -718,6 +739,9 @@ class WPSEO_Metabox {
 		
 		if ( !wpseo_get_value( 'focuskw', $post->ID ) ) {
 			$result = new WP_Error('no-focuskw', sprintf( __( 'No focus keyword was set for this %s. If you do not set a focus keyword, no score can be calculated.', 'wordpress-seo' ), $post->post_type ) );
+			
+			update_post_meta( $post->ID, '_yoast_wpseo_linkdex', 0 );  
+			
 			return $result;
 		}
 	
