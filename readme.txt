@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: 1.1.9
+Stable tag: 1.2
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -134,7 +134,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= 1.2 (development version) =
+= 1.2 =
 
 * Bugs fixed:
 	* ereg_replace != preg_replace ; in other words: alt and title tags for images in xml sitemap fixed.
@@ -162,6 +162,8 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Made sure the default OpenGraph image will always show up when there's no other image.
 	* Updated tablesorting JS used in XML Sitemaps.
 * Enhancements:
+	* Added a page level "score" for the site analysis functionality.
+	* Allow sitewide noindexing of post types and taxonomies with post- and term-level overrides.
 	* Automatically check whether force rewrite needs to be enabled.
 	* Upon activation, XML sitemaps are automatically enabled.
 	* Upon activation, title templates are pre-filled with sensible defaults.
