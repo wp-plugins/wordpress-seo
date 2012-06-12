@@ -722,6 +722,18 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 							<th>%%cf_&lt;custom-field-name&gt;%%</th>
 							<td>'.__('Replaced with a posts custom field value', 'wordpress-seo' ).'</td>
 						</tr>
+						<tr class="alt">
+							<th>%%ct_&lt;custom-tax-name&gt;%%</th>
+							<td>'.__('Replaced with a posts custom taxonomies, comma separated.', 'wordpress-seo' ).'</td>
+						</tr>
+						<tr>
+							<th>%%ct_desc_&lt;custom-tax-name&gt;%%</th>
+							<td>'.__('Replaced with a custom taxonomoies description', 'wordpress-seo' ).'</td>
+						</tr>
+						<tr class="alt">
+							<th>%%sep%%</th>
+							<td>'.__('The separator defined in your theme\'s <code>wp_title()</code> tag.', 'wordpress-seo' ).'</td>
+						</tr>
 					</table>';
 
 			echo '<h2>'.__('Variables', 'wordpress-seo').'</h2>';

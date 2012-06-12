@@ -19,7 +19,7 @@ class WPSEO_Metabox {
 
 		add_action( 'add_meta_boxes', array(&$this, 'add_custom_box') );
 
-		add_action( 'save_post', array($this,'save_postdata') );
+		add_action( 'wp_insert_post', array($this,'save_postdata') );
 		
 		add_action( 'admin_init', array(&$this, 'register_columns') );
 		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
@@ -514,25 +514,15 @@ class WPSEO_Metabox {
 
 	function save_postdata( $post_id ) {  
 		
-		if ( $post_id == null || empty($_POST) )
+		if ( $post_id == null )
 			return;
 
 		if ( wp_is_post_revision( $post_id ) )
-			$post_id = wp_is_post_revision( $post_id );
-			
-		if ( isset( $_POST['post_type'] ) ) {  
-			if ( !current_user_can( 'edit_post', $post_id ) )  {
-				return $post_id;  
-			}
-		} else {  
-			if ( !current_user_can( 'edit_post', $post_id ))  
-				return $post_id;  
-		}  
-
-		global $post;  
-		if ( empty( $post ) )
-			$post = get_post($post_id);
-
+			return;
+		
+		clean_post_cache( $post_id );
+		$post = get_post( $post_id );
+		
 		$metaboxes = array_merge( $this->get_meta_boxes( $post->post_type ), $this->get_advanced_meta_boxes() );
 		
 		$metaboxes = apply_filters( 'wpseo_save_metaboxes', $metaboxes );
@@ -567,9 +557,9 @@ class WPSEO_Metabox {
 
 			update_post_meta($post_id, $option, $data, $oldval);  
 		}  
-
-		$linkdex_results = $this->calculateResults( $post );
 		
+		$this->calculateResults( $post );
+
 		do_action('wpseo_saved_postdata');
 	}
 
@@ -797,16 +787,13 @@ class WPSEO_Metabox {
 		$alts = $this->GetImagesAltText($post->post_content);
 		$imgs = $this->GetImageCount($dom, $xpath);
 		$this->ScoreImagesAltText($job, $results, $alts, $imgs);
-		unset($alts);
-		unset($imgs);
+		unset($alts, $imgs);
 
 		// Anchors
 		$anchors 	= $this->GetAnchorTexts($dom, $xpath);
 		$count 		= $this->GetAnchorCount($dom, $xpath);
 		$this->ScoreAnchorTexts($job, $results, $anchors, $count);
-		unset($anchors);
-		unset($count);
-		unset($dom);
+		unset($anchors, $count, $dom);
 
 		$this->aasort( $results, 'val' );
 		
@@ -818,7 +805,7 @@ class WPSEO_Metabox {
 			$overall_max += 9;
 		}
 		
-		$score = round( $overall / $overall_max * 100 );
+		$score = round( ( $overall / $overall_max ) * 100 );
 		
 		update_post_meta( $post->ID, '_yoast_wpseo_linkdex', $score );  
 		

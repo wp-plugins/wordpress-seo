@@ -302,7 +302,8 @@ class WPSEO_Frontend {
 	
 	function force_wp_title() {
 		wp_reset_query();
-		return wp_title( '', 0);
+		global $sep;
+		return wp_title( $sep, true, 'right' );
 	}
 	
 	function fix_generator($generator) {
@@ -942,13 +943,13 @@ class WPSEO_Frontend {
 	}
 	
 	function flush_cache() {
-		global $wp_query, $post, $wpseo_ob;
+		global $wp_query, $post, $wpseo_ob, $sep;
 
 		if ( !$wpseo_ob )
 			return;
 			
 		$content = ob_get_contents();
-		$title = $this->title( '' );
+		$title = $this->title( '', $sep );
 		
 		$content = preg_replace( '/<title>(.*)<\/title>/','<title>'.$title.'</title>', $content);
 		ob_end_clean();
