@@ -119,11 +119,13 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				if ( !empty( $label_left ) )
 					$label_left .= ':';
 				$output_label = '<label class="checkbox" for="'.$id.'">'.$label_left.'</label>';
+				$class 		  = 'checkbox';
 			} else {
 				$output_label = '<label for="'.$id.'">'.$label.'</label>';
+				$class 		  = 'checkbox double';
 			}
 			
-			$output_input = '<input class="checkbox" type="checkbox" id="'.$id.'" name="'.$option.'['.$id.']"'. checked($options[$id],'on',false).'/>';
+			$output_input = '<input class="'.$class.'" type="checkbox" id="'.$id.'" name="'.$option.'['.$id.']"'. checked($options[$id],'on',false).'/>';
 			
 			if( $label_left !== false ) {
 				$output = $output_label . $output_input . '<label class="checkbox" for="'.$id.'">'.$label.'</label>';

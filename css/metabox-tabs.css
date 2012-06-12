@@ -279,7 +279,7 @@ table.wpseoanalysis td.score {
 	margin: 3px 0 0 0;
 	width: 16px;
 	height: 16px;
-	background-image: url('../images/score_buttons.png');
+	background-image: url(../images/score_buttons.png);
 	background-repeat: no-repeat;
 	padding: 0 0 0 0;
 }
@@ -294,4 +294,10 @@ table.wpseoanalysis td.score {
 }
 .wpseo_score_img.bad {
 	background-position: -49px -2px;
+}
+.wpseo_score_img.na {
+	background-position: -74px -2px;
+}
+.wpseo_score_img.noindex {
+	background-position: -146px -2px;
 }

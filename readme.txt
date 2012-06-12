@@ -166,9 +166,9 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Upon activation, XML sitemaps are automatically enabled.
 	* Upon activation, title templates are pre-filled with sensible defaults.
 	* Plugin now auto-detects whether titles need to be force-rewritten (using output buffering) or not.
-	* Redesign of the admin, removal of the indexations page and renaming the Titles page into Head Settings page.
+	* Redesign of the admin, removal of the indexations page and renaming the Titles page into Meta's & Titles page.
 	* Allow noindex-following per custom taxonomy and custom post type.
-	* No longer show non-public post types on the head settings page.
+	* No longer show non-public post types on the Titles & Meta's page.
 	* On activation, W3 Total Cache or WP Super Cache cache gets cleared automatically.
 	* Added an uninstall handler, deleting the plugin through the WP backend will now delete options from the DB too.
 	* Added the option to display custom taxonomy in titles and descriptions, use `%%ct_<custom-taxname>%%` for a comma separated list or `%%ct_<custom-taxname>%%single%%` for only one taxonomy term.

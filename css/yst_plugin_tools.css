@@ -40,8 +40,12 @@ input.textinput, textarea, select {
 
 input.textinput, textarea.textinput, select.select, input.checkbox {
 	float: left;
-	margin: 5px 3px 0 0;
+	margin: 12px 3px 0 0;
 	padding: 5px;
+}
+
+input.checkbox.double {
+	margin-top: 2px;
 }
 
 .textinput.metadesc {
@@ -56,7 +60,7 @@ textarea.import {
 label.textinput, label.select, label.checkbox {
 	width: 180px;
 	background-color: transparent;
-	margin: 10px 0;
+	margin: 10px 0 5px 0;
 }
 
 label.radio {

@@ -3,7 +3,7 @@
 	margin: 3px 0 0 0;
 	width: 16px;
 	height: 16px;
-	background-image: url('../images/score_buttons.png');
+	background-image: url(../images/score_buttons.png);
 	background-repeat: no-repeat;
 	padding: 0 0 0 0;
 }
@@ -21,4 +21,10 @@
 }
 .wpseo_score_img.na {
 	background-position: -74px -2px;
+}
+.wpseo_score_img.noindex {
+	background-position: -146px -2px;
+}
+th#wpseo-score {
+	width: 30px;
 }

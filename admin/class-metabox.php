@@ -17,30 +17,58 @@ class WPSEO_Metabox {
 
 		add_action( 'admin_head', array( $this, 'script') );
 
-		add_action('add_meta_boxes', array(&$this, 'add_custom_box') );
+		add_action( 'add_meta_boxes', array(&$this, 'add_custom_box') );
 
-		add_action('save_post', array($this,'save_postdata') );
+		add_action( 'save_post', array($this,'save_postdata') );
 		
-		add_filter('manage_page_posts_columns',array($this,'page_title_column_heading'),10,1);
-		add_filter('manage_post_posts_columns',array($this,'page_title_column_heading'),10,1);
-		add_action('manage_pages_custom_column',array($this,'page_title_column_content'), 10, 2);
-		add_action('manage_posts_custom_column',array($this,'page_title_column_content'), 10, 2);
-		
-		add_action('post_submitbox_misc_actions',array($this,'publish_box')); 
+		add_action( 'admin_init', array(&$this, 'register_columns') );
+		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
 	}
 
+	public function register_columns() {
+		$options = get_wpseo_options();
+		
+		foreach ( get_post_types( array('public' => true), 'names' ) as $pt ) {
+			if ( isset($options['hideeditbox-'.$pt]) && $options['hideeditbox-'.$pt] )
+				continue;
+			add_filter( 'manage_'.$pt.'_posts_columns', array( $this, 'column_heading' ), 10, 1 );
+			add_action( 'manage_'.$pt.'_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
+		}
+	}
+	
 	public function publish_box() {
 		$score = wpseo_get_value('linkdex');
 		echo '<div class="misc-pub-section curtime misc-pub-section-last" style="height:0; padding:0; margin:0; border-top: 1px solid #DFDFDF"></div>';
 		echo '<div class="misc-pub-section misc-yoast misc-pub-section-last">';
 
-		if ( $score = wpseo_get_value('linkdex') )
-			$score = $this->translate_score( $score );
-		else
-			$score = 'na';
-		$result = '<div class="wpseo_score_img '.$score.'"></div>';
+		if ( wpseo_get_value('meta-robots-noindex') == 1 ) {
+			$score = 'noindex';
+			$title = __('Post is set to noindex.','wordpress-seo');
+		} else if ( $perc_score = wpseo_get_value('linkdex') ) {
+			$score = $this->translate_score( $perc_score );
+		} else {
+			if ( isset( $_GET['post'] ) ) {
+				$post_id = (int) $_GET['post'];
+				$post = get_post( $post_id );
+			} else {
+				global $post;
+			}
+
+			$this->calculateResults( $post );
+			$score = wpseo_get_value('linkdex');
+			if ( !$score || empty( $score ) ) {
+				$score = 'na';
+				$title = __('No focus keyword set.','wordpress-seo');
+			}
+		}
+		if ( !isset($title) )
+			$title = ucfirst( $score );
+		$result = '<div title="'.$title.'" alt="'.$title.'" class="wpseo_score_img '.$score.'"></div>';
 
 		echo 'SEO: '.$result.' <a class="wpseo_tablink scroll" href="#wpseo_linkdex">Check</a>';
+		
+		// if ( WP_DEBUG )
+		// 	echo ' <small>('.$perc_score.'%)</small>';
 		echo '</div>';
 	}
 	
@@ -190,18 +218,21 @@ class WPSEO_Metabox {
 	}
 	
 	function get_advanced_meta_boxes() {
+		global $post;
+		
 		$options = get_wpseo_options();
 		
 		$mbs = array();
 		
 		$mbs['meta-robots-noindex'] = array(
 			"name" => "meta-robots-noindex",
-			"std" => "index",
+			"std" => "-",
 			"title" => __("Meta Robots Index", 'wordpress-seo' ),
-			"type" => "radio",
+			"type" => "select",
 			"options" => array(
-				"0" => __("Index", 'wordpress-seo' ),
-				"1" => __("Noindex", 'wordpress-seo' ),
+				"0" => sprintf( __( "Default for post type, currently: %s", 'wordpress-seo'), ( isset( $options['noindex-' . $post->post_type ] ) && $options['noindex-' . $post->post_type ] ) ? 'noindex' : 'index' ),
+				"2" => "index",
+				"1" => "noindex",
 			),
 		);
 		$mbs['meta-robots-nofollow'] = array(
@@ -538,8 +569,6 @@ class WPSEO_Metabox {
 		}  
 
 		$linkdex_results = $this->calculateResults( $post );
-		if ( !is_wp_error( $linkdex_results ) )
-			update_post_meta( $post_id, '_yoast_wpseo_linkdex', $linkdex_results['score'] );  
 		
 		do_action('wpseo_saved_postdata');
 	}
@@ -562,25 +591,44 @@ class WPSEO_Metabox {
 		}
 	}
 
-	function page_title_column_heading( $columns ) {
-		return array_merge(array_slice($columns, 0, 6), array('wpseo-score' => 'SEO'), array_slice($columns, 6, count($columns)));
+	function column_heading( $columns ) {
+		return array_merge( $columns, array('wpseo-score' => 'SEO', 'wpseo-title' => 'SEO Title', 'wpseo-metadesc' => 'Meta Desc.', 'wpseo-focuskw' => 'Focus KW') );
 	}
 
-	function page_title_column_content( $column_name, $id ) {
+	function column_content( $column_name, $id ) {
 		if ( $column_name == 'wpseo-score' ) {
-			if ( $score = wpseo_get_value('linkdex') )
+			if ( wpseo_get_value('meta-robots-noindex', $id) == 1 ) {
+				$score = 'noindex';
+				$title = __('Post is set to noindex.','wordpress-seo');
+			} else if ( $score = wpseo_get_value('linkdex', $id) ) {
 				$score = $this->translate_score( $score );
-			else
-				$score = 'na';
-			
-			if ( $score != 'na' )
 				$title = $score;
-			else
-				$title = 'Focus keyword not set';
-				
-			echo '<div title="'.$title.'" class="wpseo_score_img '.$score.'"></div>';
+			} else {
+				$this->calculateResults( get_post( $id ) );
+				$score = wpseo_get_value('linkdex', $id );
+				if ( !$score || empty( $score ) ) {
+					$score = 'na';
+					$title = __('Focus keyword not set.','wordpress-seo');
+				} else {
+					$score = $this->translate_score( $score );
+					$title = $score;
+				}
+			}
+			
+			echo '<div title="'.$title.'" alt="'.$title.'" class="wpseo_score_img '.$score.'"></div>';
 		}
-	}	
+		if ( $column_name == 'wpseo-title' ) {
+			echo $this->page_title( $id );
+		}
+		if ( $column_name == 'wpseo-metadesc' ) {
+			echo wpseo_get_value( 'metadesc', $id );
+		}
+		if ( $column_name == 'wpseo-focuskw' ) {
+			$focuskw = wpseo_get_value( 'focuskw', $id );
+			echo $focuskw;
+		}
+	}
+	
 	function page_title( $postid ) {
 		$fixed_title = wpseo_get_value('title', $postid );
 		if ($fixed_title) {
@@ -625,6 +673,7 @@ class WPSEO_Metabox {
 			case 7:
 			case 8:
 			case 9:
+			case 10:
 				$score = 'good';
 				break;
 		}
@@ -652,8 +701,7 @@ class WPSEO_Metabox {
 
 		$output = '<table class="wpseoanalysis">';	
 		
-		$perc_score = $results['score'];
-		unset( $results['score'] );
+		$perc_score = wpseo_get_value('linkdex');
 		
 		foreach ($results as $result) {
 			$score = $this->translate_score( $result['val'] );
@@ -770,7 +818,9 @@ class WPSEO_Metabox {
 			$overall_max += 9;
 		}
 		
-		$results['score'] = round( $overall / $overall_max * 100 );
+		$score = round( $overall / $overall_max * 100 );
+		
+		update_post_meta( $post->ID, '_yoast_wpseo_linkdex', $score );  
 		
 		return $results;
 	}

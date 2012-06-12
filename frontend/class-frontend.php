@@ -378,8 +378,10 @@ class WPSEO_Frontend {
 			global $post;
 			if ( isset( $options['noindex-' . $post->post_type ] ) && $options['noindex-' . $post->post_type ] )
 				$robots['index'] = 'noindex';
-			if ( wpseo_get_value( 'meta-robots-noindex' ) )
+			if ( wpseo_get_value( 'meta-robots-noindex' ) == 1 )
 				$robots['index'] = 'noindex';
+			if ( wpseo_get_value( 'meta-robots-noindex' ) == 2 )
+				$robots['index'] = 'index';
 			if ( wpseo_get_value( 'meta-robots-nofollow' ) )
 				$robots['follow'] = 'nofollow';
 			if ( wpseo_get_value( 'meta-robots-adv') && wpseo_get_value( 'meta-robots-adv') != 'none' ) { 
@@ -392,14 +394,15 @@ class WPSEO_Frontend {
 				$robots['index']  = 'noindex';
 			} else if ( is_tax() || is_tag() || is_category() ) {
 				$term = $wp_query->get_queried_object();
-				if ( isset( $options[ 'noindex-' . $term->taxonomy ] ) && $options[ 'noindex-' . $term->taxonomy ] ) {
+				if ( isset( $options[ 'noindex-' . $term->taxonomy ] ) && $options[ 'noindex-' . $term->taxonomy ] )
 					$robots['index'] = 'noindex';
-				} else {
-					if ( wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' ) )
-						$robots['index'] = 'noindex';					
-				}
-				if ( wpseo_get_term_meta( $term, $term->taxonomy, 'nofollow' ) )
-					$robots['follow'] = 'nofollow';
+
+				// Three possible values, index, noindex and default, do nothing for default
+				$term_meta = wpseo_get_term_meta( $term, $term->taxonomy, 'noindex' );
+				if ( 'noindex' == $term_meta || 'on' == $term_meta ) // on is for backwards compatibility
+					$robots['index'] = 'noindex';
+				else if ( 'index' == $term_meta )
+					$robots['index'] = 'index';				
 			} else if ( 
 				(is_author() 	&& isset($options['noindex-author']) && $options['noindex-author']) || 
 				(is_date() 		&& isset($options['noindex-archives']) && $options['noindex-archives']) || 

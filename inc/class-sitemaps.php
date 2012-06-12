@@ -348,7 +348,7 @@ class WPSEO_Sitemaps {
 				
 				$content = $p->post_content;
 				if ( function_exists('get_the_post_thumbnail') ) {
-					$content .= '<p>' . get_the_post_thumbnail( $p->ID, 'full' ) . '</p>';
+					$content = '<p>' . get_the_post_thumbnail( $p->ID, 'full' ) . '</p>'.$content;
 				}
 				
 				$host = str_replace( 'www.', '', parse_url( get_bloginfo('url'), PHP_URL_HOST ) );

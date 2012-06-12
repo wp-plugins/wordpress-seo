@@ -41,9 +41,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			add_action( 'personal_options_update', array(&$this,'wpseo_process_user_option_update'));
 			add_action( 'edit_user_profile_update', array(&$this,'wpseo_process_user_option_update'));
 
-			add_action( 'init', array(&$this, 'custom_category_descriptions_allow_html' ) );
-			add_filter( 'category_description', array(&$this, 'custom_category_descriptions_add_shortcode_support' ) );
-			
 			add_filter( 'user_contactmethods', array(&$this,'add_google_plus_contactmethod'), 10, 1 );
 			
 			if ( '0' == get_option('blog_public') )
@@ -465,7 +462,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				
 				?>
 				<a href="http://yoast.com/"><div id="top yoast-icon" style="background: url(<?php echo WPSEO_URL; ?>images/wordpress-SEO-32x32.png) no-repeat;" class="icon32"><br /></div></a>
-				<h2 id="wpseo-title"><?php _e("Yoast WordPress SEO: Head Settings", 'wordpress-seo' ); ?></h2>
+				<h2 id="wpseo-title"><?php _e("Yoast WordPress SEO: Title's &amp; Meta's", 'wordpress-seo' ); ?></h2>
 				<div id="wpseo_content_top" class="postbox-container" style="width:75%;">
 					<div class="metabox-holder">	
 						<div class="meta-box-sortables">
@@ -571,15 +568,14 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				</div>
 				<div id="taxonomies" class="wpseotab">
 			<?php
-			foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $taxonomy) {
-				echo '<h4>'.$taxonomy->labels->name.'</h4>';
-				$name =  $taxonomy->name;
-				echo $this->textinput('title-'.$name,__('Title template', 'wordpress-seo' ));
-				echo $this->textarea('metadesc-'.$name,__('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
-				if ( isset($options['usemetakeywords']) && $options['usemetakeywords'] )
-					echo $this->textinput('metakey-'.$name,__('Meta keywords template', 'wordpress-seo' ));
-				echo $this->checkbox('noindex-'.$name,'<code>noindex, follow</code>', __('Meta Robots','wordpress-seo') );
-				echo $this->checkbox('tax-hideeditbox-'.$name, __('Hide','wordpress-seo'), __('WordPress SEO Meta Box','wordpress-seo') );
+			foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $tax ) {
+				echo '<h4>'.$tax->labels->name.'</h4>';
+				echo $this->textinput( 'title-'.$tax->name, __('Title template', 'wordpress-seo' ) );
+				echo $this->textarea( 'metadesc-'.$tax->name, __('Meta description template', 'wordpress-seo' ), '', 'metadesc' );
+				if ( isset( $options['usemetakeywords']) && $options['usemetakeywords'] )
+					echo $this->textinput( 'metakey-'.$tax->name, __('Meta keywords template', 'wordpress-seo' ) );
+				echo $this->checkbox( 'noindex-'.$tax->name, '<code>noindex, follow</code>', __('Meta Robots','wordpress-seo') );
+				echo $this->checkbox( 'tax-hideeditbox-'.$tax->name, __('Hide','wordpress-seo'), __('WordPress SEO Meta Box','wordpress-seo') );
 				echo '<br/>';
 			}
 			
@@ -1236,30 +1232,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		  $contactmethods['googleplus'] = 'Google+';
 
 		  return $contactmethods;
-		}
-
-		/**
-		 * Allows HTML in descriptions
-		 */
-		function custom_category_descriptions_allow_html() {
-			$filters = array(
-				'pre_term_description',
-			    'pre_link_description',
-			    'pre_link_notes',
-			    'pre_user_description'
-			);
-
-			foreach ( $filters as $filter ) {
-			    remove_filter( $filter, 'wp_filter_kses' );
-			}
-			remove_filter( 'term_description', 'wp_kses_data' );
-		}
-
-		/**
-		 * Adds shortcode support to category descriptions.
-		 */
-		function custom_category_descriptions_add_shortcode_support( $desc, $cat_id ) {
-		    return do_shortcode( $desc );
 		}
 
 	} // end class WPSEO_Admin
