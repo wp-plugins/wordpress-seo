@@ -24,6 +24,8 @@ class WPSEO_Metabox {
 		add_action( 'admin_init', array(&$this, 'register_columns') );
 		add_filter( 'request', array(&$this, 'column_sort_orderby') );
 		
+		add_action( 'restrict_manage_posts', array(&$this, 'posts_filter_dropdown') );
+		
 		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
 	}
 
@@ -237,7 +239,7 @@ class WPSEO_Metabox {
 			"title" => __("Meta Robots Index", 'wordpress-seo' ),
 			"type" => "select",
 			"options" => array(
-				"0" => sprintf( __( "Default for post type, currently: %s", 'wordpress-seo'), ( isset( $options['noindex-' . $post_type ] ) && $options['noindex-' . $post->post_type ] ) ? 'noindex' : 'index' ),
+				"0" => sprintf( __( "Default for post type, currently: %s", 'wordpress-seo'), ( isset( $options['noindex-' . $post_type ] ) && $options['noindex-' . $post_type ] ) ? 'noindex' : 'index' ),
 				"2" => "index",
 				"1" => "noindex",
 			),
@@ -587,6 +589,25 @@ class WPSEO_Metabox {
 		}
 	}
 
+	function posts_filter_dropdown() {
+		echo '<select name="seo_filter">';
+		echo '<option value="">All SEO Scores</option>';
+		foreach ( array(
+					'na' => 'SEO: No Focus Keyword',
+					'bad' => 'SEO: Bad',
+					'poor' => 'SEO: Poor',
+					'ok' => 'SEO: OK',
+					'good' => 'SEO: Good',
+					'noindex' => 'SEO: Post Noindexed',
+					) as $val => $text ) {
+			$sel = '';
+			if ( isset($_GET['seo_filter']) && $_GET['seo_filter'] == $val )
+				$sel = 'selected ';
+			echo '<option '.$sel.'value="'.$val.'">'.$text.'</option>';
+		}
+		echo '</select>';
+	}
+	
 	function column_heading( $columns ) {
 		return array_merge( $columns, array('wpseo-score' => 'SEO', 'wpseo-title' => 'SEO Title', 'wpseo-metadesc' => 'Meta Desc.', 'wpseo-focuskw' => 'Focus KW') );
 	}
@@ -635,6 +656,73 @@ class WPSEO_Metabox {
 	}
 	
 	function column_sort_orderby( $vars ) {
+		if ( isset( $_GET['seo_filter'] ) ) {
+			switch ( $_GET['seo_filter'] ) {
+				case 'noindex':
+					$low = false;
+					$noindex = true;
+					break;
+				case 'na':
+					$low = 0;
+					$high = 0;
+					break;
+				case 'bad':
+					$low = 1;
+					$high = 34;
+					break;
+				case 'poor':
+					$low = 35;
+					$high = 54;
+					break;
+				case 'ok':
+					$low = 55;
+					$high = 74;
+					break;
+				case 'good':
+					$low = 75;
+					$high = 100;
+					break;
+				default:
+					$low = false;
+					$noindex = false;
+					break;
+			}
+			if ( $low !== false ) {
+				$vars = array_merge( 
+						$vars, 
+						array(
+							'meta_query' => array(
+								'relation' => 'AND',
+								array(
+									'key' => '_yoast_wpseo_meta-robots-noindex',
+									'value' => 1,
+									'compare' => '!='
+								),
+								array(
+									'key' => '_yoast_wpseo_linkdex',
+									'value' => array( $low, $high ),
+									'type' => 'numeric',
+									'compare' => 'BETWEEN'
+					    		)
+							)
+						)
+					);
+			} else if ( $noindex ) {
+				$vars = array_merge( 
+						$vars, 
+						array(
+							'meta_query' => array(
+								'relation' => 'AND',
+								array(
+									'key' => '_yoast_wpseo_meta-robots-noindex',
+									'value' => 1,
+									'compare' => '='
+								),
+							)
+						)
+					);				
+			}
+		}
 		if ( isset( $vars['orderby'] ) && 'wpseo-score' == $vars['orderby'] ) {
 			$vars = array_merge( $vars, array(
 				'meta_key' => '_yoast_wpseo_linkdex',
@@ -936,8 +1024,7 @@ class WPSEO_Metabox {
 			
 			if ( $needle_position === false )
 				$this->SaveScoreResult( $results, 2, sprintf( $scoreTitleKeywordMissing, $job["keyword_folded"] ) );
-
-			if ( $needle_position <= $scoreTitleKeywordLimit )
+			else if ( $needle_position <= $scoreTitleKeywordLimit )
 				$this->SaveScoreResult( $results, 9, $scoreTitleKeywordBeginning );
 			else
 				$this->SaveScoreResult( $results, 6, $scoreTitleKeywordEnd );
@@ -1031,9 +1118,9 @@ class WPSEO_Metabox {
 		$scoreImagesAltKeywordMissing 	= __("The images on this page do not have alt tags containing your keyword / phrase.", 'wordpress-seo' );
 
 		if ( $imgcount == 0 ) {
-			$this->SaveScoreResult($results,6,$scoreImagesNoImages);
+			$this->SaveScoreResult($results,3,$scoreImagesNoImages);
 		} else if ( count($alts) == 0 && $imgcount != 0 ) {
-			$this->SaveScoreResult($results,3,$scoreImagesNoAlt);
+			$this->SaveScoreResult($results,5,$scoreImagesNoAlt);
 		} else {
 			$found=false;
 			foreach ($alts as $alt) {
@@ -1141,10 +1228,11 @@ class WPSEO_Metabox {
 		}
 	}
 
-
 	function ScoreBody($job, &$results, $body, $firstp, $statistics) {		
 		$scoreBodyGoodLimit 	= 300;
-		$scoreBodyPoorLimit 	= 100;
+		$scoreBodyOKLimit 		= 250;
+		$scoreBodyPoorLimit 	= 200;
+		$scoreBodyBadLimit 		= 100;
 
 		$scoreBodyGoodLength 	= __("There are %d words contained in the body copy, this is greater than the 300 word recommended minimum.", 'wordpress-seo' );
 		$scoreBodyPoorLength 	= __("There are %d words contained in the body copy, this is below the 300 word recommended minimum. Add more useful content on this topic for readers.", 'wordpress-seo' );
@@ -1163,10 +1251,14 @@ class WPSEO_Metabox {
 		// Copy length check
 		$wordCount = $statistics->word_count( $body );
 		
-		if ( $wordCount < $scoreBodyPoorLimit )
-			$this->SaveScoreResult( $results, 1, sprintf( $scoreBodyBadLength, $wordCount ) );
-		else if ( $wordCount < $scoreBodyGoodLimit )
+		if ( $wordCount < $scoreBodyBadLimit )
+			$this->SaveScoreResult( $results, -10, sprintf( $scoreBodyBadLength, $wordCount ) );
+		else if ( $wordCount < $scoreBodyPoorLimit )
+			$this->SaveScoreResult( $results, 3, sprintf( $scoreBodyPoorLength, $wordCount ) );
+		else if ( $wordCount < $scoreBodyOKLimit )
 			$this->SaveScoreResult( $results, 5, sprintf( $scoreBodyPoorLength, $wordCount ) );
+		else if ( $wordCount < $scoreBodyGoodLimit )
+			$this->SaveScoreResult( $results, 7, sprintf( $scoreBodyPoorLength, $wordCount ) );
 		else
 			$this->SaveScoreResult( $results, 9, sprintf( $scoreBodyGoodLength, $wordCount ) );
 
@@ -1197,7 +1289,7 @@ class WPSEO_Metabox {
 		}
 
 		$lang = get_bloginfo('language');
-		if ( substr($lang, 0, 2) == 'en' ) {
+		if ( substr($lang, 0, 2) == 'en' && $wordCount > 100 ) {
 			// Flesch Reading Ease check
 			$flesch = $statistics->flesch_kincaid_reading_ease($body);
 

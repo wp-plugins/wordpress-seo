@@ -332,11 +332,10 @@ function wpseo_translate_score( $val ) {
 		case 0:
 			$score = 'na';
 			break;
-		case 3:
 		case 4:
+		case 5:
 			$score = 'poor';
 			break;
-		case 5:
 		case 6:
 		case 7:
 			$score = 'ok';

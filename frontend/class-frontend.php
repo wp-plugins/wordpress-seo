@@ -11,8 +11,6 @@ class WPSEO_Frontend {
 
 		add_filter( 'wp_title', array( &$this, 'title' ), 10, 3 );
 		add_filter( 'thematic_doctitle', array( &$this, 'force_wp_title' ) );
-		add_filter( 'headway_title', array( &$this, 'force_wp_title' ) );
-		add_filter( 'woo_title', array( &$this, 'force_wp_title' ) );
 		
 		add_action( 'wp',array( &$this, 'page_redirect' ), 99, 1 );
 
@@ -405,7 +403,7 @@ class WPSEO_Frontend {
 					$robots['index'] = 'index';				
 			} else if ( 
 				(is_author() 	&& isset($options['noindex-author']) && $options['noindex-author']) || 
-				(is_date() 		&& isset($options['noindex-archives']) && $options['noindex-archives']) || 
+				(is_date() 		&& isset($options['noindex-archive']) && $options['noindex-archive']) || 
 				(is_home() 		&& get_query_var( 'paged') > 1) )
 			{
 				$robots['index']  = 'noindex';
