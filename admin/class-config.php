@@ -1016,8 +1016,6 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			echo $this->hidden('ms_defaults_set');
 			echo $this->hidden('version');
 			
-			ksort($options);
-			
 			if ( isset($options['blocking_files']) && is_array($options['blocking_files']) && count($options['blocking_files']) > 0 ) {
 				$options['blocking_files'] = array_unique( $options['blocking_files'] );
 				echo '<p id="blocking_files" class="wrong">'

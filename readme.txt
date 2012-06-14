@@ -138,6 +138,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 * Fixed possible bug on multi site.
 * New icons for the analysis functionality.
+* Fixed a bug in alt & title elements for XML sitemaps.
 
 = 1.2.2 =
 

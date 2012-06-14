@@ -17,6 +17,9 @@ class WPSEO_Sitemaps {
 	private $bad_sitemap = false;
 
 	function __construct() {
+		if ( ! defined('ENT_XML1') )
+			define( "ENT_XML1", 16 );
+			
 		$options = get_option('wpseo_xml');
 		if ( !isset($options['enablexmlsitemap']) || !$options['enablexmlsitemap'] )
 			return;
@@ -538,11 +541,11 @@ class WPSEO_Sitemaps {
 		if ( isset($url['images']) && count($url['images']) > 0 ) {
 			foreach( $url['images'] as $src => $img ) {
 				$output .= "\t\t<image:image>\n";
-				$output .= "\t\t\t<image:loc>".htmlspecialchars( $src )."</image:loc>\n";
+				$output .= "\t\t\t<image:loc>".esc_html( $src )."</image:loc>\n";
 				if ( isset($img['title']) )
-					$output .= "\t\t\t<image:title>".preg_replace( "[^A-Za-z0-9\s\.]", "", $img['title'] )."</image:title>\n";
+					$output .= "\t\t\t<image:title>"._wp_specialchars( $img['title'] )."</image:title>\n";
 				if ( isset($img['alt']) )
-					$output .= "\t\t\t<image:caption>".preg_replace( "[^A-Za-z0-9\s\.]", "", $img['alt'] )."</image:caption>\n";
+					$output .= "\t\t\t<image:caption>"._wp_specialchars( $img['alt'] )."</image:caption>\n";
 				$output .= "\t\t</image:image>\n";
 			}
 		}
