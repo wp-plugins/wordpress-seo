@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.3
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -134,7 +134,15 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
-= 1.2.1 (development version) =
+= 1.2.2 =
+
+* Some small bug fixes.
+* Made loading the TextStatistics class conditional on the existence of said class.
+* Added a posts filter option for SEO quality in the edit posts / pages overview.
+* Added a filter `wpseo_use_page_analysis` that disables the page analysis functionality when false is returned.
+* Added a filter `wpseo_show_date_in_snippet` that disables the date in the preview snippet when false is returned.
+
+= 1.2.1 =
 
 * Bugs fixed:
 	* Trim the focus keyword before running page analysis tests.
