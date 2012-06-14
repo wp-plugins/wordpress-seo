@@ -101,7 +101,9 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		 * Create a Checkbox input field
 		 */
 		function checkbox($id, $label, $label_left = false, $option = '') {
-			if ( $option == '' ) {
+			if ( $option == '' && $this->currentoption != '' ) {
+				$options = get_option( $this->currentoption );
+			} else if ( $option == ''  && $this->currentoption != '' ) {
 				$options = get_wpseo_options();
 				$option = !empty($option) ? $option : $this->currentoption;
 			} else {

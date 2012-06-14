@@ -1164,9 +1164,9 @@ class WPSEO_Metabox {
 	}
 	
 	function ScoreHeadings($job, &$results, $headings) {
-		$scoreHeadingsNone				= __("No heading tags appear in the copy.", 'wordpress-seo' );
-		$scoreHeadingsKeywordIn			= __("Keyword / keyphrase appears in %s (out of %s) headings in the copy. While not a major ranking factor, this is beneficial.", 'wordpress-seo' );
-		$scoreHeadingsKeywordMissing	= __("You have not used your keyword / keyphrase in any heading in your copy.", 'wordpress-seo' );
+		$scoreHeadingsNone				= __("No subheading tags (like an H2) appear in the copy.", 'wordpress-seo' );
+		$scoreHeadingsKeywordIn			= __("Keyword / keyphrase appears in %s (out of %s) subheadings in the copy. While not a major ranking factor, this is beneficial.", 'wordpress-seo' );
+		$scoreHeadingsKeywordMissing	= __("You have not used your keyword / keyphrase in any subheading in your copy.", 'wordpress-seo' );
 
 		$headingCount = count( $headings );
 		if ( $headingCount == 0 )

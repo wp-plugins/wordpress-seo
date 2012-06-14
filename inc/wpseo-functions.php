@@ -399,6 +399,19 @@ function wpseo_maybe_upgrade() {
 		delete_option('wpseo_indexation');
 	}
 	
+	// Clean up the wrong wpseo options
+	if ( version_compare( $current_version, '1.2.3', '<' ) ) {
+		$opt = get_option('wpseo');
+	
+		foreach ( $opt as $key => $val ) {
+			if ( !in_array( $key, array('ignore_blog_public_warning', 'ignore_tour', 'ignore_page_comments', 'ignore_permalink', 'ms_defaults_set', 'version', 'disableadvanced_meta', 'googleverify', 'msverify', 'alexaverify') ) {
+				unset( $opt[$key] );
+			}
+		}
+		
+		update_option('wpseo', $opt);
+	}
+	
 	wpseo_title_test();
 	
 	$options['version'] = WPSEO_VERSION;
