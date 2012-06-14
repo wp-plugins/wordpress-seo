@@ -6,7 +6,8 @@ class WPSEO_Metabox {
 	var $wpseo_meta_length_reason = '';
 	
 	function __construct() {
-		require WPSEO_PATH."/admin/linkdex/TextStatistics.php";
+		if ( !class_exists('TextStatistics') )
+			require WPSEO_PATH."/admin/linkdex/TextStatistics.php";
 		
 		$options = get_wpseo_options();
 
@@ -21,12 +22,13 @@ class WPSEO_Metabox {
 
 		add_action( 'wp_insert_post', array($this,'save_postdata') );
 		
-		add_action( 'admin_init', array(&$this, 'register_columns') );
-		add_filter( 'request', array(&$this, 'column_sort_orderby') );
+		if ( apply_filters('wpseo_use_page_analysis', true ) ) {
+			add_action( 'admin_init', array(&$this, 'register_columns') );
+			add_filter( 'request', array(&$this, 'column_sort_orderby') );
 		
-		add_action( 'restrict_manage_posts', array(&$this, 'posts_filter_dropdown') );
-		
-		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
+			add_action( 'restrict_manage_posts', array(&$this, 'posts_filter_dropdown') );
+			add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
+		}
 	}
 
 	public function register_columns() {
@@ -101,7 +103,7 @@ class WPSEO_Metabox {
 		$options = get_wpseo_options();
 		
 		$date = '';
-		if ( $post->post_type == 'post' ) {
+		if ( $post->post_type == 'post' && apply_filters( 'wpseo_show_date_in_snippet', true, $post ) ) {
 			$date = $this->get_post_date( $post );
 
 			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
