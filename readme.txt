@@ -134,6 +134,11 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.2.3 =
+
+* Fixed possible bug on multi site.
+* New icons for the analysis functionality.
+
 = 1.2.2 =
 
 * Some small bug fixes.

@@ -404,3 +404,76 @@ function wpseo_maybe_upgrade() {
 	$options['version'] = WPSEO_VERSION;
 	update_option( 'wpseo', $options );
 }
+
+function wpseo_title_test() {
+	$options = get_option('wpseo_titles');
+	
+	if ( isset( $options['forcerewritetitle'] ) ) {
+		unset( $options['forcerewritetitle'] ); 
+		update_option('wpseo_titles', $options);
+	}
+	
+	if ( isset( $options['title-home'] ) )
+		$old_home_setting = $options['title-home'];
+	
+	$options['title-home'] = '%%sitename%% - %%sitedesc%% - 12345';
+	update_option('wpseo_titles', $options);
+
+	if ( 'page' != get_option('show_on_front') ) {
+		$expected_title = wpseo_replace_vars( $options['title-home'], array() );
+	} else {
+		$page = get_post( get_option('page_on_front') );
+		$expected_title = wpseo_replace_vars( $options['title-page'], $page );
+	}
+
+	$resp = wp_remote_get( get_bloginfo('url') );
+	if ( $resp && !is_wp_error( $resp ) && 200 == $resp['response']['code'] ) {
+		$res = preg_match('/<title>([^<]+)<\/title>/im', $resp['body'], $matches);
+	
+		if ( $res && $matches[1] != $expected_title ) {
+			$options['forcerewritetitle'] = 'on';
+			update_option('wpseo_titles', $options);
+
+			$resp = wp_remote_get( get_bloginfo('url') );
+			preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
+		}
+
+		if ( !$res || $matches[1] != $expected_title ) {
+			unset( $options['forcerewritetitle'] ); 
+			update_option('wpseo_titles', $options);
+		}
+	} else {
+		// If that dies, let's make sure the titles are correct and force the output.
+		$options['forcerewritetitle'] = 'on';
+		update_option('wpseo_titles', $options);
+	}
+	
+	if ( isset($old_home_setting) ) {
+		$options['title-home'] = $old_home_setting;
+		update_option('wpseo_titles', $options);
+	}
+}
+add_filter( 'switch_theme', 'wpseo_title_test', 0 );
+
+function wpseo_translate_score( $val ) {
+	$score = 'bad';
+	switch ( $val ) {
+		case 0:
+			$score = 'na';
+			break;
+		case 4:
+		case 5:
+			$score = 'poor';
+			break;
+		case 6:
+		case 7:
+			$score = 'ok';
+			break;
+		case 8:
+		case 9:
+		case 10:
+			$score = 'good';
+			break;
+	}
+	return $score;
+}
