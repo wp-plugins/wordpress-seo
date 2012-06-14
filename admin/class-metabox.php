@@ -22,25 +22,28 @@ class WPSEO_Metabox {
 
 		add_action( 'wp_insert_post', array($this,'save_postdata') );
 		
-		if ( apply_filters('wpseo_use_page_analysis', true ) ) {
-			add_action( 'admin_init', array(&$this, 'register_columns') );
+		add_action( 'admin_init', array(&$this, 'setup_page_analysis') );
+	}
+
+	public function setup_page_analysis() {
+		
+		if ( apply_filters('wpseo_use_page_analysis', true ) === true ) {
+		
+			$options = get_wpseo_options();
+		
+			foreach ( get_post_types( array('public' => true), 'names' ) as $pt ) {
+				if ( isset($options['hideeditbox-'.$pt]) && $options['hideeditbox-'.$pt] )
+					continue;
+				add_filter( 'manage_'.$pt.'_posts_columns', array( $this, 'column_heading' ), 10, 1 );
+				add_action( 'manage_'.$pt.'_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
+				add_action( 'manage_edit-'.$pt.'_sortable_columns', array( $this, 'column_sort' ), 10, 2 );
+			}
 			add_filter( 'request', array(&$this, 'column_sort_orderby') );
 		
 			add_action( 'restrict_manage_posts', array(&$this, 'posts_filter_dropdown') );
 			add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
 		}
-	}
 
-	public function register_columns() {
-		$options = get_wpseo_options();
-		
-		foreach ( get_post_types( array('public' => true), 'names' ) as $pt ) {
-			if ( isset($options['hideeditbox-'.$pt]) && $options['hideeditbox-'.$pt] )
-				continue;
-			add_filter( 'manage_'.$pt.'_posts_columns', array( $this, 'column_heading' ), 10, 1 );
-			add_action( 'manage_'.$pt.'_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
-			add_action( 'manage_edit-'.$pt.'_sortable_columns', array( $this, 'column_sort' ), 10, 2 );
-		}
 	}
 	
 	public function publish_box() {
@@ -102,8 +105,9 @@ class WPSEO_Metabox {
 			
 		$options = get_wpseo_options();
 		
-		$date = '';
-		if ( $post->post_type == 'post' && apply_filters( 'wpseo_show_date_in_snippet', true, $post ) ) {
+		$use_date 	= apply_filters( 'wpseo_show_date_in_snippet_preview', true, $post );
+		$date 		= '';
+		if ( $post->post_type == 'post' && $use_date ) {
 			$date = $this->get_post_date( $post );
 
 			$this->wpseo_meta_length = $this->wpseo_meta_length - (strlen($date)+5);
@@ -498,7 +502,7 @@ class WPSEO_Metabox {
 		
 		// TODO: make this configurable per post type.
 		$date = '';
-		if ( $post->post_type == 'post' )
+		if ( $post->post_type == 'post' && apply_filters( 'wpseo_show_date_in_snippet_preview', true, $post ) )
 			$date = $this->get_post_date( $post );
 		
 		$title = wpseo_get_value('title');
