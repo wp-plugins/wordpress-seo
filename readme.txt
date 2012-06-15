@@ -149,6 +149,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Only count alt tags in keyword density and word count calculations, leave out title attributes.
 * Enhancements:
 	* New icons for the analysis functionality.
+	* Twitter card functionality.
 
 = 1.2.2 =
 

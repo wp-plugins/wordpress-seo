@@ -422,10 +422,8 @@ function wpseo_maybe_upgrade() {
 function wpseo_title_test() {
 	$options = get_option('wpseo_titles');
 	
-	if ( isset( $options['forcerewritetitle'] ) ) {
+	if ( isset( $options['forcerewritetitle'] ) )
 		unset( $options['forcerewritetitle'] ); 
-		update_option('wpseo_titles', $options);
-	}
 	
 	if ( isset( $options['title-home'] ) )
 		$old_home_setting = $options['title-home'];
@@ -446,20 +444,17 @@ function wpseo_title_test() {
 	
 		if ( $res && $matches[1] != $expected_title ) {
 			$options['forcerewritetitle'] = 'on';
-			update_option('wpseo_titles', $options);
+			update_option('wpseo_titles', $options );
 
 			$resp = wp_remote_get( get_bloginfo('url') );
-			preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
+			$res = preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
 		}
 
-		if ( !$res || $matches[1] != $expected_title ) {
+		if ( !$res || $matches[1] != $expected_title )
 			unset( $options['forcerewritetitle'] ); 
-			update_option('wpseo_titles', $options);
-		}
 	} else {
 		// If that dies, let's make sure the titles are correct and force the output.
 		$options['forcerewritetitle'] = 'on';
-		update_option('wpseo_titles', $options);
 	}
 	
 	if ( isset( $old_home_setting ) ) 		
@@ -468,7 +463,7 @@ function wpseo_title_test() {
 	if ( isset( $old_page_setting ) )
 		$options['title-page'] = $old_page_setting;
 		
-	update_option('wpseo_titles', $options);
+	update_option('wpseo_titles', $options );
 }
 add_filter( 'switch_theme', 'wpseo_title_test', 0 );
 

@@ -1246,6 +1246,7 @@ class WPSEO_Metabox {
 
 		$scoreBodyGoodLength 	= __("There are %d words contained in the body copy, this is greater than the 300 word recommended minimum.", 'wordpress-seo' );
 		$scoreBodyPoorLength 	= __("There are %d words contained in the body copy, this is below the 300 word recommended minimum. Add more useful content on this topic for readers.", 'wordpress-seo' );
+		$scoreBodyOKLength 		= __("There are %d words contained in the body copy, this is slightly below the 300 word recommended minimum, add a bit more copy.", 'wordpress-seo' );
 		$scoreBodyBadLength 	= __("There are %d words contained in the body copy. This is far too low and should be increased.", 'wordpress-seo' );
 
 		$scoreKeywordDensityLow 	= __("The keyword density is %s%%, which is a bit low, the keyword was found %s times.", 'wordpress-seo' );
@@ -1267,13 +1268,13 @@ class WPSEO_Metabox {
 		$wordCount = $statistics->word_count( $body );
 		
 		if ( $wordCount < $scoreBodyBadLimit )
-			$this->SaveScoreResult( $results, -10, sprintf( $scoreBodyBadLength, $wordCount ) );
+			$this->SaveScoreResult( $results, -20, sprintf( $scoreBodyBadLength, $wordCount ) );
 		else if ( $wordCount < $scoreBodyPoorLimit )
-			$this->SaveScoreResult( $results, 3, sprintf( $scoreBodyPoorLength, $wordCount ) );
+			$this->SaveScoreResult( $results, -10, sprintf( $scoreBodyPoorLength, $wordCount ) );
 		else if ( $wordCount < $scoreBodyOKLimit )
 			$this->SaveScoreResult( $results, 5, sprintf( $scoreBodyPoorLength, $wordCount ) );
 		else if ( $wordCount < $scoreBodyGoodLimit )
-			$this->SaveScoreResult( $results, 7, sprintf( $scoreBodyPoorLength, $wordCount ) );
+			$this->SaveScoreResult( $results, 7, sprintf( $scoreBodyOKLength, $wordCount ) );
 		else
 			$this->SaveScoreResult( $results, 9, sprintf( $scoreBodyGoodLength, $wordCount ) );
 

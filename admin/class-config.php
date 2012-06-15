@@ -1201,6 +1201,11 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 			echo '<h4>'.__( 'Default settings', 'wordpress-seo' ).'</h4>';
 			echo $this->textinput('og_default_image', __('Image URL', 'wordpress-seo' ) );
 			echo '<p class="desc label">'.__('This image is used if the post/page being shared does not contain any images.','wordpress-seo').'</p>';
+
+			echo '<h2>'.__('Twitter','wordpress-seo').'</h2>';
+			echo $this->checkbox('twitter', '<label for="twitter">'.__('Add Twitter card meta data', 'wordpress-seo').'</label>' );
+			echo'<p class="desc">'.__('Add Twitter card meta data to your site\'s <code>&lt;head&gt;</code> section.', 'wordpress-seo').'</p>';
+			echo $this->textinput('twitter_site', __('Site Twitter Username', 'wordpress-seo' ) );
 						
 			$this->admin_footer('');
 		}
@@ -1241,6 +1246,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		function add_google_plus_contactmethod( $contactmethods ) {
 		  // Add Twitter
 		  $contactmethods['googleplus'] = 'Google+';
+		  $contactmethods['twitter'] = 'Twitter username';
 
 		  return $contactmethods;
 		}

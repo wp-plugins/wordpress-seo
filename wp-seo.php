@@ -81,6 +81,8 @@ if ( is_admin() ) {
 		require WPSEO_PATH.'frontend/class-breadcrumbs.php';
 	if ( isset( $options['opengraph'] )  && $options['opengraph'] )
 		require WPSEO_PATH.'frontend/class-opengraph.php';
+	if ( isset( $options['twitter'] )  && $options['twitter'] )
+		require WPSEO_PATH.'frontend/class-twitter.php';
 }
 
 // Load all extra modules
