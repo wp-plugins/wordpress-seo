@@ -11,7 +11,7 @@ class WPSEO_Frontend {
 
 		add_filter( 'wp_title', array( &$this, 'title' ), 10, 3 );
 		add_filter( 'thematic_doctitle', array( &$this, 'force_wp_title' ) );
-		
+
 		add_action( 'wp',array( &$this, 'page_redirect' ), 99, 1 );
 
 		add_action( 'admin_head', array( &$this, 'noindex_page' ) );
@@ -205,7 +205,7 @@ class WPSEO_Frontend {
 		// This variable holds the page-specific title part
 		// that is used to generate default titles.
 		$title_part = '';		
-			
+	
 		if ( $this->is_home_static_page() ) {
  			global $post;
 			$title = $this->get_content_title();
@@ -299,6 +299,7 @@ class WPSEO_Frontend {
  	}
 	
 	function force_wp_title() {
+		wp_reset_query();
 		return $this->title( '', '', false );
 	}
 	
@@ -946,6 +947,9 @@ class WPSEO_Frontend {
 			return;
 			
 		$content = ob_get_contents();
+
+		wp_reset_query();
+
 		$title = $this->title( '', $sep );
 		
 		$content = preg_replace( '/<title>(.*)<\/title>/','<title>'.$title.'</title>', $content);
