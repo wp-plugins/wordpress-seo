@@ -27,6 +27,7 @@ function get_wpseo_options_arr() {
 function get_wpseo_options() {
 	$options = array();
 	foreach( get_wpseo_options_arr() as $opt ) {
+		// echo '<!--'.print_r( get_option($opt), 1 ).'-->';
 		$options = array_merge( $options, (array) get_option($opt) );
 	}
 	return $options;

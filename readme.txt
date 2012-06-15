@@ -136,10 +136,14 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 = 1.2.3 =
 
-* Fixed possible bug on multi site.
-* New icons for the analysis functionality.
-* Fixed a bug in alt & title elements for XML sitemaps.
-* Fix to force title rewrites in two places: call `wp_reset_query` for stupid themes and plugins.
+* Bug fixes:
+	* Fixed possible bug on multi site.
+	* Fixed a bug in alt & title elements for XML sitemaps.
+	* Fix to force title rewrites in two places: call `wp_reset_query` for stupid themes and plugins.
+	* Fixed bug in saving some options.
+	* Fixed OpenGraph bug where default image wouldn't be used for post without images.
+* Enhancements:
+	* New icons for the analysis functionality.
 
 = 1.2.2 =
 

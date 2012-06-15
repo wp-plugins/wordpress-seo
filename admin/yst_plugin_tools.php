@@ -103,6 +103,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 		function checkbox($id, $label, $label_left = false, $option = '') {
 			if ( $option == '' && $this->currentoption != '' ) {
 				$options = get_option( $this->currentoption );
+				$option = $this->currentoption;
 			} else if ( $option == ''  && $this->currentoption != '' ) {
 				$options = get_wpseo_options();
 				$option = !empty($option) ? $option : $this->currentoption;
@@ -127,7 +128,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 				$class 		  = 'checkbox double';
 			}
 			
-			$output_input = '<input class="'.$class.'" type="checkbox" id="'.$id.'" name="'.$option.'['.$id.']"'. checked($options[$id],'on',false).'/>';
+			$output_input = "<input class='$class' type='checkbox' id='${id}' name='${option}[${id}]' ".checked($options[$id],'on',false).'/>';
 			
 			if( $label_left !== false ) {
 				$output = $output_label . $output_input . '<label class="checkbox" for="'.$id.'">'.$label.'</label>';

@@ -23,8 +23,9 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				wp_redirect( admin_url('admin.php?page=wpseo_dashboard') );
 			}
 			
+			add_action( 'admin_init', array(&$this, 'options_init') );
+
 			if ( $this->grant_access() ) {
-				add_action( 'admin_init', array(&$this, 'options_init') );
 				add_action( 'admin_menu', array(&$this, 'register_settings_page') );
 				add_action( 'network_admin_menu', array(&$this, 'register_network_settings_page') );
 

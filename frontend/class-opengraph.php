@@ -5,12 +5,10 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	var $options;
 	
 	public function __construct() {
-		$this->options = get_wpseo_options();
-
-		add_action( 'wpseo_head', array(&$this, 'opengraph') );
-
-		if ( isset( $this->options['opengraph'] ) && $this->options['opengraph'] )
-			add_filter('language_attributes', array(&$this, 'add_opengraph_namespace'));
+		$this->options = get_option('wpseo_social');
+		
+		add_action( 'wpseo_head', array( &$this, 'opengraph' ) );
+		add_filter( 'language_attributes', array( &$this, 'add_opengraph_namespace' ) );
 	}
 
 	public function opengraph() {
@@ -188,6 +186,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		
 	public function image( $image = '' ) {
 		if ( is_singular() ) {
+			global $post;
+
 			$shown_images = array();
 
 			if ( is_front_page() ) {
@@ -201,7 +201,6 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 						echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
 				}				
 			} 
-			global $post;
 			
 			if ( function_exists('has_post_thumbnail') && has_post_thumbnail( $post->ID ) ) {
 				$featured_img = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'medium' ) );
@@ -238,24 +237,27 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 					}
 				}
 			}
-		} else {
-			$og_image = '';
-			
-			if ( is_front_page() ) {
-				if ( isset( $this->options['og_frontpage_image'] ) )
-					$og_image = $this->options['og_frontpage_image'];
-				if ( isset( $this->options['gp_frontpage_image'] ) )
-					$gp_image = $this->options['gp_frontpage_image'];
-			}
+			if ( count( $shown_images ) > 0 )
+				return;
+		} 
+		
 
-			if ( empty( $og_image ) && isset( $this->options['og_default_image'] ) )
-				$og_image = $this->options['og_default_image'];
-	
-			$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
-	
-			if ( isset( $og_image ) && $og_image != '' ) 
-				echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
+		$og_image = '';
+		
+		if ( is_front_page() ) {
+			if ( isset( $this->options['og_frontpage_image'] ) )
+				$og_image = $this->options['og_frontpage_image'];
+			if ( isset( $this->options['gp_frontpage_image'] ) )
+				$gp_image = $this->options['gp_frontpage_image'];
 		}
+
+		if ( empty( $og_image ) && isset( $this->options['og_default_image'] ) )
+			$og_image = $this->options['og_default_image'];
+
+		$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
+
+		if ( isset( $og_image ) && $og_image != '' ) 
+			echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
 	}
 		
 	public function description() {
