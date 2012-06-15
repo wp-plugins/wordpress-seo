@@ -596,6 +596,10 @@ class WPSEO_Metabox {
 	}
 
 	function posts_filter_dropdown() {
+		global $pagenow;
+		if ( $pagenow == 'upload.php' )
+			return;
+			
 		echo '<select name="seo_filter">';
 		echo '<option value="">All SEO Scores</option>';
 		foreach ( array(
@@ -1253,6 +1257,11 @@ class WPSEO_Metabox {
 
 		$fleschurl					= '<a href="http://en.wikipedia.org/wiki/Flesch-Kincaid_readability_test#Flesch_Reading_Ease">'.__('Flesch Reading Ease', 'wordpress-seo' ).'</a>';
 		$scoreFlesch				= __("The copy scores %s in the %s test, which is considered %s to read. %s", 'wordpress-seo' );
+		
+
+		// Replace images with their alt tags, then strip all tags
+		$body = preg_replace( '/(<img([^>]+)?alt="([^"]+)"([^>]+)>)/','$3', $body);
+		$body = strip_tags( $body );
 		
 		// Copy length check
 		$wordCount = $statistics->word_count( $body );

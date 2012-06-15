@@ -145,6 +145,8 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Prevent error on division by zero when swapping around text.
 	* Prevent notice in title_test and also fix possible bugs.
 	* Properly escape the delimiter too in all `preg_quote` calls.
+	* Don't show SEO filter on upload.php.
+	* Only count alt tags in keyword density and word count calculations, leave out title attributes.
 * Enhancements:
 	* New icons for the analysis functionality.
 
