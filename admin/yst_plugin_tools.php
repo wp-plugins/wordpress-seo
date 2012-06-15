@@ -155,7 +155,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			
 			$val = '';
 			if (isset($options[$id]))
-				$val = htmlspecialchars($options[$id]);
+				$val = _wp_specialchars($options[$id]);
 			
 			return '<label class="textinput" for="'.$id.'">'.$label.':</label><input class="textinput" type="text" id="'.$id.'" name="'.$option.'['.$id.']" value="'.$val.'"/>' . '<br class="clear" />';
 		}
@@ -199,7 +199,7 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			
 			$val = '';
 			if (isset($options[$id]))
-				$val = htmlspecialchars($options[$id]);
+				$val = _wp_specialchars($options[$id]);
 			return '<input class="hidden" type="hidden" id="'.$id.'" name="'.$option.'['.$id.']" value="'.$val.'"/>';
 		}
 		

@@ -142,6 +142,9 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Fix to force title rewrites in two places: call `wp_reset_query` for stupid themes and plugins.
 	* Fixed bug in saving some options.
 	* Fixed OpenGraph bug where default image wouldn't be used for post without images.
+	* Prevent error on division by zero when swapping around text.
+	* Prevent notice in title_test and also fix possible bugs.
+	* Properly escape the delimiter too in all `preg_quote` calls.
 * Enhancements:
 	* New icons for the analysis functionality.
 

@@ -429,17 +429,17 @@ function wpseo_title_test() {
 	
 	if ( isset( $options['title-home'] ) )
 		$old_home_setting = $options['title-home'];
-	
+
+	if ( isset( $options['title-page'] ) )
+		$old_page_setting = $options['title-page'];
+
+	// Change both templates so whatever page is on front, we server the expected title.
 	$options['title-home'] = '%%sitename%% - %%sitedesc%% - 12345';
-	update_option('wpseo_titles', $options);
+	$options['title-page'] = '%%sitename%% - %%sitedesc%% - 12345';
+	update_option( 'wpseo_titles', $options );
 
-	if ( 'page' != get_option('show_on_front') ) {
-		$expected_title = wpseo_replace_vars( $options['title-home'], array() );
-	} else {
-		$page = get_post( get_option('page_on_front') );
-		$expected_title = wpseo_replace_vars( $options['title-page'], $page );
-	}
-
+	$expected_title = wpseo_replace_vars( $options['title-home'], array() );
+	
 	$resp = wp_remote_get( get_bloginfo('url') );
 	if ( $resp && !is_wp_error( $resp ) && 200 == $resp['response']['code'] ) {
 		$res = preg_match('/<title>([^<]+)<\/title>/im', $resp['body'], $matches);
@@ -462,10 +462,13 @@ function wpseo_title_test() {
 		update_option('wpseo_titles', $options);
 	}
 	
-	if ( isset($old_home_setting) ) {
+	if ( isset( $old_home_setting ) ) 		
 		$options['title-home'] = $old_home_setting;
-		update_option('wpseo_titles', $options);
-	}
+	
+	if ( isset( $old_page_setting ) )
+		$options['title-page'] = $old_page_setting;
+		
+	update_option('wpseo_titles', $options);
 }
 add_filter( 'switch_theme', 'wpseo_title_test', 0 );
 

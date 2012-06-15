@@ -1272,9 +1272,10 @@ class WPSEO_Metabox {
 		
 		// Keyword Density check
 		if ( $wordCount > 0 ) {
-			$keywordCount 		= preg_match_all("/".preg_quote($job["keyword"])."/msiU", $body, $res);
+			$keywordCount 		= preg_match_all("/".preg_quote( $job["keyword"], '/' )."/msiU", $body, $res);
 			$keywordWordCount 	= str_word_count( $job["keyword"] );
-			$keywordDensity 	= number_format( ( ($keywordCount / ($wordCount - (($keywordCount -1) * $keywordWordCount))) * 100 ) , 2 );
+			if ( $keywordCount > 0 && $keywordWordCount > 0 )
+				$keywordDensity 	= number_format( ( ($keywordCount / ($wordCount - (($keywordCount -1) * $keywordWordCount))) * 100 ) , 2 );
 		}
 
 		if ( $keywordDensity < 1 ) {
