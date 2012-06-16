@@ -250,7 +250,10 @@ class WPSEO_Frontend {
 
 			if ( empty($title) ) {
  				$post_type_obj = get_post_type_object( $post_type );
-				$title_part = $post_type_obj->labels->menu_name;
+				if ( isset( $post_type_obj->labels->menu_name ) )
+					$title_part = $post_type_obj->labels->menu_name;
+				else
+					$title_part = $post_type_obj->name;
  			}
  		} else if ( is_archive() ) {
 			$title = $this->get_title_from_options( 'title-archive' );
