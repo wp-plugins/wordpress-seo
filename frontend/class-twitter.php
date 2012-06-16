@@ -49,13 +49,13 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 	
 	public function site_name() {
 		if ( isset( $this->options['twitter_site'] ) )
-			echo '<meta name="twitter:site" value="@' . $this->options['twitter_site'] . '">'."\n";
+			echo '<meta name="twitter:site" value="@' . trim( $this->options['twitter_site'] ) . '">'."\n";
 	}
 
 	public function author_twitter() {
-		$twitter = get_the_author_meta( 'twitter' );
+		$twitter = trim( get_the_author_meta( 'twitter' ) );
 		
-		if ( $twitter )
+		if ( $twitter && !empty( $twitter ) )
 			echo '<meta name="twitter:creator" value="@' . $twitter . '">'."\n";
 	}
 

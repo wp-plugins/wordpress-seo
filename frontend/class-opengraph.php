@@ -18,7 +18,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		
 		$this->locale();
 		$this->id();
-		$this->title();
+		$this->og_title();
 		$this->description();
 		$this->url();
 		$this->site_name();
@@ -45,107 +45,13 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		}
 	}
 	
-	public function title() {
-		global $post, $wp_query;
-		if ( empty($post) && is_singular() ) {
-			$post = $wp_query->get_queried_object();
-		}
-
-		if ( is_home() && 'posts' == get_option('show_on_front') ) {
-			if ( isset($this->options['title-home']) && $this->options['title-home'] != '' )
-				$title = wpseo_replace_vars( $this->options['title-home'], array() );
-			else
-				$title = get_bloginfo('name');
-		} else if ( is_home() && 'posts' != get_option('show_on_front') ) {
-			// For some reason, in some instances is_home returns true for the front page when page_for_posts is not set.
-			if ( get_option('page_for_posts') == 0 )
-				$post = get_post( get_option( 'page_on_front') );
-			else
-				$post = get_post( get_option( 'page_for_posts' ) );
-			$fixed_title = wpseo_get_value('title');
-			if ( $fixed_title ) { 
-				$title = $fixed_title; 
-			} else {
-				if (isset($this->options['title-'.$post->post_type]) && !empty($this->options['title-'.$post->post_type]) )
-					$title = wpseo_replace_vars($this->options['title-'.$post->post_type], (array) $post );
-				else
-					$title = get_bloginfo('name');
-			}
-		} else if ( is_singular() ) {
-			$fixed_title = wpseo_get_value('title');
-			if ( $fixed_title ) { 
-				$title = $fixed_title; 
-			} else {
-				if (isset($this->options['title-'.$post->post_type]) && !empty($this->options['title-'.$post->post_type]) ) {
-					$title = wpseo_replace_vars( $this->options['title-'.$post->post_type], (array) $post );
-				} else {
-					$title = get_the_title();
-					$title = apply_filters('single_post_title', $title);
-				}
-			}
-		} else if ( is_category() || is_tag() || is_tax() ) {
-			$term = $wp_query->get_queried_object();
-			$title = trim( wpseo_get_term_meta( $term, $term->taxonomy, 'title' ) );
-			if ( !$title || empty($title) ) {
-				if ( isset($this->options['title-'.$term->taxonomy]) && !empty($this->options['title-'.$term->taxonomy]) ) {
-					$title = wpseo_replace_vars($this->options['title-'.$term->taxonomy], (array) $term );
-				} else {
-					if ( is_category() )
-						$title = single_cat_title('', false);
-					else if ( is_tag() )
-						$title = single_tag_title('', false);
-					else if ( is_tax() ) {
-						if ( function_exists('single_term_title') ) {
-							$title = single_term_title('', false);
-						} else {
-							$term = $wp_query->get_queried_object();
-							$title = $term->name;
-						}
-					}
-				}
-			}
-		} else if ( is_search() ) {
-			if ( isset($this->options['title-search']) && !empty($this->options['title-search']) )
-				$title = wpseo_replace_vars($this->options['title-search'], (array) $wp_query->get_queried_object() );	
-			else
-				$title = __('Search for "','wordpress-seo').get_search_query().'"';
-		} else if ( is_author() ) {
-			$author_id = get_query_var('author');
-			$title = get_the_author_meta('wpseo_title', $author_id);
-			if ( empty($title) ) {
-				if ( isset($this->options['title-author']) && !empty($this->options['title-author']) )
-					$title = wpseo_replace_vars($this->options['title-author'], array() );
-				else
-					$title = get_the_author_meta('display_name', $author_id); 
-			}
-		} else if ( is_post_type_archive() ) {
-			$post_type = get_post_type();
-			if ( isset($this->options['title-ptarchive-'.$post_type]) && '' != $this->options['title-ptarchive-'.$post_type] ) {
-				return $this->options['title-ptarchive-'.$post_type];
-			} else {
-				$post_type_obj = get_post_type_object( $post_type );
-				$title = $post_type_obj->labels->menu_name;
-			}
-		} else if ( is_archive() ) {
-		 	if ( isset($this->options['title-archive']) && !empty($this->options['title-archive']) )
-				$title = wpseo_replace_vars($this->options['title-archive'], array() );
-			else if ( is_month() ) 
-				$title = single_month_title(' ', false).' '.__('Archives','wordpress-seo'); 
-			else if ( is_year() )
-				$title = get_query_var('year').' '.__('Archives','wordpress-seo'); 
-		} else if ( is_404() ) {
-		 	if ( isset($this->options['title-404']) && !empty($this->options['title-404']) )
-				$title = wpseo_replace_vars($this->options['title-404'], array('post_title' => '') );
-			else
-				$title = __('Page not found','wordpress-seo');
-		} 
-		echo "<meta property='og:title' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
-		// echo "<meta itemprop='name' content='".esc_attr( strip_tags( stripslashes( $title ) ) )."'/>\n";
+	public function og_title() {
+		$title = $this->title('');
+		echo "<meta property='og:title' content='".esc_attr( $title )."'/>\n";
 	}
 		
 	public function url() {
-		$url = WPSEO_Frontend::canonical( false );
-		echo "<meta property='og:url' content='".esc_attr( $url )."'/>\n";
+		echo "<meta property='og:url' content='".esc_attr( $this->canonical( false ) )."'/>\n";
 	}
 	
 	public function locale() {
@@ -264,18 +170,10 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		$ogdesc = wpseo_get_value('opengraph-description');
 		
 		if ( !$ogdesc )
-			$ogdesc = WPSEO_Frontend::metadesc( false );
+			$ogdesc = $this->metadesc( false );
 
 		if ( $ogdesc && $ogdesc != '' )
 			echo "<meta property='og:description' content='".esc_attr( $ogdesc )."'/>\n";
-		// 
-		// $gplusdesc = wpseo_get_value('google-plus-description');
-		// 
-		// if ( !$gplusdesc )
-		// 	$gplusdesc = WPSEO_Frontend::metadesc( false );
-		// 
-		// if ( $gplusdesc && $gplusdesc != '' )
-		// 	echo "<meta itemprop='description' content='".esc_attr( $gplusdesc )."'/>\n";
 	}
 
 	public function site_name() {

@@ -150,6 +150,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 * Enhancements:
 	* New icons for the analysis functionality.
 	* Twitter card functionality.
+	* Removed 200 lines of code from OpenGraph class because I could just inherit it from the parent class. d0h!
 
 = 1.2.2 =
 
