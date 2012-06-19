@@ -425,18 +425,11 @@ function wpseo_title_test() {
 	if ( isset( $options['forcerewritetitle'] ) )
 		unset( $options['forcerewritetitle'] ); 
 	
-	if ( isset( $options['title-home'] ) )
-		$old_home_setting = $options['title-home'];
-
-	if ( isset( $options['title-page'] ) )
-		$old_page_setting = $options['title-page'];
-
-	// Change both templates so whatever page is on front, we server the expected title.
-	$options['title-home'] = '%%sitename%% - %%sitedesc%% - 12345';
-	$options['title-page'] = '%%sitename%% - %%sitedesc%% - 12345';
-	update_option( 'wpseo_titles', $options );
-
-	$expected_title = wpseo_replace_vars( $options['title-home'], array() );
+	$options['title_test'] = true;
+	update_option('wpseo_titles', $options );
+	
+	// Setting title_test to true forces the plugin to output the title below through a filter in class-frontend.php
+	$expected_title = 'This is a Yoast Test Title';
 	
 	$resp = wp_remote_get( get_bloginfo('url') );
 	if ( $resp && !is_wp_error( $resp ) && 200 == $resp['response']['code'] ) {
@@ -457,12 +450,7 @@ function wpseo_title_test() {
 		$options['forcerewritetitle'] = 'on';
 	}
 	
-	if ( isset( $old_home_setting ) ) 		
-		$options['title-home'] = $old_home_setting;
-	
-	if ( isset( $old_page_setting ) )
-		$options['title-page'] = $old_page_setting;
-		
+	unset( $options['title_test'] );
 	update_option('wpseo_titles', $options );
 }
 add_filter( 'switch_theme', 'wpseo_title_test', 0 );

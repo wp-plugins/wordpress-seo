@@ -407,7 +407,7 @@ class WPSEO_Sitemaps {
 
 						$src = apply_filters( 'wpseo_xml_sitemap_img', $image, $p );
 						
-						$url['images'][$src] = $image;
+						$url['images'][] = $image;
 					}
 				}
 

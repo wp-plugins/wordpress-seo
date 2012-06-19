@@ -61,6 +61,9 @@ class WPSEO_Frontend {
 			add_action( 'get_header', array( &$this, 'force_rewrite_output_buffer' ) );
 			add_action( 'wp_footer', array( &$this, 'flush_cache' ) );			
 		}
+		
+		if ( isset($options['title_test']) && $options['title_test'] )
+			add_filter( 'wpseo_title', array( &$this, 'title_test_helper' ) );	
 	}
 
 	function is_home_posts_page() {
@@ -82,7 +85,7 @@ class WPSEO_Frontend {
 			$object = $wp_query->get_queried_object();
 		}
 		$title = wpseo_get_value( 'title', $object->ID );
- 		
+		
 		if ( !empty($title) )
 			return wpseo_replace_vars( $title, (array) $object );
 		
@@ -205,7 +208,7 @@ class WPSEO_Frontend {
 		// This variable holds the page-specific title part
 		// that is used to generate default titles.
 		$title_part = '';		
-	
+			
 		if ( $this->is_home_static_page() ) {
  			global $post;
 			$title = $this->get_content_title();
@@ -303,15 +306,19 @@ class WPSEO_Frontend {
 	
 	function force_wp_title() {
 		wp_reset_query();
-		return $this->title( '', '', false );
+		$title = $this->title( '' );
 	}
 	
 	function fix_generator($generator) {
 		return preg_replace( '/\s?'.get_bloginfo( 'version').'/', '', $generator );
 	}
 	
-	function debug_marker() {
-		echo "\n<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->\n";
+	function debug_marker( $echo = true ) {
+		$marker = "<!-- This site is optimized with the Yoast WordPress SEO plugin v".WPSEO_VERSION." - http://yoast.com/wordpress/seo/ -->";
+		if ( !$echo )
+			return $marker;
+		else
+			echo "\n${marker}\n";
 	}
 	
 	function head() {
@@ -955,7 +962,19 @@ class WPSEO_Frontend {
 
 		$title = $this->title( '', $sep );
 		
-		$content = preg_replace( '/<title>(.*)<\/title>/','<title>'.$title.'</title>', $content);
+		// Find all titles, strip them out and add the new one in within the debug marker, so it's easily identified whether a site uses force rewrite.
+		if ( preg_match_all( '/<title>(.*)?<\/title>/i', $content, $matches ) ) {
+			$count = count( $matches[0] );
+			if ( $count > 0 ) {
+				$i = 0;
+				while ( $count > $i ) {
+					$content = str_replace( $matches[0][$i], '', $content );
+					$i++;
+				}
+			}
+		} 
+		$content = str_replace( $this->debug_marker( false ), $this->debug_marker( false )."\n".'<title>'.$title.'</title>', $content );
+		
 		ob_end_clean();
 		echo $content;
 	}
@@ -965,6 +984,11 @@ class WPSEO_Frontend {
 		$wpseo_ob = true;
 		ob_start();
 	}
+	
+	function title_test_helper( ) {
+		return 'This is a Yoast Test Title';
+	}
+	
 }
 
 $wpseo_front = new WPSEO_Frontend;

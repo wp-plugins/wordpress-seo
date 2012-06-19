@@ -66,7 +66,7 @@ class WPSEO_Taxonomy {
 		$this->form_row( 'wpseo_canonical', __( 'Canonical', 'wordpress-seo' ), __( 'The canonical link is shown on the archive page for this term.', 'wordpress-seo' ), $tax_meta );
 		$this->form_row( 'wpseo_bctitle', __( 'Breadcrumbs Title', 'wordpress-seo' ), sprintf(__( 'The Breadcrumbs title is used in the breadcrumbs where this %s appears.', 'wordpress-seo' ), $taxonomy), $tax_meta );
 
-		if ( $tax_meta['wpseo_noindex'] == 'on' )
+		if ( isset($tax_meta['wpseo_noindex']) && $tax_meta['wpseo_noindex'] == 'on' )
 			$tax_meta['wpseo_noindex'] = 'noindex';
 		$current = ( isset( $options['noindex-'.$taxonomy] ) && $options['noindex-'.$taxonomy] ) ? 'noindex' : 'index';
 		$noindex_options = array( 
