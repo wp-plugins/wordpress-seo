@@ -408,8 +408,17 @@ function wpseo_maybe_upgrade() {
 		}
 		
 		update_option('wpseo', $opt);
+		unset($opt);
 	}
-	
+
+	// Fix wrongness created by buggy version 1.2.2
+	if ( version_compare( $current_version, '1.2.4', '<' ) ) {
+		$options = get_option('wpseo_titles');
+		if ( $options['title-home'] == '%%sitename%% - %%sitedesc%% - 12345' ) {
+			$options['title-home'] = '%%sitename%% - %%sitedesc%%';
+			update_option( 'wpseo_titles', $options );
+		}
+	}
 	wpseo_title_test();
 	
 	$options['version'] = WPSEO_VERSION;
