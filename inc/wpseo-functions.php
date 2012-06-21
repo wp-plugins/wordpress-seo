@@ -27,7 +27,6 @@ function get_wpseo_options_arr() {
 function get_wpseo_options() {
 	$options = array();
 	foreach( get_wpseo_options_arr() as $opt ) {
-		// echo '<!--'.print_r( get_option($opt), 1 ).'-->';
 		$options = array_merge( $options, (array) get_option($opt) );
 	}
 	return $options;
@@ -439,8 +438,6 @@ function wpseo_title_test() {
 	
 	$resp = wp_remote_get( get_bloginfo('url') );
 	
-	// echo '<pre>'.htmlentities($resp['body'],1).'</pre>';
-	
 	if ( $resp && !is_wp_error( $resp ) && 200 == $resp['response']['code'] ) {
 		$res = preg_match('/<title>([^<]+)<\/title>/im', $resp['body'], $matches);
 	
@@ -449,8 +446,6 @@ function wpseo_title_test() {
 			update_option('wpseo_titles', $options );
 
 			$resp = wp_remote_get( get_bloginfo('url') );
-
-			echo '<pre>'.htmlentities($resp['body'],1).'</pre>';
 
 			$res = preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
 		}

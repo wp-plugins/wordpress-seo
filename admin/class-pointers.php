@@ -27,21 +27,45 @@ class WPSEO_Pointers {
 		
 		$adminpages = array( 
 			'wpseo_dashboard' => array(
-					'content'  => '<h3>'.__( 'Dashboard', 'wordpress-seo' ).'</h3><p>'.__( 'This is the WordPress SEO Dashboard, here you can control some of the basic settings such as for which post types and taxonomies to show the WordPress SEO controls.', 'wordpress-seo' ).'</p><p><strong>'.__( 'Webmaster Tools', 'wordpress-seo' ).'</strong><br/>'.__( 'Underneath the General Settings, you can add the verification codes for the different Webmaster Tools programs, I highly encourage you to check out both Google and Bing\'s Webmaster Tools.', 'wordpress-seo' ).'</p><p><strong>'.__( 'About This Tour', 'wordpress-seo' ).'</strong><br/>'.__( 'Clicking Next below takes you to the next page of the tour. If you want to stop this tour, click "Close".', 'wordpress-seo' ).'</p>',
+					'content'  => '<h3>'.__( 'Dashboard', 'wordpress-seo' ).'</h3><p>'.__( 'This is the WordPress SEO Dashboard, here you can restart this tour or revert the WP SEO settings to default.', 'wordpress-seo' ).'</p>'
+					.'<p><strong>'.__( 'More WordPress SEO', 'wordpress-seo' ).'</strong><br/>'.sprintf( __( 'There\'s more to learn about WordPress & SEO than just using this plugin. Read our article %1$sthe definitive guide to WordPress SEO%2$s.', 'wordpress-seo' ), '<a target="_blank" href="http://yoast.com/articles/wordpress-seo/#utm_source=wpadmin&utm_medium=wpseo_tour&utm_term=link&utm_campaign=wpseoplugin">', '</a>').'</p>'
+					.'<p><strong>'.__( 'Webmaster Tools', 'wordpress-seo' ).'</strong><br/>'.__( 'Underneath the General Settings, you can add the verification codes for the different Webmaster Tools programs, I highly encourage you to check out both Google and Bing\'s Webmaster Tools.', 'wordpress-seo' ).'</p>'
+					.'<p><strong>'.__( 'About This Tour', 'wordpress-seo' ).'</strong><br/>'.__( 'Clicking Next below takes you to the next page of the tour. If you want to stop this tour, click "Close".', 'wordpress-seo' ).'</p>'
+					.'<p><strong>'.__( 'Like this plugin?', 'wordpress-seo' ).'</strong><br/>'.sprintf(__( 'If you like this plugin, please %srate it 5 stars on WordPress.org%s and consider making a donation by clicking the button on the right!', 'wordpress-seo' ),'<a target="_blank" href="http://wordpress.org/extend/plugins/wordpress-seo/">','</a>').'</p>'.
+					 '<p><strong>'.__('Newsletter','wordpress-seo').'</strong><br/>'.
+					 __( 'If you would like to keep up to date regarding the WordPress SEO plugin and other plugins by Yoast, subscribe to the newsletter:', 'wordpress-seo').'</p>'.
+					 '<form action="http://yoast.us1.list-manage.com/subscribe/post?u=ffa93edfe21752c921f860358&amp;id=972f1c9122" method="post" id="newsletter-form">'.
+					 '<p>'.
+					 '<label for="newsletter-name">'.__('Name','wordpress-seo').':</label><input style="color:#666" name="MMERGE9" value="'.$current_user->display_name.'" id="newsletter-name" placeholder="'.__('Name','wordpress-seo').'"/><br/>'.
+					 '<label for="newsletter-email">'.__('Email','wordpress-seo').':</label><input style="color:#666" name="EMAIL" value="'.$current_user->user_email.'" id="newsletter-email" placeholder="'.__('Email','wordpress-seo').'"/><br/>'.
+					 '<input type="hidden" name="group" value="2"/>'.
+					 '<button type="submit" class="button-primary">'.__('Subscribe','wordpress-seo').'</button>'.
+					 '</p></form>',
 				'button2'  => __( 'Next', 'wordpress-seo' ),
 				'function' => 'window.location="'.admin_url('admin.php?page=wpseo_titles').'";'
 			),
 			'wpseo_titles' => array(
 				'content'  => "<h3>".__( "Title &amp; Description settings", 'wordpress-seo' )."</h3>"
-							   ."<p>".__( "This is were you set the templates for your titles and descriptions of all the different types of pages on your blog, be it your homepage, posts, pages, category or tag archives, or even custom post type archives and custom posts: all of that is done from here.", 'wordpress-seo' )."</p>"
+							   ."<p>".__( "This is were you set the templates for your titles and descriptions of all the different types of pages on your blog, be it your homepage, posts & pages (under post types), category or tag archives (under taxonomy archives), or even custom post type archives and custom posts: all of that is done from here.", 'wordpress-seo' )."</p>"
 							   ."<p><strong>".__( "Templates", 'wordpress-seo' )."</strong><br/>"
-							   .__( "The templates are built using variables, see <a href='#titleshelp'>the bottom of this page</a> for all the different variables available to you to use in these.", 'wordpress-seo' )."</p>"
-							   ."<p><strong>".__( "Trouble?", 'wordpress-seo' )."</strong><br/>".__( "Be sure to check if your titles are displaying correctly once you've set this up. If you're experiencing trouble with how titles display, be sure to check the 'Force rewrite' checkbox on the left and check again, or follow the instructions on this page on how to modify your theme.", 'wordpress-seo' )."</p>",
+							   .__( "The templates are built using variables, the help tab for all the different variables available to you to use in these.", 'wordpress-seo' )."</p>"
+							   ."<p><strong>".__( "Sitewide settings", 'wordpress-seo' )."</strong><br/>"
+							   .__( "You can also set some sidewide settings here to add specific meta tags or to remove some unneeded cruft.", 'wordpress-seo' )."</p>",
+				'button2'  => __( 'Next', 'wordpress-seo' ),
+				'function' => 'window.location="'.admin_url('admin.php?page=wpseo_social').'";'
+			),
+			'wpseo_social' => array(
+				'content'  => "<h3>".__( "Social settings", 'wordpress-seo' )."</h3>"
+								."<p><strong>".__('Facebook OpenGraph','wordpress-seo').'</strong><br/>'
+							  	.__( "On this page you can enable the OpenGraph functionality from this plugin, as well as assign a Facebook user or Application to be the admin of your site, so you can view the Facebook insights.", 'wordpress-seo' )."</p>"
+							  	.'<p>'.sprintf( __( 'Read more about %1$sFacebook OpenGraph%2$s.', 'wordpress-seo' ), '<a target="_blank" href="http://yoast.com/facebook-open-graph-protocol/#utm_source=wpadmin&utm_medium=wpseo_tour&utm_term=link&utm_campaign=wpseoplugin">', '</a>' )."</p>"
+								."<p><strong>".__('Twitter Cards','wordpress-seo').'</strong><br/>'
+							  	.sprintf( __( 'This functionality is currently in beta, but it allows for %1$sTwitter Cards%2$s.', 'wordpress-seo' ), '<a target="_blank" href="http://yoast.com/twitter-cards/#utm_source=wpadmin&utm_medium=wpseo_tour&utm_term=link&utm_campaign=wpseoplugin">', '</a>' )."</p>",
 				'button2'  => __( 'Next', 'wordpress-seo' ),
 				'function' => 'window.location="'.admin_url('admin.php?page=wpseo_xml').'";'
 			),
 			'wpseo_xml' => array(
-				'content'  => '<h3>'.__( 'XML Sitemaps', 'wordpress-seo' ).'</h3><p>'.__( 'I highly encourage you to check the box to enable XML Sitemaps. Once you do, an XML sitemap will be generated when you publish a new post, page or custom post and Google and Bing will be automatically notified.', 'wordpress-seo' ).'</p><p>'.__( 'Be sure to check whether post types or taxonomies are showing that search engines shouldn\'t be indexing, if so, check the box before them to hide them from the XML sitemaps.', 'wordpress-seo' ).'</p>',
+				'content'  => '<h3>'.__( 'XML Sitemaps', 'wordpress-seo' ).'</h3><p>'.__( 'This plugin adds an XML sitemap to your site. It\'s automatically updated when you publish a new post, page or custom post and Google and Bing will be automatically notified.', 'wordpress-seo' ).'</p><p>'.__( 'Be sure to check whether post types or taxonomies are showing that search engines shouldn\'t be indexing, if so, check the box before them to hide them from the XML sitemaps.', 'wordpress-seo' ).'</p>',
 				'button2'  => __( 'Next', 'wordpress-seo' ),
 				'function' => 'window.location="'.admin_url('admin.php?page=wpseo_permalinks').'";'
 			),
@@ -51,7 +75,7 @@ class WPSEO_Pointers {
 				'function' => 'window.location="'.admin_url('admin.php?page=wpseo_internal-links').'";'
 			),
 			'wpseo_internal-links' => array(
-				'content'  => '<h3>'.__( 'Breadcrumbs Settings', 'wordpress-seo' ).'</h3><p>'.sprintf(__( 'If your theme supports my breadcrumbs, as all Genesis and WooThemes themes as well as a couple of other ones do, you can change the settings for those here. If you want to modify your theme to support them, %sfollow these instructions%s.', 'wordpress-seo' ),'<a href="http://yoast.com/wordpress/breadcrumbs/">','</a>').'</p>',
+				'content'  => '<h3>'.__( 'Breadcrumbs Settings', 'wordpress-seo' ).'</h3><p>'.sprintf(__( 'If your theme supports my breadcrumbs, as all Genesis and WooThemes themes as well as a couple of other ones do, you can change the settings for those here. If you want to modify your theme to support them, %sfollow these instructions%s.', 'wordpress-seo' ),'<a target="_blank" href="http://yoast.com/wordpress/breadcrumbs/#utm_source=wpadmin&utm_medium=wpseo_tour&utm_term=link&utm_campaign=wpseoplugin">','</a>').'</p>',
 				'button2'  => __( 'Next', 'wordpress-seo' ),
 				'function' => 'window.location="'.admin_url('admin.php?page=wpseo_rss').'";'
 			),
@@ -66,42 +90,45 @@ class WPSEO_Pointers {
 				'function' => 'window.location="'.admin_url('admin.php?page=wpseo_files').'";'
 			),
 			'wpseo_files' => array(
-				'content'  => '<h3>'.__( 'File Editor', 'wordpress-seo' ).'</h3><p>'.__( 'Here you can edit the .htaccess and robots.txt files, two of the most powerful files in your WordPress install. Only touch these files if you know what you\'re doing!', 'wordpress-seo' ).'</p><p><strong>'.__( 'Like this plugin?', 'wordpress-seo' ).'</strong><br/>'.sprintf(__( 'If you like this plugin, please %srate it 5 stars on WordPress.org%s and consider making a donation by clicking the button on the right!', 'wordpress-seo' ),'<a href="http://wordpress.org/extend/plugins/wordpress-seo/">','</a>').'</p>'.
-				 '<p><strong>'.__('Newsletter','wordpress-seo').'</strong><br/>'.
-				 __( 'If you would like to keep up to date regarding the WordPress SEO plugin and other plugins by Yoast, subscribe to the newsletter:', 'wordpress-seo').'</p>'.
-				 '<form action="http://yoast.us1.list-manage.com/subscribe/post?u=ffa93edfe21752c921f860358&amp;id=972f1c9122" method="post" id="newsletter-form">'.
-				 '<p>'.
-				 '<label for="newsletter-name">'.__('Name','wordpress-seo').':</label><input style="color:#666" name="MMERGE9" value="'.$current_user->display_name.'" id="newsletter-name" placeholder="'.__('Name','wordpress-seo').'"/><br/>'.
-				 '<label for="newsletter-email">'.__('Email','wordpress-seo').':</label><input style="color:#666" name="EMAIL" value="'.$current_user->user_email.'" id="newsletter-email" placeholder="'.__('Email','wordpress-seo').'"/><br/>'.
-				 '<input type="hidden" name="group" value="2"/>'.
-				 '<button type="submit" class="button-primary">'.__('Subscribe','wordpress-seo').'</button>'.
-				 '</p></form>'.
-				 '<p>'.__( 'The tour ends here, good luck!', 'wordpress-seo' ).'</p>',
+				'content'  => '<h3>'.__( 'File Editor', 'wordpress-seo' ).'</h3><p>'.__( 'Here you can edit the .htaccess and robots.txt files, two of the most powerful files in your WordPress install. Only touch these files if you know what you\'re doing!', 'wordpress-seo' ).'</p>'
+				 .'<p>'.sprintf( __( 'The tour ends here, thanks for using my plugin!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a target="_blank" href="http://yoast.com/#utm_source=wpadmin&utm_medium=wpseo_tour&utm_term=link&utm_campaign=wpseoplugin">', '</a>').'</p>',
 			),
 		);
 
+		if ( ( defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT ) || ( defined('DISALLOW_FILE_MODS') && DISALLOW_FILE_MODS ) ) {
+			unset( $adminpages['wpseo_files'] );
+			$adminpages['wpseo_import']['function'] = '';
+			unset($adminpages['wpseo_import']['button2']);
+			$adminpages['wpseo_import']['content'] .= '<p>'.sprintf( __( 'The tour ends here, thanks for using my plugin!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a href="http://yoast.com/">', '</a>').'</p>';
+		}
 		$page = '';
 		if ( isset($_GET['page']) )
 			$page = $_GET['page'];
 
 		if ( 'admin.php' != $pagenow || !array_key_exists( $page, $adminpages ) ) {
-			$id 			= 'toplevel_page_wpseo_dashboard';
+			$id 			= 'li.toplevel_page_wpseo_dashboard';
 			$content 		= '<h3>'.__( 'Congratulations!', 'wordpress-seo' ).'</h3>';
 			$content 		.= '<p>'.__( 'You\'ve just installed WordPress SEO by Yoast! Click "Start Tour" to view a quick introduction of this plugins core functionality.', 'wordpress-seo' ).'</p>';
-			$position_at 	= 'left top';
+			$opt_arr		= array(
+				'content' => $content,
+				'position' => array( 'edge' => 'top', 'align' => 'center' )
+			);
 			$button2 		= __( "Start Tour", 'wordpress-seo' );
 			$function 		= 'document.location="'.admin_url('admin.php?page=wpseo_dashboard').'";';
 		} else {
 			if ( '' != $page && in_array( $page, array_keys( $adminpages ) ) ) {
-				$id 			= 'wpseo_content_top';
-				$content 		= $adminpages[$page]['content'];
-				$position_at 	= 'left bottom';
+				$opt_arr = array(
+					'content' => $adminpages[$page]['content'],
+					'position' => array( 'edge' => 'top', 'align' => 'left' ),
+					'pointerWidth' => 400
+				);
+				$id 			= '#wpseo-title';
 				$button2 		= $adminpages[$page]['button2'];
 				$function 		= $adminpages[$page]['function'];
 			}
 		}
 
-		$this->print_buttons( $id, $content, __( "Close", 'wordpress-seo' ), $position_at, $button2, $function );
+		$this->print_buttons( $id, $opt_arr, __( "Close", 'wordpress-seo' ), $position_at, $button2, $function );
 	}
 	
 	function admin_head() {
@@ -114,13 +141,14 @@ class WPSEO_Pointers {
 	<?php
 	}
 	
-	function print_buttons( $id, $content, $button1, $position_at, $button2 = false, $button2_function = '' ) {
+	function print_buttons( $selector, $options, $button1, $position_at, $button2 = false, $button2_function = '' ) {
 	?>
 	<script type="text/javascript"> 
 	//<![CDATA[ 
-	jQuery(document).ready( function() { 
-		jQuery('#<?php echo $id; ?>').pointer({ 
-			content: '<?php echo addslashes( $content ); ?>', 
+	(function($){
+		var wpseo_pointer_options = <?php echo json_encode( $options ); ?>, setup;
+		
+		wpseo_pointer_options = $.extend( wpseo_pointer_options, {
 			buttons: function( event, t ) {
 				button = jQuery('<a id="pointer-close" class="button-secondary">' + '<?php echo $button1; ?>' + '</a>');
 				button.bind( 'click.pointer', function() {
@@ -128,28 +156,27 @@ class WPSEO_Pointers {
 				});
 				return button;
 			},
-			position: {
-				my: 'left bottom', 
-				at: '<?php echo $position_at; ?>', 
-				offset: '0 0'
-			},
-			arrow: {
-				edge: 'left',
-				align: 'top',
-				offset: 10
-			},
-			close: function() { },
-		}).pointer('open'); 
-		<?php if ( $button2 ) { ?> 
-		jQuery('#pointer-close').after('<a id="pointer-primary" class="button-primary">' + '<?php echo $button2; ?>' + '</a>');
-		jQuery('#pointer-primary').click( function() {
-			<?php echo $button2_function; ?>
+			close: function() { }
 		});
-		jQuery('#pointer-close').click( function() {
-			wpseo_setIgnore("tour","wp-pointer-0","<?php echo wp_create_nonce('wpseo-ignore'); ?>");
-		});
-		<?php } ?>
-	}); 
+
+		setup = function() {
+			$('<?php echo $selector; ?>').pointer( wpseo_pointer_options ).pointer('open');
+			<?php if ( $button2 ) { ?> 
+			jQuery('#pointer-close').after('<a id="pointer-primary" class="button-primary">' + '<?php echo $button2; ?>' + '</a>');
+			jQuery('#pointer-primary').click( function() {
+				<?php echo $button2_function; ?>
+			});
+			jQuery('#pointer-close').click( function() {
+				wpseo_setIgnore("tour","wp-pointer-0","<?php echo wp_create_nonce('wpseo-ignore'); ?>");
+			});
+			<?php } ?>
+		};
+		
+		if ( wpseo_pointer_options.position && wpseo_pointer_options.position.defer_loading )
+			$(window).bind( 'load.wp-pointers', setup );
+		else
+			$(document).ready( setup );
+	})( jQuery );
 	//]]> 
 	</script>
 	<?php

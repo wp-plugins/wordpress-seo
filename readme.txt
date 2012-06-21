@@ -141,9 +141,13 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Make the title test helper function only return the test title to the right WordPress user-agent.
 	* Fix for slug saving that should help interoperability with other slug-enhancing / changing functions.
 	* Fix wrong homepage titles with 12345 in them because of bug in 1.2.2.
+	* Added text domains on some strings that were missing it.
 * Enhancements:
 	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
 	* Added support for image galleries in the page analysis functionality, alt tags from images in galleries are now parsed too.
+	* Updates to introductory tour.
+* i18n:
+	* Updated Russian translation.
 
 = 1.2.3 =
 

@@ -489,10 +489,10 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 								
 				echo '<h2>'.__('Sitewide <code>meta</code> settings','wordpress-seo').'</h2>';
 				echo $this->checkbox( 'noindex-subpages', __('Noindex subpages of archives', 'wordpress-seo') );
-				echo '<p class="desc">'.__('If you want to prevent /page/2/ and further of any archive to show up in the search results, enable this.').'</p>';
+				echo '<p class="desc">'.__('If you want to prevent /page/2/ and further of any archive to show up in the search results, enable this.','wordpress-seo').'</p>';
 				
 				echo $this->checkbox( 'usemetakeywords', __( 'Use <code>meta</code> keywords tag?', 'wordpress-seo' ) );
-				echo '<p class="desc">'.__('I don\'t know why you\'d want to use meta keywords, but if you want to, check this box.').'</p>';
+				echo '<p class="desc">'.__('I don\'t know why you\'d want to use meta keywords, but if you want to, check this box.','wordpress-seo').'</p>';
 				
 				echo $this->checkbox( 'noodp', __('Add <code>noodp</code> meta robots tag sitewide', 'wordpress-seo' ) );
 				echo '<p class="desc">'.__('Prevents search engines from using the DMOZ description for pages from this site in the search results.', 'wordpress-seo').'</p>';
@@ -602,7 +602,7 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 				echo '<p class="desc label">'.__('For the date based archives, the same applies: they probably look a lot like your homepage, and could thus be seen as duplicate content.', 'wordpress-seo').'</p>';
 
 				echo '<h2>'.__('Special Pages', 'wordpress-seo' ).'</h2>';
-				echo '<p>'.__('These pages will be noindex, followed by default, so they will never show up in search results.').'</p>';
+				echo '<p>'.__('These pages will be noindex, followed by default, so they will never show up in search results.','wordpress-seo').'</p>';
 				echo '<h4>'.__('Search pages', 'wordpress-seo' ).'</h4>';
 				echo $this->textinput('title-search',__('Title template', 'wordpress-seo') );
 				echo '<h4>'.__('404 pages', 'wordpress-seo' ).'</h4>';
