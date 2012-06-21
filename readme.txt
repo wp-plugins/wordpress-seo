@@ -134,6 +134,11 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.2.4 =
+
+* Enhancements:
+	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
+
 = 1.2.3 =
 
 * Bug fixes:

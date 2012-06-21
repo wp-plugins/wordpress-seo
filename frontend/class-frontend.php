@@ -305,8 +305,13 @@ class WPSEO_Frontend {
  	}
 	
 	function force_wp_title() {
+		global $wp_query;
+		$old_wp_query = $wp_query;
 		wp_reset_query();
+		
 		$title = $this->title( '' );
+
+		$GLOBALS['wp_query'] = $old_wp_query;		
 	}
 	
 	function fix_generator($generator) {
@@ -327,7 +332,7 @@ class WPSEO_Frontend {
 		global $wp_query;
 		
 		$old_wp_query = $wp_query;
-		
+
 		wp_reset_query();
 				
 		$this->debug_marker();
@@ -369,7 +374,7 @@ class WPSEO_Frontend {
 		
 		echo "<!-- / Yoast WordPress SEO plugin. -->\n\n";
 		
-		$wp_query = $old_wp_query;
+		$GLOBALS['wp_query'] = $old_wp_query;
 	}
 
 	function robots() {
@@ -958,6 +963,8 @@ class WPSEO_Frontend {
 			
 		$content = ob_get_contents();
 
+		$old_wp_query = $wp_query;
+
 		wp_reset_query();
 
 		$title = $this->title( '', $sep );
@@ -976,6 +983,9 @@ class WPSEO_Frontend {
 		$content = str_replace( $this->debug_marker( false ), $this->debug_marker( false )."\n".'<title>'.$title.'</title>', $content );
 		
 		ob_end_clean();
+
+		$GLOBALS['wp_query'] = $old_wp_query;		
+
 		echo $content;
 	}
 	

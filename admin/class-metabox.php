@@ -903,10 +903,11 @@ class WPSEO_Metabox {
 		unset($headings);
 
 		// Images
-		$alts = $this->GetImagesAltText($post->post_content);
-		$imgs = $this->GetImageCount($dom, $xpath);
-		$this->ScoreImagesAltText($job, $results, $alts, $imgs);
-		unset($alts, $imgs);
+		$imgs = array();
+		$imgs['count'] = $this->GetImageCount($dom, $xpath);
+		$imgs = $this->GetImagesAltText($post, $imgs);
+		$this->ScoreImagesAltText($job, $results, $imgs);
+		unset($imgs);
 
 		// Anchors
 		$anchors 	= $this->GetAnchorTexts($dom, $xpath);
@@ -1121,19 +1122,19 @@ class WPSEO_Metabox {
 		return $count;
 	}
 	
-	function ScoreImagesAltText($job, &$results, $alts, $imgcount) {
+	function ScoreImagesAltText($job, &$results, $imgs) {
 		$scoreImagesNoImages 			= __("No images appear in this page, consider adding some as appropriate.", 'wordpress-seo' );
 		$scoreImagesNoAlt			 	= __("The images on this page are missing alt tags.", 'wordpress-seo' );
 		$scoreImagesAltKeywordIn		= __("The images on this page contain alt tags with the target keyword / phrase.", 'wordpress-seo' );
 		$scoreImagesAltKeywordMissing 	= __("The images on this page do not have alt tags containing your keyword / phrase.", 'wordpress-seo' );
 
-		if ( $imgcount == 0 ) {
+		if ( $imgs['count'] == 0 ) {
 			$this->SaveScoreResult($results,3,$scoreImagesNoImages);
-		} else if ( count($alts) == 0 && $imgcount != 0 ) {
+		} else if ( count($imgs['alts']) == 0 && $imgs['count'] != 0 ) {
 			$this->SaveScoreResult($results,5,$scoreImagesNoAlt);
 		} else {
 			$found=false;
-			foreach ($alts as $alt) {
+			foreach ($imgs['alts'] as $alt) {
 				$haystack1=$this->strip_separators_and_fold($alt,true);
 				$haystack2=$this->strip_separators_and_fold($alt,false);
 				if (strrpos($haystack1,$job["keyword_folded"])!==false)
@@ -1149,13 +1150,21 @@ class WPSEO_Metabox {
 
 	}
 
-	function GetImagesAltText($postcontent) {
-		preg_match_all( '/<img [^>]+ alt=(["\'])([^\\1]+)\\1[^>]+>/im', $postcontent, $matches );
-		$alts = array();
+	function GetImagesAltText($post, $imgs) {
+		preg_match_all( '/<img [^>]+ alt=(["\'])([^\\1]+)\\1[^>]+>/im', $post->post_content, $matches );
+		$imgs['alts'] = array();
 		foreach ( $matches[2] as $alt ) {
-			$alts[] = wpseo_strtolower_utf8( $alt );
+			$imgs['alts'][] = wpseo_strtolower_utf8( $alt );
 		}
-		return $alts;
+		if ( preg_match_all( '/\[gallery/', $post->post_content, $matches ) ) {
+			$attachments = get_children( array('post_parent' => $post->ID, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image' ) );
+			foreach( $attachments as $att_id => $attachment ) {
+				if ( $alt = get_post_meta( $att_id, '_wp_attachment_image_alt', true) )
+					$imgs['alts'][] = $alt;
+				$imgs['count']++;
+			}
+		}			
+		return $imgs;
 	}
 
 	function GetImageCount(&$dom, &$xpath) {

@@ -53,11 +53,13 @@ if ( !class_exists('Yoast_WPSEO_Plugin_Admin') ) {
 			add_submenu_page('wpseo_dashboard',__( 'RSS', 'wordpress-seo' ),__( 'RSS', 'wordpress-seo' ),$this->accesslvl, 'wpseo_rss', array(&$this,'rss_page'));
 			add_submenu_page('wpseo_dashboard',__( 'Import & Export', 'wordpress-seo' ),__( 'Import & Export', 'wordpress-seo' ),$this->accesslvl, 'wpseo_import', array(&$this,'import_page'));
 			
-			// Make sure on a multi site install only super admins can edit .htaccess and robots.txt
-			if ( !function_exists('is_multisite') || !is_multisite() )
-				add_submenu_page('wpseo_dashboard',__( 'Edit files', 'wordpress-seo' ),__( 'Edit files', 'wordpress-seo' ),$this->accesslvl, 'wpseo_files', array(&$this,'files_page'));
-			else
-				add_submenu_page('wpseo_dashboard',__( 'Edit files', 'wordpress-seo' ),__( 'Edit files', 'wordpress-seo' ),'delete_users', 'wpseo_files', array(&$this,'files_page'));
+			if ( !( defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT ) && ! ( defined('DISALLOW_FILE_MODS') && DISALLOW_FILE_MODS ) ) {
+				// Make sure on a multi site install only super admins can edit .htaccess and robots.txt
+				if ( !function_exists('is_multisite') || !is_multisite() )
+					add_submenu_page('wpseo_dashboard',__( 'Edit files', 'wordpress-seo' ),__( 'Edit files', 'wordpress-seo' ),$this->accesslvl, 'wpseo_files', array(&$this,'files_page'));
+				else
+					add_submenu_page('wpseo_dashboard',__( 'Edit files', 'wordpress-seo' ),__( 'Edit files', 'wordpress-seo' ),'delete_users', 'wpseo_files', array(&$this,'files_page'));
+			}
 			
 			global $submenu;
 			if ( isset($submenu['wpseo_dashboard']) )
