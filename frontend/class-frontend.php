@@ -995,8 +995,11 @@ class WPSEO_Frontend {
 		ob_start();
 	}
 	
-	function title_test_helper( ) {
-		return 'This is a Yoast Test Title';
+	function title_test_helper( $title ) {
+		global $wp_version;
+		if ( $_SERVER['HTTP_USER_AGENT'] == 'WordPress/'.$wp_version.'; '.get_site_url() )
+			return 'This is a Yoast Test Title';
+		return $title;
 	}
 	
 }

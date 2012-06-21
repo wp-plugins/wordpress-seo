@@ -136,8 +136,13 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 = 1.2.4 =
 
+* Bug fixes:
+	* Properly restore $wp_query after running header functionality.
+	* Make the title test helper function only return the test title to the right WordPress user-agent.
+	* Fix for slug saving that should help interoperability with other slug-enhancing / changing functions.
 * Enhancements:
 	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
+	* Added support for image galleries in the page analysis functionality, alt tags from images in galleries are now parsed too.
 
 = 1.2.3 =
 

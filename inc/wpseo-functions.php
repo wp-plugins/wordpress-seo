@@ -297,10 +297,7 @@ function wpseo_remove_stopwords_from_slug( $slug ) {
 		return $slug;
 		
 	// Lowercase the slug and strip slashes
-	$clean_slug = strtolower( stripslashes( $_POST['post_title'] ) );
-
-	// Remove all weird HTML entities
-	$clean_slug = remove_accents( $_POST['post_title'] );
+	$clean_slug = sanitize_title( stripslashes( $_POST['post_title'] ) );
 
     // Turn it to an array and strip stopwords by comparing against an array of stopwords
     $clean_slug_array = array_diff ( split( " ", $clean_slug ), wpseo_stopwords() );
@@ -432,6 +429,9 @@ function wpseo_title_test() {
 	$expected_title = 'This is a Yoast Test Title';
 	
 	$resp = wp_remote_get( get_bloginfo('url') );
+	
+	// echo '<pre>'.htmlentities($resp['body'],1).'</pre>';
+	
 	if ( $resp && !is_wp_error( $resp ) && 200 == $resp['response']['code'] ) {
 		$res = preg_match('/<title>([^<]+)<\/title>/im', $resp['body'], $matches);
 	
@@ -440,6 +440,9 @@ function wpseo_title_test() {
 			update_option('wpseo_titles', $options );
 
 			$resp = wp_remote_get( get_bloginfo('url') );
+
+			echo '<pre>'.htmlentities($resp['body'],1).'</pre>';
+
 			$res = preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
 		}
 
