@@ -8,10 +8,6 @@ class WPSEO_Pointers {
 	
 	function enqueue() {
 		$options = get_option('wpseo');
-		if ( isset( $_GET['wpseo_restart_tour'] ) ) {
-			unset( $options['ignore_tour'] );
-			update_option( 'wpseo', $options );
-		}
 		if ( !isset($options['ignore_tour']) || !$options['ignore_tour'] ) {
 			wp_enqueue_style( 'wp-pointer' ); 
 			wp_enqueue_script( 'jquery-ui' ); 
@@ -91,7 +87,7 @@ class WPSEO_Pointers {
 			),
 			'wpseo_files' => array(
 				'content'  => '<h3>'.__( 'File Editor', 'wordpress-seo' ).'</h3><p>'.__( 'Here you can edit the .htaccess and robots.txt files, two of the most powerful files in your WordPress install. Only touch these files if you know what you\'re doing!', 'wordpress-seo' ).'</p>'
-				 .'<p>'.sprintf( __( 'The tour ends here, thanks for using my plugin!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a target="_blank" href="http://yoast.com/#utm_source=wpadmin&utm_medium=wpseo_tour&utm_term=link&utm_campaign=wpseoplugin">', '</a>').'</p>',
+				 .'<p>'.sprintf( __( 'The tour ends here, thank you for using my plugin and good luck with your SEO!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a target="_blank" href="http://yoast.com/#utm_source=wpadmin&utm_medium=wpseo_tour&utm_term=link&utm_campaign=wpseoplugin">', '</a>').'</p>',
 			),
 		);
 
@@ -99,7 +95,7 @@ class WPSEO_Pointers {
 			unset( $adminpages['wpseo_files'] );
 			$adminpages['wpseo_import']['function'] = '';
 			unset($adminpages['wpseo_import']['button2']);
-			$adminpages['wpseo_import']['content'] .= '<p>'.sprintf( __( 'The tour ends here, thanks for using my plugin!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a href="http://yoast.com/">', '</a>').'</p>';
+			$adminpages['wpseo_import']['content'] .= '<p>'.sprintf( __( 'The tour ends here,thank you for using my plugin and good luck with your SEO!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a href="http://yoast.com/">', '</a>').'</p>';
 		}
 		$page = '';
 		if ( isset($_GET['page']) )

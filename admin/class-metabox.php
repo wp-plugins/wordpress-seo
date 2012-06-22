@@ -6,8 +6,8 @@ class WPSEO_Metabox {
 	var $wpseo_meta_length_reason = '';
 	
 	function __construct() {
-		if ( !class_exists('TextStatistics') )
-			require WPSEO_PATH."/admin/linkdex/TextStatistics.php";
+		if ( !class_exists('Yoast_TextStatistics') && apply_filters('wpseo_use_page_analysis', true ) === true )
+			require WPSEO_PATH."/admin/TextStatistics.php";
 		
 		$options = get_wpseo_options();
 
@@ -567,10 +567,7 @@ class WPSEO_Metabox {
 					continue;
 			}
 
-			$option = '_yoast_wpseo_'.$meta_box['name'];
-			$oldval = get_post_meta($post_id, $option, true);
-
-			update_post_meta($post_id, $option, $data, $oldval);  
+			wpseo_set_value( $post_id, $meta_box['name'], $data );
 		}  
 		
 		$this->calculateResults( $post );
@@ -628,7 +625,7 @@ class WPSEO_Metabox {
 				$score = 'noindex';
 				$title = __('Post is set to noindex.','wordpress-seo');
 				if ( wpseo_get_value('meta-robots-noindex', $id) !== 0 )
-					update_post_meta( $id, '_yoast_wpseo_linkdex', 0 );
+					wpseo_set_value( $id, 'linkdex', 0 );
 			} else if ( $score = wpseo_get_value('linkdex', $id) ) {
 				$score = wpseo_translate_score( round( $score / 10 ) );
 				$title = $score;
@@ -835,7 +832,7 @@ class WPSEO_Metabox {
 		if ( !wpseo_get_value( 'focuskw', $post->ID ) ) {
 			$result = new WP_Error('no-focuskw', sprintf( __( 'No focus keyword was set for this %s. If you do not set a focus keyword, no score can be calculated.', 'wordpress-seo' ), $post->post_type ) );
 			
-			update_post_meta( $post->ID, '_yoast_wpseo_linkdex', 0 );  
+			wpseo_set_value( $post->ID, 'linkdex', 0 );
 			
 			return $result;
 		}
@@ -855,7 +852,7 @@ class WPSEO_Metabox {
 		@$dom->loadHTML($post->post_content);
 		$xpath = new DOMXPath($dom);
 
-		$statistics = new TextStatistics;
+		$statistics = new Yoast_TextStatistics;
 		
 		// Keyword
 		$this->ScoreKeyword($job, $results);
@@ -927,7 +924,7 @@ class WPSEO_Metabox {
 		
 		$score = round( ( $overall / $overall_max ) * 100 );
 		
-		update_post_meta( $post->ID, '_yoast_wpseo_linkdex', $score );  
+		wpseo_set_value( $post->ID, 'linkdex', $score );
 		
 		return $results;
 	}

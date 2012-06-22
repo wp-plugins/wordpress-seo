@@ -2,41 +2,15 @@
 
     /*
 
-        TextStatistics Class
+        Modified (Reduced) TextStatistics Class
         http://code.google.com/p/php-text-statistics/
 
         Released under New BSD license
         http://www.opensource.org/licenses/bsd-license.php
 
-        Calculates following readability scores (formulae can be found in wiki):
-          * Flesch Kincaid Reading Ease
-          * Flesch Kincaid Grade Level
-          * Gunning Fog Score
-          * Coleman Liau Index
-          * SMOG Index
-          * Automated Reability Index
-
-        Will also give:
-          * String length
-          * Letter count
-          * Syllable count
-          * Sentence count
-          * Average words per sentence
-          * Average syllables per word
-        
-        Sample Code
-        ----------------
-        $statistics = new TextStatistics;
-        $text = 'The quick brown fox jumped over the lazy dog.';
-        echo 'Flesch-Kincaid Reading Ease: ' . $statistics->flesch_kincaid_reading_ease($text);
-
-
-		Modifications by Yoast
-		-----
-		Removed all multibyte code references for speed and compatibility
     */
 
-    class TextStatistics {
+    class Yoast_TextStatistics {
 
         protected $strEncoding = ''; // Used to hold character encoding to be used by object, if set
 
@@ -60,51 +34,6 @@
         function flesch_kincaid_reading_ease($strText) {
             $strText = $this->clean_text($strText);
             return round((206.835 - (1.015 * $this->average_words_per_sentence($strText)) - (84.6 * $this->average_syllables_per_word($strText))), 1);
-        }
-
-        /**
-         * Gives the Flesch-Kincaid Grade level of text entered rounded to one digit
-         * @param   strText         Text to be checked
-         */
-        function flesch_kincaid_grade_level($strText) {
-            $strText = $this->clean_text($strText);
-            return round(((0.39 * $this->average_words_per_sentence($strText)) + (11.8 * $this->average_syllables_per_word($strText)) - 15.59), 1);
-        }
-
-        /**
-         * Gives the Gunning-Fog score of text entered rounded to one digit
-         * @param   strText         Text to be checked
-         */
-        public function gunning_fog_score($strText) {
-            $strText = $this->clean_text($strText);
-            return round((($this->average_words_per_sentence($strText) + $this->percentage_words_with_three_syllables($strText, false)) * 0.4), 1);
-        }
-
-        /**
-         * Gives the Coleman-Liau Index of text entered rounded to one digit
-         * @param   strText         Text to be checked
-         */
-        public function coleman_liau_index($strText) {
-            $strText = $this->clean_text($strText);
-            return round( ( (5.89 * ($this->letter_count($strText) / $this->word_count($strText))) - (0.3 * ($this->sentence_count($strText) / $this->word_count($strText))) - 15.8 ), 1);
-        }
-
-        /**
-         * Gives the SMOG Index of text entered rounded to one digit
-         * @param   strText         Text to be checked
-         */
-        public function smog_index($strText) {
-            $strText = $this->clean_text($strText);
-            return round(1.043 * sqrt(($this->words_with_three_syllables($strText) * (30 / $this->sentence_count($strText))) + 3.1291), 1);
-        }
-
-        /**
-         * Gives the Automated Readability Index of text entered rounded to one digit
-         * @param   strText         Text to be checked
-         */
-        public function automated_readability_index($strText) {
-            $strText = $this->clean_text($strText);
-            return round(((4.71 * ($this->letter_count($strText) / $this->word_count($strText))) + (0.5 * ($this->word_count($strText) / $this->sentence_count($strText))) - 21.43), 1);
         }
 
         /**
@@ -224,45 +153,6 @@
         }
 
         /**
-         * Returns the number of words with more than three syllables
-         * @param   strText                  Text to be measured
-         * @param   blnCountProperNouns      Boolean - should proper nouns be included in words count
-         */
-        public function words_with_three_syllables($strText, $blnCountProperNouns = true) {
-            $strText = $this->clean_text($strText);
-            $intLongWordCount = 0;
-            $intWordCount = $this->word_count($strText);
-            $arrWords = explode(' ', $strText);
-            for ($i = 0; $i < $intWordCount; $i++) {
-                if ($this->syllable_count($arrWords[$i]) > 2) {
-                    if ($blnCountProperNouns) { 
-                        $intLongWordCount++;
-                    } else {
-                        $strFirstLetter = $this->substring($arrWords[$i], 0, 1);
-                        if ($strFirstLetter !== $this->upper_case($strFirstLetter)) {
-                            // First letter is lower case. Count it.
-                            $intLongWordCount++;
-                        }
-                    }
-                }
-            }
-            return ($intLongWordCount);
-        }
-
-        /**
-         * Returns the percentage of words with more than three syllables
-         * @param   strText      Text to be measured
-         * @param   blnCountProperNouns      Boolean - should proper nouns be included in words count
-         */
-        public function percentage_words_with_three_syllables($strText, $blnCountProperNouns = true) {
-            $strText = $this->clean_text($strText);
-            $intWordCount = $this->word_count($strText);
-            $intLongWordCount = $this->words_with_three_syllables($strText, $blnCountProperNouns);
-            $intPercentage = (($intLongWordCount / $intWordCount) * 100);
-            return ($intPercentage);
-        }
-
-        /**
          * Returns the number of syllables in the word.
          * Based in part on Greg Fast's Perl module Lingua::EN::Syllables
          * @param   strWord      Word to be measured
@@ -365,5 +255,3 @@
         }
 
     }
-
-?>
