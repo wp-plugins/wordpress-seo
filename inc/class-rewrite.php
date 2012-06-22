@@ -2,20 +2,11 @@
 
 class WPSEO_Rewrite {
 
-	function WPSEO_Rewrite() {
-		$options = get_wpseo_options();
-		
+	function __construct() {
 		add_filter('query_vars', array(&$this, 'query_vars') );
-
-		if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] ) {
-			add_filter( 'category_link', array(&$this, 'no_category_base'), 1000, 2 );
-			add_filter( 'request', array(&$this, 'no_category_base_request') );
-			add_filter( 'category_rewrite_rules', array(&$this, 'category_rewrite_rules') );
-			
-			add_action('created_category', 'flush_rewrite_rules' );
-			add_action('edited_category', 'flush_rewrite_rules' );
-			add_action('delete_category', 'flush_rewrite_rules' );
-		}
+		add_filter( 'category_link', array(&$this, 'no_category_base'), 1000, 2 );
+		add_filter( 'request', array(&$this, 'no_category_base_request') );
+		add_filter( 'category_rewrite_rules', array(&$this, 'category_rewrite_rules') );
 	}
 	
 	function no_category_base($catlink, $category_id) {

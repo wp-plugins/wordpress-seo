@@ -1,29 +1,5 @@
 <?php
 
-function wpseo_load_plugins( $path ) {
-	$allowed_plugins = array('wpseo-local', 'wpseo-news');
-	
-	if ( is_dir( $path ) ) {
-		$dir = @opendir( $path );
-		if ($dir) {
-			while (($entry = @readdir($dir)) !== false) {
-				$full_dir_path = $path . "/" . $entry;
-				if( in_array($entry, $allowed_plugins) && is_readable($full_dir_path) && is_dir($full_dir_path) ) {
-					$module_dir = @opendir( $full_dir_path );
-					if ($module_dir) {
-						while (($module_entry = @readdir($module_dir)) !== false) {
-							if (strrchr($module_entry, '.') === '.php') {
-								require $full_dir_path . '/' . $module_entry;
-							}
-						}
-					}
-				}
-			}
-			@closedir($dir);
-		}
-	}
-}
-
 function wpseo_get_country($country_code) {
 	$country_arr = wpseo_get_country_arr();
 	return $country_arr[$country_code];
@@ -45,6 +21,8 @@ function wpseo_activate() {
 	wpseo_defaults();
 	
 	wpseo_flush_rules();
+
+	wpseo_title_test();
 		
 	// Clear cache so the changes are obvious.
 	if ( function_exists('w3tc_pgcache_flush') ) {
@@ -53,7 +31,6 @@ function wpseo_activate() {
 		wp_cache_clear_cache();
 	}
 	
-	wpseo_title_test();
 }
 
 function wpseo_reset_defaults() {

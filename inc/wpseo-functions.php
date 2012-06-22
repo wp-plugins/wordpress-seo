@@ -423,6 +423,7 @@ function wpseo_maybe_upgrade() {
 	$options['version'] = WPSEO_VERSION;
 	update_option( 'wpseo', $options );
 }
+add_action( 'admin_init', 'wpseo_maybe_upgrade' );
 
 function wpseo_title_test() {
 	$options = get_option('wpseo_titles');
@@ -435,6 +436,12 @@ function wpseo_title_test() {
 	
 	// Setting title_test to true forces the plugin to output the title below through a filter in class-frontend.php
 	$expected_title = 'This is a Yoast Test Title';
+
+	if ( function_exists('w3tc_pgcache_flush') ) {
+		w3tc_pgcache_flush();
+	} else if (function_exists('wp_cache_clear_cache')) {
+		wp_cache_clear_cache();
+	}
 	
 	$resp = wp_remote_get( get_bloginfo('url') );
 	

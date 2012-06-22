@@ -32,6 +32,8 @@ if ( !defined('WPSEO_PATH') )
 if ( !defined('WPSEO_BASENAME') )
 	define( 'WPSEO_BASENAME', plugin_basename( __FILE__ ) );
 
+define( 'WPSEO_FILE', __FILE__ );
+
 load_plugin_textdomain( 'wordpress-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 if ( version_compare(PHP_VERSION, '5.2', '<') ) {
@@ -46,37 +48,56 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 
 define( 'WPSEO_VERSION', '1.2.3' );
 
-global $wp_version;
-
 $pluginurl = plugin_dir_url( __FILE__ );
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
 	$pluginurl = preg_replace( '/^https/', 'http', $pluginurl );
 define( 'WPSEO_FRONT_URL', $pluginurl );
+unset( $pluginurl );
 
 require WPSEO_PATH.'inc/wpseo-functions.php';
-require WPSEO_PATH.'inc/class-rewrite.php';
-require WPSEO_PATH.'inc/class-sitemaps.php';
 
-if ( !defined('DOING_AJAX') || !DOING_AJAX )
-	require WPSEO_PATH.'inc/wpseo-non-ajax-functions.php';
-	
 $options = get_wpseo_options();
 
-if ( is_admin() ) {
-	require WPSEO_PATH.'admin/ajax.php';
-	if ( !defined('DOING_AJAX') || !DOING_AJAX ) {
-		require WPSEO_PATH.'admin/yst_plugin_tools.php';
-		require WPSEO_PATH.'admin/class-config.php';
-		require WPSEO_PATH.'admin/class-metabox.php';
-		require WPSEO_PATH.'admin/class-taxonomy.php';
-		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
-			require WPSEO_PATH.'admin/class-opengraph-admin.php';
+if ( !defined('DOING_AJAX') || !DOING_AJAX ) {
+	require WPSEO_PATH.'inc/wpseo-non-ajax-functions.php';
+}
 
-		if ( version_compare( $wp_version, '3.2.1', '>') )
-			require WPSEO_PATH.'admin/class-pointers.php';
+if ( is_admin() ) {
+	if ( defined('DOING_AJAX') && DOING_AJAX ) {
+		require WPSEO_PATH.'admin/ajax.php';
+	} else {
+		
+		if ( isset( $_GET['wpseo_restart_tour'] ) ) {
+			unset( $options['ignore_tour'] );
+			update_option( 'wpseo', $options );
+		}
+		
+		require WPSEO_PATH.'admin/class-admin.php';
+
+		global $pagenow;
+		if ( $pagenow != 'admin.php' ) {
+			require WPSEO_PATH.'admin/class-metabox.php';			
+			require WPSEO_PATH.'admin/class-taxonomy.php';
+			if ( isset( $options['opengraph'] )  && $options['opengraph'] )
+				require WPSEO_PATH.'admin/class-opengraph-admin.php';
+		} else {
+			require WPSEO_PATH.'admin/class-config.php';
+			if ( !isset( $options['ignore_tour'] ) || !$options['ignore_tour'] )
+				require WPSEO_PATH.'admin/class-pointers.php';
+		}
+
+		if ( isset( $options['enablexmlsitemap'] ) && $options['enablexmlsitemap'] )
+			require WPSEO_PATH.'admin/class-sitemaps-admin.php';
 	}
+	
+	register_activation_hook( __FILE__, 'wpseo_activate' );
+	register_deactivation_hook( __FILE__, 'wpseo_deactivate' );
 } else {
 	require WPSEO_PATH.'frontend/class-frontend.php';
+	if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] )
+		require WPSEO_PATH.'inc/class-sitemaps.php';
+	if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] )
+		require WPSEO_PATH.'inc/class-rewrite.php';
 	if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
 		require WPSEO_PATH.'frontend/class-breadcrumbs.php';
 	if ( isset( $options['opengraph'] )  && $options['opengraph'] )
@@ -84,20 +105,4 @@ if ( is_admin() ) {
 	if ( isset( $options['twitter'] )  && $options['twitter'] )
 		require WPSEO_PATH.'frontend/class-twitter.php';
 }
-
-// Load all extra modules
-if ( !defined('DOING_AJAX') || !DOING_AJAX )
-	wpseo_load_plugins( WP_PLUGIN_DIR.'/wordpress-seo-modules/' );
-
-// Let's act as though this is AIOSEO so plugins and themes that act differently for that will fix do it for this plugin as well.
-if ( !class_exists('All_in_One_SEO_Pack') ) {
-	class All_in_One_SEO_Pack {
-		function All_in_One_SEO_Pack() {
-			return true;
-		}
-	}
-}
-
-add_action( 'admin_init', 'wpseo_maybe_upgrade' );
-register_activation_hook( __FILE__, 'wpseo_activate' );
-register_deactivation_hook( __FILE__, 'wpseo_deactivate' );
+unset( $options );

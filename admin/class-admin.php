@@ -69,13 +69,13 @@ if ( ! class_exists( 'WPSEO_Admin' ) ) {
 		
 		function register_settings_page() {
 			add_menu_page( __( 'WordPress SEO Configuration', 'wordpress-seo' ), __( 'SEO', 'wordpress-seo' ), 'manage_options', 'admin.php?page=wpseo_dashboard', '', WPSEO_URL.'images/yoast-icon.png');
-			add_submenu_page('wpseo_dashboard',__( 'Titles &amp; Metas', 'wordpress-seo' ),__( 'Titles &amp; Metas', 'wordpress-seo' ), 'manage_options', 'admin.php?page=wpseo_titles');
-			add_submenu_page('wpseo_dashboard',__( 'Social', 'wordpress-seo' ),__( 'Social', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_social');
-			add_submenu_page('wpseo_dashboard',__( 'XML Sitemaps', 'wordpress-seo' ),__( 'XML Sitemaps', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_xml');
-			add_submenu_page('wpseo_dashboard',__( 'Permalinks', 'wordpress-seo' ),__( 'Permalinks', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_permalinks');
-			add_submenu_page('wpseo_dashboard',__( 'Internal Links', 'wordpress-seo' ),__( 'Internal Links', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_internal-links');
-			add_submenu_page('wpseo_dashboard',__( 'RSS', 'wordpress-seo' ),__( 'RSS', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_rss');
-			add_submenu_page('wpseo_dashboard',__( 'Import & Export', 'wordpress-seo' ),__( 'Import & Export', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_import');
+			add_submenu_page('admin.php?page=wpseo_dashboard',__( 'Titles &amp; Metas', 'wordpress-seo' ),__( 'Titles &amp; Metas', 'wordpress-seo' ), 'manage_options', 'admin.php?page=wpseo_titles');
+			add_submenu_page('admin.php?page=wpseo_dashboard',__( 'Social', 'wordpress-seo' ),__( 'Social', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_social');
+			add_submenu_page('admin.php?page=wpseo_dashboard',__( 'XML Sitemaps', 'wordpress-seo' ),__( 'XML Sitemaps', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_xml');
+			add_submenu_page('admin.php?page=wpseo_dashboard',__( 'Permalinks', 'wordpress-seo' ),__( 'Permalinks', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_permalinks');
+			add_submenu_page('admin.php?page=wpseo_dashboard',__( 'Internal Links', 'wordpress-seo' ),__( 'Internal Links', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_internal-links');
+			add_submenu_page('admin.php?page=wpseo_dashboard',__( 'RSS', 'wordpress-seo' ),__( 'RSS', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_rss');
+			add_submenu_page('admin.php?page=wpseo_dashboard',__( 'Import & Export', 'wordpress-seo' ),__( 'Import & Export', 'wordpress-seo' ),'manage_options', 'admin.php?page=wpseo_import');
 			
 			if ( !( defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT ) && ! ( defined('DISALLOW_FILE_MODS') && DISALLOW_FILE_MODS ) ) {
 				// Make sure on a multi site install only super admins can edit .htaccess and robots.txt
