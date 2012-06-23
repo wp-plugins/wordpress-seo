@@ -6,20 +6,20 @@ class WPSEO_Frontend {
 		
 		$options = get_wpseo_options();
 
-		add_action( 'wp_head', array( &$this, 'head' ), 1, 1 );
+		add_action( 'wp_head', array( $this, 'head' ), 1, 1 );
 		remove_action( 'wp_head', 'rel_canonical' );
 
-		add_filter( 'wp_title', array( &$this, 'title' ), 10, 3 );
-		add_filter( 'thematic_doctitle', array( &$this, 'force_wp_title' ) );
+		add_filter( 'wp_title', array( $this, 'title' ), 10, 3 );
+		add_filter( 'thematic_doctitle', array( $this, 'title' ) );
 
-		add_action( 'wp',array( &$this, 'page_redirect' ), 99, 1 );
+		add_action( 'wp',array( $this, 'page_redirect' ), 99, 1 );
 
-		add_action( 'admin_head', array( &$this, 'noindex_page' ) );
+		add_action( 'admin_head', array( $this, 'noindex_page' ) );
 
-		add_action( 'template_redirect', array( &$this, 'noindex_feed' ) );
+		add_action( 'template_redirect', array( $this, 'noindex_feed' ) );
 
-		add_filter( 'loginout',array( &$this, 'nofollow_link' ) );
-		add_filter( 'register',array( &$this, 'nofollow_link' ) );
+		add_filter( 'loginout',array( $this, 'nofollow_link' ) );
+		add_filter( 'register',array( $this, 'nofollow_link' ) );
 
 		if ( isset($options['hide-rsdlink']) && $options['hide-rsdlink'] )
 			remove_action( 'wp_head', 'rsd_link' );
@@ -42,28 +42,28 @@ class WPSEO_Frontend {
 		if ( ( isset($options['disable-date']) && $options['disable-date'] ) || 
 			 ( isset($options['disable-author']) && $options['disable-author'] ) ||
 			 ( isset($options['disable-post_formats']) && $options['disable-post_formats'] ) )
-			add_action( 'wp', array( &$this, 'archive_redirect' ) );
+			add_action( 'wp', array( $this, 'archive_redirect' ) );
 
 		if (isset($options['redirectattachment']) && $options['redirectattachment'])
-			add_action( 'template_redirect', array( &$this, 'attachment_redirect' ),1);
+			add_action( 'template_redirect', array( $this, 'attachment_redirect' ),1);
 
 
 		if (isset($options['trailingslash']) && $options['trailingslash'])
-			add_filter( 'user_trailingslashit', array( &$this, 'add_trailingslash') , 10, 2);
+			add_filter( 'user_trailingslashit', array( $this, 'add_trailingslash') , 10, 2);
 
 		if (isset($options['cleanpermalinks']) && $options['cleanpermalinks'])
-			add_action( 'template_redirect',array( &$this, 'clean_permalink' ),1);	
+			add_action( 'template_redirect',array( $this, 'clean_permalink' ),1);	
 
-		add_filter( 'the_content_feed', array( &$this, 'embed_rssfooter' ) );
-		add_filter( 'the_excerpt_rss', array( &$this, 'embed_rssfooter_excerpt' ) );	
+		add_filter( 'the_content_feed', array( $this, 'embed_rssfooter' ) );
+		add_filter( 'the_excerpt_rss', array( $this, 'embed_rssfooter_excerpt' ) );	
 		
 		if (isset($options['forcerewritetitle']) && $options['forcerewritetitle']) {
-			add_action( 'get_header', array( &$this, 'force_rewrite_output_buffer' ) );
-			add_action( 'wp_footer', array( &$this, 'flush_cache' ) );			
+			add_action( 'get_header', array( $this, 'force_rewrite_output_buffer' ) );
+			add_action( 'wp_footer', array( $this, 'flush_cache' ) );			
 		}
 		
 		if ( isset($options['title_test']) && $options['title_test'] )
-			add_filter( 'wpseo_title', array( &$this, 'title_test_helper' ) );	
+			add_filter( 'wpseo_title', array( $this, 'title_test_helper' ) );	
 	}
 
 	function is_home_posts_page() {
@@ -84,6 +84,7 @@ class WPSEO_Frontend {
 			global $wp_query;
 			$object = $wp_query->get_queried_object();
 		}
+		
 		$title = wpseo_get_value( 'title', $object->ID );
 		
 		if ( !empty($title) )
@@ -122,8 +123,12 @@ class WPSEO_Frontend {
 	function get_title_from_options( $index, $var_source = array() ) {
 		$options = get_wpseo_options();
 		
-		if ( !isset($options[$index]) || empty($options[$index]) )
-			return '';
+		if ( !isset($options[$index]) || empty($options[$index]) ) {
+			if ( is_singular() )
+				return wpseo_replace_vars( '%%title%% %%sep%% %%sitename%%', (array) $var_source );
+			else
+				return '';
+		}	
 		
 		return wpseo_replace_vars( $options[$index], (array) $var_source );
 	}
@@ -263,24 +268,11 @@ class WPSEO_Frontend {
 
 			if ( empty($title) ) {
  				if ( is_month() )
-					// Since the 'Archives' translation string is ambiguous
-					// and doesn't allow for translations that swap the
-					// directionality, I updated the format to be properly
-					// translatable.
 					$title_part = sprintf( __('%s Archives', 'wordpress-seo'), single_month_title(' ', false) );
  				else if ( is_year() )
-					// Since the 'Archives' translation string is ambiguous
-					// and doesn't allow for translations that swap the
-					// directionality, I updated the format to be properly
-					// translatable.
 					$title_part = sprintf( __('%s Archives', 'wordpress-seo' ), get_query_var( 'year' ) );
-				// Take care of day archives. Without this, titles can look
-				// quite odd when a seperator is not empty.
 				else if ( is_day() )
 					$title_part = sprintf( __('%s Archives', 'wordpress-seo' ), get_the_date() );
-				// Cover all other possibilities (including time archives).
-				// Without this, titles can look quite odd when a
-				// seperator is not empty.
 				else
 					$title_part = __( 'Archives', 'wordpress-seo' );
  			}

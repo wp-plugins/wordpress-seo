@@ -9,20 +9,14 @@ class WPSEO_Metabox {
 		if ( !class_exists('Yoast_TextStatistics') && apply_filters('wpseo_use_page_analysis', true ) === true )
 			require WPSEO_PATH."/admin/TextStatistics.php";
 		
-		$options = get_wpseo_options();
-
 		add_action( 'add_meta_boxes',                  array( $this, 'add_meta_box' ) );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'enqueue'      ) );
 		add_action( 'admin_print_styles-post.php',     array( $this, 'enqueue'      ) );
 		add_action( 'admin_print_styles-edit.php',     array( $this, 'enqueue'      ) );
-
 		add_action( 'admin_head', array( $this, 'script') );
-
-		add_action( 'add_meta_boxes', array(&$this, 'add_custom_box') );
-
+		add_action( 'add_meta_boxes', array($this, 'add_custom_box') );
 		add_action( 'wp_insert_post', array($this,'save_postdata') );
-		
-		add_action( 'admin_init', array(&$this, 'setup_page_analysis') );
+		add_action( 'admin_init', array($this, 'setup_page_analysis') );
 	}
 
 	public function setup_page_analysis() {
@@ -38,24 +32,46 @@ class WPSEO_Metabox {
 				add_action( 'manage_'.$pt.'_posts_custom_column', array( $this, 'column_content' ), 10, 2 );
 				add_action( 'manage_edit-'.$pt.'_sortable_columns', array( $this, 'column_sort' ), 10, 2 );
 			}
-			add_filter( 'request', array(&$this, 'column_sort_orderby') );
+			add_filter( 'request', array($this, 'column_sort_orderby') );
 		
-			add_action( 'restrict_manage_posts', array(&$this, 'posts_filter_dropdown') );
+			add_action( 'restrict_manage_posts', array($this, 'posts_filter_dropdown') );
 			add_action( 'post_submitbox_misc_actions', array( $this, 'publish_box' ) ); 
 		}
 
 	}
 	
+	// This should work with Greek, Russian, Polish & French amongst other languages...
+	function strtolower_utf8( $string ) { 
+		$convert_to = array( 
+		  "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", 
+		  "v", "w", "x", "y", "z", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", 
+		  "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "а", "б", "в", "г", "д", "е", "ё", "ж", 
+		  "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", 
+		  "ь", "э", "ю", "я", "ą", "ć", "ę", "ł", "ń", "ó", "ś", "ź", "ż" 
+		); 
+		$convert_from = array( 
+		  "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", 
+		  "V", "W", "X", "Y", "Z", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", 
+		  "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", 
+		  "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ъ", 
+		  "Ь", "Э", "Ю", "Я", "Ą", "Ć", "Ę", "Ł", "Ń", "Ó", "Ś", "Ź", "Ż"
+		); 
+
+		return str_replace($convert_from, $convert_to, $string);
+	}
+	
 	public function publish_box() {
-		$score = wpseo_get_value('linkdex');
 		echo '<div class="misc-pub-section curtime misc-pub-section-last" style="height:0; padding:0; margin:0; border-top: 1px solid #DFDFDF"></div>';
 		echo '<div class="misc-pub-section misc-yoast misc-pub-section-last">';
 
 		if ( wpseo_get_value('meta-robots-noindex') == 1 ) {
 			$score = 'noindex';
 			$title = __('Post is set to noindex.','wordpress-seo');
-		} else if ( $perc_score = wpseo_get_value('linkdex') ) {
-			$score = wpseo_translate_score( round( $perc_score / 10 ) );
+		} else if ( $score = wpseo_get_value('linkdex') ) {
+			$score = round( $score / 10 );
+			if ( $score < 1 )
+				$score = 1;
+			$score = wpseo_translate_score( $score );
 		} else {
 			if ( isset( $_GET['post'] ) ) {
 				$post_id = (int) $_GET['post'];
@@ -945,7 +961,7 @@ class WPSEO_Metabox {
 		$keywordWordsRemoved = array(" a ", " in ", " an ", " on ", " for ", " the ", " and ");
 
 		// lower
-		$inputString = wpseo_strtolower_utf8($inputString);
+		$inputString = $this->strtolower_utf8($inputString);
 
 		// default characters replaced by space
 		$inputString = str_replace($keywordCharactersAlwaysReplacedBySpace, ' ', $inputString);
@@ -1058,7 +1074,7 @@ class WPSEO_Metabox {
 		} else {
 			$found = false;
 			foreach ($anchor_texts as $anchor_text) {
-				if ( wpseo_strtolower_utf8( $anchor_text ) == $job["keyword_folded"] )
+				if ( $this->strtolower_utf8( $anchor_text ) == $job["keyword_folded"] )
 					$found = true;
 			}
 			if ( $found )
@@ -1157,7 +1173,7 @@ class WPSEO_Metabox {
 		preg_match_all( '/<img [^>]+ alt=(["\'])([^\\1]+)\\1[^>]+>/im', $post->post_content, $matches );
 		$imgs['alts'] = array();
 		foreach ( $matches[2] as $alt ) {
-			$imgs['alts'][] = wpseo_strtolower_utf8( $alt );
+			$imgs['alts'][] = $this->strtolower_utf8( $alt );
 		}
 		if ( preg_match_all( '/\[gallery/', $post->post_content, $matches ) ) {
 			$attachments = get_children( array('post_parent' => $post->ID, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image' ) );
@@ -1210,7 +1226,7 @@ class WPSEO_Metabox {
 		preg_match_all('/<h([1-6])([^>]+)?>(.*)?<\/h\\1>/i', $postcontent, $matches);
 		$headings = array();
 		foreach ($matches[3] as $heading) {
-			$headings[] = wpseo_strtolower_utf8( $heading );
+			$headings[] = $this->strtolower_utf8( $heading );
 		}
 		return $headings;
 	}	
@@ -1290,7 +1306,7 @@ class WPSEO_Metabox {
 		else
 			$this->SaveScoreResult( $results, 9, sprintf( $scoreBodyGoodLength, $wordCount ) );
 
-		$body = wpseo_strtolower_utf8( $body );
+		$body = $this->strtolower_utf8( $body );
 		
 		// Keyword Density check
 		if ( $wordCount > 0 ) {
@@ -1311,7 +1327,7 @@ class WPSEO_Metabox {
 			$this->SaveScoreResult( $results, 9, sprintf( $scoreKeywordDensityGood, $keywordDensity, $keywordCount ) );		
 		}
 
-		$firstp = wpseo_strtolower_utf8( $firstp );
+		$firstp = $this->strtolower_utf8( $firstp );
 		
 		// First Paragraph Test
 		if ( stripos( $firstp, $job["keyword"] ) === false && stripos( $firstp, $job["keyword_folded"] ) === false ) {

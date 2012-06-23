@@ -3,7 +3,7 @@
 class WPSEO_Pointers {
 
 	function __construct() {
-		add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 	
 	function enqueue() {
@@ -13,8 +13,8 @@ class WPSEO_Pointers {
 			wp_enqueue_script( 'jquery-ui' ); 
 			wp_enqueue_script( 'wp-pointer' ); 
 			wp_enqueue_script( 'utils' );
-			add_action( 'admin_print_footer_scripts', array( &$this, 'print_scripts' ), 99 );
-			add_action( 'admin_head', array( &$this, 'admin_head' ) );
+			add_action( 'admin_print_footer_scripts', array( $this, 'print_scripts' ), 99 );
+			add_action( 'admin_head', array( $this, 'admin_head' ) );
 		}
 	}
 

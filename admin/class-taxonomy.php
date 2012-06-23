@@ -7,12 +7,12 @@ class WPSEO_Taxonomy {
 		
 		if ( is_admin() && isset($_GET['taxonomy']) && 
 			( !isset($options['tax-hideeditbox-'.$_GET['taxonomy']]) || !$options['tax-hideeditbox-'.$_GET['taxonomy']]) )
-			add_action($_GET['taxonomy'] . '_edit_form', array(&$this,'term_additions_form'), 10, 2 );
+			add_action($_GET['taxonomy'] . '_edit_form', array($this,'term_additions_form'), 10, 2 );
 		
-		add_action( 'edit_term', array(&$this,'update_term'), 10, 3 );
+		add_action( 'edit_term', array($this,'update_term'), 10, 3 );
 		
-		add_action( 'init', array(&$this, 'custom_category_descriptions_allow_html' ) );
-		add_filter( 'category_description', array(&$this, 'custom_category_descriptions_add_shortcode_support' ), 10, 2 );
+		add_action( 'init', array($this, 'custom_category_descriptions_allow_html' ) );
+		add_filter( 'category_description', array($this, 'custom_category_descriptions_add_shortcode_support' ), 10, 2 );
 	}
 	
 	function form_row( $id, $label, $desc, $tax_meta, $type = 'text', $options = '' ) {

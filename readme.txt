@@ -143,6 +143,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Fix wrong homepage titles with 12345 in them because of bug in 1.2.2.
 	* Added text domains on some strings that were missing it.
 * Enhancements:
+	* Massive updates to how parts of the plugin are loaded, leading to a reduction of memory usage in WordPress admin of 1~2 MB.
 	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
 	* Added support for image galleries in the page analysis functionality, alt tags from images in galleries are now parsed too.
 	* Updates to introductory tour.

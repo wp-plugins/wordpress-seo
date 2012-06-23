@@ -7,8 +7,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	public function __construct() {
 		$this->options = get_option('wpseo_social');
 		
-		add_action( 'wpseo_head', array( &$this, 'opengraph' ) );
-		add_filter( 'language_attributes', array( &$this, 'add_opengraph_namespace' ) );
+		add_action( 'wpseo_head', array( $this, 'opengraph' ) );
+		add_filter( 'language_attributes', array( $this, 'add_opengraph_namespace' ) );
 	}
 
 	public function opengraph() {

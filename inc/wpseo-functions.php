@@ -142,7 +142,7 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 		'%%name%%'					=> get_the_author_meta('display_name', !empty($r->post_author) ? $r->post_author : get_query_var('author')),
 		'%%userid%%'				=> !empty($r->post_author) ? $r->post_author : get_query_var('author'),
 		'%%searchphrase%%'			=> esc_html(get_query_var('s')),
-		'%%page%%'		 			=> ( $max_num_pages > 1) ? sprintf( $sep . ' ' . __('Page %d of %d','wordpress-seo'), $pagenum, $max_num_pages) : '', 
+		'%%page%%'		 			=> ( $max_num_pages > 1 && $pagenum > 1 ) ? sprintf( $sep . ' ' . __('Page %d of %d','wordpress-seo'), $pagenum, $max_num_pages) : '', 
 		'%%pagetotal%%'	 			=> $max_num_pages, 
 		'%%pagenumber%%' 			=> $pagenum,
 		'%%caption%%'				=> $r->post_excerpt,
@@ -156,6 +156,17 @@ function wpseo_replace_vars($string, $args, $omit = array() ) {
 	if ( strpos( $string, '%%' ) === false ) {
 		$string = preg_replace( '/\s+/u',' ', $string );
 		return trim( $string );
+	}
+
+	if ( isset( $wp_query->query_vars['post_type'] ) && preg_match_all( '/%%pt_([^%]+)%%/u', $string, $matches, PREG_SET_ORDER ) ) {
+		$pt = get_post_type_object( $wp_query->query_vars['post_type'] );
+		$pt_plural = $pt_singular = $pt->name;
+		if ( isset( $pt->labels->singular_name ) )
+			$pt_singular = $pt->labels->singular_name;
+		if ( isset( $pt->labels->name ) )
+			$pt_plural = $pt->labels->name;
+		$string = str_replace( '%%pt_single%%', $pt_singular, $string);
+		$string = str_replace( '%%pt_plural%%', $pt_plural, $string);
 	}
 
 	if ( preg_match_all( '/%%cf_([^%]+)%%/u', $string, $matches, PREG_SET_ORDER ) ) {
@@ -231,61 +242,13 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 	return (isset($tax_meta['wpseo_'.$meta])) ? $tax_meta['wpseo_'.$meta] : false;
 }
 
-// Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.
+
+/**
+ * Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.
+ *
+ * @param $text string input string that might contain shortcodes
+ * @return $text string string without shortcodes
+ */
 function wpseo_strip_shortcode( $text ) {
 	return preg_replace( '|\[(.+?)\](.+?\[/\\1\])?|s', '', $text );
-}
-
-function wpseo_limit_words( $text, $limit = 30 ) {
-	$explode = explode(' ',$text);
-    $string  = '';	
-	$i = 0;
-    while ( $limit > $i ) {
-        $string .= $explode[$i]." ";
-		$i++;
-    }
-    return $string;
-}
-
-// This should work with Greek, Russian, Polish & French amongst other languages...
-function wpseo_strtolower_utf8($string){ 
-	$convert_to = array( 
-	  "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", 
-	  "v", "w", "x", "y", "z", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", 
-	  "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ø", "ù", "ú", "û", "ü", "ý", "а", "б", "в", "г", "д", "е", "ё", "ж", 
-	  "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", 
-	  "ь", "э", "ю", "я", "ą", "ć", "ę", "ł", "ń", "ó", "ś", "ź", "ż" 
-	); 
-	$convert_from = array( 
-	  "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", 
-	  "V", "W", "X", "Y", "Z", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", 
-	  "Ð", "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "А", "Б", "В", "Г", "Д", "Е", "Ё", "Ж", 
-	  "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ъ", 
-	  "Ь", "Э", "Ю", "Я", "Ą", "Ć", "Ę", "Ł", "Ń", "Ó", "Ś", "Ź", "Ż"
-	); 
-
-	return str_replace($convert_from, $convert_to, $string);
-}
-
-function wpseo_translate_score( $val ) {
-	$score = 'bad';
-	switch ( $val ) {
-		case 0:
-			$score = 'na';
-			break;
-		case 4:
-		case 5:
-			$score = 'poor';
-			break;
-		case 6:
-		case 7:
-			$score = 'ok';
-			break;
-		case 8:
-		case 9:
-		case 10:
-			$score = 'good';
-			break;
-	}
-	return $score;
 }

@@ -1,14 +1,11 @@
 <?php 
 
-class WPSEO_Social_Admin {
+class WPSEO_Social_Admin extends WPSEO_Metabox {
 
 	public function __construct() {
-		$options = get_wpseo_options();
-
-		add_action( 'wpseo_tab_header', array(&$this, 'tab_header'), 60 );
-		add_action( 'wpseo_tab_content', array(&$this, 'tab_content') );
-
-		add_filter( 'wpseo_save_metaboxes', array(&$this, 'save_meta_boxes' ), 10, 1 );
+		add_action( 'wpseo_tab_header', array($this, 'tab_header'), 60 );
+		add_action( 'wpseo_tab_content', array($this, 'tab_content') );
+		add_filter( 'wpseo_save_metaboxes', array($this, 'save_meta_boxes' ), 10, 1 );
 	}
 
 	public function tab_header() {
@@ -20,14 +17,13 @@ class WPSEO_Social_Admin {
 		
 		$content = '';
 		foreach( $this->get_meta_boxes() as $meta_box ) {
-			$content .= $wpseo_metabox->do_meta_box( $meta_box );
+			$content .= $this->do_meta_box( $meta_box );
 		}
-		$wpseo_metabox->do_tab( 'social', __('Social', 'wordpress-seo' ), $content );
+		$this->do_tab( 'social', __('Social', 'wordpress-seo' ), $content );
 	}
 	
 	public function get_meta_boxes( ) {
 		$mbs = array();
-		$options = get_option('wpseo');
 		$mbs['opengraph-description'] = array(
 			"name" => "opengraph-description",
 			"type" => "textarea",

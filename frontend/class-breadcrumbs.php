@@ -7,16 +7,16 @@ class WPSEO_Breadcrumbs {
 
 		if (isset($options['trytheme']) && $options['trytheme']) {
 			// Thesis
-			add_action('thesis_hook_before_headline', array(&$this, 'breadcrumb_output'),10,1);
+			add_action('thesis_hook_before_headline', array($this, 'breadcrumb_output'),10,1);
 
 			// Hybrid
 			remove_action( 'hybrid_before_content', 'hybrid_breadcrumb' );
-			add_action( 'hybrid_before_content', array(&$this, 'breadcrumb_output'), 10, 1 );
+			add_action( 'hybrid_before_content', array($this, 'breadcrumb_output'), 10, 1 );
 
 			// Thematic
-			add_action('thematic_belowheader', array(&$this, 'breadcrumb_output'),10,1);
+			add_action('thematic_belowheader', array($this, 'breadcrumb_output'),10,1);
 						
-			add_action('framework_hook_content_open', array(&$this, 'breadcrumb_output'),10,1);			
+			add_action('framework_hook_content_open', array($this, 'breadcrumb_output'),10,1);			
 		}
 
 		// If breadcrumbs are active (which they are otherwise this class wouldn't be instantiated), there's no reason

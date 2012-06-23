@@ -449,15 +449,6 @@ class WPSEO_Admin_Pages {
 		$this->postbox('support', __('Need support?', 'wordpress-seo' ), $content);
 	}
 
-	function text_limit( $text, $limit, $finish = '&hellip;') {
-		if( strlen( $text ) > $limit ) {
-	    	$text = substr( $text, 0, $limit );
-			$text = substr( $text, 0, - ( strlen( strrchr( $text,' ') ) ) );
-			$text .= $finish;
-		}
-		return $text;
-	}
-
 	function fetch_rss_items( $num ) {
 		include_once(ABSPATH . WPINC . '/feed.php');
 		$rss = fetch_feed( $this->feed );
@@ -468,7 +459,7 @@ class WPSEO_Admin_Pages {
 		
 		$rss_items = $rss->get_items( 0, $rss->get_item_quantity( $num ) );
 		
-		// If the feed was erroneously 
+		// If the feed was erroneous 
 		if ( !$rss_items ) {
 			$md5 = md5( $this->feed );
 			delete_transient( 'feed_' . $md5 );

@@ -94,6 +94,10 @@ class WPSEO_Admin {
 			else
 				add_submenu_page('wpseo_dashboard',__( 'Edit files', 'wordpress-seo' ),__( 'Edit files', 'wordpress-seo' ),'delete_users', 'wpseo_files', array($this,'files_page'));
 		}
+		
+		global $submenu;
+		if ( isset($submenu['wpseo_dashboard']) )
+			$submenu['wpseo_dashboard'][0][0] = __( 'Dashboard', 'wordpress-seo' );
 	}
 	
 	function register_network_settings_page() {

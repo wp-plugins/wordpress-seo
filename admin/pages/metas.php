@@ -225,6 +225,14 @@ $content = '
 				<td>'.__('Replaced with the term name', 'wordpress-seo' ).'</td>
 			</tr>
 			<tr>
+				<th>%%pt_single%%</th>
+				<td>'.__('Replaced with the post type single label', 'wordpress-seo' ).'</td>
+			</tr>
+			<tr class="alt">
+				<th>%%pt_plural%%</th>
+				<td>'.__('Replaced with the post type plural label', 'wordpress-seo' ).'</td>
+			</tr>
+			<tr>
 				<th>%%modified%%</th>
 				<td>'.__('Replaced with the post/page modified time', 'wordpress-seo' ).'</td>
 			</tr>

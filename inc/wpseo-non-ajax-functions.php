@@ -33,18 +33,22 @@ function wpseo_defaults() {
 	
 	if ( !is_array( get_option('wpseo_titles') ) ) {
 		$opt = array (
-			'title-post' => '%%title%% %%sep%% %%sitename%%',
-			'title-page' => '%%title%% %%sep%% %%sitename%%',
-			'title-attachment' => '%%title%% %%sep%% %%sitename%%',
-			'title-category' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
-			'title-post_tag' => '%%term_title%% '.__('Archives','wordpress-seo').' %%sep%% %%page%% %%sitename%%',
-			'title-author' => '%%name%% %%sep%% '.__('Author at','wordpress-seo').' %%sitename%%',
-			'title-archive' => '%%date%% %%sep%% %%sitename%%',
-			'title-search' => sprintf( __('You searched for %s', 'wordpress-seo'), '%%searchphrase%%' ).' %%sep%% %%sitename%%',
+			'title-home' => '%%sitename%% %%page%% %%sep%% %%sitedesc%%',
+			'title-author' => sprintf( __('%s, Author at %s','wordpress-seo'), '%%name%%', '%%sitename%%').' %%page%% ',
+			'title-archive' => '%%date%% %%page%% %%sep%% %%sitename%%',
+			'title-search' => sprintf( __('You searched for %s', 'wordpress-seo'), '%%searchphrase%%' ).' %%page%% %%sep%% %%sitename%%',
 			'title-404' => __('Page Not Found', 'wordpress-seo').' %%sep%% %%sitename%%',
 			'noindex-archive' => 'on',
 			'noindex-post_format' => 'on',
 		);
+		foreach ( get_post_types( array( 'public' => true ), 'objects' ) as $pt ) {
+			$opt['title-'.$pt->name] = '%%title%% %%page%% %%sep%% %%sitename%%';
+			if ( $pt->has_archive )
+				$opt['title-ptarchive-'.$pt->name] = sprintf(__('%s Archive','wordpress-seo'), '%%pt_plural%%').' %%page%% %%sep%% %%sitename%%';
+		}
+		foreach ( get_taxonomies( array( 'public' => true ) ) as $tax ) {
+			$opt['title-'.$tax] = sprintf( __('%s Archives','wordpress-seo'), '%%term_title%%').' %%page%% %%sep%% %%sitename%%';
+		}
 		update_option( 'wpseo_titles', $opt );
 	}
 	
@@ -132,6 +136,31 @@ function wpseo_deactivate() {
 	} else if (function_exists('wp_cache_clear_cache')) {
 		wp_cache_clear_cache();
 	}
+}
+
+function wpseo_translate_score( $val ) {
+	switch ( $val ) {
+		case 0:
+			$score = 'na';
+			break;
+		case 4:
+		case 5:
+			$score = 'poor';
+			break;
+		case 6:
+		case 7:
+			$score = 'ok';
+			break;
+		case 8:
+		case 9:
+		case 10:
+			$score = 'good';
+			break;
+		default:
+			$score = 'bad';
+			break;
+	}
+	return $score;
 }
 
 /**
