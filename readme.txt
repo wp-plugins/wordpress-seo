@@ -142,6 +142,9 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Fix for slug saving that should help interoperability with other slug-enhancing / changing functions.
 	* Fix wrong homepage titles with 12345 in them because of bug in 1.2.2.
 	* Added text domains on some strings that were missing it.
+	* Replace `split` with `explode` as `split` is deprecated in newer PHP versions.
+	* Properly deal with shortcodes with text inbetween.
+	* Remove several functions that are no longer used.
 * Enhancements:
 	* Massive updates to how parts of the plugin are loaded, leading to a reduction of memory usage in WordPress admin of 1~2 MB.
 	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
