@@ -567,7 +567,7 @@ class WPSEO_Metabox {
 					continue;
 			}
 
-			wpseo_set_value( $post_id, $meta_box['name'], $data );
+			wpseo_set_value( $meta_box['name'], $data, $post_id );
 		}  
 		
 		$this->calculateResults( $post );
@@ -625,7 +625,7 @@ class WPSEO_Metabox {
 				$score = 'noindex';
 				$title = __('Post is set to noindex.','wordpress-seo');
 				if ( wpseo_get_value('meta-robots-noindex', $id) !== 0 )
-					wpseo_set_value( $id, 'linkdex', 0 );
+					wpseo_set_value( 'linkdex', 0, $id );
 			} else if ( $score = wpseo_get_value('linkdex', $id) ) {
 				$score = wpseo_translate_score( round( $score / 10 ) );
 				$title = $score;
@@ -832,7 +832,7 @@ class WPSEO_Metabox {
 		if ( !wpseo_get_value( 'focuskw', $post->ID ) ) {
 			$result = new WP_Error('no-focuskw', sprintf( __( 'No focus keyword was set for this %s. If you do not set a focus keyword, no score can be calculated.', 'wordpress-seo' ), $post->post_type ) );
 			
-			wpseo_set_value( $post->ID, 'linkdex', 0 );
+			wpseo_set_value( 'linkdex', 0, $post->ID );
 			
 			return $result;
 		}
@@ -922,9 +922,11 @@ class WPSEO_Metabox {
 			$overall_max += 9;
 		}
 		
+		if ( $overall < 1 )
+			$overall = 1;
 		$score = round( ( $overall / $overall_max ) * 100 );
 		
-		wpseo_set_value( $post->ID, 'linkdex', $score );
+		wpseo_set_value( 'linkdex', $score, $post->ID );
 		
 		return $results;
 	}
@@ -1298,6 +1300,9 @@ class WPSEO_Metabox {
 				$keywordDensity 	= number_format( ( ($keywordCount / ($wordCount - (($keywordCount -1) * $keywordWordCount))) * 100 ) , 2 );
 		}
 
+		if ( !isset($keywordDensity) )
+			$keywordDensity = 0;
+			
 		if ( $keywordDensity < 1 ) {
 			$this->SaveScoreResult( $results, 4, sprintf( $scoreKeywordDensityLow, $keywordDensity, $keywordCount ) );		
 		} else if ( $keywordDensity > 4.5 ) {

@@ -7,7 +7,7 @@ class WPSEO_Admin_Pages {
 	var $adminpages 	= array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles', 'wpseo_xml', 'wpseo_social');
 	
 	function __construct() {
-		add_action( 'init', array( $this, 'init') );
+		add_action( 'init', array( $this, 'init'), 20 );
 	}
 	
 	function init() {
@@ -506,4 +506,5 @@ class WPSEO_Admin_Pages {
 	}
 	
 } // end class WPSEO_Admin
+global $wpseo_admin_pages;
 $wpseo_admin_pages = new WPSEO_Admin_Pages();

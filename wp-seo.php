@@ -76,37 +76,45 @@ function wpseo_frontend_init() {
 		require WPSEO_PATH.'frontend/class-twitter.php';	
 }
 
+function wpseo_admin_init() {
+	$options = get_wpseo_options();
+	if ( isset( $_GET['wpseo_restart_tour'] ) ) {
+		unset( $options['ignore_tour'] );
+		update_option( 'wpseo', $options );
+	}
+	
+	require WPSEO_PATH.'admin/class-admin.php';
+
+	global $pagenow;
+	if ( in_array( $pagenow, array('edit.php', 'post.php', 'post-new.php') ) ) {
+		require WPSEO_PATH.'admin/class-metabox.php';			
+		if ( isset( $options['opengraph'] )  && $options['opengraph'] )
+			require WPSEO_PATH.'admin/class-opengraph-admin.php';
+	}
+		
+	if ( in_array( $pagenow, array('edit-tags.php') ) )	
+		require WPSEO_PATH.'admin/class-taxonomy.php';
+
+	if ( in_array( $pagenow, array('admin.php') ) )
+		require WPSEO_PATH.'admin/class-config.php';
+
+	if ( !isset( $options['ignore_tour'] ) || !$options['ignore_tour'] )
+		require WPSEO_PATH.'admin/class-pointers.php';
+	
+	if ( isset( $options['enablexmlsitemap'] ) && $options['enablexmlsitemap'] )
+		require WPSEO_PATH.'admin/class-sitemaps-admin.php';	
+}
+
 if ( is_admin() ) {
 	if ( defined('DOING_AJAX') && DOING_AJAX ) {
 		require WPSEO_PATH.'admin/ajax.php';
 	} else {
-		
-		if ( isset( $_GET['wpseo_restart_tour'] ) ) {
-			unset( $options['ignore_tour'] );
-			update_option( 'wpseo', $options );
-		}
-		
-		require WPSEO_PATH.'admin/class-admin.php';
-
-		global $pagenow;
-		if ( $pagenow != 'admin.php' ) {
-			require WPSEO_PATH.'admin/class-metabox.php';			
-			require WPSEO_PATH.'admin/class-taxonomy.php';
-			if ( isset( $options['opengraph'] )  && $options['opengraph'] )
-				require WPSEO_PATH.'admin/class-opengraph-admin.php';
-		} else {
-			require WPSEO_PATH.'admin/class-config.php';
-			if ( !isset( $options['ignore_tour'] ) || !$options['ignore_tour'] )
-				require WPSEO_PATH.'admin/class-pointers.php';
-		}
-
-		if ( isset( $options['enablexmlsitemap'] ) && $options['enablexmlsitemap'] )
-			require WPSEO_PATH.'admin/class-sitemaps-admin.php';
+		add_action( 'plugins_loaded', 'wpseo_admin_init', 0 );
 	}
 	
 	register_activation_hook( __FILE__, 'wpseo_activate' );
 	register_deactivation_hook( __FILE__, 'wpseo_deactivate' );
 } else {	
-	add_action( 'init', 'wpseo_frontend_init', 0 );
+	add_action( 'plugins_loaded', 'wpseo_frontend_init', 0 );
 }
 unset( $options );

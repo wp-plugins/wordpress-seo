@@ -616,4 +616,5 @@ class WPSEO_Sitemaps {
 	}
 }
 
+global $wpseo_sitemaps;
 $wpseo_sitemaps = new WPSEO_Sitemaps();
