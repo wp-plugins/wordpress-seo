@@ -149,6 +149,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Massive updates to how parts of the plugin are loaded, leading to a reduction of memory usage in WordPress admin of 1~2 MB.
 	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
 	* Added support for image galleries in the page analysis functionality, alt tags from images in galleries are now parsed too.
+	* Add an option to remove the `replytocom` variables from comment links (they're bloody stupid).
 	* Updates to introductory tour.
 * i18n:
 	* Updated Russian translation.

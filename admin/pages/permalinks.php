@@ -14,6 +14,9 @@ $content .= '<p class="desc">'.__('If you choose a permalink for your posts with
 $content .= $wpseo_admin_pages->checkbox('redirectattachment',__('Redirect attachment URL\'s to parent post URL.', 'wordpress-seo' ));
 $content .= '<p class="desc">'.__('Attachments to posts are stored in the database as posts, this means they\'re accessible under their own URL\'s if you do not redirect them, enabling this will redirect them to the post they were attached to.', 'wordpress-seo').'</p>';
 
+$content .= $wpseo_admin_pages->checkbox('cleanreplytocom',__('Remove the <code>?replytocom</code> variables.', 'wordpress-seo' ));
+$content .= '<p class="desc">'.__('This prevents threaded replies from working when the user has JavaScript disabled, but on a large site can mean a <em>huge</em> improvement in crawl efficiency for search engines when you have a lot of comments.', 'wordpress-seo').'</p>';
+
 $content .= $wpseo_admin_pages->checkbox('cleanpermalinks',__('Redirect ugly URL\'s to clean permalinks. (Not recommended in many cases!)', 'wordpress-seo' ));
 $content .= '<p class="desc">'.__('People make mistakes in their links towards you sometimes, or unwanted parameters are added to the end of your URLs, this allows you to redirect them all away. Please note that while this is a feature that is actively maintained, it is known to break several plugins, and should for that reason be the first feature you disable when you encounter issues after installing this plugin.', 'wordpress-seo').'</p>';
 

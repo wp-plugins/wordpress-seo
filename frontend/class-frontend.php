@@ -47,13 +47,15 @@ class WPSEO_Frontend {
 		if (isset($options['redirectattachment']) && $options['redirectattachment'])
 			add_action( 'template_redirect', array( $this, 'attachment_redirect' ),1);
 
-
 		if (isset($options['trailingslash']) && $options['trailingslash'])
 			add_filter( 'user_trailingslashit', array( $this, 'add_trailingslash') , 10, 2);
 
 		if (isset($options['cleanpermalinks']) && $options['cleanpermalinks'])
 			add_action( 'template_redirect',array( $this, 'clean_permalink' ),1);	
 
+		if (isset($options['cleanreplytocom']) && $options['cleanreplytocom'])
+			add_filter( 'comment_reply_link', array( $this, 'remove_reply_to_com' ) );
+		
 		add_filter( 'the_content_feed', array( $this, 'embed_rssfooter' ) );
 		add_filter( 'the_excerpt_rss', array( $this, 'embed_rssfooter_excerpt' ) );	
 		
@@ -786,6 +788,10 @@ class WPSEO_Frontend {
 		}
 	}
 
+	public function remove_reply_to_com( $link ) {
+		return preg_replace( '/href=\'(.*(\?|&)replytocom=(\d+)#respond)/', 'href=\'#comment-$3', $link );
+	}
+	
 	public function clean_permalink( $headers ) {
 		if ( is_robots() || get_query_var( 'sitemap' ) )
 			return;
