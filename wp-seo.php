@@ -58,8 +58,22 @@ require WPSEO_PATH.'inc/wpseo-functions.php';
 
 $options = get_wpseo_options();
 
-if ( !defined('DOING_AJAX') || !DOING_AJAX ) {
+if ( !defined('DOING_AJAX') || !DOING_AJAX )
 	require WPSEO_PATH.'inc/wpseo-non-ajax-functions.php';
+
+function wpseo_frontend_init() {
+	$options = get_wpseo_options();
+	require WPSEO_PATH.'frontend/class-frontend.php';
+	if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] )
+		require WPSEO_PATH.'inc/class-sitemaps.php';
+	if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] )
+		require WPSEO_PATH.'inc/class-rewrite.php';
+	if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
+		require WPSEO_PATH.'frontend/class-breadcrumbs.php';
+	if ( isset( $options['opengraph'] )  && $options['opengraph'] )
+		require WPSEO_PATH.'frontend/class-opengraph.php';
+	if ( isset( $options['twitter'] )  && $options['twitter'] )
+		require WPSEO_PATH.'frontend/class-twitter.php';	
 }
 
 if ( is_admin() ) {
@@ -92,17 +106,7 @@ if ( is_admin() ) {
 	
 	register_activation_hook( __FILE__, 'wpseo_activate' );
 	register_deactivation_hook( __FILE__, 'wpseo_deactivate' );
-} else {
-	require WPSEO_PATH.'frontend/class-frontend.php';
-	if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] )
-		require WPSEO_PATH.'inc/class-sitemaps.php';
-	if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] )
-		require WPSEO_PATH.'inc/class-rewrite.php';
-	if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
-		require WPSEO_PATH.'frontend/class-breadcrumbs.php';
-	if ( isset( $options['opengraph'] )  && $options['opengraph'] )
-		require WPSEO_PATH.'frontend/class-opengraph.php';
-	if ( isset( $options['twitter'] )  && $options['twitter'] )
-		require WPSEO_PATH.'frontend/class-twitter.php';
+} else {	
+	add_action( 'init', 'wpseo_frontend_init', 0 );
 }
 unset( $options );

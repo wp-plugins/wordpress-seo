@@ -1,17 +1,5 @@
 <?php
 
-function wpseo_get_country($country_code) {
-	$country_arr = wpseo_get_country_arr();
-	return $country_arr[$country_code];
-}
-
-function wpseo_get_country_arr(){
-	$countries = array(
-		'AF'=>'Afghanistan', 'AL'=>'Albania', 'DZ'=>'Algeria', 'AS'=>'American Samoa', 'AD'=>'Andorra', 'AO'=>'Angola', 'AI'=>'Anguilla', 'AQ'=>'Antarctica', 'AG'=>'Antigua And Barbuda', 'AR'=>'Argentina', 'AM'=>'Armenia', 'AW'=>'Aruba', 'AU'=>'Australia', 'AT'=>'Austria', 'AZ'=>'Azerbaijan', 'BS'=>'Bahamas', 'BH'=>'Bahrain', 'BD'=>'Bangladesh', 'BB'=>'Barbados', 'BY'=>'Belarus', 'BE'=>'Belgium', 'BZ'=>'Belize', 'BJ'=>'Benin', 'BM'=>'Bermuda', 'BT'=>'Bhutan', 'BO'=>'Bolivia', 'BA'=>'Bosnia And Herzegovina', 'BW'=>'Botswana', 'BV'=>'Bouvet Island', 'BR'=>'Brazil', 'IO'=>'British Indian Ocean Territory', 'BN'=>'Brunei', 'BG'=>'Bulgaria', 'BF'=>'Burkina Faso', 'BI'=>'Burundi', 'KH'=>'Cambodia', 'CM'=>'Cameroon', 'CA'=>'Canada', 'CV'=>'Cape Verde', 'KY'=>'Cayman Islands', 'CF'=>'Central African Republic', 'TD'=>'Chad', 'CL'=>'Chile', 'CN'=>'China', 'CX'=>'Christmas Island', 'CC'=>'Cocos (Keeling) Islands', 'CO'=>'Columbia', 'KM'=>'Comoros', 'CG'=>'Congo', 'CK'=>'Cook Islands', 'CR'=>'Costa Rica', 'CI'=>'Cote D\'Ivorie (Ivory Coast)', 'HR'=>'Croatia (Hrvatska)', 'CU'=>'Cuba', 'CY'=>'Cyprus', 'CZ'=>'Czech Republic', 'CD'=>'Democratic Republic Of Congo (Zaire)', 'DK'=>'Denmark', 'DJ'=>'Djibouti', 'DM'=>'Dominica', 'DO'=>'Dominican Republic', 'TP'=>'East Timor', 'EC'=>'Ecuador', 'EG'=>'Egypt', 'SV'=>'El Salvador', 'GQ'=>'Equatorial Guinea', 'ER'=>'Eritrea', 'EE'=>'Estonia', 'ET'=>'Ethiopia', 'FK'=>'Falkland Islands (Malvinas)', 'FO'=>'Faroe Islands', 'FJ'=>'Fiji', 'FI'=>'Finland', 'FR'=>'France', 'FX'=>'France, Metropolitan', 'GF'=>'French Guinea', 'PF'=>'French Polynesia', 'TF'=>'French Southern Territories', 'GA'=>'Gabon', 'GM'=>'Gambia', 'GE'=>'Georgia', 'DE'=>'Germany', 'GH'=>'Ghana', 'GI'=>'Gibraltar', 'GR'=>'Greece', 'GL'=>'Greenland', 'GD'=>'Grenada', 'GP'=>'Guadeloupe', 'GU'=>'Guam', 'GT'=>'Guatemala', 'GN'=>'Guinea', 'GW'=>'Guinea-Bissau', 'GY'=>'Guyana', 'HT'=>'Haiti', 'HM'=>'Heard And McDonald Islands', 'HN'=>'Honduras', 'HK'=>'Hong Kong', 'HU'=>'Hungary', 'IS'=>'Iceland', 'IN'=>'India', 'ID'=>'Indonesia', 'IR'=>'Iran', 'IQ'=>'Iraq', 'IE'=>'Ireland', 'IL'=>'Israel', 'IT'=>'Italy', 'JM'=>'Jamaica', 'JP'=>'Japan', 'JO'=>'Jordan', 'KZ'=>'Kazakhstan', 'KE'=>'Kenya', 'KI'=>'Kiribati', 'KW'=>'Kuwait', 'KG'=>'Kyrgyzstan', 'LA'=>'Laos', 'LV'=>'Latvia', 'LB'=>'Lebanon', 'LS'=>'Lesotho', 'LR'=>'Liberia', 'LY'=>'Libya', 'LI'=>'Liechtenstein', 'LT'=>'Lithuania', 'LU'=>'Luxembourg', 'MO'=>'Macau', 'MK'=>'Macedonia', 'MG'=>'Madagascar', 'MW'=>'Malawi', 'MY'=>'Malaysia', 'MV'=>'Maldives', 'ML'=>'Mali', 'MT'=>'Malta', 'MH'=>'Marshall Islands', 'MQ'=>'Martinique', 'MR'=>'Mauritania', 'MU'=>'Mauritius', 'YT'=>'Mayotte', 'MX'=>'Mexico', 'FM'=>'Micronesia', 'MD'=>'Moldova', 'MC'=>'Monaco', 'MN'=>'Mongolia', 'MS'=>'Montserrat', 'MA'=>'Morocco', 'MZ'=>'Mozambique', 'MM'=>'Myanmar (Burma)', 'NA'=>'Namibia', 'NR'=>'Nauru', 'NP'=>'Nepal', 'NL'=>'Netherlands', 'AN'=>'Netherlands Antilles', 'NC'=>'New Caledonia', 'NZ'=>'New Zealand', 'NI'=>'Nicaragua', 'NE'=>'Niger', 'NG'=>'Nigeria', 'NU'=>'Niue', 'NF'=>'Norfolk Island', 'KP'=>'North Korea', 'MP'=>'Northern Mariana Islands', 'NO'=>'Norway', 'OM'=>'Oman', 'PK'=>'Pakistan', 'PW'=>'Palau', 'PA'=>'Panama', 'PG'=>'Papua New Guinea', 'PY'=>'Paraguay', 'PE'=>'Peru', 'PH'=>'Philippines', 'PN'=>'Pitcairn', 'PL'=>'Poland', 'PT'=>'Portugal', 'PR'=>'Puerto Rico', 'QA'=>'Qatar', 'RE'=>'Reunion', 'RO'=>'Romania', 'RU'=>'Russia', 'RW'=>'Rwanda', 'SH'=>'Saint Helena', 'KN'=>'Saint Kitts And Nevis', 'LC'=>'Saint Lucia', 'PM'=>'Saint Pierre And Miquelon', 'VC'=>'Saint Vincent And The Grenadines', 'SM'=>'San Marino', 'ST'=>'Sao Tome And Principe', 'SA'=>'Saudi Arabia', 'SN'=>'Senegal', 'SC'=>'Seychelles', 'SL'=>'Sierra Leone', 'SG'=>'Singapore', 'SK'=>'Slovak Republic', 'SI'=>'Slovenia', 'SB'=>'Solomon Islands', 'SO'=>'Somalia', 'ZA'=>'South Africa', 'GS'=>'South Georgia And South Sandwich Islands', 'KR'=>'South Korea', 'ES'=>'Spain', 'LK'=>'Sri Lanka', 'SD'=>'Sudan', 'SR'=>'Suriname', 'SJ'=>'Svalbard And Jan Mayen', 'SZ'=>'Swaziland', 'SE'=>'Sweden', 'CH'=>'Switzerland', 'SY'=>'Syria', 'TW'=>'Taiwan', 'TJ'=>'Tajikistan', 'TZ'=>'Tanzania', 'TH'=>'Thailand', 'TG'=>'Togo', 'TK'=>'Tokelau', 'TO'=>'Tonga', 'TT'=>'Trinidad And Tobago', 'TN'=>'Tunisia', 'TR'=>'Turkey', 'TM'=>'Turkmenistan', 'TC'=>'Turks And Caicos Islands', 'TV'=>'Tuvalu', 'UG'=>'Uganda', 'UA'=>'Ukraine', 'AE'=>'United Arab Emirates', 'UK'=>'United Kingdom', 'US'=>'United States', 'UM'=>'United States Minor Outlying Islands', 'UY'=>'Uruguay', 'UZ'=>'Uzbekistan', 'VU'=>'Vanuatu', 'VA'=>'Vatican City (Holy See)', 'VE'=>'Venezuela', 'VN'=>'Vietnam', 'VG'=>'Virgin Islands (British)', 'VI'=>'Virgin Islands (US)', 'WF'=>'Wallis And Futuna Islands', 'EH'=>'Western Sahara', 'WS'=>'Western Samoa', 'YE'=>'Yemen', 'YU'=>'Yugoslavia', 'ZM'=>'Zambia', 'ZW'=>'Zimbabwe'
-	);
-	return $countries;
-}
-
 function wpseo_flush_rules() {
 	global $wp_rewrite;
 	$wp_rewrite->flush_rules();
@@ -33,17 +21,9 @@ function wpseo_activate() {
 	
 }
 
-function wpseo_reset_defaults() {
-	foreach ( get_wpseo_options_arr() as $opt ) {
-		delete_option( $opt );
-	}
-	wpseo_defaults();
-	
-	wpseo_title_test();
-}
-
 function wpseo_defaults() {
-	if ( !is_array( get_option('wpseo') ) ) {
+	$options = get_option('wpseo');
+	if ( !is_array( $options ) ) {
 		$opt = array(
 			'disableadvanced_meta' => 'on',
 			'version' => WPSEO_VERSION,
@@ -93,7 +73,55 @@ function wpseo_defaults() {
 	if ( function_exists( 'woo_version_init' ) ) {
 		update_option( 'seo_woo_use_third_party_data', 'true' );
 	}
+	
+	wpseo_title_test();
 }
+
+function wpseo_title_test() {
+	$options = get_option('wpseo_titles');
+	
+	if ( isset( $options['forcerewritetitle'] ) )
+		unset( $options['forcerewritetitle'] ); 
+	
+	$options['title_test'] = true;
+	update_option('wpseo_titles', $options );
+	
+	// Setting title_test to true forces the plugin to output the title below through a filter in class-frontend.php
+	$expected_title = 'This is a Yoast Test Title';
+
+	if ( function_exists('w3tc_pgcache_flush') ) {
+		w3tc_pgcache_flush();
+	} else if (function_exists('wp_cache_clear_cache')) {
+		wp_cache_clear_cache();
+	}
+	
+	$resp = wp_remote_get( get_bloginfo('url') );
+	
+	// echo '<pre>'.$resp['body'].'</pre>';
+	
+	if ( $resp && !is_wp_error( $resp ) && 200 == $resp['response']['code'] ) {
+		$res = preg_match('/<title>([^<]+)<\/title>/im', $resp['body'], $matches);
+	
+		if ( $res && $matches[1] != $expected_title ) {
+			$options['forcerewritetitle'] = 'on';
+			update_option('wpseo_titles', $options );
+
+			$resp = wp_remote_get( get_bloginfo('url') );
+
+			$res = preg_match('/<title>([^>]+)<\/title>/im', $resp['body'], $matches);
+		}
+
+		if ( !$res || $matches[1] != $expected_title )
+			unset( $options['forcerewritetitle'] ); 
+	} else {
+		// If that dies, let's make sure the titles are correct and force the output.
+		$options['forcerewritetitle'] = 'on';
+	}
+	
+	unset( $options['title_test'] );
+	update_option('wpseo_titles', $options );
+}
+add_filter( 'switch_theme', 'wpseo_title_test', 0 );
 
 function wpseo_deactivate() {
 	wpseo_flush_rules();
@@ -104,54 +132,6 @@ function wpseo_deactivate() {
 	} else if (function_exists('wp_cache_clear_cache')) {
 		wp_cache_clear_cache();
 	}
-}
-
-function wpseo_export_settings( $include_taxonomy ) {
-    $content = "; ".__( "This is a settings export file for the WordPress SEO plugin by Yoast.com", 'wordpress-seo' )." - http://yoast.com/wordpress/seo/ \r\n"; 
-
-	$optarr = get_wpseo_options_arr();
-	
-	foreach ($optarr as $optgroup) {
-		$content .= "\n".'['.$optgroup.']'."\n";
-		$options = get_option($optgroup);
-		if (!is_array($options))
-			continue;
-	    foreach ($options as $key => $elem) { 
-	        if( is_array($elem) ) { 
-	            for($i=0;$i<count($elem);$i++)  { 
-	                $content .= $key."[] = \"".$elem[$i]."\"\n"; 
-	            } 
-	        } 
-	        else if($elem=="") 
-				$content .= $key." = \n"; 
-	        else 
-				$content .= $key." = \"".$elem."\"\n"; 
-	    }		
-	}
-
-	if ( $include_taxonomy ) {
-		$content .= "\r\n\r\n[wpseo_taxonomy_meta]\r\n";
-		$content .= "wpseo_taxonomy_meta = \"".urlencode( json_encode( get_option('wpseo_taxonomy_meta') ) )."\"";
-	}
-
-	$dir = wp_upload_dir();
-	
-    if ( !$handle = fopen( $dir['path'].'/settings.ini', 'w' ) )
-        die();
-
-    if ( !fwrite($handle, $content) ) 
-        die();
-
-    fclose($handle);
-
-	require_once (ABSPATH . 'wp-admin/includes/class-pclzip.php');
-	
-	chdir( $dir['path'] );
-	$zip = new PclZip('./settings.zip');
-	if ($zip->create('./settings.ini') == 0)
-	  	return false;
-	
-	return $dir['url'].'/settings.zip'; 
 }
 
 /**
@@ -235,20 +215,3 @@ function wpseo_admin_bar_css() {
 		wp_enqueue_style( 'boxes', WPSEO_URL.'css/adminbar.css', WPSEO_VERSION );
 }
 add_action( 'wp_enqueue_scripts', 'wpseo_admin_bar_css' );
-
-function wpseo_stopwords_check( $haystack, $checkingUrl = false ) {
-	$stopWords = wpseo_stopwords();
-	
-	foreach ( $stopWords as $stopWord ) {
-		// If checking a URL remove the single quotes
-		if ( $checkingUrl )
-			$stopWord = str_replace( "'", "", $stopWord );
-
-		// Check whether the stopword appears as a whole word
-		$res = preg_match( "/(^|[ \n\r\t\.,'\(\)\"\+;!?:])". preg_quote( $stopWord, '/' ) ."($|[ \n\r\t\.,'\(\)\"\+;!?:])/i", $haystack, $match );
-		if ( $res > 0 )
-			return $stopWord;
-	}
-	
-	return false;
-}

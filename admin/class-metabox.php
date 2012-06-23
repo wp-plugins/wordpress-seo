@@ -968,13 +968,17 @@ class WPSEO_Metabox {
 	}
 	
 	function ScoreKeyword($job, &$results) {
+		global $wpseo_admin;
+		
 		$keywordStopWord = __("The keyword for this page contains one or more %sstop words%s, consider removing them. Found '%s'.", 'wordpress-seo' );
 	
-		if ( wpseo_stopwords_check( $job["keyword"] ) !== false )
-			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord,"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>", wpseo_stopwords_check( $job["keyword"] ) ) );			
+		if ( $wpseo_admin->stopwords_check( $job["keyword"] ) !== false )
+			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord,"<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>", $wpseo_admin->stopwords_check( $job["keyword"] ) ) );			
 	}
 	
 	function ScoreUrl($job, &$results, $statistics) {
+		global $wpseo_admin;
+		
 		$urlGood 		= __("The keyword / phrase appears in the URL for this page.", 'wordpress-seo' );
 		$urlMedium 		= __("The keyword / phrase does not appear in the URL for this page. If you decide to rename the URL be sure to check the old URL 301 redirects to the new one!", 'wordpress-seo' );
 		$urlStopWords	= __("The slug for this page contains one or more <a href=\"http://en.wikipedia.org/wiki/Stop_words\">stop words</a>, consider removing them.", 'wordpress-seo' );
@@ -990,7 +994,7 @@ class WPSEO_Metabox {
 			$this->SaveScoreResult( $results, 6, $urlMedium );	
 
 		// Check for Stop Words in the slug
-		if ( wpseo_stopwords_check( $job["pageSlug"], true ) !== false )
+		if ( $wpseo_admin->stopwords_check( $job["pageSlug"], true ) !== false )
 			$this->SaveScoreResult( $results, 5, $urlStopWords );
 
 		// Check if the slug isn't too long relative to the length of the keyword
