@@ -12,8 +12,6 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	}
 
 	public function opengraph() {
-		global $wp_query, $paged;
-		
 		wp_reset_query();
 		
 		$this->locale();
@@ -35,8 +33,9 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		if ( isset( $this->options['fbadminapp'] ) && 0 != $this->options['fbadminapp'] ) {
 			echo "<meta property='fb:app_id' content='".esc_attr( $this->options['fbadminapp'] )."'/>\n";
 		} else if ( isset( $this->options['fb_admins'] ) && is_array( $this->options['fb_admins'] ) && ( count( $this->options['fb_admins'] ) > 0 )  ) {
+			$adminstr = '';
 			foreach ( $this->options['fb_admins'] as $admin_id => $admin ) {
-				if ( isset($adminstr) )
+				if ( !empty($adminstr) )
 					$adminstr .= ','.$admin_id;
 				else
 					$adminstr = $admin_id;
@@ -90,7 +89,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		echo "<meta property='og:type' content='".esc_attr( $type )."'/>\n";
 	}
 		
-	public function image( $image = '' ) {
+	public function image() {
 		if ( is_singular() ) {
 			global $post;
 
@@ -98,6 +97,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 
 			if ( is_front_page() ) {
 				if ( is_front_page() ) {
+					$og_image = '';
 					if ( isset( $this->options['og_frontpage_image'] ) )
 						$og_image = $this->options['og_frontpage_image'];
 						
@@ -164,6 +164,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 
 		if ( isset( $og_image ) && $og_image != '' ) 
 			echo "<meta property='og:image' content='".esc_attr( $og_image )."'/>\n";
+                
+                // @TODO add G+ image stuff
 	}
 		
 	public function description() {

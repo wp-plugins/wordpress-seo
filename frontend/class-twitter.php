@@ -68,7 +68,6 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 			if ( $featured_img ) {
 				$img = apply_filters( 'wpseo_opengraph_image', $featured_img[0] );
 				echo "<meta name='twitter:image' content='".esc_attr( $img )."'>\n";
-				$shown_images[] = $img;
 			}
 		} 
 		

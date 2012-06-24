@@ -137,7 +137,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 = 1.2.4 =
 
 * Bug fixes:
-	* Properly restore $wp_query after running header functionality.
+	* Properly restore $wp_query after running header functionality, so we're not breaking badly built themes.
 	* Make the title test helper function only return the test title to the right WordPress user-agent.
 	* Fix for slug saving that should help interoperability with other slug-enhancing / changing functions.
 	* Fix wrong homepage titles with 12345 in them because of bug in 1.2.2.
@@ -145,11 +145,14 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Replace `split` with `explode` as `split` is deprecated in newer PHP versions.
 	* Properly deal with shortcodes with text inbetween.
 	* Remove several functions that are no longer used.
+	* `%%page%%` only outputs '`%%sep%%` Page 2 of X' when not on page 1. If you want it to show up on Page 1 you can use `%%pagetotal%%` and `%%pagenumber%%`. This both works for paginated posts & pages too.
 * Enhancements:
 	* Massive updates to how parts of the plugin are loaded, leading to a reduction of memory usage in WordPress admin of 1~2 MB.
 	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
 	* Added support for image galleries in the page analysis functionality, alt tags from images in galleries are now parsed too.
 	* Add an option to remove the `replytocom` variables from comment links (they're bloody stupid).
+	* Added variables `%%pt_single%%` and `%%pt_plural%%` which output the single and plural label of the current post type (useful for post type archives).
+	* Made the default settings smarter, they'll now use better titles _and_ will set titles for each public post type, post type archive and taxonomy.
 	* Updates to introductory tour.
 * i18n:
 	* Updated Russian translation.
