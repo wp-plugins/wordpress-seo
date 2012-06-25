@@ -7,8 +7,6 @@
 
 /**
  * Adds the OpenGraph output
- *
- * @package WPSEO_OpenGraph
  */
 class WPSEO_OpenGraph extends WPSEO_Frontend {
 

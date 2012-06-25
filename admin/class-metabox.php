@@ -9,8 +9,6 @@
  * class WPSEO_Metabox
  *
  * The class that generates the metabox on the edit post / page as well as contains all page analysis functionality.
- *
- * @package WPSEO_Metabox
  */
 class WPSEO_Metabox {
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package XML Sitemaps
+ * @package XML_Sitemaps
  */
 
 class WPSEO_Sitemaps {

@@ -7,8 +7,6 @@
 
 /**
  * Main frontend class for WordPress SEO, responsible for the SEO output as well as removing default WordPress output.
- *
- * @package WPSEO_Frontend
  */
 class WPSEO_Frontend {
 
