@@ -2,9 +2,19 @@
 
 class WPSEO_Metabox {
 
-	var $wpseo_meta_length = 156;
-	var $wpseo_meta_length_reason = '';
+	/**
+	 * @var int $meta_length Allowed length of the meta description.
+	 */
+	var $meta_length = 156;
 
+	/**
+	 * @var string $meta_length_reason Reason the meta description is not the default length.
+	 */
+	var $meta_length_reason = '';
+
+	/**
+	 * Class constructor
+	 */
 	function __construct() {
 		if ( !class_exists( 'Yoast_TextStatistics' ) && apply_filters( 'wpseo_use_page_analysis', true ) === true )
 			require WPSEO_PATH . "/admin/TextStatistics.php";
@@ -19,6 +29,9 @@ class WPSEO_Metabox {
 		add_action( 'admin_init', array( $this, 'setup_page_analysis' ) );
 	}
 
+	/**
+	 * Sets up all the functionality related to the prominence of the page analysis functionality.
+	 */
 	public function setup_page_analysis() {
 
 		if ( apply_filters( 'wpseo_use_page_analysis', true ) === true ) {
@@ -40,7 +53,14 @@ class WPSEO_Metabox {
 
 	}
 
-	// This should work with Greek, Russian, Polish & French amongst other languages...
+	/**
+	 * Lowercase a sentence while preserving "weird" characters.
+	 *
+	 * This should work with Greek, Russian, Polish & French amongst other languages...
+	 *
+	 * @param string $string String to lowercase
+	 * @return string
+	 */
 	function strtolower_utf8( $string ) {
 		$convert_to   = array(
 			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
@@ -60,6 +80,9 @@ class WPSEO_Metabox {
 		return str_replace( $convert_from, $convert_to, $string );
 	}
 
+	/**
+	 * Outputs the page analysis score in the Publish Box.
+	 */
 	public function publish_box() {
 		echo '<div class="misc-pub-section curtime misc-pub-section-last" style="height:0; padding:0; margin:0; border-top: 1px solid #DFDFDF"></div>';
 		echo '<div class="misc-pub-section misc-yoast misc-pub-section-last">';
@@ -99,18 +122,24 @@ class WPSEO_Metabox {
 		echo '</div>';
 	}
 
+	/**
+	 * Adds the WordPress SEO box to the edit boxes in the edit post / page overview.
+	 */
 	public function add_custom_box() {
 		$options = get_wpseo_options();
 
-		foreach ( get_post_types() as $posttype ) {
-			if ( in_array( $posttype, array( 'revision', 'nav_menu_item', 'attachment' ) ) )
-				continue;
+		foreach ( get_post_types( array( 'public' => true ) ) as $posttype ) {
 			if ( isset( $options['hideeditbox-' . $posttype] ) && $options['hideeditbox-' . $posttype] )
 				continue;
 			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', 'wordpress-seo' ), array( $this, 'meta_box' ), $posttype, 'normal', apply_filters( 'wpseo_metabox_prio', 'high' ) );
 		}
 	}
 
+	/**
+	 * Outputs the scripts needed for the edit / post page overview, snippet preview, etc.
+	 *
+	 * @return bool
+	 */
 	public function script() {
 		if ( isset( $_GET['post'] ) ) {
 			$post_id = (int) $_GET['post'];
@@ -120,7 +149,7 @@ class WPSEO_Metabox {
 		}
 
 		if ( !isset( $post ) )
-			return;
+			return false;
 
 		$options = get_wpseo_options();
 
@@ -129,12 +158,12 @@ class WPSEO_Metabox {
 		if ( $post->post_type == 'post' && $use_date ) {
 			$date = $this->get_post_date( $post );
 
-			$this->wpseo_meta_length        = $this->wpseo_meta_length - ( strlen( $date ) + 5 );
-			$this->wpseo_meta_length_reason = __( ' (because of date display)', 'wordpress-seo' );
+			$this->meta_length        = $this->meta_length - ( strlen( $date ) + 5 );
+			$this->meta_length_reason = __( ' (because of date display)', 'wordpress-seo' );
 		}
 
-		$this->wpseo_meta_length_reason = apply_filters( 'wpseo_metadesc_length_reason', $this->wpseo_meta_length_reason, $post );
-		$this->wpseo_meta_length        = apply_filters( 'wpseo_metadesc_length', $this->wpseo_meta_length, $post );
+		$this->meta_length_reason = apply_filters( 'wpseo_metadesc_length_reason', $this->meta_length_reason, $post );
+		$this->meta_length        = apply_filters( 'wpseo_metadesc_length', $this->meta_length, $post );
 
 		unset( $date );
 
@@ -156,7 +185,7 @@ class WPSEO_Metabox {
 		?>
 	<script type="text/javascript">
 		var wpseo_lang = '<?php echo substr( get_locale(), 0, 2 ); ?>';
-		var wpseo_meta_desc_length = '<?php echo $this->wpseo_meta_length; ?>';
+		var wpseo_meta_desc_length = '<?php echo $this->meta_length; ?>';
 		var wpseo_title_template = '<?php echo esc_attr( $title_template ); ?>';
 		var wpseo_metadesc_template = '<?php echo esc_attr( $metadesc_template ); ?>';
 		var wpseo_permalink_template = '<?php echo $sample_permalink; ?>';
@@ -165,18 +194,26 @@ class WPSEO_Metabox {
 	<?php
 	}
 
+	/**
+	 * Add the meta box
+	 */
 	public function add_meta_box() {
 		$options = get_wpseo_options();
 
-		foreach ( get_post_types() as $posttype ) {
-			if ( in_array( $posttype, array( 'revision', 'nav_menu_item', 'post_format', 'attachment' ) ) )
-				continue;
+		foreach ( get_post_types( array( 'public'=> true ) ) as $posttype ) {
 			if ( isset( $options['hideeditbox-' . $posttype] ) && $options['hideeditbox-' . $posttype] )
 				continue;
 			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', 'wordpress-seo' ), array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
 		}
 	}
 
+	/**
+	 * Output a tab in the WP SEO Metabox
+	 *
+	 * @param string $id      CSS ID of the tab.
+	 * @param string $heading Heading for the tab.
+	 * @param string $content Content of the tab.
+	 */
 	public function do_tab( $id, $heading, $content ) {
 		?>
 	<div class="wpseotab <?php echo $id ?>">
@@ -188,6 +225,12 @@ class WPSEO_Metabox {
 	<?php
 	}
 
+	/**
+	 * Retrieve the meta boxes for the given post type.
+	 *
+	 * @param string $post_type
+	 * @return array
+	 */
 	public function get_meta_boxes( $post_type = 'post' ) {
 		$options = get_wpseo_options();
 
@@ -224,7 +267,7 @@ class WPSEO_Metabox {
 			"title"       => __( "Meta Description", 'wordpress-seo' ),
 			"rows"        => 2,
 			"richedit"    => false,
-			"description" => sprintf( __( "The <code>meta</code> description will be limited to %s chars%s, %s chars left.", 'wordpress-seo' ), $this->wpseo_meta_length, $this->wpseo_meta_length_reason, "<span id='yoast_wpseo_metadesc-length'></span>" ) . " <div id='yoast_wpseo_metadesc_notice'></div><p>" . sprintf( __( "If the meta description is empty, the preview shows what the plugin generates based on your %smeta description template%s.", 'wordpress-seo' ), "<a target='_blank' href='" . admin_url( 'admin.php?page=wpseo_titles#' . $post_type ) . "'>", "</a>" ) . "</p>"
+			"description" => sprintf( __( "The <code>meta</code> description will be limited to %s chars%s, %s chars left.", 'wordpress-seo' ), $this->meta_length, $this->meta_length_reason, "<span id='yoast_wpseo_metadesc-length'></span>" ) . " <div id='yoast_wpseo_metadesc_notice'></div><p>" . sprintf( __( "If the meta description is empty, the preview shows what the plugin generates based on your %smeta description template%s.", 'wordpress-seo' ), "<a target='_blank' href='" . admin_url( 'admin.php?page=wpseo_titles#' . $post_type ) . "'>", "</a>" ) . "</p>"
 		);
 		if ( isset( $options['usemetakeywords'] ) && $options['usemetakeywords'] ) {
 			$mbs['metakeywords'] = array(
@@ -243,6 +286,11 @@ class WPSEO_Metabox {
 		return $mbs;
 	}
 
+	/**
+	 * Retrieve the meta boxes for the advanced tab.
+	 *
+	 * @return array
+	 */
 	function get_advanced_meta_boxes() {
 		global $post;
 
@@ -354,6 +402,9 @@ class WPSEO_Metabox {
 		return $mbs;
 	}
 
+	/**
+	 * Output the meta box
+	 */
 	function meta_box() {
 		if ( isset( $_GET['post'] ) ) {
 			$post_id = (int) $_GET['post'];
@@ -398,6 +449,12 @@ class WPSEO_Metabox {
 		echo '</div>';
 	}
 
+	/**
+	 * Adds a line in the meta box
+	 *
+	 * @param array $meta_box Contains the vars based on which output is generated.
+	 * @return string
+	 */
 	function do_meta_box( $meta_box ) {
 		$content = '';
 
@@ -486,6 +543,12 @@ class WPSEO_Metabox {
 		return $content;
 	}
 
+	/**
+	 * Retrieve a post date when post is published, or return current date when it's not.
+	 *
+	 * @param object $post Post to retrieve the date for.
+	 * @return string
+	 */
 	function get_post_date( $post ) {
 		if ( isset( $post->post_date ) && $post->post_status == 'publish' )
 			$date = date( 'j M Y', strtotime( $post->post_date ) );
@@ -494,6 +557,11 @@ class WPSEO_Metabox {
 		return $date;
 	}
 
+	/**
+	 * Generate a snippet preview.
+	 *
+	 * @return string
+	 */
 	function snippet() {
 		if ( isset( $_GET['post'] ) ) {
 			$post_id = (int) $_GET['post'];
@@ -529,13 +597,19 @@ class WPSEO_Metabox {
 		return $content;
 	}
 
+	/**
+	 * Save the WP SEO metadata for posts.
+	 *
+	 * @param int $post_id
+	 * @return mixed
+	 */
 	function save_postdata( $post_id ) {
 
 		if ( $post_id == null )
-			return;
+			return false;
 
 		if ( wp_is_post_revision( $post_id ) )
-			return;
+			return false;
 
 		clean_post_cache( $post_id );
 		$post = get_post( $post_id );
@@ -577,6 +651,9 @@ class WPSEO_Metabox {
 		do_action( 'wpseo_saved_postdata' );
 	}
 
+	/**
+	 * Enqueues all the needed JS and CSS.
+	 */
 	public function enqueue() {
 		$color = get_user_meta( get_current_user_id(), 'admin_color', true );
 		if ( '' == $color )
@@ -594,20 +671,25 @@ class WPSEO_Metabox {
 		}
 	}
 
+	/**
+	 * Adds a dropdown that allows filtering on the posts SEO Quality.
+	 *
+	 * @return bool
+	 */
 	function posts_filter_dropdown() {
 		global $pagenow;
 		if ( $pagenow == 'upload.php' )
-			return;
+			return false;
 
 		echo '<select name="seo_filter">';
 		echo '<option value="">All SEO Scores</option>';
 		foreach ( array(
-					  'na'      => 'SEO: No Focus Keyword',
-					  'bad'     => 'SEO: Bad',
-					  'poor'    => 'SEO: Poor',
-					  'ok'      => 'SEO: OK',
-					  'good'    => 'SEO: Good',
-					  'noindex' => 'SEO: Post Noindexed',
+					  'na'      => __( 'SEO: No Focus Keyword', 'wordpress-seo' ),
+					  'bad'     => __( 'SEO: Bad', 'wordpress-seo' ),
+					  'poor'    => __( 'SEO: Poor', 'wordpress-seo' ),
+					  'ok'      => __( 'SEO: OK', 'wordpress-seo' ),
+					  'good'    => __( 'SEO: Good', 'wordpress-seo' ),
+					  'noindex' => __( 'SEO: Post Noindexed', 'wordpress-seo' )
 				  ) as $val => $text ) {
 			$sel = '';
 			if ( isset( $_GET['seo_filter'] ) && $_GET['seo_filter'] == $val )
@@ -617,23 +699,35 @@ class WPSEO_Metabox {
 		echo '</select>';
 	}
 
+	/**
+	 * Adds the column headings for the SEO plugin for edit posts / pages overview
+	 *
+	 * @param array $columns Already existing columns.
+	 * @return array
+	 */
 	function column_heading( $columns ) {
-		return array_merge( $columns, array( 'wpseo-score' => 'SEO', 'wpseo-title' => 'SEO Title', 'wpseo-metadesc' => 'Meta Desc.', 'wpseo-focuskw' => 'Focus KW' ) );
+		return array_merge( $columns, array( 'wpseo-score' => __( 'SEO', 'wordpress-seo' ), 'wpseo-title' => __( 'SEO Title', 'wordpress-seo' ), 'wpseo-metadesc' => __( 'Meta Desc.', 'wordpress-seo' ), 'wpseo-focuskw' => __( 'Focus KW', 'wordpress-seo' ) ) );
 	}
 
-	function column_content( $column_name, $id ) {
+	/**
+	 * Display the column content for the given column
+	 *
+	 * @param string $column_name Column to display the content for.
+	 * @param int    $post_id     Post to display the column content for.
+	 */
+	function column_content( $column_name, $post_id ) {
 		if ( $column_name == 'wpseo-score' ) {
-			if ( wpseo_get_value( 'meta-robots-noindex', $id ) == 1 ) {
+			if ( wpseo_get_value( 'meta-robots-noindex', $post_id ) == 1 ) {
 				$score = 'noindex';
 				$title = __( 'Post is set to noindex.', 'wordpress-seo' );
-				if ( wpseo_get_value( 'meta-robots-noindex', $id ) !== 0 )
-					wpseo_set_value( 'linkdex', 0, $id );
-			} else if ( $score = wpseo_get_value( 'linkdex', $id ) ) {
+				if ( wpseo_get_value( 'meta-robots-noindex', $post_id ) !== 0 )
+					wpseo_set_value( 'linkdex', 0, $post_id );
+			} else if ( $score = wpseo_get_value( 'linkdex', $post_id ) ) {
 				$score = wpseo_translate_score( round( $score / 10 ) );
 				$title = $score;
 			} else {
-				$this->calculateResults( get_post( $id ) );
-				$score = wpseo_get_value( 'linkdex', $id );
+				$this->calculateResults( get_post( $post_id ) );
+				$score = wpseo_get_value( 'linkdex', $post_id );
 				if ( !$score || empty( $score ) ) {
 					$score = 'na';
 					$title = __( 'Focus keyword not set.', 'wordpress-seo' );
@@ -646,17 +740,23 @@ class WPSEO_Metabox {
 			echo '<div title="' . $title . '" alt="' . $title . '" class="wpseo_score_img ' . $score . '"></div>';
 		}
 		if ( $column_name == 'wpseo-title' ) {
-			echo $this->page_title( $id );
+			echo $this->page_title( $post_id );
 		}
 		if ( $column_name == 'wpseo-metadesc' ) {
-			echo wpseo_get_value( 'metadesc', $id );
+			echo wpseo_get_value( 'metadesc', $post_id );
 		}
 		if ( $column_name == 'wpseo-focuskw' ) {
-			$focuskw = wpseo_get_value( 'focuskw', $id );
+			$focuskw = wpseo_get_value( 'focuskw', $post_id );
 			echo $focuskw;
 		}
 	}
 
+	/**
+	 * Indicate which of the SEO columns are sortable.
+	 *
+	 * @param array $columns appended with their orderby variable.
+	 * @return array
+	 */
 	function column_sort( $columns ) {
 		$columns['wpseo-score']    = 'wpseo-score';
 		$columns['wpseo-metadesc'] = 'wpseo-metadesc';
@@ -664,6 +764,12 @@ class WPSEO_Metabox {
 		return $columns;
 	}
 
+	/**
+	 * Modify the query based on the seo_filter variable in $_GET
+	 *
+	 * @param array $vars Query variables.
+	 * @return array
+	 */
 	function column_sort_orderby( $vars ) {
 		if ( isset( $_GET['seo_filter'] ) ) {
 			$noindex = false;
@@ -757,12 +863,18 @@ class WPSEO_Metabox {
 		return $vars;
 	}
 
-	function page_title( $postid ) {
-		$fixed_title = wpseo_get_value( 'title', $postid );
+	/**
+	 * Retrieve the page title.
+	 *
+	 * @param int $post_id Post to retrieve the title for.
+	 * @return string
+	 */
+	function page_title( $post_id ) {
+		$fixed_title = wpseo_get_value( 'title', $post_id );
 		if ( $fixed_title ) {
 			return $fixed_title;
 		} else {
-			$post    = get_post( $postid );
+			$post    = get_post( $post_id );
 			$options = get_wpseo_options();
 			if ( isset( $options['title-' . $post->post_type] ) && !empty( $options['title-' . $post->post_type] ) )
 				return wpseo_replace_vars( $options['title-' . $post->post_type], (array) $post );
@@ -771,6 +883,12 @@ class WPSEO_Metabox {
 		}
 	}
 
+	/**
+	 * Sort an array by a given key.
+	 *
+	 * @param array $array Array to sort, array is returned sorted.
+	 * @param string $key Key to sort array by.
+	 */
 	function aasort( &$array, $key ) {
 		$sorter = array();
 		$ret    = array();
@@ -785,15 +903,13 @@ class WPSEO_Metabox {
 		$array = $ret;
 	}
 
+	/**
+	 * Output the page analysis results.
+	 *
+	 * @param object $post Post to output the page analysis results for.
+	 * @return string
+	 */
 	function linkdex_output( $post ) {
-
-		if ( isset( $_GET['post'] ) ) {
-			$post_id = (int) $_GET['post'];
-			$post    = get_post( $post_id );
-		} else if ( is_int( $post->ID ) ) {
-			$post = get_post( $post->ID );
-		}
-
 		$results = $this->calculateResults( $post );
 
 		if ( is_wp_error( $results ) ) {
@@ -823,6 +939,12 @@ class WPSEO_Metabox {
 		return $output;
 	}
 
+	/**
+	 * Calculate the page analysis results for post.
+	 *
+	 * @param object $post Post to calculate the results for.
+	 * @return array
+	 */
 	function calculateResults( $post ) {
 		$options = get_wpseo_options();
 
@@ -932,6 +1054,7 @@ class WPSEO_Metabox {
 
 		return $results;
 	}
+
 
 	function SaveScoreResult( &$results, $scoreValue, $scoreUrlStatusMessage ) {
 		$score     = array(

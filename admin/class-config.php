@@ -5,16 +5,28 @@
  */
 class WPSEO_Admin_Pages {
 
+	/**
+	 * @var string $currentoption The option in use for the current admin page.
+	 */
 	var $currentoption = 'wpseo';
-	var $feed = 'http://yoast.com/feed/';
+
+	/**
+	 * @var array $adminpages Array of admin pages that the plugin uses.
+	 */
 	var $adminpages = array( 'wpseo_dashboard', 'wpseo_rss', 'wpseo_files', 'wpseo_permalinks', 'wpseo_internal-links', 'wpseo_import', 'wpseo_titles', 'wpseo_xml', 'wpseo_social' );
 
+	/**
+	 * Class constructor, which basically only hooks the init function on the init hook
+	 */
 	function __construct() {
 		add_action( 'init', array( $this, 'init' ), 20 );
 	}
 
+	/**
+	 * Make sure the needed scripts are loaded for admin pages
+	 */
 	function init() {
-		if ( isset( $_GET[ 'wpseo_reset_defaults' ] ) ) {
+		if ( isset( $_GET['wpseo_reset_defaults'] ) ) {
 			$this->reset_defaults();
 			wp_redirect( admin_url( 'admin.php?page=wpseo_dashboard' ) );
 		}
@@ -27,6 +39,9 @@ class WPSEO_Admin_Pages {
 		}
 	}
 
+	/**
+	 * Resets the site to the default WordPress SEO settings and runs a title test to check whether force rewrite needs to be on.
+	 */
 	function reset_defaults() {
 		foreach ( get_wpseo_options_arr() as $opt ) {
 			delete_option( $opt );
@@ -36,6 +51,9 @@ class WPSEO_Admin_Pages {
 		wpseo_title_test();
 	}
 
+	/**
+	 * Generates the sidebar for admin pages.
+	 */
 	function admin_sidebar() {
 		?>
 	<div class="postbox-container" style="width:25%;max-width:250px;">
@@ -61,11 +79,20 @@ class WPSEO_Admin_Pages {
 	<?php
 	}
 
+	/**
+	 * Generates the header for admin pages
+	 *
+	 * @param string $title          The title to show in the main heading.
+	 * @param bool   $form           Whether or not the form should be included.
+	 * @param string $option         The long name of the option to use for the current page.
+	 * @param string $optionshort    The short name of the option to use for the current page.
+	 * @param bool   $contains_files Whether the form should allow for file uploads.
+	 */
 	function admin_header( $title, $form = true, $option = 'yoast_wpseo_options', $optionshort = 'wpseo', $contains_files = false ) {
 		?>
 		<div class="wrap">
 			<?php
-		if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset( $_GET[ 'settings-updated' ] ) && $_GET[ 'settings-updated' ] == 'true' ) ) {
+		if ( ( isset( $_GET['updated'] ) && $_GET['updated'] == 'true' ) || ( isset( $_GET['settings-updated'] ) && $_GET['settings-updated'] == 'true' ) ) {
 			$msg = __( 'Settings updated', 'wordpress-seo' );
 
 			if ( function_exists( 'w3tc_pgcache_flush' ) ) {
@@ -77,7 +104,7 @@ class WPSEO_Admin_Pages {
 			}
 
 			// flush rewrite rules if XML sitemap settings have been updated.
-			if ( isset( $_GET[ 'page' ] ) && 'wpseo_xml' == $_GET[ 'page' ] )
+			if ( isset( $_GET['page'] ) && 'wpseo_xml' == $_GET['page'] )
 				flush_rewrite_rules();
 
 			echo '<div id="message" style="width:94%;" class="message updated"><p><strong>' . $msg . '.</strong></p></div>';
@@ -104,6 +131,11 @@ class WPSEO_Admin_Pages {
 
 	}
 
+	/**
+	 * Generates the footer for admin pages
+	 *
+	 * @param bool $submit Whether or not a submit button should be shown.
+	 */
 	function admin_footer( $submit = true ) {
 		if ( $submit ) {
 			?>
@@ -119,6 +151,13 @@ class WPSEO_Admin_Pages {
 		<?php
 	}
 
+	/**
+	 * Used for imports, this functions either copies $old_metakey into $new_metakey or just plain replaces $old_metakey with $new_metakey
+	 *
+	 * @param string $old_metakey The old name of the meta value.
+	 * @param string $new_metakey The new name of the meta value, usually the WP SEO name.
+	 * @param bool   $replace     Whether to replace or to copy the values.
+	 */
 	function replace_meta( $old_metakey, $new_metakey, $replace = false ) {
 		global $wpdb;
 		$oldies = $wpdb->get_results( "SELECT * FROM $wpdb->postmeta WHERE meta_key = '$old_metakey'" );
@@ -134,11 +173,22 @@ class WPSEO_Admin_Pages {
 		}
 	}
 
+	/**
+	 * Deletes all post meta values with a given meta key from the database
+	 *
+	 * @param string $metakey Key to delete all meta values for.
+	 */
 	function delete_meta( $metakey ) {
 		global $wpdb;
 		$wpdb->query( "DELETE FROM $wpdb->postmeta WHERE meta_key = '$metakey'" );
 	}
 
+	/**
+	 * Exports the current site's WP SEO settings.
+	 *
+	 * @param bool $include_taxonomy Whether to include the taxonomy metadata the plugin creates.
+	 * @return bool|string $return False when failed, the URL to the export file when succeeded.
+	 */
 	function export_settings( $include_taxonomy ) {
 		$content = "; " . __( "This is a settings export file for the WordPress SEO plugin by Yoast.com", 'wordpress-seo' ) . " - http://yoast.com/wordpress/seo/ \r\n";
 
@@ -152,7 +202,7 @@ class WPSEO_Admin_Pages {
 			foreach ( $options as $key => $elem ) {
 				if ( is_array( $elem ) ) {
 					for ( $i = 0; $i < count( $elem ); $i++ ) {
-						$content .= $key . "[] = \"" . $elem[ $i ] . "\"\n";
+						$content .= $key . "[] = \"" . $elem[$i] . "\"\n";
 					}
 				} else if ( $elem == "" )
 					$content .= $key . " = \n";
@@ -168,7 +218,7 @@ class WPSEO_Admin_Pages {
 
 		$dir = wp_upload_dir();
 
-		if ( !$handle = fopen( $dir[ 'path' ] . '/settings.ini', 'w' ) )
+		if ( !$handle = fopen( $dir['path'] . '/settings.ini', 'w' ) )
 			die();
 
 		if ( !fwrite( $handle, $content ) )
@@ -178,17 +228,20 @@ class WPSEO_Admin_Pages {
 
 		require_once ( ABSPATH . 'wp-admin/includes/class-pclzip.php' );
 
-		chdir( $dir[ 'path' ] );
+		chdir( $dir['path'] );
 		$zip = new PclZip( './settings.zip' );
 		if ( $zip->create( './settings.ini' ) == 0 )
 			return false;
 
-		return $dir[ 'url' ] . '/settings.zip';
+		return $dir['url'] . '/settings.zip';
 	}
 
+	/**
+	 * Loads the required styles for the config page.
+	 */
 	function config_page_styles() {
 		global $pagenow;
-		if ( $pagenow == 'admin.php' && isset( $_GET[ 'page' ] ) && in_array( $_GET[ 'page' ], $this->adminpages ) ) {
+		if ( $pagenow == 'admin.php' && isset( $_GET['page'] ) && in_array( $_GET['page'], $this->adminpages ) ) {
 			wp_enqueue_style( 'dashboard' );
 			wp_enqueue_style( 'thickbox' );
 			wp_enqueue_style( 'global' );
@@ -197,9 +250,12 @@ class WPSEO_Admin_Pages {
 		}
 	}
 
+	/**
+	 * Loads the required scripts for the config page.
+	 */
 	function config_page_scripts() {
 		global $pagenow;
-		if ( $pagenow == 'admin.php' && isset( $_GET[ 'page' ] ) && in_array( $_GET[ 'page' ], $this->adminpages ) ) {
+		if ( $pagenow == 'admin.php' && isset( $_GET['page'] ) && in_array( $_GET['page'], $this->adminpages ) ) {
 			wp_enqueue_script( 'wpseo-admin-script', WPSEO_URL . 'js/wp-seo-admin.js', array( 'jquery' ), WPSEO_VERSION, true );
 			wp_enqueue_script( 'postbox' );
 			wp_enqueue_script( 'dashboard' );
@@ -208,40 +264,52 @@ class WPSEO_Admin_Pages {
 	}
 
 	/**
-	 * Create a Checkbox input field
+	 * Retrieve options based on the option or the class currentoption.
+	 *
+	 * @since 1.2.4
+	 *
+	 * @param string $option The option to retrieve.
+	 * @return array
 	 */
-	function checkbox( $id, $label, $label_left = false, $option = '' ) {
-		if ( $option == '' && $this->currentoption != '' ) {
-			$options = get_option( $this->currentoption );
-			$option  = $this->currentoption;
-		} else if ( $option == '' && $this->currentoption != '' ) {
-			$options = get_wpseo_options();
-			$option  = !empty( $option ) ? $option : $this->currentoption;
-		} else {
-			if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
-				$options = get_site_option( $option );
-			} else {
-				$options = get_option( $option );
-			}
-		}
+	function get_option( $option = '' ) {
+		if ( $option == '' )
+			$option = $this->currentoption;
 
-		if ( !isset( $options[ $id ] ) )
-			$options[ $id ] = false;
+		if ( function_exists( 'is_network_admin' ) && is_network_admin() )
+			return get_site_option( $option );
+		else
+			return get_option( $option );
+	}
+
+	/**
+	 * Create a Checkbox input field.
+	 *
+	 * @param string $var        The variable within the option to create the checkbox for.
+	 * @param string $label      The label to show for the variable.
+	 * @param bool   $label_left Whether the label should be left (true) or right (false).
+	 * @param string $option     The option the variable belongs to.
+	 * @return string
+	 */
+	function checkbox( $var, $label, $label_left = false, $option = '' ) {
+		$options = $this->get_option( $option );
+
+		if ( !isset( $options[$var] ) )
+			$options[$var] = false;
 
 		if ( $label_left !== false ) {
 			if ( !empty( $label_left ) )
 				$label_left .= ':';
-			$output_label = '<label class="checkbox" for="' . $id . '">' . $label_left . '</label>';
+			$output_label = '<label class="checkbox" for="' . $var . '">' . $label_left . '</label>';
 			$class        = 'checkbox';
 		} else {
-			$output_label = '<label for="' . $id . '">' . $label . '</label>';
+			$output_label = '<label for="' . $var . '">' . $label . '</label>';
 			$class        = 'checkbox double';
 		}
 
-		$output_input = "<input class='$class' type='checkbox' id='${id}' name='${option}[${id}]' " . checked( $options[ $id ], 'on', false ) . '/>';
+		$output_input = "<input class='$class' type='checkbox' id='${var}' name='${option}[${var}]' " . checked( $options[$var], 'on', false ) . '/>';
 
 		if ( $label_left !== false ) {
-			$output = $output_label . $output_input . '<label class="checkbox" for="' . $id . '">' . $label . '</label>';
+			$output = $output_label . $output_input . '<label class="checkbox" for="' . $var . '">' . $label . '</label>';
 		} else {
 			$output = $output_input . $output_label;
 		}
@@ -249,119 +317,109 @@ class WPSEO_Admin_Pages {
 	}
 
 	/**
-	 * Create a Text input field
+	 * Create a Text input field.
+	 *
+	 * @param string $var    The variable within the option to create the text input field for.
+	 * @param string $label  The label to show for the variable.
+	 * @param string $option The option the variable belongs to.
+	 * @return string
 	 */
-	function textinput( $id, $label, $option = '' ) {
-		if ( $option == '' ) {
-			$options = get_wpseo_options();
-			$option  = !empty( $option ) ? $option : $this->currentoption;
-		} else {
-			if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
-				$options = get_site_option( $option );
-			} else {
-				$options = get_option( $option );
-			}
-		}
+	function textinput( $var, $label, $option = '' ) {
+		$options = $this->get_option( $option );
 
 		$val = '';
-		if ( isset( $options[ $id ] ) )
-			$val = _wp_specialchars( $options[ $id ] );
+		if ( isset( $options[$var] ) )
+			$val = esc_attr( $options[$var] );
 
-		return '<label class="textinput" for="' . $id . '">' . $label . ':</label><input class="textinput" type="text" id="' . $id . '" name="' . $option . '[' . $id . ']" value="' . $val . '"/>' . '<br class="clear" />';
+		return '<label class="textinput" for="' . $var . '">' . $label . ':</label><input class="textinput" type="text" id="' . $var . '" name="' . $option . '[' . $var . ']" value="' . $val . '"/>' . '<br class="clear" />';
 	}
 
 	/**
-	 * Create a small textarea
+	 * Create a textarea.
+	 *
+	 * @param string $var    The variable within the option to create the textarea for.
+	 * @param string $label  The label to show for the variable.
+	 * @param string $option The option the variable belongs to.
+	 * @param string $class  The CSS class to assign to the textarea.
+	 * @return string
 	 */
-	function textarea( $id, $label, $option = '', $class = '' ) {
-		if ( $option == '' ) {
-			$options = get_wpseo_options();
-			$option  = !empty( $option ) ? $option : $this->currentoption;
-		} else {
-			if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
-				$options = get_site_option( $option );
-			} else {
-				$options = get_option( $option );
-			}
-		}
+	function textarea( $var, $label, $option = '', $class = '' ) {
+		$options = $this->get_option( $option );
 
 		$val = '';
-		if ( isset( $options[ $id ] ) )
-			$val = esc_html( $options[ $id ] );
+		if ( isset( $options[$var] ) )
+			$val = esc_attr( $options[$var] );
 
-		return '<label class="textinput" for="' . $id . '">' . $label . ':</label><textarea class="textinput ' . $class . '" id="' . $id . '" name="' . $option . '[' . $id . ']">' . $val . '</textarea>' . '<br class="clear" />';
+		return '<label class="textinput" for="' . $var . '">' . $label . ':</label><textarea class="textinput ' . $class . '" id="' . $var . '" name="' . $option . '[' . $var . ']">' . $val . '</textarea>' . '<br class="clear" />';
 	}
 
 	/**
-	 * Create a Hidden input field
+	 * Create a hidden input field.
+	 *
+	 * @param string $var    The variable within the option to create the hidden input for.
+	 * @param string $option The option the variable belongs to.
+	 * @return string
 	 */
-	function hiddeninput( $id, $option = '' ) {
-		if ( $option == '' ) {
-			$options = get_wpseo_options();
-			$option  = !empty( $option ) ? $option : $this->currentoption;
-		} else {
-			if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
-				$options = get_site_option( $option );
-			} else {
-				$options = get_option( $option );
-			}
-		}
+	function hidden( $var, $option = '' ) {
+		$options = $this->get_option( $option );
 
 		$val = '';
-		if ( isset( $options[ $id ] ) )
-			$val = _wp_specialchars( $options[ $id ] );
-		return '<input class="hidden" type="hidden" id="' . $id . '" name="' . $option . '[' . $id . ']" value="' . $val . '"/>';
+		if ( isset( $options[$var] ) )
+			$val = esc_attr( $options[$var] );
+
+		return '<input type="hidden" id="hidden_' . $var . '" name="' . $option . '[' . $var . ']" value="' . $val . '"/>';
 	}
 
 	/**
-	 * Create a Select Box
+	 * Create a Select Box.
+	 *
+	 * @param string $var    The variable within the option to create the select for.
+	 * @param string $label  The label to show for the variable.
+	 * @param string $values The select options to choose from.
+	 * @param string $option The option the variable belongs to.
+	 * @return string
 	 */
-	function select( $id, $label, $values, $option = '' ) {
-		if ( $option == '' ) {
-			$options = get_wpseo_options();
-			$option  = !empty( $option ) ? $option : $this->currentoption;
-		} else {
-			if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
-				$options = get_site_option( $option );
-			} else {
-				$options = get_option( $option );
-			}
-		}
+	function select( $var, $label, $values, $option = '' ) {
+		$options = $this->get_option( $option );
 
-		$output = '<label class="select" for="' . $id . '">' . $label . ':</label>';
-		$output .= '<select class="select" name="' . $option . '[' . $id . ']" id="' . $id . '">';
+		$output = '<label class="select" for="' . $var . '">' . $label . ':</label>';
+		$output .= '<select class="select" name="' . $option . '[' . $var . ']" id="' . $var . '">';
 
 		foreach ( $values as $value => $label ) {
 			$sel = '';
-			if ( isset( $options[ $id ] ) && $options[ $id ] == $value )
+			if ( isset( $options[$var] ) && $options[$var] == $value )
 				$sel = 'selected="selected" ';
 
 			if ( !empty( $label ) )
-				$output .= '<option ' . $sel . 'value="' . $value . '">' . $label . '</option>';
+				$output .= '<option ' . $sel . 'value="' . esc_attr( $value ) . '">' . $label . '</option>';
 		}
 		$output .= '</select>';
 		return $output . '<br class="clear"/>';
 	}
 
 	/**
-	 * Create a File upload
+	 * Create a File upload field.
+	 *
+	 * @param string $var    The variable within the option to create the file upload field for.
+	 * @param string $label  The label to show for the variable.
+	 * @param string $option The option the variable belongs to.
+	 * @return string
 	 */
-	function file_upload( $id, $label, $option = '' ) {
-		$option  = !empty( $option ) ? $option : $this->currentoption;
-		$options = get_wpseo_options();
+	function file_upload( $var, $label, $option = '' ) {
+		$options = $this->get_option( $option );
 
 		$val = '';
-		if ( isset( $options[ $id ] ) && strtolower( gettype( $options[ $id ] ) ) == 'array' ) {
-			$val = $options[ $id ][ 'url' ];
+		if ( isset( $options[$var] ) && strtolower( gettype( $options[$var] ) ) == 'array' ) {
+			$val = $options[$var]['url'];
 		}
-		$output = '<label class="select" for="' . $id . '">' . $label . ':</label>';
-		$output .= '<input type="file" value="' . $val . '" class="textinput" name="' . $option . '[' . $id . ']" id="' . $id . '"/>';
+		$output = '<label class="select" for="' . $var . '">' . $label . ':</label>';
+		$output .= '<input type="file" value="' . $val . '" class="textinput" name="' . $option . '[' . $var . ']" id="' . $var . '"/>';
 
 		// Need to save separate array items in hidden inputs, because empty file inputs type will be deleted by settings API.
-		if ( !empty( $options[ $id ] ) ) {
-			$output .= '<input class="hidden" type="hidden" id="' . $id . '_file" name="wpseo_local[' . $id . '][file]" value="' . $options[ $id ][ 'file' ] . '"/>';
-			$output .= '<input class="hidden" type="hidden" id="' . $id . '_url" name="wpseo_local[' . $id . '][url]" value="' . $options[ $id ][ 'url' ] . '"/>';
-			$output .= '<input class="hidden" type="hidden" id="' . $id . '_type" name="wpseo_local[' . $id . '][type]" value="' . $options[ $id ][ 'type' ] . '"/>';
+		if ( !empty( $options[$var] ) ) {
+			$output .= '<input class="hidden" type="hidden" id="' . $var . '_file" name="wpseo_local[' . $var . '][file]" value="' . esc_attr( $options[$var]['file'] ) . '"/>';
+			$output .= '<input class="hidden" type="hidden" id="' . $var . '_url" name="wpseo_local[' . $var . '][url]" value="' . esc_attr( $options[$var]['url'] ) . '"/>';
+			$output .= '<input class="hidden" type="hidden" id="' . $var . '_type" name="wpseo_local[' . $var . '][type]" value="' . esc_attr( $options[$var]['type'] ) . '"/>';
 		}
 		$output .= '<br class="clear"/>';
 
@@ -369,26 +427,23 @@ class WPSEO_Admin_Pages {
 	}
 
 	/**
-	 * Create a Radio input field
+	 * Create a Radio input field.
+	 *
+	 * @param string $var    The variable within the option to create the file upload field for.
+	 * @param string $values The radio options to choose from.
+	 * @param string $label  The label to show for the variable.
+	 * @param string $option The option the variable belongs to.
+	 * @return string
 	 */
-	function radio( $id, $values, $label, $option = '' ) {
-		if ( $option == '' ) {
-			$options = get_wpseo_options();
-			$option  = !empty( $option ) ? $option : $this->currentoption;
-		} else {
-			if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
-				$options = get_site_option( $option );
-			} else {
-				$options = get_option( $option );
-			}
-		}
+	function radio( $var, $values, $label, $option = '' ) {
+		$options = $this->get_option( $option );
 
-		if ( !isset( $options[ $id ] ) )
-			$options[ $id ] = false;
+		if ( !isset( $options[$var] ) )
+			$options[$var] = false;
 
 		$output = '<br/><label class="select">' . $label . ':</label>';
 		foreach ( $values as $key => $value ) {
-			$output .= '<input type="radio" class="radio" id="' . $id . '-' . $key . '" name="' . $option . '[' . $id . ']" value="' . $key . '" ' . ( $options[ $id ] == $key ? ' checked="checked"' : '' ) . ' /> <label class="radio" for="' . $id . '-' . $key . '">' . $value . '</label>';
+			$output .= '<input type="radio" class="radio" id="' . $var . '-' . $key . '" name="' . $option . '[' . $var . ']" value="' . $key . '" ' . ( $options[$var] == $key ? ' checked="checked"' : '' ) . ' /> <label class="radio" for="' . $var . '-' . $key . '">' . $value . '</label>';
 		}
 		$output .= '<br/>';
 
@@ -396,28 +451,11 @@ class WPSEO_Admin_Pages {
 	}
 
 	/**
-	 * Create a hidden input field
-	 */
-	function hidden( $id, $option = '' ) {
-		if ( $option == '' ) {
-			$options = get_wpseo_options();
-			$option  = !empty( $option ) ? $option : $this->currentoption;
-		} else {
-			if ( function_exists( 'is_network_admin' ) && is_network_admin() ) {
-				$options = get_site_option( $option );
-			} else {
-				$options = get_option( $option );
-			}
-		}
-
-		if ( !isset( $options[ $id ] ) )
-			$options[ $id ] = '';
-
-		return '<input type="hidden" id="hidden_' . $id . '" name="' . $option . '[' . $id . ']" value="' . $options[ $id ] . '"/>';
-	}
-
-	/**
-	 * Create a potbox widget
+	 * Create a potbox widget.
+	 *
+	 * @param string $id      ID of the postbox.
+	 * @param string $title   Title of the postbox.
+	 * @param string $content Content of the postbox.
 	 */
 	function postbox( $id, $title, $content ) {
 		?>
@@ -430,20 +468,23 @@ class WPSEO_Admin_Pages {
 
 
 	/**
-	 * Create a form table from an array of rows
+	 * Create a form table from an array of rows.
+	 *
+	 * @param array $rows Rows to include in the table.
+	 * @return string
 	 */
 	function form_table( $rows ) {
 		$content = '<table class="form-table">';
 		foreach ( $rows as $row ) {
 			$content .= '<tr><th valign="top" scrope="row">';
-			if ( isset( $row[ 'id' ] ) && $row[ 'id' ] != '' )
-				$content .= '<label for="' . $row[ 'id' ] . '">' . $row[ 'label' ] . ':</label>';
+			if ( isset( $row['id'] ) && $row['id'] != '' )
+				$content .= '<label for="' . $row['id'] . '">' . $row['label'] . ':</label>';
 			else
-				$content .= $row[ 'label' ];
-			if ( isset( $row[ 'desc' ] ) && $row[ 'desc' ] != '' )
-				$content .= '<br/><small>' . $row[ 'desc' ] . '</small>';
+				$content .= $row['label'];
+			if ( isset( $row['desc'] ) && $row['desc'] != '' )
+				$content .= '<br/><small>' . $row['desc'] . '</small>';
 			$content .= '</th><td valign="top">';
-			$content .= $row[ 'content' ];
+			$content .= $row['content'];
 			$content .= '</td></tr>';
 		}
 		$content .= '</table>';
@@ -458,22 +499,28 @@ class WPSEO_Admin_Pages {
 		$this->postbox( 'support', __( 'Need support?', 'wordpress-seo' ), $content );
 	}
 
-	function fetch_rss_items( $num ) {
+	/**
+	 * Fetch RSS items from the feed.
+	 *
+	 * @param int $num Number of items to fetch.
+	 * @return array|bool False on error, array of RSS items on success.
+	 */
+	function fetch_rss_items( $num, $feed ) {
 		include_once( ABSPATH . WPINC . '/feed.php' );
-		$rss = fetch_feed( $this->feed );
+		$rss = fetch_feed( $feed );
 
 		// Bail if feed doesn't work
-		if ( is_wp_error( $rss ) )
+		if ( !$rss || is_wp_error( $rss ) )
 			return false;
 
 		$rss_items = $rss->get_items( 0, $rss->get_item_quantity( $num ) );
 
 		// If the feed was erroneous 
 		if ( !$rss_items ) {
-			$md5 = md5( $this->feed );
+			$md5 = md5( $feed );
 			delete_transient( 'feed_' . $md5 );
 			delete_transient( 'feed_mod_' . $md5 );
-			$rss       = fetch_feed( $this->feed );
+			$rss       = fetch_feed( $feed );
 			$rss_items = $rss->get_items( 0, $rss->get_item_quantity( $num ) );
 		}
 
@@ -484,7 +531,7 @@ class WPSEO_Admin_Pages {
 	 * Box with latest news from Yoast.com for sidebar
 	 */
 	function news() {
-		$rss_items = $this->fetch_rss_items( 3 );
+		$rss_items = $this->fetch_rss_items( 3, 'http://yoast.com/feed/' );
 
 		$content = '<ul>';
 		if ( !$rss_items ) {

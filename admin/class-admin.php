@@ -1,7 +1,13 @@
 <?php
 
+/**
+ * Class that holds most of the admin functionality for WP SEO.
+ */
 class WPSEO_Admin {
 
+	/**
+	 * Class constructor
+	 */
 	function __construct() {
 		$this->multisite_defaults();
 
@@ -25,12 +31,12 @@ class WPSEO_Admin {
 				add_action( 'admin_footer', array( $this, 'blog_public_warning' ) );
 		}
 
-		add_action( 'admin_init', array( $this, 'wpseo_maybe_upgrade' ) );
+		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		add_filter( 'name_save_pre', array( $this, 'remove_stopwords_from_slug' ), 0 );
 
-		add_action( 'show_user_profile', array( $this, 'wpseo_user_profile' ) );
-		add_action( 'edit_user_profile', array( $this, 'wpseo_user_profile' ) );
+		add_action( 'show_user_profile', array( $this, 'user_profile' ) );
+		add_action( 'edit_user_profile', array( $this, 'user_profile' ) );
 		add_action( 'personal_options_update', array( $this, 'process_user_option_update' ) );
 		add_action( 'edit_user_profile_update', array( $this, 'process_user_option_update' ) );
 		add_filter( 'user_contactmethods', array( $this, 'update_contactmethods' ), 10, 1 );
@@ -124,70 +130,70 @@ class WPSEO_Admin {
 	 * Loads the form for the network configuration page.
 	 */
 	function network_config_page() {
-		require( 'pages/network.php' );
+		require( WPSEO_PATH . '/admin/pages/network.php' );
 	}
 
 	/**
 	 * Loads the form for the import/export page.
 	 */
 	function import_page() {
-		require( 'pages/import.php' );
+		require( WPSEO_PATH . '/admin/pages/import.php' );
 	}
 
 	/**
 	 * Loads the form for the titles & metas page.
 	 */
 	function titles_page() {
-		require( 'pages/metas.php' );
+		require( WPSEO_PATH . '/admin/pages/metas.php' );
 	}
 
 	/**
 	 * Loads the form for the permalinks page.
 	 */
 	function permalinks_page() {
-		require( 'pages/permalinks.php' );
+		require( WPSEO_PATH . '/admin/pages/permalinks.php' );
 	}
 
 	/**
 	 * Loads the form for the internal links / breadcrumbs page.
 	 */
 	function internallinks_page() {
-		require( 'pages/internal-links.php' );
+		require( WPSEO_PATH . '/admin/pages/internal-links.php' );
 	}
 
 	/**
 	 * Loads the form for the file edit page.
 	 */
 	function files_page() {
-		require( 'pages/files.php' );
+		require( WPSEO_PATH . '/admin/pages/files.php' );
 	}
 
 	/**
 	 * Loads the form for the RSS page.
 	 */
 	function rss_page() {
-		require( 'pages/rss.php' );
+		require( WPSEO_PATH . '/admin/pages/rss.php' );
 	}
 
 	/**
 	 * Loads the form for the XML Sitemaps page.
 	 */
 	function xml_sitemaps_page() {
-		require( 'pages/xml-sitemaps.php' );
+		require( WPSEO_PATH . '/admin/pages/xml-sitemaps.php' );
 	}
 
 	/**
 	 * Loads the form for the Dashboard page.
 	 */
 	function config_page() {
-		require( 'pages/dashboard.php' );
+		require( WPSEO_PATH . '/admin/pages/dashboard.php' );
 	}
 
 	/**
 	 * Loads the form for the Social Settings page.
 	 */
 	function social_page() {
-		require( 'pages/social.php' );
+		require( WPSEO_PATH . '/admin/pages/social.php' );
 	}
 
 	/**
@@ -262,7 +268,7 @@ class WPSEO_Admin {
 	 *
 	 * @param object $user
 	 */
-	function wpseo_user_profile( $user ) {
+	function user_profile( $user ) {
 		if ( !current_user_can( 'edit_users' ) )
 			return;
 
@@ -297,7 +303,7 @@ class WPSEO_Admin {
 	 * Determine whether the wpseo option holds the current version, if it doesn't, run
 	 * the upgrade procedures.
 	 */
-	function wpseo_maybe_upgrade() {
+	function maybe_upgrade() {
 		$options         = get_option( 'wpseo' );
 		$current_version = isset( $options[ 'version' ] ) ? $options[ 'version' ] : 0;
 
@@ -391,14 +397,16 @@ class WPSEO_Admin {
 		if ( version_compare( $current_version, '1.2.3', '<' ) ) {
 			$opt = get_option( 'wpseo' );
 
-			foreach ( $opt as $key => $val ) {
-				if ( !in_array( $key, array( 'ignore_blog_public_warning', 'ignore_tour', 'ignore_page_comments', 'ignore_permalink', 'ms_defaults_set', 'version', 'disableadvanced_meta', 'googleverify', 'msverify', 'alexaverify' ) ) ) {
-					unset( $opt[ $key ] );
+			if ( is_array($opt) ) {
+				foreach ( $opt as $key => $val ) {
+					if ( !in_array( $key, array( 'ignore_blog_public_warning', 'ignore_tour', 'ignore_page_comments', 'ignore_permalink', 'ms_defaults_set', 'version', 'disableadvanced_meta', 'googleverify', 'msverify', 'alexaverify' ) ) ) {
+						unset( $opt[ $key ] );
+					}
 				}
-			}
 
-			update_option( 'wpseo', $opt );
-			unset( $opt );
+				update_option( 'wpseo', $opt );
+				unset( $opt );
+			}
 		}
 
 		// Fix wrongness created by buggy version 1.2.2
