@@ -1,7 +1,8 @@
 <?php
-
 /**
  * Adds the OpenGraph metaboxes to the interface
+ *
+ * @package WPSEO_OpenGraph
  */
 class WPSEO_OpenGraph extends WPSEO_Frontend {
 

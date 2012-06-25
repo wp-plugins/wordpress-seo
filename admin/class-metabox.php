@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * class WPSEO_Metabox
+ *
+ * The class that generates the metabox on the edit post / page as well as contains all page analysis functionality.
+ *
+ * @package WPSEO_Metabox
+ */
 class WPSEO_Metabox {
 
 	/**
@@ -886,8 +892,8 @@ class WPSEO_Metabox {
 	/**
 	 * Sort an array by a given key.
 	 *
-	 * @param array $array Array to sort, array is returned sorted.
-	 * @param string $key Key to sort array by.
+	 * @param array  $array Array to sort, array is returned sorted.
+	 * @param string $key   Key to sort array by.
 	 */
 	function aasort( &$array, $key ) {
 		$sorter = array();
@@ -979,7 +985,7 @@ class WPSEO_Metabox {
 		$statistics = new Yoast_TextStatistics;
 
 		// Keyword
-		$this->ScoreKeyword( $job, $results );
+		$this->ScoreKeyword( $job['keyword'], $results );
 
 		// Title
 		if ( wpseo_get_value( 'title' ) ) {
@@ -1055,7 +1061,13 @@ class WPSEO_Metabox {
 		return $results;
 	}
 
-
+	/**
+	 * Save the score result to the results array.
+	 *
+	 * @param array  $results               The results array used to store results.
+	 * @param int    $scoreValue            The score value.
+	 * @param string $scoreUrlStatusMessage The score message.
+	 */
 	function SaveScoreResult( &$results, $scoreValue, $scoreUrlStatusMessage ) {
 		$score     = array(
 			'val' => $scoreValue,
@@ -1064,6 +1076,13 @@ class WPSEO_Metabox {
 		$results[] = $score;
 	}
 
+	/**
+	 * Clean up the input string.
+	 *
+	 * @param string $inputString              String to clean up.
+	 * @param bool   $removeOptionalCharacters Whether or not to do a cleanup of optional chars too.
+	 * @return string
+	 */
 	function strip_separators_and_fold( $inputString, $removeOptionalCharacters = false ) {
 		$keywordCharactersAlwaysReplacedBySpace = array( ",", "'", "\"", "?", "’", "“", "”", "|", "/" );
 		$keywordCharactersRemovedOrReplaced     = array( "_", "-" );
@@ -1094,15 +1113,28 @@ class WPSEO_Metabox {
 		return trim( $inputString );
 	}
 
-	function ScoreKeyword( $job, &$results ) {
+	/**
+	 * Check whether the keyword contains stopwords.
+	 *
+	 * @param string $keyword The keyword to check for stopwords.
+	 * @param array  $results The results array.
+	 */
+	function ScoreKeyword( $keyword, &$results ) {
 		global $wpseo_admin;
 
 		$keywordStopWord = __( "The keyword for this page contains one or more %sstop words%s, consider removing them. Found '%s'.", 'wordpress-seo' );
 
-		if ( $wpseo_admin->stopwords_check( $job["keyword"] ) !== false )
-			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, "<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>", $wpseo_admin->stopwords_check( $job["keyword"] ) ) );
+		if ( $wpseo_admin->stopwords_check( $keyword ) !== false )
+			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, "<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>", $wpseo_admin->stopwords_check( $keyword ) ) );
 	}
 
+	/**
+	 * Check whether the keyword is contained in the URL.
+	 *
+	 * @param array  $job        The job array holding both the keyword and the URLs.
+	 * @param array  $results    The results array.
+	 * @param object $statistics Object of class YoastStatistics used to calculate lengths.
+	 */
 	function ScoreUrl( $job, &$results, $statistics ) {
 		global $wpseo_admin;
 
@@ -1129,6 +1161,14 @@ class WPSEO_Metabox {
 			$this->SaveScoreResult( $results, 5, $longSlug );
 	}
 
+	/**
+	 * Check whether the keyword is contained in the title.
+	 *
+	 * @param array  $job        The job array holding both the keyword versions.
+	 * @param array  $results    The results array.
+	 * @param string $title      The title to check against keywords.
+	 * @param object $statistics Object of class YoastStatistics used to calculate lengths.
+	 */
 	function ScoreTitle( $job, &$results, $title, $statistics ) {
 		$scoreTitleMinLength    = 40;
 		$scoreTitleMaxLength    = 70;
@@ -1169,6 +1209,14 @@ class WPSEO_Metabox {
 		}
 	}
 
+	/**
+	 * Check whether the document contains outbound links and whether it's anchor text matches the keyword.
+	 *
+	 * @param array  $job          The job array holding both the keyword versions.
+	 * @param array  $results      The results array.
+	 * @param array  $anchor_texts The array holding all anchors in the document.
+	 * @param array  $count        The number of anchors in the document, grouped by type.
+	 */
 	function ScoreAnchorTexts( $job, &$results, $anchor_texts, $count ) {
 		$scoreNoLinks               = __( "No outbound links appear in this page, consider adding some as appropriate.", 'wordpress-seo' );
 		$scoreKeywordInOutboundLink = __( "You're linking to another page with the keyword you want this page to rank for, consider changing that if you truly want this page to rank.", 'wordpress-seo' );
@@ -1199,6 +1247,12 @@ class WPSEO_Metabox {
 
 	}
 
+	/**
+	 * Retrieve the anchor texts used in the current document.
+	 *
+	 * @param object $xpath An XPATH object of the current document.
+	 * @return array
+	 */
 	function GetAnchorTexts( &$xpath ) {
 		$query        = "//a|//A";
 		$dom_objects  = $xpath->query( $query );
@@ -1214,6 +1268,12 @@ class WPSEO_Metabox {
 		return $anchor_texts;
 	}
 
+	/**
+	 * Count the number of anchors and group them by type.
+	 *
+	 * @param object $xpath An XPATH object of the current document.
+	 * @return array
+	 */
 	function GetAnchorCount( &$xpath ) {
 		$query       = "//a|//A";
 		$dom_objects = $xpath->query( $query );
@@ -1249,6 +1309,13 @@ class WPSEO_Metabox {
 		return $count;
 	}
 
+	/**
+	 * Check whether the images alt texts contain the keyword.
+	 *
+	 * @param array $job     The job array holding both the keyword versions.
+	 * @param array $results The results array.
+	 * @param array $imgs    The array with images alt texts.
+	 */
 	function ScoreImagesAltText( $job, &$results, $imgs ) {
 		$scoreImagesNoImages          = __( "No images appear in this page, consider adding some as appropriate.", 'wordpress-seo' );
 		$scoreImagesNoAlt             = __( "The images on this page are missing alt tags.", 'wordpress-seo' );
@@ -1277,6 +1344,13 @@ class WPSEO_Metabox {
 
 	}
 
+	/**
+	 * Retrieve the alt texts from the images.
+	 *
+	 * @param object $post The post to find images in.
+	 * @param array  $imgs The array holding the image information.
+	 * @return array The updated images array.
+	 */
 	function GetImagesAltText( $post, $imgs ) {
 		preg_match_all( '/<img [^>]+ alt=(["\'])([^\\1]+)\\1[^>]+>/im', $post->post_content, $matches );
 		$imgs['alts'] = array();
@@ -1295,12 +1369,25 @@ class WPSEO_Metabox {
 		return $imgs;
 	}
 
+	/**
+	 * Use XPATH to count the number of images.
+	 *
+	 * @param object $xpath An XPATH object of the document
+	 * @return int Image count
+	 */
 	function GetImageCount( &$xpath ) {
 		$query       = "//img|//IMG";
 		$dom_objects = $xpath->query( $query );
 		return count( $dom_objects );
 	}
 
+	/**
+	 * Score the headings for keyword appearance.
+	 *
+	 * @param array $job      The array holding the keywords.
+	 * @param array $results  The results array.
+	 * @param array $headings The headings found in the document.
+	 */
 	function ScoreHeadings( $job, &$results, $headings ) {
 		$scoreHeadingsNone           = __( "No subheading tags (like an H2) appear in the copy.", 'wordpress-seo' );
 		$scoreHeadingsKeywordIn      = __( "Keyword / keyphrase appears in %s (out of %s) subheadings in the copy. While not a major ranking factor, this is beneficial.", 'wordpress-seo' );
@@ -1327,7 +1414,12 @@ class WPSEO_Metabox {
 		}
 	}
 
-	// Currently just returns an array of the text content
+	/**
+	 * Fetch all headings and return their content.
+	 *
+	 * @param string $postcontent Post content to find headings in.
+	 * @return array Array of heading texts.
+	 */
 	function GetHeadings( $postcontent ) {
 		preg_match_all( '/<h([1-6])([^>]+)?>(.*)?<\/h\\1>/i', $postcontent, $matches );
 		$headings = array();
@@ -1337,6 +1429,15 @@ class WPSEO_Metabox {
 		return $headings;
 	}
 
+	/**
+	 * Score the meta description for length and keyword appearance.
+	 *
+	 * @param array  $job         The array holding the keywords.
+	 * @param array  $results     The results array.
+	 * @param string $description The meta description.
+	 * @param object $statistics  Object of class YoastStatistics used to calculate lengths.
+	 * @param int    $maxlength   The maximum length of the meta description.
+	 */
 	function ScoreDescription( $job, &$results, $description, $statistics, $maxlength = 155 ) {
 		$scoreDescriptionMinLength      = 120;
 		$scoreDescriptionCorrectLength  = __( "In the specified meta description, consider: How does it compare to the competition? Could it be made more appealing?", 'wordpress-seo' );
@@ -1372,6 +1473,15 @@ class WPSEO_Metabox {
 		}
 	}
 
+	/**
+	 * Score the body for length and keyword appearance.
+	 *
+	 * @param array  $job         The array holding the keywords.
+	 * @param array  $results     The results array.
+	 * @param string $body        The body.
+	 * @param string $firstp      The first paragraph.
+	 * @param object $statistics  Object of class YoastStatistics used to calculate lengths.
+	 */
 	function ScoreBody( $job, &$results, $body, $firstp, $statistics ) {
 		$scoreBodyGoodLimit = 300;
 		$scoreBodyOKLimit   = 250;
@@ -1477,6 +1587,12 @@ class WPSEO_Metabox {
 		}
 	}
 
+	/**
+	 * Retrieve the body from the post.
+	 *
+	 * @param object $post The post object.
+	 * @return string The post content.
+	 */
 	function GetBody( $post ) {
 		// Strip shortcodes, for obvious reasons
 		$origHtml = wpseo_strip_shortcode( $post->post_content );
@@ -1510,6 +1626,12 @@ class WPSEO_Metabox {
 		return $htmdata5;
 	}
 
+	/**
+	 * Retrieve the first paragraph from the post.
+	 *
+	 * @param object $post The post to retrieve the first paragraph from.
+	 * @return string
+	 */
 	function GetFirstParagraph( $post ) {
 		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.		
 		$res = preg_match( '/<p>(.*)<\/p>/', wpautop( $post->post_content ), $matches );
