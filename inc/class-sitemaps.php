@@ -142,7 +142,7 @@ class WPSEO_Sitemaps {
 
 		// reference post type specific sitemaps
 		foreach ( get_post_types( array( 'public' => true ) ) as $post_type ) {
-			if ( in_array( $post_type, array( 'revision', 'nav_menu_item', 'attachment' ) ) )
+			if ( $post_type == 'attachment' )
 				continue;
 
 			if ( isset( $options['post_types-' . $post_type . '-not_in_sitemap'] ) && $options['post_types-' . $post_type . '-not_in_sitemap'] )

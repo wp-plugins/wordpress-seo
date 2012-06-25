@@ -146,6 +146,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Properly deal with shortcodes with text inbetween.
 	* Remove several functions that are no longer used.
 	* `%%page%%` only outputs '`%%sep%%` Page 2 of X' when not on page 1. If you want it to show up on Page 1 you can use `%%pagetotal%%` and `%%pagenumber%%`. This both works for paginated posts & pages too.
+	* Allow for rel=author on sites with static frontpage too.
 * Enhancements:
 	* Massive updates to how parts of the plugin are loaded, leading to a reduction of memory usage in WordPress admin of 1~2 MB.
 	* Respect `DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` constants. When set to true, edit files menu option won't show.
