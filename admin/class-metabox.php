@@ -1,5 +1,11 @@
 <?php
 /**
+ * @package Admin
+ *
+ * This code generates the metabox on the edit post / page as well as contains all page analysis functionality.
+ */
+
+/**
  * class WPSEO_Metabox
  *
  * The class that generates the metabox on the edit post / page as well as contains all page analysis functionality.
@@ -1133,7 +1139,7 @@ class WPSEO_Metabox {
 	 *
 	 * @param array  $job        The job array holding both the keyword and the URLs.
 	 * @param array  $results    The results array.
-	 * @param object $statistics Object of class YoastStatistics used to calculate lengths.
+	 * @param object $statistics Object of class Yoast_TextStatistics used to calculate lengths.
 	 */
 	function ScoreUrl( $job, &$results, $statistics ) {
 		global $wpseo_admin;
@@ -1167,7 +1173,7 @@ class WPSEO_Metabox {
 	 * @param array  $job        The job array holding both the keyword versions.
 	 * @param array  $results    The results array.
 	 * @param string $title      The title to check against keywords.
-	 * @param object $statistics Object of class YoastStatistics used to calculate lengths.
+	 * @param object $statistics Object of class Yoast_TextStatistics used to calculate lengths.
 	 */
 	function ScoreTitle( $job, &$results, $title, $statistics ) {
 		$scoreTitleMinLength    = 40;
@@ -1435,7 +1441,7 @@ class WPSEO_Metabox {
 	 * @param array  $job         The array holding the keywords.
 	 * @param array  $results     The results array.
 	 * @param string $description The meta description.
-	 * @param object $statistics  Object of class YoastStatistics used to calculate lengths.
+	 * @param object $statistics  Object of class Yoast_TextStatistics used to calculate lengths.
 	 * @param int    $maxlength   The maximum length of the meta description.
 	 */
 	function ScoreDescription( $job, &$results, $description, $statistics, $maxlength = 155 ) {
@@ -1480,7 +1486,7 @@ class WPSEO_Metabox {
 	 * @param array  $results     The results array.
 	 * @param string $body        The body.
 	 * @param string $firstp      The first paragraph.
-	 * @param object $statistics  Object of class YoastStatistics used to calculate lengths.
+	 * @param object $statistics  Object of class Yoast_TextStatistics used to calculate lengths.
 	 */
 	function ScoreBody( $job, &$results, $body, $firstp, $statistics ) {
 		$scoreBodyGoodLimit = 300;

@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Admin
+ */
 
 /**
  * Class that holds most of the admin functionality for WP SEO.

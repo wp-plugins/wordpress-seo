@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Internals
+ */
 
 /**
  * Get the value from the post custom values

@@ -1,6 +1,12 @@
 <?php
 /**
- * Adds the OpenGraph metaboxes to the interface
+ * @package Frontend
+ *
+ * This code handles the OpenGraph output.
+ */
+
+/**
+ * Adds the OpenGraph output
  *
  * @package WPSEO_OpenGraph
  */

@@ -1,7 +1,14 @@
 <?php
+/**
+ * @package Admin
+ */
 
 /**
+ * class WPSEO_Admin_Pages
+ *
  * Class with functionality for the WP SEO admin pages.
+ *
+ * @package WPSEO_Admin_Pages
  */
 class WPSEO_Admin_Pages {
 

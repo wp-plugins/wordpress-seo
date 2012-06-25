@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package XML Sitemaps
+ */
 
 class WPSEO_Sitemaps {
 	/**

@@ -1,16 +1,23 @@
 <?php
+/**
+ * @package Admin
+ */
 
-/*
-Modified (Reduced) TextStatistics Class
-http://code.google.com/p/php-text-statistics/
-
-Released under New BSD license
-http://www.opensource.org/licenses/bsd-license.php
-*/
+/**
+ * Modified (Reduced) TextStatistics Class
+ *
+ * Mostly removed functionality that isn't needed within the WordPress SEO plugin.
+ *
+ * @link    http://code.google.com/p/php-text-statistics/
+ * @license http://www.opensource.org/licenses/bsd-license.php New BSD license
+ */
 
 class Yoast_TextStatistics {
 
-	protected $strEncoding = ''; // Used to hold character encoding to be used by object, if set
+	/**
+	 * @var string $strEncoding Used to hold character encoding to be used by object, if set
+	 */
+	protected $strEncoding = '';
 
 	/**
 	 * Constructor.
@@ -165,7 +172,7 @@ class Yoast_TextStatistics {
 		$intWordCount     = $this->word_count( $strText );
 		$arrWords         = explode( ' ', $strText );
 		for ( $i = 0; $i < $intWordCount; $i++ ) {
-			$intSyllableCount += $this->syllable_count( $arrWords[ $i ] );
+			$intSyllableCount += $this->syllable_count( $arrWords[$i] );
 		}
 		return ( $intSyllableCount / $intWordCount );
 	}
@@ -189,8 +196,8 @@ class Yoast_TextStatistics {
 		, 'forever'   => 3
 		, 'shoreline' => 2
 		);
-		if ( isset( $arrProblemWords[ $strWord ] ) ) {
-			$intSyllableCount = $arrProblemWords[ $strWord ];
+		if ( isset( $arrProblemWords[$strWord] ) ) {
+			$intSyllableCount = $arrProblemWords[$strWord];
 		}
 		if ( $intSyllableCount > 0 ) {
 			return $intSyllableCount;

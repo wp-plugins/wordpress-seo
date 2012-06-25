@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Admin
+ */
 
 class WPSEO_Social_Admin extends WPSEO_Metabox {
 

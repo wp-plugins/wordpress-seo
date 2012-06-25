@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Frontend
+ */
 
 class WPSEO_Twitter extends WPSEO_Frontend {
 

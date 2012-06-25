@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Internals
+ */
 
 function wpseo_flush_rules() {
 	global $wp_rewrite;

@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Admin
+ */
 
 /**
  * Function used from AJAX calls, takes it variables from $_POST, dies on exit.

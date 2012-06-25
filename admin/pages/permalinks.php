@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Admin
+ */
 
 global $wpseo_admin_pages;
 

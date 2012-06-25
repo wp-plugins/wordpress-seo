@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package Admin
+ */
 
 class WPSEO_Taxonomy {
 

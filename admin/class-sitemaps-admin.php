@@ -1,4 +1,7 @@
 <?php
+/**
+ * @package XML Sitemaps
+ */
 
 /**
  * Class that handles the Admin side of XML sitemaps
