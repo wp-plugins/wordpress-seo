@@ -71,7 +71,7 @@ class WPSEO_Metabox {
 	 * @param string $string String to lowercase
 	 * @return string
 	 */
-	function strtolower_utf8( $string ) {
+	public function strtolower_utf8( $string ) {
 		$convert_to   = array(
 			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
 			"v", "w", "x", "y", "z", "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï",
@@ -115,7 +115,7 @@ class WPSEO_Metabox {
 					global $post;
 				}
 
-				$this->calculateResults( $post );
+				$this->calculate_results( $post );
 				$score = wpseo_get_value( 'linkdex' );
 				if ( !$score || empty( $score ) ) {
 					$score = 'na';
@@ -656,7 +656,7 @@ class WPSEO_Metabox {
 			wpseo_set_value( $meta_box['name'], $data, $post_id );
 		}
 
-		$this->calculateResults( $post );
+		$this->calculate_results( $post );
 
 		do_action( 'wpseo_saved_postdata' );
 	}
@@ -736,7 +736,7 @@ class WPSEO_Metabox {
 				$score = wpseo_translate_score( round( $score / 10 ) );
 				$title = $score;
 			} else {
-				$this->calculateResults( get_post( $post_id ) );
+				$this->calculate_results( get_post( $post_id ) );
 				$score = wpseo_get_value( 'linkdex', $post_id );
 				if ( !$score || empty( $score ) ) {
 					$score = 'na';
@@ -920,7 +920,7 @@ class WPSEO_Metabox {
 	 * @return string
 	 */
 	function linkdex_output( $post ) {
-		$results = $this->calculateResults( $post );
+		$results = $this->calculate_results( $post );
 
 		if ( is_wp_error( $results ) ) {
 			$error = $results->get_error_messages();
@@ -955,7 +955,7 @@ class WPSEO_Metabox {
 	 * @param object $post Post to calculate the results for.
 	 * @return array
 	 */
-	function calculateResults( $post ) {
+	function calculate_results( $post ) {
 		$options = get_wpseo_options();
 
 		if ( !class_exists( 'DOMDocument' ) ) {
@@ -989,7 +989,7 @@ class WPSEO_Metabox {
 		$statistics = new Yoast_TextStatistics;
 
 		// Keyword
-		$this->ScoreKeyword( $job['keyword'], $results );
+		$this->score_keyword( $job['keyword'], $results );
 
 		// Title
 		if ( wpseo_get_value( 'title' ) ) {
@@ -1001,7 +1001,7 @@ class WPSEO_Metabox {
 				$title_template = '%%title%% - %%sitename%%';
 			$title = wpseo_replace_vars( $title_template, (array) $post );
 		}
-		$this->ScoreTitle( $job, $results, $title, $statistics );
+		$this->score_title( $job, $results, $title, $statistics );
 		unset( $title );
 
 		// Meta description
@@ -1015,35 +1015,35 @@ class WPSEO_Metabox {
 
 		$meta_length = apply_filters( 'wpseo_metadesc_length', 156, $post );
 
-		$this->ScoreDescription( $job, $results, $description, $statistics, $meta_length );
+		$this->score_description( $job, $results, $description, $statistics, $meta_length );
 		unset( $description );
 
 		// Body
-		$body   = $this->GetBody( $post );
-		$firstp = $this->GetFirstParagraph( $post );
-		$this->ScoreBody( $job, $results, $body, $firstp, $statistics );
+		$body   = $this->get_body( $post );
+		$firstp = $this->get_first_paragraph( $post );
+		$this->score_body( $job, $results, $body, $firstp, $statistics );
 		unset( $body );
 		unset( $firstp );
 
 		// URL
-		$this->ScoreUrl( $job, $results, $statistics );
+		$this->score_url( $job, $results, $statistics );
 
 		// Headings
-		$headings = $this->GetHeadings( $post->post_content );
-		$this->ScoreHeadings( $job, $results, $headings );
+		$headings = $this->get_headings( $post->post_content );
+		$this->score_headings( $job, $results, $headings );
 		unset( $headings );
 
 		// Images
 		$imgs          = array();
-		$imgs['count'] = $this->GetImageCount( $xpath );
-		$imgs          = $this->GetImagesAltText( $post, $imgs );
-		$this->ScoreImagesAltText( $job, $results, $imgs );
+		$imgs['count'] = $this->get_image_count( $xpath );
+		$imgs          = $this->get_images_alt_text( $post, $imgs );
+		$this->score_images_alt_text( $job, $results, $imgs );
 		unset( $imgs );
 
 		// Anchors
-		$anchors = $this->GetAnchorTexts( $xpath );
-		$count   = $this->GetAnchorCount( $xpath );
-		$this->ScoreAnchorTexts( $job, $results, $anchors, $count );
+		$anchors = $this->get_anchor_texts( $xpath );
+		$count   = $this->get_anchor_count( $xpath );
+		$this->score_anchor_texts( $job, $results, $anchors, $count );
 		unset( $anchors, $count, $dom );
 
 		$this->aasort( $results, 'val' );
@@ -1072,7 +1072,7 @@ class WPSEO_Metabox {
 	 * @param int    $scoreValue   The score value.
 	 * @param string $scoreMessage The score message.
 	 */
-	function SaveScoreResult( &$results, $scoreValue, $scoreMessage ) {
+	function save_score_result( &$results, $scoreValue, $scoreMessage ) {
 		$score     = array(
 			'val' => $scoreValue,
 			'msg' => $scoreMessage
@@ -1123,13 +1123,13 @@ class WPSEO_Metabox {
 	 * @param string $keyword The keyword to check for stopwords.
 	 * @param array  $results The results array.
 	 */
-	function ScoreKeyword( $keyword, &$results ) {
+	function score_keyword( $keyword, &$results ) {
 		global $wpseo_admin;
 
 		$keywordStopWord = __( "The keyword for this page contains one or more %sstop words%s, consider removing them. Found '%s'.", 'wordpress-seo' );
 
 		if ( $wpseo_admin->stopwords_check( $keyword ) !== false )
-			$this->SaveScoreResult( $results, 5, sprintf( $keywordStopWord, "<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>", $wpseo_admin->stopwords_check( $keyword ) ) );
+			$this->save_score_result( $results, 5, sprintf( $keywordStopWord, "<a href=\"http://en.wikipedia.org/wiki/Stop_words\">", "</a>", $wpseo_admin->stopwords_check( $keyword ) ) );
 	}
 
 	/**
@@ -1139,7 +1139,7 @@ class WPSEO_Metabox {
 	 * @param array  $results    The results array.
 	 * @param object $statistics Object of class Yoast_TextStatistics used to calculate lengths.
 	 */
-	function ScoreUrl( $job, &$results, $statistics ) {
+	function score_url( $job, &$results, $statistics ) {
 		global $wpseo_admin;
 
 		$urlGood      = __( "The keyword / phrase appears in the URL for this page.", 'wordpress-seo' );
@@ -1152,17 +1152,17 @@ class WPSEO_Metabox {
 		$haystack2 = $this->strip_separators_and_fold( $job["pageUrl"], false );
 
 		if ( stripos( $haystack1, $needle ) || stripos( $haystack2, $needle ) )
-			$this->SaveScoreResult( $results, 9, $urlGood );
+			$this->save_score_result( $results, 9, $urlGood );
 		else
-			$this->SaveScoreResult( $results, 6, $urlMedium );
+			$this->save_score_result( $results, 6, $urlMedium );
 
 		// Check for Stop Words in the slug
 		if ( $wpseo_admin->stopwords_check( $job["pageSlug"], true ) !== false )
-			$this->SaveScoreResult( $results, 5, $urlStopWords );
+			$this->save_score_result( $results, 5, $urlStopWords );
 
 		// Check if the slug isn't too long relative to the length of the keyword
 		if ( ( $statistics->text_length( $job["keyword"] ) + 20 ) < $statistics->text_length( $job["pageSlug"] ) && 40 < $statistics->text_length( $job["pageSlug"] ) )
-			$this->SaveScoreResult( $results, 5, $longSlug );
+			$this->save_score_result( $results, 5, $longSlug );
 	}
 
 	/**
@@ -1173,7 +1173,7 @@ class WPSEO_Metabox {
 	 * @param string $title      The title to check against keywords.
 	 * @param object $statistics Object of class Yoast_TextStatistics used to calculate lengths.
 	 */
-	function ScoreTitle( $job, &$results, $title, $statistics ) {
+	function score_title( $job, &$results, $title, $statistics ) {
 		$scoreTitleMinLength    = 40;
 		$scoreTitleMaxLength    = 70;
 		$scoreTitleKeywordLimit = 0;
@@ -1187,15 +1187,15 @@ class WPSEO_Metabox {
 		$scoreTitleKeywordEnd       = __( "The page title contains keyword / phrase, but it does not appear at the beginning; try and move it to the beginning.", 'wordpress-seo' );
 
 		if ( $title == "" ) {
-			$this->SaveScoreResult( $results, 1, $scoreTitleMissing );
+			$this->save_score_result( $results, 1, $scoreTitleMissing );
 		} else {
 			$length = $statistics->text_length( $title );
 			if ( $length < $scoreTitleMinLength )
-				$this->SaveScoreResult( $results, 6, sprintf( $scoreTitleTooShort, $length ) );
+				$this->save_score_result( $results, 6, sprintf( $scoreTitleTooShort, $length ) );
 			else if ( $length > $scoreTitleMaxLength )
-				$this->SaveScoreResult( $results, 6, sprintf( $scoreTitleTooLong, $length ) );
+				$this->save_score_result( $results, 6, sprintf( $scoreTitleTooLong, $length ) );
 			else
-				$this->SaveScoreResult( $results, 9, $scoreTitleCorrectLength );
+				$this->save_score_result( $results, 9, $scoreTitleCorrectLength );
 
 			// TODO MA Keyword/Title matching is exact match with separators removed, but should extend to distributed match
 			$needle_position = stripos( $title, $job["keyword_folded"] );
@@ -1205,11 +1205,11 @@ class WPSEO_Metabox {
 			}
 
 			if ( $needle_position === false )
-				$this->SaveScoreResult( $results, 2, sprintf( $scoreTitleKeywordMissing, $job["keyword_folded"] ) );
+				$this->save_score_result( $results, 2, sprintf( $scoreTitleKeywordMissing, $job["keyword_folded"] ) );
 			else if ( $needle_position <= $scoreTitleKeywordLimit )
-				$this->SaveScoreResult( $results, 9, $scoreTitleKeywordBeginning );
+				$this->save_score_result( $results, 9, $scoreTitleKeywordBeginning );
 			else
-				$this->SaveScoreResult( $results, 6, $scoreTitleKeywordEnd );
+				$this->save_score_result( $results, 6, $scoreTitleKeywordEnd );
 		}
 	}
 
@@ -1221,7 +1221,7 @@ class WPSEO_Metabox {
 	 * @param array  $anchor_texts The array holding all anchors in the document.
 	 * @param array  $count        The number of anchors in the document, grouped by type.
 	 */
-	function ScoreAnchorTexts( $job, &$results, $anchor_texts, $count ) {
+	function score_anchor_texts( $job, &$results, $anchor_texts, $count ) {
 		$scoreNoLinks               = __( "No outbound links appear in this page, consider adding some as appropriate.", 'wordpress-seo' );
 		$scoreKeywordInOutboundLink = __( "You're linking to another page with the keyword you want this page to rank for, consider changing that if you truly want this page to rank.", 'wordpress-seo' );
 		$scoreLinksDofollow         = __( "This page has %s outbound link(s).", 'wordpress-seo' );
@@ -1230,7 +1230,7 @@ class WPSEO_Metabox {
 
 
 		if ( $count['external']['nofollow'] == 0 && $count['external']['dofollow'] == 0 ) {
-			$this->SaveScoreResult( $results, 6, $scoreNoLinks );
+			$this->save_score_result( $results, 6, $scoreNoLinks );
 		} else {
 			$found = false;
 			foreach ( $anchor_texts as $anchor_text ) {
@@ -1238,14 +1238,14 @@ class WPSEO_Metabox {
 					$found = true;
 			}
 			if ( $found )
-				$this->SaveScoreResult( $results, 2, $scoreKeywordInOutboundLink );
+				$this->save_score_result( $results, 2, $scoreKeywordInOutboundLink );
 
 			if ( $count['external']['nofollow'] == 0 && $count['external']['dofollow'] > 0 ) {
-				$this->SaveScoreResult( $results, 9, sprintf( $scoreLinksDofollow, $count['external']['dofollow'] ) );
+				$this->save_score_result( $results, 9, sprintf( $scoreLinksDofollow, $count['external']['dofollow'] ) );
 			} else if ( $count['external']['nofollow'] > 0 && $count['external']['dofollow'] == 0 ) {
-				$this->SaveScoreResult( $results, 7, sprintf( $scoreLinksNofollow, $count['external']['nofollow'] ) );
+				$this->save_score_result( $results, 7, sprintf( $scoreLinksNofollow, $count['external']['nofollow'] ) );
 			} else {
-				$this->SaveScoreResult( $results, 8, sprintf( $scoreLinks, $count['external']['nofollow'], $count['external']['dofollow'] ) );
+				$this->save_score_result( $results, 8, sprintf( $scoreLinks, $count['external']['nofollow'], $count['external']['dofollow'] ) );
 			}
 		}
 
@@ -1257,7 +1257,7 @@ class WPSEO_Metabox {
 	 * @param object $xpath An XPATH object of the current document.
 	 * @return array
 	 */
-	function GetAnchorTexts( &$xpath ) {
+	function get_anchor_texts( &$xpath ) {
 		$query        = "//a|//A";
 		$dom_objects  = $xpath->query( $query );
 		$anchor_texts = array();
@@ -1278,7 +1278,7 @@ class WPSEO_Metabox {
 	 * @param object $xpath An XPATH object of the current document.
 	 * @return array
 	 */
-	function GetAnchorCount( &$xpath ) {
+	function get_anchor_count( &$xpath ) {
 		$query       = "//a|//A";
 		$dom_objects = $xpath->query( $query );
 		$count       = array(
@@ -1320,16 +1320,16 @@ class WPSEO_Metabox {
 	 * @param array $results The results array.
 	 * @param array $imgs    The array with images alt texts.
 	 */
-	function ScoreImagesAltText( $job, &$results, $imgs ) {
+	function score_images_alt_text( $job, &$results, $imgs ) {
 		$scoreImagesNoImages          = __( "No images appear in this page, consider adding some as appropriate.", 'wordpress-seo' );
 		$scoreImagesNoAlt             = __( "The images on this page are missing alt tags.", 'wordpress-seo' );
 		$scoreImagesAltKeywordIn      = __( "The images on this page contain alt tags with the target keyword / phrase.", 'wordpress-seo' );
 		$scoreImagesAltKeywordMissing = __( "The images on this page do not have alt tags containing your keyword / phrase.", 'wordpress-seo' );
 
 		if ( $imgs['count'] == 0 ) {
-			$this->SaveScoreResult( $results, 3, $scoreImagesNoImages );
+			$this->save_score_result( $results, 3, $scoreImagesNoImages );
 		} else if ( count( $imgs['alts'] ) == 0 && $imgs['count'] != 0 ) {
-			$this->SaveScoreResult( $results, 5, $scoreImagesNoAlt );
+			$this->save_score_result( $results, 5, $scoreImagesNoAlt );
 		} else {
 			$found = false;
 			foreach ( $imgs['alts'] as $alt ) {
@@ -1341,9 +1341,9 @@ class WPSEO_Metabox {
 					$found = true;
 			}
 			if ( $found )
-				$this->SaveScoreResult( $results, 9, $scoreImagesAltKeywordIn );
+				$this->save_score_result( $results, 9, $scoreImagesAltKeywordIn );
 			else
-				$this->SaveScoreResult( $results, 5, $scoreImagesAltKeywordMissing );
+				$this->save_score_result( $results, 5, $scoreImagesAltKeywordMissing );
 		}
 
 	}
@@ -1355,7 +1355,7 @@ class WPSEO_Metabox {
 	 * @param array  $imgs The array holding the image information.
 	 * @return array The updated images array.
 	 */
-	function GetImagesAltText( $post, $imgs ) {
+	function get_images_alt_text( $post, $imgs ) {
 		preg_match_all( '/<img [^>]+ alt=(["\'])([^\\1]+)\\1[^>]+>/im', $post->post_content, $matches );
 		$imgs['alts'] = array();
 		foreach ( $matches[2] as $alt ) {
@@ -1379,7 +1379,7 @@ class WPSEO_Metabox {
 	 * @param object $xpath An XPATH object of the document
 	 * @return int Image count
 	 */
-	function GetImageCount( &$xpath ) {
+	function get_image_count( &$xpath ) {
 		$query       = "//img|//IMG";
 		$dom_objects = $xpath->query( $query );
 		return count( $dom_objects );
@@ -1392,14 +1392,14 @@ class WPSEO_Metabox {
 	 * @param array $results  The results array.
 	 * @param array $headings The headings found in the document.
 	 */
-	function ScoreHeadings( $job, &$results, $headings ) {
+	function score_headings( $job, &$results, $headings ) {
 		$scoreHeadingsNone           = __( "No subheading tags (like an H2) appear in the copy.", 'wordpress-seo' );
 		$scoreHeadingsKeywordIn      = __( "Keyword / keyphrase appears in %s (out of %s) subheadings in the copy. While not a major ranking factor, this is beneficial.", 'wordpress-seo' );
 		$scoreHeadingsKeywordMissing = __( "You have not used your keyword / keyphrase in any subheading (such as an H2) in your copy.", 'wordpress-seo' );
 
 		$headingCount = count( $headings );
 		if ( $headingCount == 0 )
-			$this->SaveScoreResult( $results, 7, $scoreHeadingsNone );
+			$this->save_score_result( $results, 7, $scoreHeadingsNone );
 		else {
 			$found = 0;
 			foreach ( $headings as $heading ) {
@@ -1412,9 +1412,9 @@ class WPSEO_Metabox {
 					$found++;
 			}
 			if ( $found )
-				$this->SaveScoreResult( $results, 9, sprintf( $scoreHeadingsKeywordIn, $found, $headingCount ) );
+				$this->save_score_result( $results, 9, sprintf( $scoreHeadingsKeywordIn, $found, $headingCount ) );
 			else
-				$this->SaveScoreResult( $results, 3, $scoreHeadingsKeywordMissing );
+				$this->save_score_result( $results, 3, $scoreHeadingsKeywordMissing );
 		}
 	}
 
@@ -1424,7 +1424,7 @@ class WPSEO_Metabox {
 	 * @param string $postcontent Post content to find headings in.
 	 * @return array Array of heading texts.
 	 */
-	function GetHeadings( $postcontent ) {
+	function get_headings( $postcontent ) {
 		preg_match_all( '/<h([1-6])([^>]+)?>(.*)?<\/h\\1>/i', $postcontent, $matches );
 		$headings = array();
 		foreach ( $matches[3] as $heading ) {
@@ -1442,7 +1442,7 @@ class WPSEO_Metabox {
 	 * @param object $statistics  Object of class Yoast_TextStatistics used to calculate lengths.
 	 * @param int    $maxlength   The maximum length of the meta description.
 	 */
-	function ScoreDescription( $job, &$results, $description, $statistics, $maxlength = 155 ) {
+	function score_description( $job, &$results, $description, $statistics, $maxlength = 155 ) {
 		$scoreDescriptionMinLength      = 120;
 		$scoreDescriptionCorrectLength  = __( "In the specified meta description, consider: How does it compare to the competition? Could it be made more appealing?", 'wordpress-seo' );
 		$scoreDescriptionTooShort       = __( "The meta description is under 120 characters, however up to %s characters are available. %s", 'wordpress-seo' );
@@ -1456,24 +1456,24 @@ class WPSEO_Metabox {
 			$metaShorter = __( "The available space is shorter than the usual 155 characters because Google will also include the publication date in the snippet.", 'wordpress-seo' );
 
 		if ( $description == "" ) {
-			$this->SaveScoreResult( $results, 1, $scoreDescriptionMissing );
+			$this->save_score_result( $results, 1, $scoreDescriptionMissing );
 		} else {
 			$length = $statistics->text_length( $description );
 
 			if ( $length < $scoreDescriptionMinLength )
-				$this->SaveScoreResult( $results, 6, sprintf( $scoreDescriptionTooShort, $maxlength, $metaShorter ) );
+				$this->save_score_result( $results, 6, sprintf( $scoreDescriptionTooShort, $maxlength, $metaShorter ) );
 			else if ( $length <= $maxlength )
-				$this->SaveScoreResult( $results, 9, $scoreDescriptionCorrectLength );
+				$this->save_score_result( $results, 9, $scoreDescriptionCorrectLength );
 			else
-				$this->SaveScoreResult( $results, 6, sprintf( $scoreDescriptionTooLong, $maxlength, $metaShorter ) );
+				$this->save_score_result( $results, 6, sprintf( $scoreDescriptionTooLong, $maxlength, $metaShorter ) );
 
 			// TODO MA Keyword/Title matching is exact match with separators removed, but should extend to distributed match
 			$haystack1 = $this->strip_separators_and_fold( $description, true );
 			$haystack2 = $this->strip_separators_and_fold( $description, false );
 			if ( strrpos( $haystack1, $job["keyword_folded"] ) === false && strrpos( $haystack2, $job["keyword_folded"] ) === false )
-				$this->SaveScoreResult( $results, 3, $scoreDescriptionKeywordMissing );
+				$this->save_score_result( $results, 3, $scoreDescriptionKeywordMissing );
 			else
-				$this->SaveScoreResult( $results, 9, $scoreDescriptionKeywordIn );
+				$this->save_score_result( $results, 9, $scoreDescriptionKeywordIn );
 		}
 	}
 
@@ -1486,7 +1486,7 @@ class WPSEO_Metabox {
 	 * @param string $firstp      The first paragraph.
 	 * @param object $statistics  Object of class Yoast_TextStatistics used to calculate lengths.
 	 */
-	function ScoreBody( $job, &$results, $body, $firstp, $statistics ) {
+	function score_body( $job, &$results, $body, $firstp, $statistics ) {
 		$scoreBodyGoodLimit = 300;
 		$scoreBodyOKLimit   = 250;
 		$scoreBodyPoorLimit = 200;
@@ -1516,15 +1516,15 @@ class WPSEO_Metabox {
 		$wordCount = $statistics->word_count( $body );
 
 		if ( $wordCount < $scoreBodyBadLimit )
-			$this->SaveScoreResult( $results, -20, sprintf( $scoreBodyBadLength, $wordCount ) );
+			$this->save_score_result( $results, -20, sprintf( $scoreBodyBadLength, $wordCount ) );
 		else if ( $wordCount < $scoreBodyPoorLimit )
-			$this->SaveScoreResult( $results, -10, sprintf( $scoreBodyPoorLength, $wordCount ) );
+			$this->save_score_result( $results, -10, sprintf( $scoreBodyPoorLength, $wordCount ) );
 		else if ( $wordCount < $scoreBodyOKLimit )
-			$this->SaveScoreResult( $results, 5, sprintf( $scoreBodyPoorLength, $wordCount ) );
+			$this->save_score_result( $results, 5, sprintf( $scoreBodyPoorLength, $wordCount ) );
 		else if ( $wordCount < $scoreBodyGoodLimit )
-			$this->SaveScoreResult( $results, 7, sprintf( $scoreBodyOKLength, $wordCount ) );
+			$this->save_score_result( $results, 7, sprintf( $scoreBodyOKLength, $wordCount ) );
 		else
-			$this->SaveScoreResult( $results, 9, sprintf( $scoreBodyGoodLength, $wordCount ) );
+			$this->save_score_result( $results, 9, sprintf( $scoreBodyGoodLength, $wordCount ) );
 
 		$body = $this->strtolower_utf8( $body );
 
@@ -1537,11 +1537,11 @@ class WPSEO_Metabox {
 				$keywordDensity = number_format( ( ( $keywordCount / ( $wordCount - ( ( $keywordWordCount - 1 ) * $keywordWordCount ) ) ) * 100 ), 2 );
 
 			if ( $keywordDensity < 1 ) {
-				$this->SaveScoreResult( $results, 4, sprintf( $scoreKeywordDensityLow, $keywordDensity, $keywordCount ) );
+				$this->save_score_result( $results, 4, sprintf( $scoreKeywordDensityLow, $keywordDensity, $keywordCount ) );
 			} else if ( $keywordDensity > 4.5 ) {
-				$this->SaveScoreResult( $results, -50, sprintf( $scoreKeywordDensityHigh, $keywordDensity, $keywordCount ) );
+				$this->save_score_result( $results, -50, sprintf( $scoreKeywordDensityHigh, $keywordDensity, $keywordCount ) );
 			} else {
-				$this->SaveScoreResult( $results, 9, sprintf( $scoreKeywordDensityGood, $keywordDensity, $keywordCount ) );
+				$this->save_score_result( $results, 9, sprintf( $scoreKeywordDensityGood, $keywordDensity, $keywordCount ) );
 			}
 		}
 
@@ -1549,9 +1549,9 @@ class WPSEO_Metabox {
 
 		// First Paragraph Test
 		if ( stripos( $firstp, $job["keyword"] ) === false && stripos( $firstp, $job["keyword_folded"] ) === false ) {
-			$this->SaveScoreResult( $results, 3, $scoreFirstParagraphLow );
+			$this->save_score_result( $results, 3, $scoreFirstParagraphLow );
 		} else {
-			$this->SaveScoreResult( $results, 9, $scoreFirstParagraphHigh );
+			$this->save_score_result( $results, 9, $scoreFirstParagraphHigh );
 		}
 
 		$lang = get_bloginfo( 'language' );
@@ -1587,7 +1587,7 @@ class WPSEO_Metabox {
 				$note  = __( 'Try to make shorter sentences, using less difficult words to improve readability.', 'wordpress-seo' );
 				$score = 4;
 			}
-			$this->SaveScoreResult( $results, $score, sprintf( $scoreFlesch, $flesch, $fleschurl, $level, $note ) );
+			$this->save_score_result( $results, $score, sprintf( $scoreFlesch, $flesch, $fleschurl, $level, $note ) );
 		}
 	}
 
@@ -1597,7 +1597,7 @@ class WPSEO_Metabox {
 	 * @param object $post The post object.
 	 * @return string The post content.
 	 */
-	function GetBody( $post ) {
+	function get_body( $post ) {
 		// Strip shortcodes, for obvious reasons
 		$origHtml = wpseo_strip_shortcode( $post->post_content );
 		if ( trim( $origHtml ) == '' )
@@ -1636,7 +1636,7 @@ class WPSEO_Metabox {
 	 * @param object $post The post to retrieve the first paragraph from.
 	 * @return string
 	 */
-	function GetFirstParagraph( $post ) {
+	function get_first_paragraph( $post ) {
 		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.		
 		$res = preg_match( '/<p>(.*)<\/p>/', wpautop( $post->post_content ), $matches );
 		if ( $res )
