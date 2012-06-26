@@ -1068,14 +1068,14 @@ class WPSEO_Metabox {
 	/**
 	 * Save the score result to the results array.
 	 *
-	 * @param array  $results               The results array used to store results.
-	 * @param int    $scoreValue            The score value.
-	 * @param string $scoreUrlStatusMessage The score message.
+	 * @param array  $results      The results array used to store results.
+	 * @param int    $scoreValue   The score value.
+	 * @param string $scoreMessage The score message.
 	 */
-	function SaveScoreResult( &$results, $scoreValue, $scoreUrlStatusMessage ) {
+	function SaveScoreResult( &$results, $scoreValue, $scoreMessage ) {
 		$score     = array(
 			'val' => $scoreValue,
-			'msg' => $scoreUrlStatusMessage
+			'msg' => $scoreMessage
 		);
 		$results[] = $score;
 	}
@@ -1151,7 +1151,7 @@ class WPSEO_Metabox {
 		$haystack1 = $this->strip_separators_and_fold( $job["pageUrl"], true );
 		$haystack2 = $this->strip_separators_and_fold( $job["pageUrl"], false );
 
-		if ( strrpos( $haystack1, $needle ) || strrpos( $haystack2, $needle ) )
+		if ( stripos( $haystack1, $needle ) || stripos( $haystack2, $needle ) )
 			$this->SaveScoreResult( $results, 9, $urlGood );
 		else
 			$this->SaveScoreResult( $results, 6, $urlMedium );

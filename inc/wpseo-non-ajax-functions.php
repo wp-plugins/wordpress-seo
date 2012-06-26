@@ -3,11 +3,17 @@
  * @package Internals
  */
 
+/**
+ * Flush the rewrite rules.
+ */
 function wpseo_flush_rules() {
 	global $wp_rewrite;
 	$wp_rewrite->flush_rules();
 }
 
+/**
+ * Runs on activation of the plugin.
+ */
 function wpseo_activate() {
 	wpseo_defaults();
 
@@ -24,6 +30,11 @@ function wpseo_activate() {
 
 }
 
+/**
+ * Set the default settings.
+ *
+ * This uses the currently available custom post types and taxonomies.
+ */
 function wpseo_defaults() {
 	$options = get_option( 'wpseo' );
 	if ( !is_array( $options ) ) {
@@ -84,6 +95,9 @@ function wpseo_defaults() {
 	wpseo_title_test();
 }
 
+/**
+ * Test whether force rewrite should be enabled or not.
+ */
 function wpseo_title_test() {
 	$options = get_option( 'wpseo_titles' );
 
@@ -128,9 +142,11 @@ function wpseo_title_test() {
 	unset( $options[ 'title_test' ] );
 	update_option( 'wpseo_titles', $options );
 }
-
 add_filter( 'switch_theme', 'wpseo_title_test', 0 );
 
+/**
+ * On deactivation, flush the rewrite rules so XML sitemaps stop working.
+ */
 function wpseo_deactivate() {
 	wpseo_flush_rules();
 
@@ -142,6 +158,12 @@ function wpseo_deactivate() {
 	}
 }
 
+/**
+ * Translates a decimal analysis score into a textual one.
+ *
+ * @param int $val The decimal score to translate.
+ * @return string
+ */
 function wpseo_translate_score( $val ) {
 	switch ( $val ) {
 		case 0:
@@ -243,8 +265,11 @@ function wpseo_admin_bar_menu() {
 
 add_action( 'admin_bar_menu', 'wpseo_admin_bar_menu', 95 );
 
+/**
+ * Enqueue a tiny bit of CSS to show so the adminbar shows right.
+ */
 function wpseo_admin_bar_css() {
-	if ( is_admin_bar_showing() )
+	if ( is_admin_bar_showing() && is_singular() )
 		wp_enqueue_style( 'boxes', WPSEO_URL . 'css/adminbar.css', WPSEO_VERSION );
 }
 

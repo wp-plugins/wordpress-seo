@@ -64,6 +64,9 @@ $options = get_wpseo_options();
 if ( !defined('DOING_AJAX') || !DOING_AJAX )
 	require WPSEO_PATH.'inc/wpseo-non-ajax-functions.php';
 
+/**
+ * Used to load the required files on the plugins_loaded hook, instead of immediately.
+ */
 function wpseo_frontend_init() {
 	$options = get_wpseo_options();
 	require WPSEO_PATH.'frontend/class-frontend.php';
@@ -79,6 +82,9 @@ function wpseo_frontend_init() {
 		require WPSEO_PATH.'frontend/class-twitter.php';	
 }
 
+/**
+ * Used to load the required files on the plugins_loaded hook, instead of immediately.
+ */
 function wpseo_admin_init() {
 	$options = get_wpseo_options();
 	if ( isset( $_GET['wpseo_restart_tour'] ) ) {

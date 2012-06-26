@@ -110,18 +110,6 @@ class Yoast_TextStatistics {
 	}
 
 	/**
-	 * Gets portion of string. Tries mb_substr and if that fails uses regular substr.
-	 *
-	 * @param   string $strText      Text to be cut up
-	 * @param   int    $intStart     Start character
-	 * @param   int    $intLenght    Length
-	 * @return string
-	 */
-	protected function substring( $strText, $intStart, $intLength ) {
-		return substr( $strText, $intStart, $intLength );
-	}
-
-	/**
 	 * Returns sentence count for text.
 	 *
 	 * @param   string $strText      Text to be measured
@@ -181,7 +169,7 @@ class Yoast_TextStatistics {
 	 * Returns the number of syllables in the word.
 	 * Based in part on Greg Fast's Perl module Lingua::EN::Syllables
 	 *
-	 * @param string  $strWord      Word to be measured
+	 * @param string  $strWord Word to be measured
 	 * @return int
 	 */
 	public function syllable_count( $strWord ) {

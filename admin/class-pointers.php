@@ -3,30 +3,41 @@
  * @package Admin
  */
 
+/**
+ * This class handles the pointers used in the introduction tour.
+ *
+ * @todo Add an introdutory pointer on the edit post page too.
+ */
 class WPSEO_Pointers {
 
+	/**
+	 * Class constructor.
+	 */
 	function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
+	/**
+	 * Enqueue styles and scripts needed for the pointers.
+	 */
 	function enqueue() {
 		$options = get_option( 'wpseo' );
-		if ( !isset( $options[ 'ignore_tour' ] ) || !$options[ 'ignore_tour' ] ) {
+		if ( !isset( $options['ignore_tour'] ) || !$options['ignore_tour'] ) {
 			wp_enqueue_style( 'wp-pointer' );
 			wp_enqueue_script( 'jquery-ui' );
 			wp_enqueue_script( 'wp-pointer' );
 			wp_enqueue_script( 'utils' );
-			add_action( 'admin_print_footer_scripts', array( $this, 'print_scripts' ), 99 );
+			add_action( 'admin_print_footer_scripts', array( $this, 'intro_tour' ), 99 );
 			add_action( 'admin_head', array( $this, 'admin_head' ) );
 		}
 	}
 
-	function print_scripts() {
+	/**
+	 * Load the introduction tour
+	 */
+	function intro_tour() {
 		global $pagenow, $current_user;
 
-		/** @noinspection PhpUndefinedFieldInspection */
-		/** @noinspection PhpUndefinedFieldInspection */
-		/** @noinspection PhpUndefinedFieldInspection */
 		$adminpages = array(
 			'wpseo_dashboard'      => array(
 				'content'  => '<h3>' . __( 'Dashboard', 'wordpress-seo' ) . '</h3><p>' . __( 'This is the WordPress SEO Dashboard, here you can restart this tour or revert the WP SEO settings to default.', 'wordpress-seo' ) . '</p>'
@@ -98,18 +109,18 @@ class WPSEO_Pointers {
 		);
 
 		if ( ( defined( 'DISALLOW_FILE_EDIT' ) && DISALLOW_FILE_EDIT ) || ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS ) ) {
-			unset( $adminpages[ 'wpseo_files' ] );
-			$adminpages[ 'wpseo_import' ][ 'function' ] = '';
-			unset( $adminpages[ 'wpseo_import' ][ 'button2' ] );
-			$adminpages[ 'wpseo_import' ][ 'content' ] .= '<p>' . sprintf( __( 'The tour ends here,thank you for using my plugin and good luck with your SEO!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a href="http://yoast.com/">', '</a>' ) . '</p>';
+			unset( $adminpages['wpseo_files'] );
+			$adminpages['wpseo_import']['function'] = '';
+			unset( $adminpages['wpseo_import']['button2'] );
+			$adminpages['wpseo_import']['content'] .= '<p>' . sprintf( __( 'The tour ends here,thank you for using my plugin and good luck with your SEO!<br/><br/>Best,<br/>Joost de Valk - %1$sYoast.com%2$s', 'wordpress-seo' ), '<a href="http://yoast.com/">', '</a>' ) . '</p>';
 		}
 		$page = '';
-		if ( isset( $_GET[ 'page' ] ) )
-			$page = $_GET[ 'page' ];
+		if ( isset( $_GET['page'] ) )
+			$page = $_GET['page'];
 
 		$function = '';
-		$button2 = '';
-		$opt_arr = array();
+		$button2  = '';
+		$opt_arr  = array();
 		$id       = '#wpseo-title';
 		if ( 'admin.php' != $pagenow || !array_key_exists( $page, $adminpages ) ) {
 			$id      = 'li.toplevel_page_wpseo_dashboard';
@@ -124,29 +135,41 @@ class WPSEO_Pointers {
 		} else {
 			if ( '' != $page && in_array( $page, array_keys( $adminpages ) ) ) {
 				$opt_arr  = array(
-					'content'      => $adminpages[ $page ][ 'content' ],
+					'content'      => $adminpages[$page]['content'],
 					'position'     => array( 'edge' => 'top', 'align' => 'left' ),
 					'pointerWidth' => 400
 				);
-				$button2  = $adminpages[ $page ][ 'button2' ];
-				$function = $adminpages[ $page ][ 'function' ];
+				$button2  = $adminpages[$page]['button2'];
+				$function = $adminpages[$page]['function'];
 			}
 		}
 
-		$this->print_buttons( $id, $opt_arr, __( "Close", 'wordpress-seo' ), $button2, $function );
+		$this->print_scripts( $id, $opt_arr, __( "Close", 'wordpress-seo' ), $button2, $function );
 	}
 
+	/**
+	 * Load a tiny bit of CSS in the head
+	 */
 	function admin_head() {
 		?>
 	<style type="text/css" media="screen">
-		#pointer-primary, #tour-close {
+		#pointer-primary {
 			margin: 0 5px 0 0;
 		}
 	</style>
 	<?php
 	}
 
-	function print_buttons( $selector, $options, $button1, $button2 = false, $button2_function = '' ) {
+	/**
+	 * Prints the pointer script
+	 *
+	 * @param string      $selector         The CSS selector the pointer is attached to.
+	 * @param array       $options          The options for the pointer.
+	 * @param string      $button1          Text for button 1
+	 * @param string|bool $button2          Text for button 2 (or false to not show it, defaults to false)
+	 * @param string      $button2_function The JavaScript function to attach to button 2
+	 */
+	function print_scripts( $selector, $options, $button1, $button2 = false, $button2_function = '' ) {
 		?>
 	<script type="text/javascript">
 		//<![CDATA[

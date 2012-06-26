@@ -131,7 +131,6 @@ class WPSEO_Admin_Pages {
 			echo '<form action="' . admin_url( 'options.php' ) . '" method="post" id="wpseo-conf"' . ( $contains_files ? ' enctype="multipart/form-data"' : '' ) . '>';
 			settings_fields( $option );
 			$this->currentoption = $optionshort;
-			// Set some of the ignore booleans here to prevent unsetting.
 		}
 
 	}
@@ -276,10 +275,7 @@ class WPSEO_Admin_Pages {
 	 * @param string $option The option to retrieve.
 	 * @return array
 	 */
-	function get_option( $option = '' ) {
-		if ( $option == '' )
-			$option = $this->currentoption;
-
+	function get_option( $option ) {
 		if ( function_exists( 'is_network_admin' ) && is_network_admin() )
 			return get_site_option( $option );
 		else
@@ -296,6 +292,9 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function checkbox( $var, $label, $label_left = false, $option = '' ) {
+		if ( empty($option) )
+			$option = $this->currentoption;
+
 		$options = $this->get_option( $option );
 
 		if ( !isset( $options[$var] ) )
@@ -330,6 +329,9 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function textinput( $var, $label, $option = '' ) {
+		if ( empty($option) )
+			$option = $this->currentoption;
+
 		$options = $this->get_option( $option );
 
 		$val = '';
@@ -349,6 +351,9 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function textarea( $var, $label, $option = '', $class = '' ) {
+		if ( empty($option) )
+			$option = $this->currentoption;
+
 		$options = $this->get_option( $option );
 
 		$val = '';
@@ -366,6 +371,9 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function hidden( $var, $option = '' ) {
+		if ( empty($option) )
+			$option = $this->currentoption;
+
 		$options = $this->get_option( $option );
 
 		$val = '';
@@ -385,6 +393,9 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function select( $var, $label, $values, $option = '' ) {
+		if ( empty($option) )
+			$option = $this->currentoption;
+
 		$options = $this->get_option( $option );
 
 		$output = '<label class="select" for="' . $var . '">' . $label . ':</label>';
@@ -411,6 +422,9 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function file_upload( $var, $label, $option = '' ) {
+		if ( empty($option) )
+			$option = $this->currentoption;
+
 		$options = $this->get_option( $option );
 
 		$val = '';
@@ -441,6 +455,9 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function radio( $var, $values, $label, $option = '' ) {
+		if ( empty($option) )
+			$option = $this->currentoption;
+
 		$options = $this->get_option( $option );
 
 		if ( !isset( $options[$var] ) )

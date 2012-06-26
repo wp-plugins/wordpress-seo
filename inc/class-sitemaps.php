@@ -588,6 +588,8 @@ class WPSEO_Sitemaps {
 
 	/**
 	 * Hook into redirect_canonical to stop trailing slashes on sitemap.xml URLs
+	 *
+	 * @return string
 	 */
 	function canonical( $redirect ) {
 		$sitemap = get_query_var( 'sitemap' );
@@ -597,6 +599,12 @@ class WPSEO_Sitemaps {
 		return $redirect;
 	}
 
+	/**
+	 * Get the modification date for the last modified post in the post type:
+	 *
+	 * @param array $post_types Post types to get the last modification date for
+	 * @return string
+	 */
 	function get_last_modified( $post_types ) {
 		global $wpdb;
 		if ( !is_array( $post_types ) )
