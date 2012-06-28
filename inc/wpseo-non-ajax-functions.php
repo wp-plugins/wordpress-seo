@@ -116,7 +116,11 @@ function wpseo_title_test() {
 		wp_cache_clear_cache();
 	}
 
-	$resp = wp_remote_get( get_bloginfo( 'url' ) );
+	global $wp_version;
+	$args = array(
+	 	'user-agent' => "WordPress/${wp_version}; ".get_site_url()." - Yoast",
+	);
+	$resp = wp_remote_get( get_bloginfo( 'url' ), $args );
 
 	// echo '<pre>'.$resp['body'].'</pre>';
 
@@ -127,7 +131,7 @@ function wpseo_title_test() {
 			$options[ 'forcerewritetitle' ] = 'on';
 			update_option( 'wpseo_titles', $options );
 
-			$resp = wp_remote_get( get_bloginfo( 'url' ) );
+			$resp = wp_remote_get( get_bloginfo( 'url' ), $args );
 
 			$res = preg_match( '/<title>([^>]+)<\/title>/im', $resp[ 'body' ], $matches );
 		}

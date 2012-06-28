@@ -589,7 +589,8 @@ class WPSEO_Sitemaps {
 	/**
 	 * Hook into redirect_canonical to stop trailing slashes on sitemap.xml URLs
 	 *
-	 * @return string
+	 * @param string $redirect The redirect URL currently determined.
+	 * @return bool|string $redirect
 	 */
 	function canonical( $redirect ) {
 		$sitemap = get_query_var( 'sitemap' );

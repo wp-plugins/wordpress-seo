@@ -155,8 +155,13 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Added variables `%%pt_single%%` and `%%pt_plural%%` which output the single and plural label of the current post type (useful for post type archives).
 	* Made the default settings smarter, they'll now use better titles _and_ will set titles for each public post type, post type archive and taxonomy.
 	* Updates to introductory tour.
+	* Added PHPdoc to the entire plugins codebase.
+	* Refactored all of the code not using WordPress code style.
+	* Breadcrumbs now use [RDFA](http://support.google.com/webmasters/bin/answer.py?hl=en&answer=185417) and have been completely rewritten for speed and more filter options.
 * i18n:
 	* Updated Russian translation.
+	* Better language codes for Hungarian and Bulgarian added.
+	* Updated .pot file.
 
 = 1.2.3 =
 

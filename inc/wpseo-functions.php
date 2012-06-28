@@ -10,8 +10,8 @@
  * @param int    $postid post ID of the post to get the value for
  * @return bool|mixed
  */
-function wpseo_get_value( $val, $postid = '' ) {
-	if ( empty( $postid ) ) {
+function wpseo_get_value( $val, $postid = 0 ) {
+	if ( $postid === 0 ) {
 		global $post;
 		if ( isset( $post ) )
 			$postid = $post->ID;
@@ -286,8 +286,8 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
 /**
  * Strip out the shortcodes with a filthy regex, because people don't properly register their shortcodes.
  *
- * @param $text string input string that might contain shortcodes
- * @return $text string string without shortcodes
+ * @param string $text input string that might contain shortcodes
+ * @return string $text string without shortcodes
  */
 function wpseo_strip_shortcode( $text ) {
 	return preg_replace( '|\[(.+?)\](.*)?(\[/\\1\])|s', '$2', $text );
