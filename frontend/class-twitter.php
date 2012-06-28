@@ -54,7 +54,7 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 	 * This defaults to summary but can be filtered using the <code>wpseo_twitter_card_type</code> filter.
 	 */
 	public function type() {
-		echo '<meta name="twitter:card" value="' . apply_filters('wpseo_twitter_card_type','summary') . '">'."\n";
+		echo '<meta name="twitter:card" content="' . apply_filters('wpseo_twitter_card_type','summary') . '">'."\n";
 	}
 
 	/**
@@ -62,7 +62,7 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 	 */
 	public function site_twitter() {
 		if ( isset( $this->options['twitter_site'] ) )
-			echo '<meta name="twitter:site" value="@' . trim( $this->options['twitter_site'] ) . '">'."\n";
+			echo '<meta name="twitter:site" content="@' . trim( $this->options['twitter_site'] ) . '">'."\n";
 	}
 
 	/**
@@ -72,7 +72,7 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 		$twitter = trim( get_the_author_meta( 'twitter' ) );
 
 		if ( $twitter && !empty( $twitter ) )
-			echo '<meta name="twitter:creator" value="@' . $twitter . '">'."\n";
+			echo '<meta name="twitter:creator" content="@' . $twitter . '">'."\n";
 	}
 
 	/**
@@ -81,7 +81,7 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 	 * Only used when OpenGraph is inactive.
 	 */
 	public function twitter_title() {
-		echo '<meta name="twitter:title" value="' . $this->title('') . '">'."\n";
+		echo '<meta name="twitter:title" content="' . $this->title('') . '">'."\n";
 	}
 
 	/**
@@ -94,7 +94,7 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 		if ( !$metadesc || empty( $metadesc ) )
 			$metadesc = strip_tags( get_the_excerpt() );
 			
-		echo '<meta name="twitter:description" value="' . esc_attr( $metadesc ) . '">'."\n";
+		echo '<meta name="twitter:description" content="' . esc_attr( $metadesc ) . '">'."\n";
 	}
 
 	/**
@@ -103,7 +103,7 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 	 * Only used when OpenGraph is inactive.
 	 */
 	public function twitter_url() {
-		echo '<meta name="twitter:url" value="' . $this->canonical( false ) . '">'."\n";
+		echo '<meta name="twitter:url" content="' . $this->canonical( false ) . '">'."\n";
 	}
 
 	/**
