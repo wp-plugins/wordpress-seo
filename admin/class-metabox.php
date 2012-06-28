@@ -528,7 +528,8 @@ class WPSEO_Metabox {
 				$checked = '';
 				if ( $meta_box_value != 'off' )
 					$checked = 'checked="checked"';
-				$content .= '<input type="checkbox" id="yoast_wpseo_' . $meta_box['name'] . '" name="yoast_wpseo_' . $meta_box['name'] . '" ' . $checked . ' class="yoast' . $class . '"/> ' . esc_html( $meta_box['expl'] ) . '<br />';
+				$expl = ( isset( $meta_box['expl'] ) ) ? esc_html( $meta_box['expl'] ) : '';
+				$content .= '<input type="checkbox" id="yoast_wpseo_' . $meta_box['name'] . '" name="yoast_wpseo_' . $meta_box['name'] . '" ' . $checked . ' class="yoast' . $class . '"/> ' . $expl . '<br />';
 				break;
 			case "radio":
 				if ( $meta_box_value == '' )

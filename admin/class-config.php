@@ -292,7 +292,7 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function checkbox( $var, $label, $label_left = false, $option = '' ) {
-		if ( empty($option) )
+		if ( empty( $option ) )
 			$option = $this->currentoption;
 
 		$options = $this->get_option( $option );
@@ -329,7 +329,7 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function textinput( $var, $label, $option = '' ) {
-		if ( empty($option) )
+		if ( empty( $option ) )
 			$option = $this->currentoption;
 
 		$options = $this->get_option( $option );
@@ -351,7 +351,7 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function textarea( $var, $label, $option = '', $class = '' ) {
-		if ( empty($option) )
+		if ( empty( $option ) )
 			$option = $this->currentoption;
 
 		$options = $this->get_option( $option );
@@ -371,7 +371,7 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function hidden( $var, $option = '' ) {
-		if ( empty($option) )
+		if ( empty( $option ) )
 			$option = $this->currentoption;
 
 		$options = $this->get_option( $option );
@@ -393,7 +393,7 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function select( $var, $label, $values, $option = '' ) {
-		if ( empty($option) )
+		if ( empty( $option ) )
 			$option = $this->currentoption;
 
 		$options = $this->get_option( $option );
@@ -422,7 +422,7 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function file_upload( $var, $label, $option = '' ) {
-		if ( empty($option) )
+		if ( empty( $option ) )
 			$option = $this->currentoption;
 
 		$options = $this->get_option( $option );
@@ -455,7 +455,7 @@ class WPSEO_Admin_Pages {
 	 * @return string
 	 */
 	function radio( $var, $values, $label, $option = '' ) {
-		if ( empty($option) )
+		if ( empty( $option ) )
 			$option = $this->currentoption;
 
 		$options = $this->get_option( $option );
@@ -524,7 +524,8 @@ class WPSEO_Admin_Pages {
 	/**
 	 * Fetch RSS items from the feed.
 	 *
-	 * @param int $num Number of items to fetch.
+	 * @param int    $num  Number of items to fetch.
+	 * @param string $feed The feed to fetch.
 	 * @return array|bool False on error, array of RSS items on success.
 	 */
 	function fetch_rss_items( $num, $feed ) {

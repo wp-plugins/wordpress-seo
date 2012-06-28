@@ -548,9 +548,9 @@ class WPSEO_Sitemaps {
 				$output .= "\t\t<image:image>\n";
 				$output .= "\t\t\t<image:loc>" . esc_html( $img['src'] ) . "</image:loc>\n";
 				if ( isset( $img['title'] ) )
-					$output .= "\t\t\t<image:title>" . _wp_specialchars( $img['title'] ) . "</image:title>\n";
+					$output .= "\t\t\t<image:title>" . _wp_specialchars( html_entity_decode( $img['title'], ENT_QUOTES, get_bloginfo('charset') ) ) . "</image:title>\n";
 				if ( isset( $img['alt'] ) )
-					$output .= "\t\t\t<image:caption>" . _wp_specialchars( $img['alt'] ) . "</image:caption>\n";
+					$output .= "\t\t\t<image:caption>" . _wp_specialchars( html_entity_decode( $img['alt'], ENT_QUOTES, get_bloginfo('charset') ) ) . "</image:caption>\n";
 				$output .= "\t\t</image:image>\n";
 			}
 		}
@@ -616,8 +616,6 @@ class WPSEO_Sitemaps {
 			$key  = 'lastpostmodified:gmt:' . $post_type;
 			$date = wp_cache_get( $key, 'timeinfo' );
 			if ( !$date ) {
-				/** @noinspection PhpUndefinedMethodInspection */
-				/** @noinspection PhpUndefinedMethodInspection */
 				$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status = 'publish' AND post_type = %s ORDER BY post_modified_gmt DESC LIMIT 1", $post_type ) );
 				if ( $date )
 					wp_cache_set( $key, $date, 'timeinfo' );
