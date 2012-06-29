@@ -70,7 +70,7 @@ class WPSEO_Breadcrumbs {
 
 		$links = array(
 			array(
-				'url'  => get_site_url(),
+				'url'  => get_home_url(),
 				'text' => ( isset( $options['breadcrumbs-home'] ) && $options['breadcrumbs-home'] != '' ) ? $options['breadcrumbs-home'] : __( 'Home', 'wordpress-seo' )
 			)
 		);

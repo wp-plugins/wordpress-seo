@@ -1178,7 +1178,7 @@ class WPSEO_Frontend {
 	 */
 	function title_test_helper( $title ) {
 		global $wp_version;
-		if ( $_SERVER['HTTP_USER_AGENT'] == "WordPress/${wp_version}; " . get_site_url() . " - Yoast" )
+		if ( $_SERVER['HTTP_USER_AGENT'] == "WordPress/${wp_version}; " . get_bloginfo('url') . " - Yoast" )
 			return 'This is a Yoast Test Title';
 		return $title;
 	}
