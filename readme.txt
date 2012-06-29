@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.1
 Tested up to: 3.4
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -137,10 +137,14 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 = 1.2.5 =
 
 * Bug fixes:
-    * Make sure html entitites are decoded and if needed re-encoded to XML entities for the XML sitemap.
-    * Fix infinite loop in sub-category or sub-taxonomy archive page breadcrumbs.
+    * Make sure html entities are decoded and if needed re-encoded to XML entities for the XML sitemap.
+    * Fix infinite loop in sub-category or other sub-taxonomy archive page breadcrumbs.
     * Fix breaking rewrite for categories when strip category is enabled.
     * Fix non-global classes that should be global.
+* i18n:
+	* Updated French translation.
+	* Updated Bosnian language code and deleted unused Bosnian version.
+	* Updated Bulgarian and deleted unused Bulgarian `bul` version.
 
 = 1.2.4 =
 
