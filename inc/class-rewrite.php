@@ -110,5 +110,5 @@ class WPSEO_Rewrite {
 		return $category_rewrite;
 	}
 }
-
+global $wpseo_rewrite;
 $wpseo_rewrite = new WPSEO_Rewrite();

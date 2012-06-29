@@ -1184,5 +1184,5 @@ class WPSEO_Frontend {
 	}
 
 }
-
+global $wpseo_front;
 $wpseo_front = new WPSEO_Frontend;

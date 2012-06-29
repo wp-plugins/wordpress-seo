@@ -231,5 +231,5 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		echo "<meta property='og:site_name' content='".esc_attr( get_bloginfo('name') )."'/>\n";
 	}
 }
-
+global $wpseo_og;
 $wpseo_og = new WPSEO_OpenGraph;

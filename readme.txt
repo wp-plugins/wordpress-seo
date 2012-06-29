@@ -134,6 +134,14 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= 1.2.5 =
+
+* Bug fixes:
+    * Make sure html entitites are decoded and if needed re-encoded to XML entities for the XML sitemap.
+    * Fix infinite loop in sub-category or sub-taxonomy archive page breadcrumbs.
+    * Fix breaking rewrite for categories when strip category is enabled.
+    * Fix non-global classes that should be global.
+
 = 1.2.4 =
 
 * Bug fixes:

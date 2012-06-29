@@ -38,7 +38,7 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 		$this->author_twitter();
 		// No need to show these when OpenGraph is also showing, as it'd be the same contents and Twitter
 		// would fallback to OpenGraph anyway.
-		if ( !isset( $options['opengraph'] ) ||  !$options['opengraph'] ) {
+		if ( !isset( $options['opengraph'] ) || !$options['opengraph'] ) {
 			$this->twitter_title();
 			$this->twitter_description();
 			$this->twitter_url();
@@ -125,5 +125,5 @@ class WPSEO_Twitter extends WPSEO_Frontend {
 		
 	}
 }
-
+global $wpseo_twitter;
 $wpseo_twitter = new WPSEO_Twitter();
