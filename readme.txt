@@ -145,6 +145,7 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 	* Updated French translation.
 	* Updated Bosnian language code and deleted unused Bosnian version.
 	* Updated Bulgarian and deleted unused Bulgarian `bul` version.
+	* Updated and completed it_IT and pt_BR translations.
 
 = 1.2.4 =
 
