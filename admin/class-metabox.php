@@ -1601,6 +1601,7 @@ class WPSEO_Metabox {
 	function get_body( $post ) {
 		// Strip shortcodes, for obvious reasons
 		$origHtml = wpseo_strip_shortcode( $post->post_content );
+
 		if ( trim( $origHtml ) == '' )
 			return '';
 

@@ -261,7 +261,7 @@ class WPSEO_Admin {
 		// Add Google+
 		$contactmethods[ 'googleplus' ] = 'Google+';
 		// Add Twitter
-		$contactmethods[ 'twitter' ] = 'Twitter username';
+		$contactmethods[ 'twitter' ] = __('Twitter username (without @)','wordpress-seo');
 
 		return $contactmethods;
 	}

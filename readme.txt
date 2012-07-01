@@ -134,6 +134,14 @@ Also, other than All In One SEO Pack, this plugin has a completely working canon
 
 == Changelog ==
 
+= Development version =
+
+* Bug fixes:
+    * Prevent adding trailing slash on paged posts when force trailing slash on categories and tags is on.
+    * Simplify shortcode stripping, to make it actually work.
+* Textual / documentation changes:
+    * Add a "without @" notice to the Twitter username input field.
+
 = 1.2.5 =
 
 * Bug fixes:

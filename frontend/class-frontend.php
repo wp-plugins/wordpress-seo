@@ -561,7 +561,6 @@ class WPSEO_Frontend {
 				// Fix paginated pages
 				if ( get_query_var( 'page' ) > 1 ) {
 					global $wp_rewrite;
-					/** @noinspection PhpUndefinedMethodInspection */
 					if ( !$wp_rewrite->using_permalinks() ) {
 						$canonical = add_query_arg( 'page', get_query_var( 'page' ), $canonical );
 					} else {
@@ -924,7 +923,7 @@ class WPSEO_Frontend {
 	 * @return string
 	 */
 	function add_trailingslash( $url, $type ) {
-		if ( 'single' === $type ) {
+		if ( 'single' === $type || 'single_paged' === $type ) {
 			return $url;
 		} else {
 			return trailingslashit( $url );

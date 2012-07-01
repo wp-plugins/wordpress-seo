@@ -290,5 +290,5 @@ function wpseo_get_term_meta( $term, $taxonomy, $meta ) {
  * @return string $text string without shortcodes
  */
 function wpseo_strip_shortcode( $text ) {
-	return preg_replace( '|\[(.+?)\](.*)?(\[/\\1\])|s', '$2', $text );
+	return preg_replace( '|\[[^\]]+\]|s', '', $text );
 }
