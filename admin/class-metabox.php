@@ -163,9 +163,8 @@ class WPSEO_Metabox {
 
 		$options = get_wpseo_options();
 
-		$use_date = apply_filters( 'wpseo_show_date_in_snippet_preview', true, $post );
-		$date     = '';
-		if ( $post->post_type == 'post' && $use_date ) {
+		$date = '';
+		if ( isset( $options['showdate-' . $post->post_type] ) && $options['showdate-' . $post->post_type] ) {
 			$date = $this->get_post_date( $post );
 
 			$this->meta_length        = $this->meta_length - ( strlen( $date ) + 5 );
@@ -581,9 +580,11 @@ class WPSEO_Metabox {
 			global $post;
 		}
 
+		$options = get_option( 'wpseo_titles' );
+
 		// TODO: make this configurable per post type.
 		$date = '';
-		if ( $post->post_type == 'post' && apply_filters( 'wpseo_show_date_in_snippet_preview', true, $post ) )
+		if ( isset( $options['showdate-' . $post->post_type] ) && $options['showdate-' . $post->post_type] )
 			$date = $this->get_post_date( $post );
 
 		$title = wpseo_get_value( 'title' );

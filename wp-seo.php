@@ -61,8 +61,12 @@ require WPSEO_PATH.'inc/wpseo-functions.php';
 
 $options = get_wpseo_options();
 
-if ( !defined('DOING_AJAX') || !DOING_AJAX )
+if ( !defined('DOING_AJAX') || !DOING_AJAX ) {
 	require WPSEO_PATH.'inc/wpseo-non-ajax-functions.php';
+
+	if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] )
+		require WPSEO_PATH.'inc/class-rewrite.php';
+}
 
 /**
  * Used to load the required files on the plugins_loaded hook, instead of immediately.
@@ -72,8 +76,6 @@ function wpseo_frontend_init() {
 	require WPSEO_PATH.'frontend/class-frontend.php';
 	if ( isset($options['enablexmlsitemap']) && $options['enablexmlsitemap'] )
 		require WPSEO_PATH.'inc/class-sitemaps.php';
-	if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] )
-		require WPSEO_PATH.'inc/class-rewrite.php';
 	if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
 		require WPSEO_PATH.'frontend/class-breadcrumbs.php';
 	if ( isset( $options['opengraph'] )  && $options['opengraph'] )

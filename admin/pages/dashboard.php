@@ -7,7 +7,7 @@ global $wpseo_admin_pages;
 
 $options = get_option( 'wpseo' );
 
-$wpseo_admin_pages->admin_header( 'General', true, 'yoast_wpseo_options', 'wpseo' );
+$wpseo_admin_pages->admin_header( __('General Settings','wordpress-seo'), true, 'yoast_wpseo_options', 'wpseo' );
 
 echo $wpseo_admin_pages->hidden( 'ignore_blog_public_warning' );
 echo $wpseo_admin_pages->hidden( 'ignore_tour' );
