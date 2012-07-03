@@ -1541,7 +1541,6 @@ class WPSEO_Metabox {
 				$keywordCount = preg_match_all( "/" . preg_quote( $job["keyword"], '/' ) . "/msiU", $body, $res );
 				if ( $keywordCount > 0 && $keywordWordCount > 0 )
 					$keywordDensity = number_format( ( ( $keywordCount / ( $wordCount - ( ( $keywordWordCount - 1 ) * $keywordWordCount ) ) ) * 100 ), 2 );
-( 1 / ( 100 - ( ( 10 - 1 ) * 10 ) ) ) * 100''
 				if ( $keywordDensity < 1 ) {
 					$this->save_score_result( $results, 4, sprintf( $scoreKeywordDensityLow, $keywordDensity, $keywordCount ) );
 				} else if ( $keywordDensity > 4.5 ) {
