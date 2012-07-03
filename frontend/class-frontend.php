@@ -700,16 +700,16 @@ class WPSEO_Frontend {
 	}
 
 	/**
-	 * Outputs the rel=author element
+	 * Outputs the rel=author & rel=publisher element
 	 */
 	function author() {
-		$gplus = false;
+		$gplus   = false;
+		$options = get_wpseo_options();
 
 		if ( is_singular() ) {
 			global $post;
 			$gplus = get_the_author_meta( 'googleplus', $post->post_author );
 		} else if ( is_home() ) {
-			$options = get_wpseo_options();
 			if ( isset( $options['plus-author'] ) )
 				$gplus = get_the_author_meta( 'googleplus', $options['plus-author'] );
 		}
@@ -718,6 +718,10 @@ class WPSEO_Frontend {
 
 		if ( $gplus )
 			echo '<link rel="author" href="' . $gplus . '"/>' . "\n";
+
+		if ( is_front_page() && isset( $options['plus-publisher'] ) ) {
+			echo '<link rel="publisher" href="' . esc_attr( $options['plus-publisher'] ) . '"/>' . "\n";
+		}
 	}
 
 	/**
@@ -1177,11 +1181,12 @@ class WPSEO_Frontend {
 	 */
 	function title_test_helper( $title ) {
 		global $wp_version;
-		if ( $_SERVER['HTTP_USER_AGENT'] == "WordPress/${wp_version}; " . get_bloginfo('url') . " - Yoast" )
+		if ( $_SERVER['HTTP_USER_AGENT'] == "WordPress/${wp_version}; " . get_bloginfo( 'url' ) . " - Yoast" )
 			return 'This is a Yoast Test Title';
 		return $title;
 	}
 
 }
+
 global $wpseo_front;
 $wpseo_front = new WPSEO_Frontend;

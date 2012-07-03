@@ -27,7 +27,7 @@ class WPSEO_Metabox {
 	 */
 	function __construct() {
 		if ( !class_exists( 'Yoast_TextStatistics' ) && apply_filters( 'wpseo_use_page_analysis', true ) === true )
-			require WPSEO_PATH . "/admin/TextStatistics.php";
+			require_once( WPSEO_PATH . "/admin/TextStatistics.php" );
 
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'enqueue' ) );
@@ -1358,10 +1358,12 @@ class WPSEO_Metabox {
 	 * @return array The updated images array.
 	 */
 	function get_images_alt_text( $post, $imgs ) {
-		preg_match_all( '/<img [^>]+ alt=(["\'])([^\\1]+)\\1[^>]+>/im', $post->post_content, $matches );
+		preg_match_all( '/<img[^>]+>/im', $post->post_content, $matches );
 		$imgs['alts'] = array();
-		foreach ( $matches[2] as $alt ) {
-			$imgs['alts'][] = $this->strtolower_utf8( $alt );
+		foreach ( $matches[0] as $img ) {
+			preg_match('|alt=(["\'])([^\\1]+)\\1|', $img, $alt);
+			echo $alt[2];
+			$imgs['alts'][] = $this->strtolower_utf8( $alt[1] );
 		}
 		if ( preg_match_all( '/\[gallery/', $post->post_content, $matches ) ) {
 			$attachments = get_children( array( 'post_parent' => $post->ID, 'post_status' => 'inherit', 'post_type' => 'attachment', 'post_mime_type' => 'image', 'fields' => 'ids' ) );
@@ -1509,7 +1511,6 @@ class WPSEO_Metabox {
 		$fleschurl   = '<a href="http://en.wikipedia.org/wiki/Flesch-Kincaid_readability_test#Flesch_Reading_Ease">' . __( 'Flesch Reading Ease', 'wordpress-seo' ) . '</a>';
 		$scoreFlesch = __( "The copy scores %s in the %s test, which is considered %s to read. %s", 'wordpress-seo' );
 
-
 		// Replace images with their alt tags, then strip all tags
 		$body = preg_replace( '/(<img([^>]+)?alt="([^"]+)"([^>]+)>)/', '$3', $body );
 		$body = strip_tags( $body );
@@ -1530,20 +1531,24 @@ class WPSEO_Metabox {
 
 		$body = $this->strtolower_utf8( $body );
 
-		// Keyword Density check
-		$keywordDensity = 0;
-		if ( $wordCount > 0 ) {
-			$keywordCount     = preg_match_all( "/" . preg_quote( $job["keyword"], '/' ) . "/msiU", $body, $res );
-			$keywordWordCount = str_word_count( $job["keyword"] );
-			if ( $keywordCount > 0 && $keywordWordCount > 0 )
-				$keywordDensity = number_format( ( ( $keywordCount / ( $wordCount - ( ( $keywordWordCount - 1 ) * $keywordWordCount ) ) ) * 100 ), 2 );
-
-			if ( $keywordDensity < 1 ) {
-				$this->save_score_result( $results, 4, sprintf( $scoreKeywordDensityLow, $keywordDensity, $keywordCount ) );
-			} else if ( $keywordDensity > 4.5 ) {
-				$this->save_score_result( $results, -50, sprintf( $scoreKeywordDensityHigh, $keywordDensity, $keywordCount ) );
-			} else {
-				$this->save_score_result( $results, 9, sprintf( $scoreKeywordDensityGood, $keywordDensity, $keywordCount ) );
+		$keywordWordCount = str_word_count( $job["keyword"] );
+		if ( $keywordWordCount > 10 ) {
+			$this->save_score_result( $results, 0, __('Your keyphrase is over 10 words, a keyphrase should be shorter and there can be only one keyphrase.', 'wordpress-seo') );
+		} else {
+			// Keyword Density check
+			$keywordDensity = 0;
+			if ( $wordCount > 100 ) {
+				$keywordCount = preg_match_all( "/" . preg_quote( $job["keyword"], '/' ) . "/msiU", $body, $res );
+				if ( $keywordCount > 0 && $keywordWordCount > 0 )
+					$keywordDensity = number_format( ( ( $keywordCount / ( $wordCount - ( ( $keywordWordCount - 1 ) * $keywordWordCount ) ) ) * 100 ), 2 );
+( 1 / ( 100 - ( ( 10 - 1 ) * 10 ) ) ) * 100''
+				if ( $keywordDensity < 1 ) {
+					$this->save_score_result( $results, 4, sprintf( $scoreKeywordDensityLow, $keywordDensity, $keywordCount ) );
+				} else if ( $keywordDensity > 4.5 ) {
+					$this->save_score_result( $results, -50, sprintf( $scoreKeywordDensityHigh, $keywordDensity, $keywordCount ) );
+				} else {
+					$this->save_score_result( $results, 9, sprintf( $scoreKeywordDensityGood, $keywordDensity, $keywordCount ) );
+				}
 			}
 		}
 
@@ -1640,7 +1645,7 @@ class WPSEO_Metabox {
 	 * @return string
 	 */
 	function get_first_paragraph( $post ) {
-		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.		
+		// To determine the first paragraph we first need to autop the content, then match the first paragraph and return.
 		$res = preg_match( '/<p>(.*)<\/p>/', wpautop( $post->post_content ), $matches );
 		if ( $res )
 			return $matches[1];
