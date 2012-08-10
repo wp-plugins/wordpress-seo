@@ -140,63 +140,72 @@ class WPSEO_Admin {
 	 * Loads the form for the import/export page.
 	 */
 	function import_page() {
-		require( WPSEO_PATH . '/admin/pages/import.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_import' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/import.php' );
 	}
 
 	/**
 	 * Loads the form for the titles & metas page.
 	 */
 	function titles_page() {
-		require( WPSEO_PATH . '/admin/pages/metas.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_titles' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/metas.php' );
 	}
 
 	/**
 	 * Loads the form for the permalinks page.
 	 */
 	function permalinks_page() {
-		require( WPSEO_PATH . '/admin/pages/permalinks.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_permalinks' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/permalinks.php' );
 	}
 
 	/**
 	 * Loads the form for the internal links / breadcrumbs page.
 	 */
 	function internallinks_page() {
-		require( WPSEO_PATH . '/admin/pages/internal-links.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_internal-links' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/internal-links.php' );
 	}
 
 	/**
 	 * Loads the form for the file edit page.
 	 */
 	function files_page() {
-		require( WPSEO_PATH . '/admin/pages/files.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_files' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/files.php' );
 	}
 
 	/**
 	 * Loads the form for the RSS page.
 	 */
 	function rss_page() {
-		require( WPSEO_PATH . '/admin/pages/rss.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_rss' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/rss.php' );
 	}
 
 	/**
 	 * Loads the form for the XML Sitemaps page.
 	 */
 	function xml_sitemaps_page() {
-		require( WPSEO_PATH . '/admin/pages/xml-sitemaps.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_xml' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/xml-sitemaps.php' );
 	}
 
 	/**
 	 * Loads the form for the Dashboard page.
 	 */
 	function config_page() {
-		require( WPSEO_PATH . '/admin/pages/dashboard.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_dashboard' == $_GET['page'] )
+			include( WPSEO_PATH . '/admin/pages/dashboard.php' );
 	}
 
 	/**
 	 * Loads the form for the Social Settings page.
 	 */
 	function social_page() {
-		require( WPSEO_PATH . '/admin/pages/social.php' );
+		if ( isset( $_GET['page'] ) && 'wpseo_social' == $_GET['page'] )
+			require( WPSEO_PATH . '/admin/pages/social.php' );
 	}
 
 	/**

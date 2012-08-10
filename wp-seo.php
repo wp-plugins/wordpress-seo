@@ -61,12 +61,11 @@ require WPSEO_PATH.'inc/wpseo-functions.php';
 
 $options = get_wpseo_options();
 
-if ( !defined('DOING_AJAX') || !DOING_AJAX ) {
-	require WPSEO_PATH.'inc/wpseo-non-ajax-functions.php';
+if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] )
+	require WPSEO_PATH.'inc/class-rewrite.php';
 
-	if ( isset( $options['stripcategorybase']) && $options['stripcategorybase'] )
-		require WPSEO_PATH.'inc/class-rewrite.php';
-}
+if ( !defined('DOING_AJAX') || !DOING_AJAX )
+	require WPSEO_PATH.'inc/wpseo-non-ajax-functions.php';
 
 /**
  * Used to load the required files on the plugins_loaded hook, instead of immediately.

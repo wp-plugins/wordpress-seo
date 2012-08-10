@@ -450,11 +450,15 @@ class WPSEO_Frontend {
 			}
 		}
 
+		unset( $options );
+
 		do_action( 'wpseo_head' );
 
 		echo "<!-- / Yoast WordPress SEO plugin. -->\n\n";
 
 		$GLOBALS['wp_query'] = $old_wp_query;
+		unset( $old_wp_query );
+		return;
 	}
 
 	/**

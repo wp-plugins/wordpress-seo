@@ -258,9 +258,6 @@ class WPSEO_Sitemaps {
 			return;
 		}
 
-		// Let's flush the object cache so we're not left with garbage from other plugins
-		wp_cache_flush();
-
 		$stackedurls = array();
 
 		$steps  = 25;
@@ -415,7 +412,7 @@ class WPSEO_Sitemaps {
 				}
 
 				// Clear the post_meta and the term cache for the post, as we no longer need it now.
-				wp_cache_delete( $p->ID, 'post_meta' );
+				// wp_cache_delete( $p->ID, 'post_meta' );
 				// clean_object_term_cache( $p->ID, $post_type );
 			}
 		}
