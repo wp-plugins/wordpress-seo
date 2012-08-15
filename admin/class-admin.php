@@ -16,7 +16,7 @@ class WPSEO_Admin {
 
 		$options = get_wpseo_options();
 
-		if ( isset( $options[ 'stripcategorybase' ] ) && $options[ 'stripcategorybase' ] ) {
+		if ( isset( $options['stripcategorybase'] ) && $options['stripcategorybase'] ) {
 			add_action( 'created_category', 'flush_rewrite_rules' );
 			add_action( 'edited_category', 'flush_rewrite_rules' );
 			add_action( 'delete_category', 'flush_rewrite_rules' );
@@ -43,6 +43,9 @@ class WPSEO_Admin {
 		add_action( 'personal_options_update', array( $this, 'process_user_option_update' ) );
 		add_action( 'edit_user_profile_update', array( $this, 'process_user_option_update' ) );
 		add_filter( 'user_contactmethods', array( $this, 'update_contactmethods' ), 10, 1 );
+
+//		if ( isset( $options['presstrends'] ) && $options['presstrends'] )
+		add_action( 'admin_footer', array( $this, 'presstrends_plugin' ), 99 );
 	}
 
 	/**
@@ -65,12 +68,12 @@ class WPSEO_Admin {
 		$option = get_option( 'wpseo' );
 		if ( function_exists( 'is_multisite' ) && is_multisite() && !is_array( $option ) ) {
 			$options = get_site_option( 'wpseo_ms' );
-			if ( is_array( $options ) && isset( $options[ 'defaultblog' ] ) && !empty( $options[ 'defaultblog' ] ) && $options[ 'defaultblog' ] != 0 ) {
+			if ( is_array( $options ) && isset( $options['defaultblog'] ) && !empty( $options['defaultblog'] ) && $options['defaultblog'] != 0 ) {
 				foreach ( get_wpseo_options_arr() as $option ) {
-					update_option( $option, get_blog_option( $options[ 'defaultblog' ], $option ) );
+					update_option( $option, get_blog_option( $options['defaultblog'], $option ) );
 				}
 			}
-			$option[ 'ms_defaults_set' ] = true;
+			$option['ms_defaults_set'] = true;
 			update_option( 'wpseo', $option );
 		}
 	}
@@ -85,10 +88,10 @@ class WPSEO_Admin {
 			return true;
 
 		$options = get_site_option( 'wpseo_ms' );
-		if ( !is_array( $options ) || !isset( $options[ 'access' ] ) )
+		if ( !is_array( $options ) || !isset( $options['access'] ) )
 			return true;
 
-		if ( $options[ 'access' ] == 'superadmin' && !is_super_admin() )
+		if ( $options['access'] == 'superadmin' && !is_super_admin() )
 			return false;
 
 		return true;
@@ -118,8 +121,8 @@ class WPSEO_Admin {
 		}
 
 		global $submenu;
-		if ( isset( $submenu[ 'wpseo_dashboard' ] ) )
-			$submenu[ 'wpseo_dashboard' ][ 0 ][ 0 ] = __( 'Dashboard', 'wordpress-seo' );
+		if ( isset( $submenu['wpseo_dashboard'] ) )
+			$submenu['wpseo_dashboard'][0][0] = __( 'Dashboard', 'wordpress-seo' );
 	}
 
 	/**
@@ -216,7 +219,7 @@ class WPSEO_Admin {
 			return;
 
 		$options = get_option( 'wpseo' );
-		if ( isset( $options[ 'ignore_blog_public_warning' ] ) && $options[ 'ignore_blog_public_warning' ] == 'ignore' )
+		if ( isset( $options['ignore_blog_public_warning'] ) && $options['ignore_blog_public_warning'] == 'ignore' )
 			return;
 		echo "<div id='message' class='error'>";
 		echo "<p><strong>" . __( "Huge SEO Issue: You're blocking access to robots.", 'wordpress-seo' ) . "</strong> " . sprintf( __( "You must %sgo to your Privacy settings%s and set your blog visible to everyone.", 'wordpress-seo' ), "<a href='options-privacy.php'>", "</a>" ) . " <a href='javascript:wpseo_setIgnore(\"blog_public_warning\",\"message\",\"" . wp_create_nonce( 'wpseo-ignore' ) . "\");' class='button'>" . __( "I know, don't bug me.", 'wordpress-seo' ) . "</a></p></div>";
@@ -253,9 +256,9 @@ class WPSEO_Admin {
 	 * @param int $user_id of the updated user
 	 */
 	function process_user_option_update( $user_id ) {
-		update_user_meta( $user_id, 'wpseo_title', ( isset( $_POST[ 'wpseo_author_title' ] ) ? $_POST[ 'wpseo_author_title' ] : '' ) );
-		update_user_meta( $user_id, 'wpseo_metadesc', ( isset( $_POST[ 'wpseo_author_metadesc' ] ) ? $_POST[ 'wpseo_author_metadesc' ] : '' ) );
-		update_user_meta( $user_id, 'wpseo_metakey', ( isset( $_POST[ 'wpseo_author_metakey' ] ) ? $_POST[ 'wpseo_author_metakey' ] : '' ) );
+		update_user_meta( $user_id, 'wpseo_title', ( isset( $_POST['wpseo_author_title'] ) ? $_POST['wpseo_author_title'] : '' ) );
+		update_user_meta( $user_id, 'wpseo_metadesc', ( isset( $_POST['wpseo_author_metadesc'] ) ? $_POST['wpseo_author_metadesc'] : '' ) );
+		update_user_meta( $user_id, 'wpseo_metakey', ( isset( $_POST['wpseo_author_metakey'] ) ? $_POST['wpseo_author_metakey'] : '' ) );
 	}
 
 	/**
@@ -268,9 +271,9 @@ class WPSEO_Admin {
 	 */
 	function update_contactmethods( $contactmethods ) {
 		// Add Google+
-		$contactmethods[ 'googleplus' ] = 'Google+';
+		$contactmethods['googleplus'] = 'Google+';
 		// Add Twitter
-		$contactmethods[ 'twitter' ] = __('Twitter username (without @)','wordpress-seo');
+		$contactmethods['twitter'] = __( 'Twitter username (without @)', 'wordpress-seo' );
 
 		return $contactmethods;
 	}
@@ -299,7 +302,7 @@ class WPSEO_Admin {
 						  name="wpseo_author_metadesc"><?php echo esc_html( get_the_author_meta( 'wpseo_metadesc', $user->ID ) ); ?></textarea>
 			</td>
 		</tr>
-		<?php     if ( isset( $options[ 'usemetakeywords' ] ) && $options[ 'usemetakeywords' ] ) { ?>
+		<?php     if ( isset( $options['usemetakeywords'] ) && $options['usemetakeywords'] ) { ?>
 		<tr>
 			<th><?php _e( "Meta keywords to use for Author page", 'wordpress-seo' ); ?></th>
 			<td><input class="regular-text" type="text" name="wpseo_author_metakey"
@@ -317,7 +320,7 @@ class WPSEO_Admin {
 	 */
 	function maybe_upgrade() {
 		$options         = get_option( 'wpseo' );
-		$current_version = isset( $options[ 'version' ] ) ? $options[ 'version' ] : 0;
+		$current_version = isset( $options['version'] ) ? $options['version'] : 0;
 
 		if ( version_compare( $current_version, WPSEO_VERSION, '==' ) )
 			return;
@@ -333,9 +336,9 @@ class WPSEO_Admin {
 			$xml_opt = array();
 			// Move XML Sitemap settings from general array to XML specific array, general settings first
 			foreach ( array( 'enablexmlsitemap', 'xml_include_images', 'xml_ping_google', 'xml_ping_bing', 'xml_ping_yahoo', 'xml_ping_ask', 'xmlnews_posttypes' ) as $opt ) {
-				if ( isset( $options[ $opt ] ) ) {
-					$xml_opt[ $opt ] = $options[ $opt ];
-					unset( $options[ $opt ] );
+				if ( isset( $options[$opt] ) ) {
+					$xml_opt[$opt] = $options[$opt];
+					unset( $options[$opt] );
 				}
 			}
 			// Per post type settings
@@ -343,9 +346,9 @@ class WPSEO_Admin {
 				if ( in_array( $post_type, array( 'revision', 'nav_menu_item', 'attachment' ) ) )
 					continue;
 
-				if ( isset( $options[ 'post_types-' . $post_type . '-not_in_sitemap' ] ) ) {
-					$xml_opt[ 'post_types-' . $post_type . '-not_in_sitemap' ] = $options[ 'post_types-' . $post_type . '-not_in_sitemap' ];
-					unset( $options[ 'post_types-' . $post_type . '-not_in_sitemap' ] );
+				if ( isset( $options['post_types-' . $post_type . '-not_in_sitemap'] ) ) {
+					$xml_opt['post_types-' . $post_type . '-not_in_sitemap'] = $options['post_types-' . $post_type . '-not_in_sitemap'];
+					unset( $options['post_types-' . $post_type . '-not_in_sitemap'] );
 				}
 			}
 			// Per taxonomy settings
@@ -353,9 +356,9 @@ class WPSEO_Admin {
 				if ( in_array( $taxonomy, array( 'nav_menu', 'link_category', 'post_format' ) ) )
 					continue;
 
-				if ( isset( $options[ 'taxonomies-' . $taxonomy . '-not_in_sitemap' ] ) ) {
-					$xml_opt[ 'taxonomies-' . $taxonomy . '-not_in_sitemap' ] = $options[ 'taxonomies-' . $taxonomy . '-not_in_sitemap' ];
-					unset( $options[ 'taxonomies-' . $taxonomy . '-not_in_sitemap' ] );
+				if ( isset( $options['taxonomies-' . $taxonomy . '-not_in_sitemap'] ) ) {
+					$xml_opt['taxonomies-' . $taxonomy . '-not_in_sitemap'] = $options['taxonomies-' . $taxonomy . '-not_in_sitemap'];
+					unset( $options['taxonomies-' . $taxonomy . '-not_in_sitemap'] );
 				}
 			}
 			if ( get_option( 'wpseo_xml' ) === false )
@@ -363,24 +366,24 @@ class WPSEO_Admin {
 			unset( $xml_opt );
 
 			// Clean up other no longer used settings
-			unset( $options[ 'wpseodir' ], $options[ 'wpseourl' ] );
+			unset( $options['wpseodir'], $options['wpseourl'] );
 		}
 
 		if ( version_compare( $current_version, '1.0.2.2', '<' ) ) {
 			$opt = (array) get_option( 'wpseo_indexation' );
-			unset( $opt[ 'hideindexrel' ], $opt[ 'hidestartrel' ], $opt[ 'hideprevnextpostlink' ], $opt[ 'hidewpgenerator' ] );
+			unset( $opt['hideindexrel'], $opt['hidestartrel'], $opt['hideprevnextpostlink'], $opt['hidewpgenerator'] );
 			update_option( 'wpseo_indexation', $opt );
 		}
 
 		if ( version_compare( $current_version, '1.0.4', '<' ) ) {
 			$opt    = (array) get_option( 'wpseo_indexation' );
 			$newopt = array(
-				'opengraph'  => isset( $opt[ 'opengraph' ] ) ? $opt[ 'opengraph' ] : '',
-				'fb_adminid' => isset( $opt[ 'fb_adminid' ] ) ? $opt[ 'fb_adminid' ] : '',
-				'fb_appid'   => isset( $opt[ 'fb_appid' ] ) ? $opt[ 'fb_appid' ] : '',
+				'opengraph'  => isset( $opt['opengraph'] ) ? $opt['opengraph'] : '',
+				'fb_adminid' => isset( $opt['fb_adminid'] ) ? $opt['fb_adminid'] : '',
+				'fb_appid'   => isset( $opt['fb_appid'] ) ? $opt['fb_appid'] : '',
 			);
 			update_option( 'wpseo_social', $newopt );
-			unset( $opt[ 'opengraph' ], $opt[ 'fb_pageid' ], $opt[ 'fb_adminid' ], $opt[ 'fb_appid' ] );
+			unset( $opt['opengraph'], $opt['fb_pageid'], $opt['fb_adminid'], $opt['fb_appid'] );
 			update_option( 'wpseo_indexation', $opt );
 		}
 
@@ -388,17 +391,17 @@ class WPSEO_Admin {
 			$opt     = get_option( 'wpseo_indexation' );
 			$metaopt = get_option( 'wpseo_titles' );
 
-			$metaopt[ 'noindex-author' ]      = isset( $opt[ 'noindexauthor' ] ) ? $opt[ 'noindexauthor' ] : '';
-			$metaopt[ 'disable-author' ]      = isset( $opt[ 'disableauthor' ] ) ? $opt[ 'disableauthor' ] : '';
-			$metaopt[ 'noindex-archive' ]     = isset( $opt[ 'noindexdate' ] ) ? $opt[ 'noindexdate' ] : '';
-			$metaopt[ 'noindex-category' ]    = isset( $opt[ 'noindexcat' ] ) ? $opt[ 'noindexcat' ] : '';
-			$metaopt[ 'noindex-post_tag' ]    = isset( $opt[ 'noindextag' ] ) ? $opt[ 'noindextag' ] : '';
-			$metaopt[ 'noindex-post_format' ] = isset( $opt[ 'noindexpostformat' ] ) ? $opt[ 'noindexpostformat' ] : '';
-			$metaopt[ 'noindex-subpages' ]    = isset( $opt[ 'noindexsubpages' ] ) ? $opt[ 'noindexsubpages' ] : '';
-			$metaopt[ 'hide-rsdlink' ]        = isset( $opt[ 'hidersdlink' ] ) ? $opt[ 'hidersdlink' ] : '';
-			$metaopt[ 'hide-feedlinks' ]      = isset( $opt[ 'hidefeedlinks' ] ) ? $opt[ 'hidefeedlinks' ] : '';
-			$metaopt[ 'hide-wlwmanifest' ]    = isset( $opt[ 'hidewlwmanifest' ] ) ? $opt[ 'hidewlwmanifest' ] : '';
-			$metaopt[ 'hide-shortlink' ]      = isset( $opt[ 'hideshortlink' ] ) ? $opt[ 'hideshortlink' ] : '';
+			$metaopt['noindex-author']      = isset( $opt['noindexauthor'] ) ? $opt['noindexauthor'] : '';
+			$metaopt['disable-author']      = isset( $opt['disableauthor'] ) ? $opt['disableauthor'] : '';
+			$metaopt['noindex-archive']     = isset( $opt['noindexdate'] ) ? $opt['noindexdate'] : '';
+			$metaopt['noindex-category']    = isset( $opt['noindexcat'] ) ? $opt['noindexcat'] : '';
+			$metaopt['noindex-post_tag']    = isset( $opt['noindextag'] ) ? $opt['noindextag'] : '';
+			$metaopt['noindex-post_format'] = isset( $opt['noindexpostformat'] ) ? $opt['noindexpostformat'] : '';
+			$metaopt['noindex-subpages']    = isset( $opt['noindexsubpages'] ) ? $opt['noindexsubpages'] : '';
+			$metaopt['hide-rsdlink']        = isset( $opt['hidersdlink'] ) ? $opt['hidersdlink'] : '';
+			$metaopt['hide-feedlinks']      = isset( $opt['hidefeedlinks'] ) ? $opt['hidefeedlinks'] : '';
+			$metaopt['hide-wlwmanifest']    = isset( $opt['hidewlwmanifest'] ) ? $opt['hidewlwmanifest'] : '';
+			$metaopt['hide-shortlink']      = isset( $opt['hideshortlink'] ) ? $opt['hideshortlink'] : '';
 
 			update_option( 'wpseo_titles', $metaopt );
 
@@ -409,10 +412,10 @@ class WPSEO_Admin {
 		if ( version_compare( $current_version, '1.2.3', '<' ) ) {
 			$opt = get_option( 'wpseo' );
 
-			if ( is_array($opt) ) {
+			if ( is_array( $opt ) ) {
 				foreach ( $opt as $key => $val ) {
 					if ( !in_array( $key, array( 'ignore_blog_public_warning', 'ignore_tour', 'ignore_page_comments', 'ignore_permalink', 'ms_defaults_set', 'version', 'disableadvanced_meta', 'googleverify', 'msverify', 'alexaverify' ) ) ) {
-						unset( $opt[ $key ] );
+						unset( $opt[$key] );
 					}
 				}
 
@@ -424,14 +427,14 @@ class WPSEO_Admin {
 		// Fix wrongness created by buggy version 1.2.2
 		if ( version_compare( $current_version, '1.2.4', '<' ) ) {
 			$options = get_option( 'wpseo_titles' );
-			if ( $options[ 'title-home' ] == '%%sitename%% - %%sitedesc%% - 12345' ) {
-				$options[ 'title-home' ] = '%%sitename%% - %%sitedesc%%';
+			if ( $options['title-home'] == '%%sitename%% - %%sitedesc%% - 12345' ) {
+				$options['title-home'] = '%%sitename%% - %%sitedesc%%';
 				update_option( 'wpseo_titles', $options );
 			}
 		}
 		wpseo_title_test();
 
-		$options[ 'version' ] = WPSEO_VERSION;
+		$options['version'] = WPSEO_VERSION;
 		update_option( 'wpseo', $options );
 	}
 
@@ -448,11 +451,11 @@ class WPSEO_Admin {
 		if ( $slug )
 			return $slug;
 
-		if ( !isset( $_POST[ 'post_title' ] ) )
+		if ( !isset( $_POST['post_title'] ) )
 			return $slug;
 
 		// Lowercase the slug and strip slashes
-		$clean_slug = sanitize_title( stripslashes( $_POST[ 'post_title' ] ) );
+		$clean_slug = sanitize_title( stripslashes( $_POST['post_title'] ) );
 
 		// Turn it to an array and strip stopwords by comparing against an array of stopwords
 		$clean_slug_array = array_diff( explode( " ", $clean_slug ), $this->stopwords() );
@@ -490,6 +493,58 @@ class WPSEO_Admin {
 		}
 
 		return false;
+	}
+
+	/**
+	 * PressTrends tracking
+	 */
+	function presstrends_plugin() {
+
+		// PressTrends Account API Key
+		$api_key = 'n6svrrn650hyckud8ghhs1o497hcm0g1o3s5';
+		$auth    = 'dhs4fy3nhnx5x0y6gkdfwt7fz2wprguqk';
+
+		// Start of Metrics
+		global $wpdb;
+		$data = get_transient( 'presstrends_cache_data' );
+		if ( !$data || $data == '' ) {
+			$api_base = 'http://api.presstrends.io/index.php/api/pluginsites/update/auth/';
+			$url      = $api_base . $auth . '/api/' . $api_key . '/';
+
+			$count_posts    = wp_count_posts();
+			$count_pages    = wp_count_posts( 'page' );
+			$comments_count = wp_count_comments();
+			$theme_data     = wp_get_theme();
+			$plugin_name    = '&';
+			foreach ( get_plugins() as $plugin_info ) {
+				$plugin_name .= $plugin_info['Name'] . '&';
+			}
+			$plugin_data         = get_plugin_data( WPSEO_PATH . 'wp-seo.php' );
+			$posts_with_comments = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->posts WHERE post_type='post' AND comment_count > 0" );
+			$data                = array(
+				'url'             => stripslashes( str_replace( array( 'http://', '/', ':' ), '', site_url() ) ),
+				'posts'           => $count_posts->publish,
+				'pages'           => $count_pages->publish,
+				'comments'        => $comments_count->total_comments,
+				'approved'        => $comments_count->approved,
+				'spam'            => $comments_count->spam,
+				'pingbacks'       => $wpdb->get_var( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_type = 'pingback'" ),
+				'post_conversion' => number_format( ( $posts_with_comments / $count_posts->publish ) * 100, 0, '.', '' ),
+				'theme_version'   => $plugin_data['Version'],
+				'theme_name'      => urlencode( $theme_data->Name ),
+				'site_name'       => str_replace( ' ', '', get_bloginfo( 'name' ) ),
+				'plugins'         => count( get_option( 'active_plugins' ) ),
+				'plugin'          => urlencode( $plugin_name ),
+				'wpversion'       => get_bloginfo( 'version' ),
+			);
+
+			foreach ( $data as $k => $v ) {
+				$url .= $k . '/' . $v . '/';
+			}
+			wp_remote_get( $url );
+			set_transient( 'presstrends_cache_data', $data, 60 * 60 * 24 );
+		}
+		echo '<!-- PressTrends tracking active -->';
 	}
 }
 

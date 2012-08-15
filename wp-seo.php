@@ -108,7 +108,7 @@ function wpseo_admin_init() {
 	if ( in_array( $pagenow, array('admin.php') ) )
 		require WPSEO_PATH.'admin/class-config.php';
 
-	if ( !isset( $options['ignore_tour'] ) || !$options['ignore_tour'] )
+//	if ( !isset( $options['ignore_tour'] ) || !$options['ignore_tour'] )
 		require WPSEO_PATH.'admin/class-pointers.php';
 	
 	if ( isset( $options['enablexmlsitemap'] ) && $options['enablexmlsitemap'] )
