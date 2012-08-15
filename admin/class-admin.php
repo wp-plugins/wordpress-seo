@@ -45,7 +45,7 @@ class WPSEO_Admin {
 		add_filter( 'user_contactmethods', array( $this, 'update_contactmethods' ), 10, 1 );
 
 //		if ( isset( $options['presstrends'] ) && $options['presstrends'] )
-		add_action( 'admin_footer', array( $this, 'presstrends_plugin' ), 99 );
+		add_action( 'admin_init', array( $this, 'presstrends_plugin' ), 99 );
 	}
 
 	/**
