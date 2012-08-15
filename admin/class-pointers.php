@@ -29,9 +29,9 @@ class WPSEO_Pointers {
 			wp_enqueue_script( 'utils' );
 		}
 		if ( !isset( $options['presstrends'] ) ) {
-			add_action( 'admin_print_footer_scripts', array( $this, 'presstrends_request' ), 99 );
+			add_action( 'admin_print_footer_scripts', array( $this, 'presstrends_request' ) );
 		} else if ( !isset( $options['ignore_tour'] ) || !$options['ignore_tour'] ) {
-			add_action( 'admin_print_footer_scripts', array( $this, 'intro_tour' ), 99 );
+			add_action( 'admin_print_footer_scripts', array( $this, 'intro_tour' ) );
 			add_action( 'admin_head', array( $this, 'admin_head' ) );
 		}
 	}
@@ -40,14 +40,14 @@ class WPSEO_Pointers {
 		$id      = '#wpadminbar';
 		$content = '<h3>' . __( 'Help us improve WordPress SEO', 'wordpress-seo' ) . '</h3>';
 		$content .= '<p>' . __( 'You\'ve just installed WordPress SEO by Yoast. Please helps us improve it by allowing us to gather anonymous usage stats through PressTrends.', 'wordpress-seo' ) . '</p>';
-		$opt_arr  = array(
+		$opt_arr   = array(
 			'content'  => $content,
 			'position' => array( 'edge' => 'top', 'align' => 'center' )
 		);
-		$button2  = __( "Allow", 'wordpress-seo' );
-		$nonce = wp_create_nonce('wpseo_activate_presstrends');
-		$function2 = 'wpseo_presstrends_ajax("'.$nonce.'", 1 );';
-		$function1 = 'wpseo_presstrends_ajax("'.$nonce.'", 0 );';
+		$button2   = __( "Allow", 'wordpress-seo' );
+		$nonce     = wp_create_nonce( 'wpseo_activate_presstrends' );
+		$function2 = 'wpseo_presstrends_ajax("' . $nonce . '", 1 );';
+		$function1 = 'wpseo_presstrends_ajax("' . $nonce . '", 0 );';
 
 		$this->print_scripts( $id, $opt_arr, __( "Do not allow", 'wordpress-seo' ), $button2, $function2, $function1 );
 	}
@@ -217,11 +217,11 @@ class WPSEO_Pointers {
 						<?php echo $button2_function; ?>
 					});
 					jQuery('#pointer-close').click(function () {
-						<?php if ($button1_function == '') { ?>
-						wpseo_setIgnore("tour", "wp-pointer-0", "<?php echo wp_create_nonce( 'wpseo-ignore' ); ?>");
-						<?php } else { ?>
-						<?php echo $button1_function; ?>
-						<?php } ?>
+						<?php if ( $button1_function == '' ) { ?>
+							wpseo_setIgnore("tour", "wp-pointer-0", "<?php echo wp_create_nonce( 'wpseo-ignore' ); ?>");
+							<?php } else { ?>
+							<?php echo $button1_function; ?>
+							<?php } ?>
 					});
 					<?php } ?>
 			};
