@@ -44,8 +44,8 @@ class WPSEO_Admin {
 		add_action( 'edit_user_profile_update', array( $this, 'process_user_option_update' ) );
 		add_filter( 'user_contactmethods', array( $this, 'update_contactmethods' ), 10, 1 );
 
-//		if ( isset( $options['presstrends'] ) && $options['presstrends'] )
-		add_action( 'admin_init', array( $this, 'presstrends_plugin' ), 99 );
+		if ( isset( $options['presstrends'] ) && $options['presstrends'] )
+			add_action( 'admin_init', array( $this, 'presstrends_plugin' ), 99 );
 	}
 
 	/**
@@ -529,7 +529,7 @@ class WPSEO_Admin {
 				'approved'        => $comments_count->approved,
 				'spam'            => $comments_count->spam,
 				'pingbacks'       => $wpdb->get_var( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_type = 'pingback'" ),
-				'post_conversion' => number_format( ( $posts_with_comments / $count_posts->publish ) * 100, 0, '.', '' ),
+				'post_conversion' => ( $count_posts->publish > 0 && $posts_with_comments > 0 ) ? number_format( ( $posts_with_comments / $count_posts->publish ) * 100, 0, '.', '' ) : 0,
 				'theme_version'   => $plugin_data['Version'],
 				'theme_name'      => urlencode( $theme_data->Name ),
 				'site_name'       => str_replace( ' ', '', get_bloginfo( 'name' ) ),
@@ -544,7 +544,6 @@ class WPSEO_Admin {
 			wp_remote_get( $url );
 			set_transient( 'presstrends_cache_data', $data, 60 * 60 * 24 );
 		}
-		echo '<!-- PressTrends tracking active -->';
 	}
 }
 
