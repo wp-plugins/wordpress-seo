@@ -146,6 +146,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 * Bug fixes:
     * Fix for images not showing up in XML sitemap.
     * Fix to allow breadcrumb titles to once again be set for CPT archive pages.
+    * Prevent empty rel=publisher link from being put out.
 * Enhancements:
     * No longer show .htaccess editor when on NGINX.
 * Documentation:

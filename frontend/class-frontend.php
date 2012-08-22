@@ -723,7 +723,7 @@ class WPSEO_Frontend {
 		if ( $gplus )
 			echo '<link rel="author" href="' . $gplus . '"/>' . "\n";
 
-		if ( is_front_page() && isset( $options['plus-publisher'] ) ) {
+		if ( is_front_page() && isset( $options['plus-publisher'] ) && !empty( $options['plus-publisher'] ) ) {
 			echo '<link rel="publisher" href="' . esc_attr( $options['plus-publisher'] ) . '"/>' . "\n";
 		}
 	}
