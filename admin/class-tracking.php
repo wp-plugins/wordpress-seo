@@ -129,6 +129,7 @@ function wpseo_tracking_additions( $options ) {
 		'opengraph'           => $opt['opengraph'],
 		'twitter'             => $opt['twitter'],
 		'strip_category_base' => $opt['stripcategorybase'],
+		'on_front'			  => get_option('show_on_front'),
 	);
 	return $options;
 }
