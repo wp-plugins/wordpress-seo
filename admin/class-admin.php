@@ -44,8 +44,6 @@ class WPSEO_Admin {
 		add_action( 'edit_user_profile_update', array( $this, 'process_user_option_update' ) );
 		add_filter( 'user_contactmethods', array( $this, 'update_contactmethods' ), 10, 1 );
 
-		if ( isset( $options['presstrends'] ) && $options['presstrends'] )
-			add_action( 'admin_init', array( $this, 'yoast_tracking' ), 99 );
 	}
 
 	/**
@@ -427,7 +425,7 @@ class WPSEO_Admin {
 		// Fix wrongness created by buggy version 1.2.2
 		if ( version_compare( $current_version, '1.2.4', '<' ) ) {
 			$options = get_option( 'wpseo_titles' );
-			if ( $options['title-home'] == '%%sitename%% - %%sitedesc%% - 12345' ) {
+			if ( isset( $options['title-home'] ) && $options['title-home'] == '%%sitename%% - %%sitedesc%% - 12345' ) {
 				$options['title-home'] = '%%sitename%% - %%sitedesc%%';
 				update_option( 'wpseo_titles', $options );
 			}
@@ -493,108 +491,6 @@ class WPSEO_Admin {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Yoast tracking
-	 */
-	function yoast_tracking() {
-
-		// Start of Metrics
-		global $wpdb;
-
-		$options = get_option( 'wpseo' );
-
-		if ( !isset( $options['hash'] ) || empty( $options['hash'] ) ) {
-			$options['hash'] = md5( site_url() );
-			update_option( 'wpseo', $options );
-		}
-
-		$data = get_transient( 'yoast_tracking_cache' );
-		if ( WP_DEBUG || !$data || $data == '' ) {
-
-			$pts = array();
-			foreach ( get_post_types( array( 'public' => true ) ) as $pt ) {
-				$count    = wp_count_posts( $pt );
-				$pts[$pt] = $count->publish;
-			}
-
-			$comments_count = wp_count_comments();
-
-			// wp_get_theme was introduced in 3.4, for compatibility with older versions, let's do a workaround for now.
-			if ( function_exists( 'wp_get_theme' ) ) {
-				$theme_data = wp_get_theme();
-				$theme      = array(
-					'name'      => $theme_data->display( 'Name', false, false ),
-					'version'   => $theme_data->display( 'Version', false, false ),
-					'author'    => $theme_data->display( 'Author', false, false ),
-					'author_uri'=> $theme_data->display( 'AuthorURI', false, false ),
-				);
-				if ( isset( $theme_data->template ) && !empty( $theme_data->template ) && $theme_data->parent() ) {
-					$theme['template'] = array(
-						'version'   => $theme_data->parent()->display( 'Version', false, false ),
-						'name'      => $theme_data->parent()->display( 'Name', false, false ),
-						'author'    => $theme_data->parent()->display( 'Author', false, false ),
-						'author_uri'=> $theme_data->parent()->display( 'AuthorURI', false, false ),
-					);
-				} else {
-					$theme['template'] = '';
-				}
-			} else {
-				$theme_data = (object) get_theme_data( get_stylesheet_directory() . '/style.css' );
-				$theme      = array(
-					'version'     => $theme_data->Version,
-					'name'        => $theme_data->Name,
-					'author'      => $theme_data->Author,
-					'template'    => $theme_data->Template,
-				);
-			}
-
-			$plugins = array();
-			foreach ( get_option( 'active_plugins' ) as $plugin_path ) {
-				$plugin_info = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin_path );
-				$slug           = str_replace( '/' . basename( $plugin_path ), '', $plugin_path );
-				$plugins[$slug] = array(
-					'version'    => $plugin_info['Version'],
-					'name'       => $plugin_info['Name'],
-					'plugin_uri' => $plugin_info['PluginURI'],
-					'author'     => $plugin_info['AuthorName'],
-					'author_uri' => $plugin_info['AuthorURI'],
-				);
-			}
-
-			$data = array(
-				'site'      => array(
-					'hash'        => $options['hash'],
-					'url'         => site_url(),
-					'name'        => get_bloginfo( 'name' ),
-					'version'     => get_bloginfo( 'version' ),
-					'multisite'   => is_multisite(),
-					'users'       => count( get_users() ),
-					'lang'        => get_locale(),
-				),
-				'pts'       => $pts,
-				'comments'  => array(
-					'total'    => $comments_count->total_comments,
-					'approved' => $comments_count->approved,
-					'spam'     => $comments_count->spam,
-					'pings'    => $wpdb->get_var( "SELECT COUNT(comment_ID) FROM $wpdb->comments WHERE comment_type = 'pingback'" ),
-				),
-				'theme'     => $theme,
-				'plugins'   => $plugins,
-			);
-
-
-			$url = 'http://tracking.yoast.com/';
-
-			$args = array(
-				'body' => $data
-			);
-			wp_remote_post( $url, $args );
-
-			// Store for a week, then push data again.
-			set_transient( 'yoast_tracking_cache', $data, 60 * 60 * 24 );
-		}
 	}
 }
 

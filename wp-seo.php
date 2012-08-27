@@ -92,7 +92,10 @@ function wpseo_admin_init() {
 		unset( $options['ignore_tour'] );
 		update_option( 'wpseo', $options );
 	}
-	
+
+	if ( isset( $options['presstrends'] ) && 'on' ==  $options['presstrends'] )
+		require WPSEO_PATH.'admin/class-tracking.php';
+
 	require WPSEO_PATH.'admin/class-admin.php';
 
 	global $pagenow;

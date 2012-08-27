@@ -147,8 +147,12 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
     * Fix for images not showing up in XML sitemap.
     * Fix to allow breadcrumb titles to once again be set for CPT archive pages.
     * Prevent empty rel=publisher link from being put out.
+    * Several fixes to the strip category base settings.
+    * Several fixes to the hardcoded meta description recognition code.
 * Enhancements:
     * No longer show .htaccess editor when on NGINX.
+    * Move tracking to its own file, switching to my own tracking instead of PressTrends so more specific options can be tracked.
+    * Tracking can now be enabled and disabled from the SEO Dashboard screen.
 * Documentation:
     * Added rewrite rules for NGINX to FAQ.
     * Now showing rewrite rules for NGINX on XML sitemaps settings page.
