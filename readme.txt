@@ -149,6 +149,8 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
     * Prevent empty rel=publisher link from being put out.
     * Several fixes to the strip category base settings.
     * Several fixes to the hardcoded meta description recognition code.
+    * Prevent title testing from priming the cache.
+    * Prevent upgrading from a recent version to force a title test, no longer overrides manual force rewrite settings.
 * Enhancements:
     * No longer show .htaccess editor when on NGINX.
     * Move tracking to its own file, switching to my own tracking instead of PressTrends so more specific options can be tracked.

@@ -404,6 +404,8 @@ class WPSEO_Admin {
 			update_option( 'wpseo_titles', $metaopt );
 
 			delete_option( 'wpseo_indexation' );
+
+			wpseo_title_test();
 		}
 
 		// Clean up the wrong wpseo options
@@ -430,7 +432,6 @@ class WPSEO_Admin {
 				update_option( 'wpseo_titles', $options );
 			}
 		}
-		wpseo_title_test();
 
 		$options['version'] = WPSEO_VERSION;
 		update_option( 'wpseo', $options );

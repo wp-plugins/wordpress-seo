@@ -1184,6 +1184,15 @@ class WPSEO_Frontend {
 	 * @return string
 	 */
 	function title_test_helper( $title ) {
+		if ( !defined('DONOTCACHEPAGE') )
+			define('DONOTCACHEPAGE', true);
+
+		if ( !defined('DONOTCACHCEOBJECT') )
+			define('DONOTCACHCEOBJECT', true);
+
+		if ( !defined('DONOTMINIFY') )
+			define('DONOTMINIFY', true);
+
 		global $wp_version;
 		if ( $_SERVER['HTTP_USER_AGENT'] == "WordPress/${wp_version}; " . get_bloginfo( 'url' ) . " - Yoast" )
 			return 'This is a Yoast Test Title';
