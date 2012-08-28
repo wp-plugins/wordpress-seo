@@ -100,7 +100,7 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 				);
 
 
-				$url = 'http://tracking.yoast.com/';
+				$url = 'https://tracking.yoast.com/';
 
 				$args = array(
 					'body' => $data
@@ -112,6 +112,8 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 			}
 		}
 	}
+
+	$yoast_tracking = new Yoast_Tracking;
 }
 
 /**
@@ -124,13 +126,14 @@ function wpseo_tracking_additions( $options ) {
 	$opt = get_wpseo_options();
 
 	$options['wpseo'] = array(
-		'xml_sitemaps'        => $opt['enablexmlsitemap'],
-		'force_rewrite'       => $opt['forcerewritetitle'],
-		'opengraph'           => $opt['opengraph'],
-		'twitter'             => $opt['twitter'],
-		'strip_category_base' => $opt['stripcategorybase'],
-		'on_front'			  => get_option('show_on_front'),
+		'xml_sitemaps'          => isset( $opt['enablexmlsitemap'] ) ? intval( $opt['enablexmlsitemap'] ) : 0,
+		'force_rewrite'         => isset( $opt['forcerewritetitle'] ) ? intval( $opt['forcerewritetitle'] ) : 0,
+		'opengraph'             => isset( $opt['opengraph'] ) ? intval( $opt['opengraph'] ) : 0,
+		'twitter'               => isset( $opt['twitter'] ) ? intval( $opt['twitter'] ) : 0,
+		'strip_category_base'   => isset( $opt['stripcategorybase'] ) ? intval( $opt['stripcategorybase'] ) : 0,
+		'on_front'              => get_option( 'show_on_front' ),
 	);
 	return $options;
 }
+
 add_filter( 'yoast_tracking_filters', 'wpseo_tracking_additions' );
