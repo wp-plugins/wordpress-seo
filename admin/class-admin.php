@@ -438,7 +438,7 @@ class WPSEO_Admin {
 			if ( isset( $options['presstrends'] ) ) {
 				$options['yoast_tracking'] = 'on';
 				unset( $options['presstrends'] );
-				update_options( 'wpseo', $options );
+				update_option( 'wpseo', $options );
 			}
 		}
 
