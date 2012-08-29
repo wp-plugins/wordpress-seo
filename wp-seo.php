@@ -49,7 +49,7 @@ if ( version_compare(PHP_VERSION, '5.2', '<') ) {
 	}
 }
 
-define( 'WPSEO_VERSION', '1.2.7' );
+define( 'WPSEO_VERSION', '1.2.8' );
 
 $pluginurl = plugin_dir_url( __FILE__ );
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo('url') ) )
@@ -93,7 +93,7 @@ function wpseo_admin_init() {
 		update_option( 'wpseo', $options );
 	}
 
-	if ( isset( $options['presstrends'] ) && 'on' ==  $options['presstrends'] )
+	if ( isset( $options['yoast_tracking'] ) && ( 'on' ==  $options['yoast_tracking'] || true === $options['yoast_tracking'] ) )
 		require WPSEO_PATH.'admin/class-tracking.php';
 
 	require WPSEO_PATH.'admin/class-admin.php';

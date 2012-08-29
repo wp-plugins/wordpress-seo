@@ -9,10 +9,40 @@
 if ( !class_exists( 'Yoast_Tracking' ) ) {
 	class Yoast_Tracking {
 
+		/**
+		 * Class constructor
+		 */
 		function __construct() {
 			add_action( 'admin_footer', array( $this, 'tracking' ), 99 );
+
+			// Invalidate the cache when changes are being made.
+			add_action( 'switch_theme', array( $this, 'delete_cache' ) );
+
+			add_action( 'admin_init', array( $this, 'check_active_plugins' ) );
 		}
 
+		/**
+		 * This is the only current way of doing something when a plugin is activated or updated...
+		 */
+		function check_active_plugins() {
+			$hash     = md5( serialize( get_option( 'active_plugins' ) ) );
+			$old_hash = get_transient( 'yoast_tracking_active_plugins_hash' );
+			if ( $hash != $old_hash ) {
+				add_action( 'admin_footer', array( $this, 'delete_cache' ) );
+				set_transient( 'yoast_tracking_active_plugins_hash', $hash, 7 * 60 * 60 * 24 );
+			}
+		}
+
+		/**
+		 * This deletes the tracking cache, effectively meaning the tracking will be done again.
+		 */
+		function delete_cache() {
+			delete_transient( 'yoast_tracking_cache' );
+		}
+
+		/**
+		 * Main tracking function.
+		 */
 		function tracking() {
 			// Start of Metrics
 			global $wpdb;
@@ -25,7 +55,7 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 			}
 
 			$data = get_transient( 'yoast_tracking_cache' );
-			if ( WP_DEBUG || !$data || $data == '' ) {
+			if ( ( defined( 'DEBUG_YOAST_TRACKING' ) && DEBUG_YOAST_TRACKING ) || !$data || $data == '' ) {
 
 				$pts = array();
 				foreach ( get_post_types( array( 'public' => true ) ) as $pt ) {
@@ -99,16 +129,13 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 					'plugins'   => $plugins,
 				);
 
-
-				$url = 'https://tracking.yoast.com/';
-
 				$args = array(
 					'body' => $data
 				);
-				wp_remote_post( $url, $args );
+				wp_remote_post( 'https://tracking.yoast.com/', $args );
 
 				// Store for a week, then push data again.
-				set_transient( 'yoast_tracking_cache', $data, 60 * 60 * 24 );
+				set_transient( 'yoast_tracking_cache', $data, 7 * 60 * 60 * 24 );
 			}
 		}
 	}
@@ -117,7 +144,7 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 }
 
 /**
- * Adds tracking parameters for WP SEO settings. Outside of the main class as the class could also be used in other plugins.
+ * Adds tracking parameters for WP SEO settings. Outside of the main class as the class could also be in use in other plugins.
  *
  * @param array $options
  * @return array

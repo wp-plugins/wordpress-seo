@@ -433,6 +433,15 @@ class WPSEO_Admin {
 			}
 		}
 
+		if ( version_compare( $current_version, '1.2.8', '<' ) ) {
+			$options = get_option( 'wpseo' );
+			if ( isset( $options['presstrends'] ) ) {
+				$options['yoast_tracking'] = 'on';
+				unset( $options['presstrends'] );
+				update_options( 'wpseo', $options );
+			}
+		}
+
 		$options['version'] = WPSEO_VERSION;
 		update_option( 'wpseo', $options );
 	}
