@@ -141,6 +141,13 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= trunk =
+
+* Updated languages
+	* French fr_FR
+	* Dutch nl_NL
+	* Turkish tr_TK
+
 = 1.2.8.1 =
 
 * Fixed one s, that caused a fatal error. Sigh.
