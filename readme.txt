@@ -141,7 +141,9 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
-= trunk =
+= 1.2.8.2 =
+
+* "Fix" for tracking popup with empty buttons.
 
 * Updated languages
 	* French fr_FR
