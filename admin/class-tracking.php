@@ -100,8 +100,6 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 				foreach ( get_option( 'active_plugins' ) as $plugin_path ) {
 					$plugin_info    = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin_path );
 
-					echo '<!--'.print_r( $plugin_info, 1 ).'-->';
-
 					$slug           = str_replace( '/' . basename( $plugin_path ), '', $plugin_path );
 					$plugins[$slug] = array(
 						'version'    => $plugin_info['Version'],
