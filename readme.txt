@@ -139,6 +139,12 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 6. Example of the Linkdex Page Analysis functionality.
 7. The advanced section of the WordPress SEO meta box.
 
+== Trunk ==
+
+* Updated all the languages in hopes to fix the empty text strings
+* Added basic translations for Danish (da_DK) and Finnish (fi)
+
+
 == Changelog ==
 
 = 1.2.8.2 =
