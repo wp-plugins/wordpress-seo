@@ -77,10 +77,10 @@ function wpseo_frontend_init() {
 		require WPSEO_PATH.'inc/class-sitemaps.php';
 	if ( isset($options['breadcrumbs-enable']) && $options['breadcrumbs-enable'] )
 		require WPSEO_PATH.'frontend/class-breadcrumbs.php';
-	if ( isset( $options['opengraph'] )  && $options['opengraph'] )
-		require WPSEO_PATH.'frontend/class-opengraph.php';
 	if ( isset( $options['twitter'] )  && $options['twitter'] )
 		require WPSEO_PATH.'frontend/class-twitter.php';	
+	if ( isset( $options['opengraph'] )  && $options['opengraph'] )
+		require WPSEO_PATH.'frontend/class-opengraph.php';
 }
 
 /**
