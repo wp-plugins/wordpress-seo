@@ -17,9 +17,9 @@ function replace_meta( $old_metakey, $new_metakey, $replace = false ) {
 	$oldies = $wpdb->get_results( "SELECT * FROM $wpdb->postmeta WHERE meta_key = '$old_metakey'" );
 	foreach ( $oldies as $old ) {
 		// Prevent inserting new meta values for posts that already have a value for that new meta key
-		$check = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->postmeta WHERE meta_key = '$new_metakey' AND meta_value != '' AND meta_value IS NOT NULL AND post_id = " . $old->post_id );
-		if ( $check == 0 )
-			$wpdb->query( "INSERT INTO $wpdb->postmeta (post_id, meta_key, meta_value) VALUES (" . $old->post_id . ",'" . $new_metakey . "','" . addslashes( $old->meta_value ) . "')" );
+		$check = get_post_meta( $old->post_id, $new_metakey, true );
+		if ( !$check || empty($check) )
+			update_post_meta( $old->post_id, $new_metakey, $old->meta_value );
 	}
 
 	if ( $replace ) {
@@ -151,6 +151,9 @@ if ( isset( $_POST['import'] ) ) {
 		if ( 'b' == get_option( 'seo_woo_meta_single_key' ) ) {
 			replace_meta( 'seo_keywords', '_yoast_wpseo_metakeywords', $replace );
 		}
+
+		replace_meta( 'seo_follow', '_yoast_wpseo_meta-robots-nofollow', $replace );
+		replace_meta( 'seo_noindex', '_yoast_wpseo_meta-robots-noindex', $replace );
 
 		$msg .= __( 'WooThemes SEO framework settings &amp; data successfully imported.', 'wordpress-seo' );
 	}
