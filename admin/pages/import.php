@@ -22,9 +22,8 @@ function replace_meta( $old_metakey, $new_metakey, $replace = false ) {
 			update_post_meta( $old->post_id, $new_metakey, $old->meta_value );
 	}
 
-	if ( $replace ) {
-		$wpdb->query( "DELETE FROM $wpdb->postmeta WHERE meta_key = '$old_metakey'" );
-	}
+	if ( $replace )
+		delete_post_meta( $old->post_id, $old_metakey );
 }
 
 $msg = '';
