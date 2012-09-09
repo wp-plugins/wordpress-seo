@@ -141,9 +141,10 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
-= Trunk =
+= 1.2.8.4 =
 
-* Fix for double title issues with themes that filter `wp_title`, by having WP SEO filter much later in the process.
+* Fix for double title issues with themes that filter `wp_title`, by having WP SEO filter a bit later in the process
+  (but no too late because the genesis <title> wrap filter is on 30).
 * Improved Twitter Card functionality: twitter meta tags now appear above OpenGraph meta tags.
 * Updated a bunch of languages
 * Added Spanish (es_VE) and Czech (cs_CZ)
