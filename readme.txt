@@ -141,6 +141,10 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= Trunk = 
+
+* Updated Hebrew (he_IL)
+
 = 1.2.8.4 =
 
 * Fix for double title issues with themes that filter `wp_title`, by having WP SEO filter a bit later in the process
