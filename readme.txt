@@ -143,7 +143,9 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 = Trunk = 
 
-* Updated Hebrew (he_IL)
+* Fixed a bug for MultiSite due to a missing attribute in calling `get_admin_url`.
+* Updated Hebrew (he_IL).
+* Added a `wpseo_robots` filter for the robots meta tag.
 
 = 1.2.8.4 =
 
