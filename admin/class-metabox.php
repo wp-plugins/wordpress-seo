@@ -637,19 +637,22 @@ class WPSEO_Metabox {
 		if ( $gplus = get_transient( 'gplus_' . $user_id ) )
 			return $gplus;
 
-		$args          = array(
-			'headers' => array(
-				'Referer' => 'http://yoast.com/wp-admin/',
-			),
-		);
 		$gplus_profile = get_the_author_meta( 'googleplus', $user_id );
 
 		if ( empty( $gplus_profile ) )
 			return false;
 		if ( preg_match( '|u/0/([^/]+)/|', $gplus_profile, $match ) )
 			$gplus_id = $match[1];
+		else if ( preg_match( '|\.com/(\d+)|', $gplus_profile, $match ) )
+			$gplus_id = $match[1];
 		else
 			return false;
+
+		$args = array(
+			'headers' => array(
+				'Referer' => 'http://yoast.com/wp-admin/',
+			),
+		);
 
 		$resp = wp_remote_get( 'https://www.googleapis.com/plus/v1/people/' . $gplus_id . '?key=AIzaSyBLYmCW10gzW63ob8NYIPTneph1arsxqWs', $args );
 
