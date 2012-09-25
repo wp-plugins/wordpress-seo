@@ -144,8 +144,10 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 = Trunk = 
 
 * Fixed a bug for MultiSite due to a missing attribute in calling `get_admin_url`.
-* Updated Hebrew (he_IL).
+* Updated Hebrew (he_IL), Dutch (nl_NL) French (fr_FR), Czech (cs_CZ), Italian (it_IT), Brazilian Portuguese (pt_BR).
+* Added Norwegian (nb_NO) and Portuguese (pt_PT).
 * Added a `wpseo_robots` filter for the robots meta tag.
+
 
 = 1.2.8.4 =
 
