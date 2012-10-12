@@ -141,6 +141,12 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= trunk =
+
+* Updated .pot file
+* Updated Norwegian (nb_NO), Turkish (tr_TK) and Persian (fa_IR).
+* Added Arabic (ar) and Romanian (ro_RO).
+
 = 1.2.8.7 =
 
 * Fixed %%category%% and %%tag%% and some other variables that weren't working since 1.2.8.6.
