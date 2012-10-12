@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  \n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/wordpress-seo\n"
-"POT-Creation-Date: 2012-09-07 12:17:51+00:00\n"
+"POT-Creation-Date: 2012-10-12 07:30:21+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,7 +21,7 @@ msgid "WordPress SEO Configuration"
 msgstr ""
 
 #: admin/class-admin.php:104 admin/class-admin.php:130
-#: admin/class-metabox.php:721 inc/wpseo-non-ajax-functions.php:226
+#: admin/class-metabox.php:785 inc/wpseo-non-ajax-functions.php:226
 msgid "SEO"
 msgstr ""
 
@@ -223,7 +223,7 @@ msgstr ""
 msgid "Latest news from Yoast"
 msgstr ""
 
-#: admin/class-metabox.php:102 admin/class-metabox.php:734
+#: admin/class-metabox.php:102 admin/class-metabox.php:798
 msgid "Post is set to noindex."
 msgstr ""
 
@@ -259,7 +259,7 @@ msgstr ""
 msgid "What is the main keyword or key phrase this page should be found for?"
 msgstr ""
 
-#: admin/class-metabox.php:266 admin/class-metabox.php:721
+#: admin/class-metabox.php:266 admin/class-metabox.php:785
 #: admin/class-taxonomy.php:87
 msgid "SEO Title"
 msgstr ""
@@ -440,43 +440,43 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#: admin/class-metabox.php:699
+#: admin/class-metabox.php:763
 msgid "SEO: No Focus Keyword"
 msgstr ""
 
-#: admin/class-metabox.php:700
+#: admin/class-metabox.php:764
 msgid "SEO: Bad"
 msgstr ""
 
-#: admin/class-metabox.php:701
+#: admin/class-metabox.php:765
 msgid "SEO: Poor"
 msgstr ""
 
-#: admin/class-metabox.php:702
+#: admin/class-metabox.php:766
 msgid "SEO: OK"
 msgstr ""
 
-#: admin/class-metabox.php:703
+#: admin/class-metabox.php:767
 msgid "SEO: Good"
 msgstr ""
 
-#: admin/class-metabox.php:704
+#: admin/class-metabox.php:768
 msgid "SEO: Post Noindexed"
 msgstr ""
 
-#: admin/class-metabox.php:721
+#: admin/class-metabox.php:785
 msgid "Meta Desc."
 msgstr ""
 
-#: admin/class-metabox.php:721
+#: admin/class-metabox.php:785
 msgid "Focus KW"
 msgstr ""
 
-#: admin/class-metabox.php:745
+#: admin/class-metabox.php:809
 msgid "Focus keyword not set."
 msgstr ""
 
-#: admin/class-metabox.php:942
+#: admin/class-metabox.php:1006
 msgid ""
 "This page analysis brought to you by the collaboration of Yoast and %sLinkdex"
 "%s. Linkdex is an SEO suite that helps you optimize your site and offers you "
@@ -484,292 +484,292 @@ msgid ""
 "you do too!"
 msgstr ""
 
-#: admin/class-metabox.php:947
+#: admin/class-metabox.php:1011
 msgid ""
 "To update this page analysis, save as draft or update and check this tab "
 "again"
 msgstr ""
 
-#: admin/class-metabox.php:964
+#: admin/class-metabox.php:1028
 msgid ""
 "Your hosting environment does not support PHP's %sDocument Object Model%s."
 msgstr ""
 
-#: admin/class-metabox.php:964
+#: admin/class-metabox.php:1028
 msgid ""
 "To enjoy all the benefits of the page analysis feature, you'll need to (get "
 "your host to) install it."
 msgstr ""
 
-#: admin/class-metabox.php:969
+#: admin/class-metabox.php:1033
 msgid ""
 "No focus keyword was set for this %s. If you do not set a focus keyword, no "
 "score can be calculated."
 msgstr ""
 
-#: admin/class-metabox.php:1131
+#: admin/class-metabox.php:1195
 msgid ""
 "The keyword for this page contains one or more %sstop words%s, consider "
 "removing them. Found '%s'."
 msgstr ""
 
-#: admin/class-metabox.php:1147
+#: admin/class-metabox.php:1211
 msgid "The keyword / phrase appears in the URL for this page."
 msgstr ""
 
-#: admin/class-metabox.php:1148
+#: admin/class-metabox.php:1212
 msgid ""
 "The keyword / phrase does not appear in the URL for this page. If you decide "
 "to rename the URL be sure to check the old URL 301 redirects to the new one!"
 msgstr ""
 
-#: admin/class-metabox.php:1149
+#: admin/class-metabox.php:1213
 msgid ""
 "The slug for this page contains one or more <a href=\"http://en.wikipedia."
 "org/wiki/Stop_words\">stop words</a>, consider removing them."
 msgstr ""
 
-#: admin/class-metabox.php:1150
+#: admin/class-metabox.php:1214
 msgid "The slug for this page is a bit long, consider shortening it."
 msgstr ""
 
-#: admin/class-metabox.php:1183
+#: admin/class-metabox.php:1247
 msgid "Please create a page title."
 msgstr ""
 
-#: admin/class-metabox.php:1184
+#: admin/class-metabox.php:1248
 msgid ""
 "The page title is more than 40 characters and less than the recommended 70 "
 "character limit."
 msgstr ""
 
-#: admin/class-metabox.php:1185
+#: admin/class-metabox.php:1249
 msgid ""
 "The page title contains %d characters, which is less than the recommended "
 "minimum of 40 characters. Use the space to add keyword variations or create "
 "compelling call-to-action copy."
 msgstr ""
 
-#: admin/class-metabox.php:1186
+#: admin/class-metabox.php:1250
 msgid ""
 "The page title contains %d characters, which is more than the viewable limit "
 "of 70 characters; some words will not be visible to users in your listing."
 msgstr ""
 
-#: admin/class-metabox.php:1187
+#: admin/class-metabox.php:1251
 msgid "The keyword / phrase %s does not appear in the page title."
 msgstr ""
 
-#: admin/class-metabox.php:1188
+#: admin/class-metabox.php:1252
 msgid ""
 "The page title contains keyword / phrase, at the beginning which is "
 "considered to improve rankings."
 msgstr ""
 
-#: admin/class-metabox.php:1189
+#: admin/class-metabox.php:1253
 msgid ""
 "The page title contains keyword / phrase, but it does not appear at the "
 "beginning; try and move it to the beginning."
 msgstr ""
 
-#: admin/class-metabox.php:1227
+#: admin/class-metabox.php:1291
 msgid ""
 "No outbound links appear in this page, consider adding some as appropriate."
 msgstr ""
 
-#: admin/class-metabox.php:1228
+#: admin/class-metabox.php:1292
 msgid ""
 "You're linking to another page with the keyword you want this page to rank "
 "for, consider changing that if you truly want this page to rank."
 msgstr ""
 
-#: admin/class-metabox.php:1229
+#: admin/class-metabox.php:1293
 msgid "This page has %s outbound link(s)."
 msgstr ""
 
-#: admin/class-metabox.php:1230
+#: admin/class-metabox.php:1294
 msgid "This page has %s outbound link(s), all nofollowed."
 msgstr ""
 
-#: admin/class-metabox.php:1231
+#: admin/class-metabox.php:1295
 msgid "This page has %s nofollowed link(s) and %s normal outbound link(s)."
 msgstr ""
 
-#: admin/class-metabox.php:1326
+#: admin/class-metabox.php:1390
 msgid "No images appear in this page, consider adding some as appropriate."
 msgstr ""
 
-#: admin/class-metabox.php:1327
+#: admin/class-metabox.php:1391
 msgid "The images on this page are missing alt tags."
 msgstr ""
 
-#: admin/class-metabox.php:1328
+#: admin/class-metabox.php:1392
 msgid ""
 "The images on this page contain alt tags with the target keyword / phrase."
 msgstr ""
 
-#: admin/class-metabox.php:1329
+#: admin/class-metabox.php:1393
 msgid ""
 "The images on this page do not have alt tags containing your keyword / "
 "phrase."
 msgstr ""
 
-#: admin/class-metabox.php:1399
+#: admin/class-metabox.php:1463
 msgid "No subheading tags (like an H2) appear in the copy."
 msgstr ""
 
-#: admin/class-metabox.php:1400
+#: admin/class-metabox.php:1464
 msgid ""
 "Keyword / keyphrase appears in %s (out of %s) subheadings in the copy. While "
 "not a major ranking factor, this is beneficial."
 msgstr ""
 
-#: admin/class-metabox.php:1401
+#: admin/class-metabox.php:1465
 msgid ""
 "You have not used your keyword / keyphrase in any subheading (such as an H2) "
 "in your copy."
 msgstr ""
 
-#: admin/class-metabox.php:1450
+#: admin/class-metabox.php:1514
 msgid ""
 "In the specified meta description, consider: How does it compare to the "
 "competition? Could it be made more appealing?"
 msgstr ""
 
-#: admin/class-metabox.php:1451
+#: admin/class-metabox.php:1515
 msgid ""
 "The meta description is under 120 characters, however up to %s characters "
 "are available. %s"
 msgstr ""
 
-#: admin/class-metabox.php:1452
+#: admin/class-metabox.php:1516
 msgid ""
 "The specified meta description is over %s characters, reducing it will "
 "ensure the entire description is visible. %s"
 msgstr ""
 
-#: admin/class-metabox.php:1453
+#: admin/class-metabox.php:1517
 msgid ""
 "No meta description has been specified, search engines will display copy "
 "from the page instead."
 msgstr ""
 
-#: admin/class-metabox.php:1454
+#: admin/class-metabox.php:1518
 msgid "The meta description contains the primary keyword / phrase."
 msgstr ""
 
-#: admin/class-metabox.php:1455
+#: admin/class-metabox.php:1519
 msgid ""
 "A meta description has been specified, but it does not contain the target "
 "keyword / phrase."
 msgstr ""
 
-#: admin/class-metabox.php:1459
+#: admin/class-metabox.php:1523
 msgid ""
 "The available space is shorter than the usual 155 characters because Google "
 "will also include the publication date in the snippet."
 msgstr ""
 
-#: admin/class-metabox.php:1498
+#: admin/class-metabox.php:1562
 msgid ""
 "There are %d words contained in the body copy, this is greater than the 300 "
 "word recommended minimum."
 msgstr ""
 
-#: admin/class-metabox.php:1499
+#: admin/class-metabox.php:1563
 msgid ""
 "There are %d words contained in the body copy, this is below the 300 word "
 "recommended minimum. Add more useful content on this topic for readers."
 msgstr ""
 
-#: admin/class-metabox.php:1500
+#: admin/class-metabox.php:1564
 msgid ""
 "There are %d words contained in the body copy, this is slightly below the "
 "300 word recommended minimum, add a bit more copy."
 msgstr ""
 
-#: admin/class-metabox.php:1501
+#: admin/class-metabox.php:1565
 msgid ""
 "There are %d words contained in the body copy. This is far too low and "
 "should be increased."
 msgstr ""
 
-#: admin/class-metabox.php:1503
+#: admin/class-metabox.php:1567
 msgid ""
 "The keyword density is %s%%, which is a bit low, the keyword was found %s "
 "times."
 msgstr ""
 
-#: admin/class-metabox.php:1504
+#: admin/class-metabox.php:1568
 msgid ""
 "The keyword density is %s%%, which is over the advised 4.5%% maximum, the "
 "keyword was found %s times."
 msgstr ""
 
-#: admin/class-metabox.php:1505
+#: admin/class-metabox.php:1569
 msgid ""
 "The keyword density is %s%%, which is great, the keyword was found %s times."
 msgstr ""
 
-#: admin/class-metabox.php:1507
+#: admin/class-metabox.php:1571
 msgid ""
 "The keyword doesn't appear in the first paragraph of the copy, make sure the "
 "topic is clear immediately."
 msgstr ""
 
-#: admin/class-metabox.php:1508
+#: admin/class-metabox.php:1572
 msgid "The keyword appears in the first paragraph of the copy."
 msgstr ""
 
-#: admin/class-metabox.php:1510
+#: admin/class-metabox.php:1574
 msgid "Flesch Reading Ease"
 msgstr ""
 
-#: admin/class-metabox.php:1511
+#: admin/class-metabox.php:1575
 msgid "The copy scores %s in the %s test, which is considered %s to read. %s"
 msgstr ""
 
-#: admin/class-metabox.php:1535
+#: admin/class-metabox.php:1599
 msgid ""
 "Your keyphrase is over 10 words, a keyphrase should be shorter and there can "
 "be only one keyphrase."
 msgstr ""
 
-#: admin/class-metabox.php:1571
+#: admin/class-metabox.php:1635
 msgid "very easy"
 msgstr ""
 
-#: admin/class-metabox.php:1574
+#: admin/class-metabox.php:1638
 msgid "easy"
 msgstr ""
 
-#: admin/class-metabox.php:1577
+#: admin/class-metabox.php:1641
 msgid "fairly easy"
 msgstr ""
 
-#: admin/class-metabox.php:1580
+#: admin/class-metabox.php:1644
 msgid "OK"
 msgstr ""
 
-#: admin/class-metabox.php:1583
+#: admin/class-metabox.php:1647
 msgid "fairly difficult"
 msgstr ""
 
-#: admin/class-metabox.php:1584
+#: admin/class-metabox.php:1648
 msgid "Try to make shorter sentences to improve readability."
 msgstr ""
 
-#: admin/class-metabox.php:1587
+#: admin/class-metabox.php:1651
 msgid "difficult"
 msgstr ""
 
-#: admin/class-metabox.php:1588 admin/class-metabox.php:1592
+#: admin/class-metabox.php:1652 admin/class-metabox.php:1656
 msgid ""
 "Try to make shorter sentences, using less difficult words to improve "
 "readability."
 msgstr ""
 
-#: admin/class-metabox.php:1591
+#: admin/class-metabox.php:1655
 msgid "very difficult"
 msgstr ""
 
@@ -1288,47 +1288,47 @@ msgstr ""
 msgid ".htaccess file"
 msgstr ""
 
-#: admin/pages/import.php:158
+#: admin/pages/import.php:157
 msgid "WooThemes SEO framework settings &amp; data successfully imported."
 msgstr ""
 
-#: admin/pages/import.php:189
+#: admin/pages/import.php:188
 msgid "HeadSpace2 data successfully imported"
 msgstr ""
 
-#: admin/pages/import.php:195
+#: admin/pages/import.php:194
 msgid "All in One SEO data successfully imported."
 msgstr ""
 
-#: admin/pages/import.php:201
+#: admin/pages/import.php:200
 msgid "All in One SEO (Old version) data successfully imported."
 msgstr ""
 
-#: admin/pages/import.php:212
+#: admin/pages/import.php:211
 msgid "Robots Meta values imported."
 msgstr ""
 
-#: admin/pages/import.php:225
+#: admin/pages/import.php:224
 msgid "RSS Footer options imported successfully."
 msgstr ""
 
-#: admin/pages/import.php:239
+#: admin/pages/import.php:238
 msgid "Yoast Breadcrumbs options imported successfully."
 msgstr ""
 
-#: admin/pages/import.php:241
+#: admin/pages/import.php:240
 msgid "Yoast Breadcrumbs options could not be found"
 msgstr ""
 
-#: admin/pages/import.php:245
+#: admin/pages/import.php:244
 msgid ", and old data deleted."
 msgstr ""
 
-#: admin/pages/import.php:247
+#: admin/pages/import.php:246
 msgid ", and meta keywords data deleted."
 msgstr ""
 
-#: admin/pages/import.php:254
+#: admin/pages/import.php:253
 msgid ""
 "No doubt you've used an SEO plugin before if this site isn't new. Let's make "
 "it easy on you, you can import the data below. If you want, you can import "
@@ -1336,97 +1336,97 @@ msgid ""
 "duplicate data will be imported."
 msgstr ""
 
-#: admin/pages/import.php:255
+#: admin/pages/import.php:254
 msgid ""
 "If you've used another SEO plugin, try the %sSEO Data Transporter%s plugin "
 "to move your data into this plugin, it rocks!"
 msgstr ""
 
-#: admin/pages/import.php:257
+#: admin/pages/import.php:256
 msgid "Import from HeadSpace2?"
 msgstr ""
 
-#: admin/pages/import.php:258
+#: admin/pages/import.php:257
 msgid "Import from All-in-One SEO?"
 msgstr ""
 
-#: admin/pages/import.php:259
+#: admin/pages/import.php:258
 msgid "Import from OLD All-in-One SEO?"
 msgstr ""
 
-#: admin/pages/import.php:260
+#: admin/pages/import.php:259
 msgid "Import from WooThemes SEO framework?"
 msgstr ""
 
-#: admin/pages/import.php:262
+#: admin/pages/import.php:261
 msgid "Delete the old data after import? (recommended)"
 msgstr ""
 
-#: admin/pages/import.php:263 admin/pages/import.php:270
-#: admin/pages/import.php:273 admin/pages/import.php:299
+#: admin/pages/import.php:262 admin/pages/import.php:269
+#: admin/pages/import.php:272 admin/pages/import.php:298
 msgid "Import"
 msgstr ""
 
-#: admin/pages/import.php:266
+#: admin/pages/import.php:265
 msgid "Import settings from other plugins"
 msgstr ""
 
-#: admin/pages/import.php:267
+#: admin/pages/import.php:266
 msgid "Import from Robots Meta (by Yoast)?"
 msgstr ""
 
-#: admin/pages/import.php:268
+#: admin/pages/import.php:267
 msgid "Import from RSS Footer (by Yoast)?"
 msgstr ""
 
-#: admin/pages/import.php:269
+#: admin/pages/import.php:268
 msgid "Import from Yoast Breadcrumbs?"
 msgstr ""
 
-#: admin/pages/import.php:278
+#: admin/pages/import.php:277
 msgid "Export"
 msgstr ""
 
-#: admin/pages/import.php:280
+#: admin/pages/import.php:279
 msgid ""
 "Export your WordPress SEO settings here, to import them again later or to "
 "import them on another site."
 msgstr ""
 
-#: admin/pages/import.php:282
+#: admin/pages/import.php:281
 msgid "Include Taxonomy Metadata"
 msgstr ""
 
-#: admin/pages/import.php:283
+#: admin/pages/import.php:282
 msgid "Export settings"
 msgstr ""
 
-#: admin/pages/import.php:301
+#: admin/pages/import.php:300
 msgid "Import settings by locating <em>settings.zip</em> and clicking"
 msgstr ""
 
-#: admin/pages/import.php:301 admin/pages/import.php:305
+#: admin/pages/import.php:300 admin/pages/import.php:304
 msgid "Import settings"
 msgstr ""
 
-#: admin/pages/import.php:325
+#: admin/pages/import.php:324
 msgid "Settings successfully imported."
 msgstr ""
 
-#: admin/pages/import.php:327 admin/pages/import.php:331
-#: admin/pages/import.php:333
+#: admin/pages/import.php:326 admin/pages/import.php:330
+#: admin/pages/import.php:332
 msgid "Settings could not be imported:"
 msgstr ""
 
-#: admin/pages/import.php:327
+#: admin/pages/import.php:326
 msgid "Unzipping failed."
 msgstr ""
 
-#: admin/pages/import.php:333
+#: admin/pages/import.php:332
 msgid "Upload failed."
 msgstr ""
 
-#: admin/pages/import.php:336
+#: admin/pages/import.php:335
 msgid "Export & Import SEO Settings"
 msgstr ""
 
@@ -2316,14 +2316,14 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
-#: frontend/class-frontend.php:846
+#: frontend/class-frontend.php:847
 msgid ""
 "Admin only notice: this page doesn't show a meta description because it "
 "doesn't have one, either write it for this page specifically or go into the "
 "SEO -> Titles menu and set up a template."
 msgstr ""
 
-#: inc/wpseo-functions.php:170
+#: inc/wpseo-functions.php:156
 msgid "Page %d of %d"
 msgstr ""
 
