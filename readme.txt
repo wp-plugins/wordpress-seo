@@ -144,7 +144,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 = trunk =
 
 * Updated .pot file
-* Updated Norwegian (nb_NO), Turkish (tr_TK) and Persian (fa_IR).
+* Updated Chinese (zh_CN), Russian (ru_RU), Norwegian (nb_NO), Turkish (tr_TK) and Persian (fa_IR).
 * Added Arabic (ar) and Romanian (ro_RO).
 
 = 1.2.8.7 =
