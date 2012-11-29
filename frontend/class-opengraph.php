@@ -5,6 +5,11 @@
  * This code handles the OpenGraph output.
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 /**
  * Adds the OpenGraph output
  */
@@ -21,12 +26,11 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	public function __construct() {
 		$this->options = get_option( 'wpseo_social' );
 
-		add_filter( 'language_attributes', array( $this, 'add_opengraph_namespace' ) );
-
 		global $fb_ver;
 		if ( isset( $fb_ver ) ) {
 			add_filter( 'fb_meta_tags', array( $this, 'facebook_filter' ), 10, 1 );
 		} else {
+			add_filter( 'language_attributes', array( $this, 'add_opengraph_namespace' ) );
 			add_action( 'wpseo_head', array( $this, 'opengraph' ) );
 		}
 		add_action( 'wpseo_head', array( $this, 'wpseo_opengraph_action' ) );
@@ -83,7 +87,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * @return string
 	 */
 	public function add_opengraph_namespace( $input ) {
-		return $input . ' xmlns:og="http://opengraphprotocol.org/schema/"';
+		return $input . ' prefix="og: http://ogp.me/ns#' . ( ( isset( $this->options['fbadminapp'] ) || isset( $this->options['fb_admins'] ) ) ? ' fb: http://ogp.me/ns/fb#' : '' ) . '"';
 	}
 
 	/**

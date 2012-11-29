@@ -3,11 +3,16 @@
  * @package Admin
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 global $wpseo_admin_pages;
 
 $options = get_option( 'wpseo' );
 
-if ( isset( $_GET['allow_tracking'] ) ) {
+if ( isset( $_GET['allow_tracking'] ) && check_admin_referer( 'wpseo_activate_tracking', 'nonce' ) ) {
 	$options['tracking_popup'] = 'done';
 	if ( $_GET['allow_tracking'] == 'yes' )
 		$options['yoast_tracking'] = 'on';
@@ -38,7 +43,7 @@ if ( isset( $options['blocking_files'] ) && is_array( $options['blocking_files']
 	echo '</p>';
 }
 
-if ( isset( $_GET['fixmetadesc'] ) && isset( $options['theme_check'] ) && isset( $options['theme_check']['description_found'] ) && $options['theme_check']['description_found'] ) {
+if ( isset( $_GET['fixmetadesc'] ) && check_admin_referer( 'wpseo-fix-metadesc', 'nonce' ) && isset( $options['theme_check'] ) && isset( $options['theme_check']['description_found'] ) && $options['theme_check']['description_found'] ) {
 	$fcontent = file_get_contents( TEMPLATEPATH . '/header.php' );
 	$msg      = '';
 	if ( !file_exists( TEMPLATEPATH . '/header.php.wpseobak' ) ) {
@@ -82,7 +87,7 @@ if ( !isset( $options['theme_check']['description'] ) ) {
 
 	if ( isset( $options['theme_check'] ) && isset( $options['theme_check']['description_found'] ) && $options['theme_check']['description_found'] ) {
 		echo '<p id="metadesc_found notice" class="wrong settings_error">'
-			. '<a href="' . admin_url( 'admin.php?page=wpseo_dashboard&fixmetadesc' ) . '" class="button fixit">' . __( 'Fix it.', 'wordpress-seo' ) . '</a>'
+			. '<a href="' . admin_url( 'admin.php?page=wpseo_dashboard&fixmetadesc&nonce=' . wp_create_nonce( 'wpseo-fix-metadesc' ) ) . '" class="button fixit">' . __( 'Fix it.', 'wordpress-seo' ) . '</a>'
 			. __( 'Your theme contains a meta description, which blocks WordPress SEO from working properly, please delete the following line, or press fix it:', 'wordpress-seo' ) . '<br />';
 		echo '<code>' . htmlentities( $options['theme_check']['description_found'] ) . '</code>';
 		echo '</p>';

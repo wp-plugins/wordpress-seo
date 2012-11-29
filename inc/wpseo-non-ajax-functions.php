@@ -3,6 +3,11 @@
  * @package Internals
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 /**
  * Flush the rewrite rules.
  */

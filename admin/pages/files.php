@@ -3,6 +3,11 @@
  * @package Admin
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 global $wpseo_admin_pages;
 
 if ( isset( $_POST[ 'submitrobots' ] ) ) {
@@ -40,7 +45,7 @@ if ( isset( $_POST[ 'submithtaccess' ] ) ) {
 
 $wpseo_admin_pages->admin_header( 'Files', false );
 if ( isset( $msg ) && !empty( $msg ) ) {
-	echo '<div id="message" style="width:94%;" class="updated fade"><p>' . $msg . '</p></div>';
+	echo '<div id="message" style="width:94%;" class="updated fade"><p>' . esc_html( $msg ) . '</p></div>';
 }
 
 if ( file_exists( get_home_path() . "robots.txt" ) ) {
@@ -50,7 +55,7 @@ if ( file_exists( get_home_path() . "robots.txt" ) ) {
 		$content = fread( $f, filesize( $robots_file ) );
 	else
 		$content = '';
-	$robotstxtcontent = htmlspecialchars( $content );
+	$robotstxtcontent = esc_textarea( $content );
 
 	if ( !is_writable( $robots_file ) ) {
 		$content = "<p><em>" . __( "If your robots.txt were writable, you could edit it from here.", 'wordpress-seo' ) . "</em></p>";
@@ -70,7 +75,7 @@ if ( (isset($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'],
 	$htaccess_file = get_home_path() . "/.htaccess";
 	$f             = fopen( $htaccess_file, 'r' );
 	$contentht     = fread( $f, filesize( $htaccess_file ) );
-	$contentht     = htmlspecialchars( $contentht );
+	$contentht     = esc_textarea( $contentht );
 
 	if ( !is_writable( $htaccess_file ) ) {
 		$content = "<p><em>" . __( "If your .htaccess were writable, you could edit it from here.", 'wordpress-seo' ) . "</em></p>";

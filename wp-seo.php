@@ -28,6 +28,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @package Main
  */
 
+if ( !defined('DB_NAME') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 if ( !defined('WPSEO_URL') )
 	define( 'WPSEO_URL', plugin_dir_url( __FILE__ ) );
 if ( !defined('WPSEO_PATH') )

@@ -3,6 +3,11 @@
  * @package Admin
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 global $wpseo_admin_pages;
 
 $options = get_wpseo_options();
@@ -13,14 +18,6 @@ $options = get_wpseo_options();
 
 if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset( $_GET[ 'settings-updated' ] ) && $_GET[ 'settings-updated' ] == 'true' ) ) {
 	$msg = __( 'Settings updated', 'wordpress-seo' );
-
-	if ( function_exists( 'w3tc_pgcache_flush' ) ) {
-		w3tc_pgcache_flush();
-		$msg .= __( ' &amp; W3 Total Cache Page Cache flushed', 'wordpress-seo' );
-	} else if ( function_exists( 'wp_cache_clear_cache' ) ) {
-		wp_cache_clear_cache();
-		$msg .= __( ' &amp; WP Super Cache flushed', 'wordpress-seo' );
-	}
 
 	echo '<div id="message" style="width:94%;" class="message updated"><p><strong>' . $msg . '.</strong></p></div>';
 }
@@ -105,7 +102,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 		if ( isset( $options[ 'redirectattachment' ] ) && $options[ 'redirectattachment' ] && $posttype == 'attachment' )
 			continue;
 		$name = $posttype->name;
-		echo '<h4 id="' . $name . '">' . ucfirst( $posttype->labels->name ) . '</h4>';
+		echo '<h4 id="' . esc_attr( $name ) . '">' . esc_html( ucfirst( $posttype->labels->name ) ) . '</h4>';
 		echo $wpseo_admin_pages->textinput( 'title-' . $name, __( 'Title template', 'wordpress-seo' ) );
 		echo $wpseo_admin_pages->textarea( 'metadesc-' . $name, __( 'Meta description template', 'wordpress-seo' ), '', 'metadesc' );
 		if ( isset( $options[ 'usemetakeywords' ] ) && $options[ 'usemetakeywords' ] )
@@ -125,7 +122,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 
 		$name = $pt->name;
 
-		echo '<h4>' . ucfirst( $pt->labels->name ) . '</h4>';
+		echo '<h4>' . esc_html( ucfirst( $pt->labels->name ) ) . '</h4>';
 		echo $wpseo_admin_pages->textinput( 'title-ptarchive-' . $name, __( 'Title', 'wordpress-seo' ) );
 		echo $wpseo_admin_pages->textarea( 'metadesc-ptarchive-' . $name, __( 'Meta description', 'wordpress-seo' ), '', 'metadesc' );
 		if ( isset( $options[ 'breadcrumbs-enable' ] ) && $options[ 'breadcrumbs-enable' ] )
@@ -139,7 +136,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 <div id="taxonomies" class="wpseotab">
 	<?php
 	foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $tax ) {
-		echo '<h4>' . $tax->labels->name . '</h4>';
+		echo '<h4>' . esc_html( ucfirst( $tax->labels->name ) ). '</h4>';
 		echo $wpseo_admin_pages->textinput( 'title-' . $tax->name, __( 'Title template', 'wordpress-seo' ) );
 		echo $wpseo_admin_pages->textarea( 'metadesc-' . $tax->name, __( 'Meta description template', 'wordpress-seo' ), '', 'metadesc' );
 		if ( isset( $options[ 'usemetakeywords' ] ) && $options[ 'usemetakeywords' ] )

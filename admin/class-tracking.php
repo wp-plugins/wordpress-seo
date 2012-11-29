@@ -3,6 +3,11 @@
  * @package Admin
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 /**
  * Class that creates the tracking functionality for WP SEO, as the core class might be used in more plugins, it's checked for existence first.
  */

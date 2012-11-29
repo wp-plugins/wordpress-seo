@@ -5,6 +5,11 @@
  * Main frontend code.
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 /**
  * Main frontend class for WordPress SEO, responsible for the SEO output as well as removing default WordPress output.
  *
@@ -908,7 +913,7 @@ class WPSEO_Frontend {
 			( isset( $options['disable-author'] ) && $options['disable-author'] && $wp_query->is_author ) ||
 			( isset( $options['disable-post_formats'] ) && $options['disable-post_formats'] && $wp_query->is_tax( 'post_format' ) )
 		) {
-			wp_redirect( get_bloginfo( 'url' ), 301 );
+			wp_safe_redirect( get_bloginfo( 'url' ), 301 );
 			exit;
 		}
 	}
@@ -921,7 +926,7 @@ class WPSEO_Frontend {
 	function attachment_redirect() {
 		global $post;
 		if ( is_attachment() && isset( $post->post_parent ) && is_numeric( $post->post_parent ) && $post->post_parent != 0 ) {
-			wp_redirect( get_permalink( $post->post_parent ), 301 );
+			wp_safe_redirect( get_permalink( $post->post_parent ), 301 );
 			exit;
 		}
 	}
@@ -1068,7 +1073,7 @@ class WPSEO_Frontend {
 		}
 
 		if ( !empty( $properurl ) && $cururl != $properurl ) {
-			wp_redirect( $properurl, 301 );
+			wp_safe_redirect( $properurl, 301 );
 			exit;
 		}
 	}

@@ -3,6 +3,11 @@
  * @package Internals
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 /**
  * Get the value from the post custom values
  *
@@ -11,6 +16,7 @@
  * @return bool|mixed
  */
 function wpseo_get_value( $val, $postid = 0 ) {
+	$postid = absint( $postid );
 	if ( $postid === 0 ) {
 		global $post;
 		if ( isset( $post ) )

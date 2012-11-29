@@ -3,6 +3,11 @@
  * @package XML_Sitemaps
  */
 
+if ( !defined('WPSEO_VERSION') ) {
+	header('HTTP/1.0 403 Forbidden');
+	die;
+}
+
 class WPSEO_Sitemaps {
 	/**
 	 * Content of the sitemap to output.
