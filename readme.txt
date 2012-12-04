@@ -145,7 +145,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 * Updated .pot file
 * Updated Danish (da_DK), Indonesian (id_ID), Chinese (zh_CN), Russian (ru_RU), Norwegian (nb_NO), Turkish (tr_TK), Hebrew (he_IL) and Persian (fa_IR).
-* Added Arabic (ar) and Romanian (ro_RO).
+* Added Arabic (ar), Catalan (ca) and Romanian (ro_RO).
 
 = 1.2.8.7 =
 
