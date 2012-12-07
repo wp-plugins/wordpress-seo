@@ -275,17 +275,17 @@ class WPSEO_Admin_Pages {
 		if ( $label_left !== false ) {
 			if ( !empty( $label_left ) )
 				$label_left .= ':';
-			$output_label = '<label class="checkbox" for="' . esc_attr( $var ) . '">' . esc_html( $label_left ) . '</label>';
+			$output_label = '<label class="checkbox" for="' . esc_attr( $var ) . '">' . $label_left . '</label>';
 			$class        = 'checkbox';
 		} else {
-			$output_label = '<label for="' . esc_attr( $var ) . '">' . esc_html( $label ) . '</label>';
+			$output_label = '<label for="' . esc_attr( $var ) . '">' . $label . '</label>';
 			$class        = 'checkbox double';
 		}
 
 		$output_input = "<input class='$class' type='checkbox' id='".esc_attr( $var )."' name='" . esc_attr( $option ) . "[" . esc_attr( $var ) ."]' " . checked( $options[$var], 'on', false ) . '/>';
 
 		if ( $label_left !== false ) {
-			$output = $output_label . $output_input . '<label class="checkbox" for="' . esc_attr( $var ) . '">' . esc_html( $label ) . '</label>';
+			$output = $output_label . $output_input . '<label class="checkbox" for="' . esc_attr( $var ) . '">' . $label . '</label>';
 		} else {
 			$output = $output_input . $output_label;
 		}
@@ -310,7 +310,7 @@ class WPSEO_Admin_Pages {
 		if ( isset( $options[$var] ) )
 			$val = esc_attr( $options[$var] );
 
-		return '<label class="textinput" for="' . esc_attr( $var ) . '">' . esc_html( $label ) . ':</label><input class="textinput" type="text" id="' . esc_attr( $var ) . '" name="' . $option . '[' . esc_attr( $var ) . ']" value="' . $val . '"/>' . '<br class="clear" />';
+		return '<label class="textinput" for="' . esc_attr( $var ) . '">' . $label . ':</label><input class="textinput" type="text" id="' . esc_attr( $var ) . '" name="' . $option . '[' . esc_attr( $var ) . ']" value="' . $val . '"/>' . '<br class="clear" />';
 	}
 
 	/**
@@ -461,7 +461,7 @@ class WPSEO_Admin_Pages {
 	function postbox( $id, $title, $content ) {
 		?>
 	<div id="<?php echo esc_attr( $id ); ?>" class="yoastbox">
-		<h2><?php echo esc_html( $title ); ?></h2>
+		<h2><?php echo $title; ?></h2>
 		<?php echo $content; ?>
 	</div>
 	<?php

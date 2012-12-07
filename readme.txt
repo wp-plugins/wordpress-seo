@@ -141,6 +141,11 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= 1.3.1 =
+
+* Fix somewhat too aggressive escaping of content.
+* Added notice text for non-existing .htaccess file / robots.txt file.
+
 = 1.3 =
 
 * Long list of small fixes and improvements to code best practices after Sucuri review. Fixes 3 small security issues.
