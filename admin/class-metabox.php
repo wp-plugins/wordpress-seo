@@ -1001,7 +1001,7 @@ class WPSEO_Metabox {
 
 		foreach ( $results as $result ) {
 			$score = wpseo_translate_score( $result['val'] );
-			$output .= '<tr><td class="score"><div class="wpseo_score_img ' . esc_attr( $score ) . '"></div></td><td>' . esc_html( $result['msg'] ) . '</td></tr>';
+			$output .= '<tr><td class="score"><div class="wpseo_score_img ' . esc_attr( $score ) . '"></div></td><td>' . $result['msg'] . '</td></tr>';
 		}
 		$output .= '</table>';
 		$output .= '<hr/>';

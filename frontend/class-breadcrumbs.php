@@ -226,7 +226,6 @@ class WPSEO_Breadcrumbs {
 
 		$opt    = get_wpseo_options();
 		$sep    = ( isset( $opt['breadcrumbs-sep'] ) && $opt['breadcrumbs-sep'] != '' ) ? $opt['breadcrumbs-sep'] : '&raquo;';
-		$sep	= esc_html( $sep );
 		$output = '';
 
 		foreach ( $links as $i => $link ) {
