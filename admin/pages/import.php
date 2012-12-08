@@ -32,7 +32,10 @@ function replace_meta( $old_metakey, $new_metakey, $replace = false ) {
 }
 
 $msg = '';
-if ( check_admin_referer( 'wpseo-import' ) && isset( $_POST['import'] ) ) {
+if ( isset( $_POST['import'] ) ) {
+
+	check_admin_referer( 'wpseo-import' );
+
 	global $wpdb;
 	$msg      = '';
 	$replace  = false;

@@ -68,8 +68,12 @@ if ( file_exists( get_home_path() . "robots.txt" ) ) {
 		$content .= '<div class="submit"><input class="button" type="submit" name="submitrobots" value="' . __( "Save changes to Robots.txt", 'wordpress-seo' ) . '" /></div>';
 		$content .= '</form>';
 	}
-	$wpseo_admin_pages->postbox( 'robotstxt', __( 'Robots.txt', 'wordpress-seo' ), $content );
+
+} else {
+	$content = '<p>'.__('If you had a robots.txt file and it was editable, you could edit it from here.','wordpress-seo');
 }
+
+$wpseo_admin_pages->postbox( 'robotstxt', __( 'Robots.txt', 'wordpress-seo' ), $content );
 
 if ( (isset($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'], 'nginx') === false) && file_exists( get_home_path() . ".htaccess" ) ) {
 	$htaccess_file = get_home_path() . "/.htaccess";
@@ -88,6 +92,9 @@ if ( (isset($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'],
 		$content .= '<div class="submit"><input class="button" type="submit" name="submithtaccess" value="' . __( 'Save changes to .htaccess', 'wordpress-seo' ) . '" /></div>';
 		$content .= '</form>';
 	}
+	$wpseo_admin_pages->postbox( 'htaccess', __( '.htaccess file', 'wordpress-seo' ), $content );
+} else if ( (isset($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'], 'nginx') === false) && !file_exists( get_home_path() . ".htaccess" ) ) {
+	$content = '<p>'.__('If you had a .htaccess file and it was editable, you could edit it from here.','wordpress-seo');
 	$wpseo_admin_pages->postbox( 'htaccess', __( '.htaccess file', 'wordpress-seo' ), $content );
 }
 
