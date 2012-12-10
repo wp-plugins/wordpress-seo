@@ -141,6 +141,12 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= trunk =
+
+* Updated wordpress-seo.pot
+* Updated Turkish (tr_TR) filename
+* Updated Spanish (es_ES) translation
+
 = 1.3.1.1 =
 
 * Some of that escaping was too aggressive.
