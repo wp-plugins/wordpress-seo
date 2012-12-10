@@ -144,8 +144,10 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 = trunk =
 
 * Updated wordpress-seo.pot
-* Updated Turkish (tr_TR) filename
-* Updated Spanish (es_ES) translation
+* Updated Turkish (tr_TR) filename.
+* Updated Spanish (es_ES) translation.
+* Fixed bug where non-admin users couldn't save their profile updates.
+* Fixed bug with the same OpenGraph image appearing multiple times.
 
 = 1.3.1.1 =
 

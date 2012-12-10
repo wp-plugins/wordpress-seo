@@ -5,8 +5,8 @@
  * This code handles the OpenGraph output.
  */
 
-if ( !defined('WPSEO_VERSION') ) {
-	header('HTTP/1.0 403 Forbidden');
+if ( !defined( 'WPSEO_VERSION' ) ) {
+	header( 'HTTP/1.0 403 Forbidden' );
 	die;
 }
 
@@ -19,6 +19,11 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * @var array $options Options for the OpenGraph Settings
 	 */
 	var $options = array();
+
+	/**
+	 * @var array $shown_images Holds the images that have been put out as OG image.
+	 */
+	var $shown_images = array();
 
 	/**
 	 * Class constructor.
@@ -141,15 +146,15 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 
 		// catch some weird locales served out by WP that are not easily doubled up.
 		$fix_locales = array(
-			'ca'=> 'ca_ES',
-			'en'=> 'en_US',
-			'el'=> 'el_GR',
-			'et'=> 'et_EE',
-			'ja'=> 'ja_JP',
-			'sq'=> 'sq_AL',
-			'uk'=> 'uk_UA',
-			'vi'=> 'vi_VN',
-			'zh'=> 'zh_CN'
+			'ca' => 'ca_ES',
+			'en' => 'en_US',
+			'el' => 'el_GR',
+			'et' => 'et_EE',
+			'ja' => 'ja_JP',
+			'sq' => 'sq_AL',
+			'uk' => 'uk_UA',
+			'vi' => 'vi_VN',
+			'zh' => 'zh_CN'
 		);
 
 		if ( isset( $fix_locales[$locale] ) )
@@ -205,6 +210,40 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	}
 
 	/**
+	 * Display an OpenGraph image tag
+	 *
+	 * @param string $img Source URL to the image
+	 *
+	 * @return bool
+	 */
+	private function image_output( $img ) {
+		if ( empty( $img ) )
+			return false;
+
+		$img = trim( apply_filters( 'wpseo_opengraph_image', $img ) );
+		if ( !empty( $img ) ) {
+			if ( strpos( $img, 'http' ) !== 0 ) {
+				if ( $img[0] != '/' )
+					return false;
+
+				// If it's a relative URL, it's relative to the domain, not necessarily to the WordPress install, we
+				// want to preserve domain name and URL scheme (http / https) though.
+				$parsed_url = parse_url( home_url() );
+				$img        = $parsed_url['scheme'] . '://' . $parsed_url['host'] . $img;
+			}
+
+			if ( in_array( $img, $this->shown_images ) )
+				return false;
+
+			array_push( $this->shown_images, $img );
+
+			echo "<meta property='og:image' content='" . esc_url( $img ) . "'/>\n";
+			return true;
+		}
+
+	}
+
+	/**
 	 * Output the OpenGraph image elements for all the images within the current post/page.
 	 *
 	 * @return bool
@@ -213,77 +252,27 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		if ( is_singular() ) {
 			global $post;
 
-			$shown_images = array();
-
 			if ( is_front_page() ) {
-				if ( is_front_page() ) {
-					$og_image = '';
-					if ( isset( $this->options['og_frontpage_image'] ) )
-						$og_image = $this->options['og_frontpage_image'];
+				$og_image = '';
+				if ( isset( $this->options['og_frontpage_image'] ) )
+					$og_image = $this->options['og_frontpage_image'];
 
-					$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
-
-					if ( isset( $og_image ) && $og_image != '' )
-						echo "<meta property='og:image' content='" . esc_attr( $og_image ) . "'/>\n";
-				}
+				$this->image_output( $og_image );
 			}
 
-			if ( function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $post->ID ) ) {
-				$featured_img = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'medium' ) );
-
-				if ( $featured_img ) {
-					$img = apply_filters( 'wpseo_opengraph_image', $featured_img[0] );
-					echo "<meta property='og:image' content='" . esc_attr( $img ) . "'/>\n";
-					$shown_images[] = $img;
-				}
-			}
+			if ( function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $post->ID ) )
+				$this->image_output( wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'medium' ) ) );
 
 			if ( preg_match_all( '/<img [^>]+>/', $post->post_content, $matches ) ) {
 				foreach ( $matches[0] as $img ) {
-					if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) ) {
-						$img = $match[2];
-
-						if ( in_array( $img, $shown_images ) )
-							continue;
-
-						if ( strpos( $img, 'http' ) !== 0 ) {
-							if ( $img[0] != '/' )
-								continue;
-							$img = get_bloginfo( 'url' ) . $img;
-						}
-
-						if ( $img != esc_url( $img ) )
-							continue;
-
-						$img = apply_filters( 'wpseo_opengraph_image', $img );
-
-						echo "<meta property='og:image' content='" . esc_attr( $img ) . "'/>\n";
-
-						$shown_images[] = $img;
-					}
+					if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) )
+						$this->image_output( $match[2] );
 				}
 			}
-			if ( count( $shown_images ) > 0 )
-				return true;
 		}
 
-
-		$og_image = '';
-
-		if ( is_front_page() ) {
-			if ( isset( $this->options['og_frontpage_image'] ) )
-				$og_image = $this->options['og_frontpage_image'];
-			if ( isset( $this->options['gp_frontpage_image'] ) )
-				$gp_image = $this->options['gp_frontpage_image'];
-		}
-
-		if ( empty( $og_image ) && isset( $this->options['og_default_image'] ) )
-			$og_image = $this->options['og_default_image'];
-
-		$og_image = apply_filters( 'wpseo_opengraph_image', $og_image );
-
-		if ( isset( $og_image ) && $og_image != '' )
-			echo "<meta property='og:image' content='" . esc_attr( $og_image ) . "'/>\n";
+		if ( count( $this->shown_images ) == 0 && isset( $this->options['og_default_image'] ) )
+			$this->image_output( $this->options['og_default_image'] );
 
 		// @TODO add G+ image stuff
 	}
