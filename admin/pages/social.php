@@ -46,7 +46,7 @@ if ( !isset( $options['fbconnectkey'] ) || empty( $options['fbconnectkey'] ) ) {
 
 if ( isset( $_GET['key'] ) && $_GET['key'] == $options['fbconnectkey'] ) {
 	if ( isset( $_GET['userid'] ) ) {
-		if ( !is_array( $options['fb_admins'] ) )
+		if ( !isset( $options['fb_admins'] ) || !is_array( $options['fb_admins'] ) )
 			$options['fb_admins'] = array();
 		$user_id                                = $_GET['userid'];
 		$options['fb_admins'][$user_id]['name'] = urldecode( $_GET['userrealname'] );
@@ -69,7 +69,7 @@ $options = get_option( 'wpseo_social' );
 
 if ( isset( $options['fb_admins'] ) && is_array( $options['fb_admins'] ) ) {
 	foreach ( $options['fb_admins'] as $id => $admin ) {
-		$fbconnect .= '<input type="hidden" name="wpseo_social[fb_admins][' . esc_attr( $id ) . ']" value="' . esc_attr( $admin ) . '"/>';
+		$fbconnect .= '<input type="hidden" name="wpseo_social[fb_admins][' . esc_attr( $id ) . ']" value="' . esc_attr( $admin['link'] ) . '"/>';
 	}
 	$clearall = true;
 }

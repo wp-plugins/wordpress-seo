@@ -818,10 +818,10 @@ class WPSEO_Metabox {
 			echo '<div title="' . $title . '" alt="' . $title . '" class="wpseo_score_img ' . esc_attr( $score ) . '"></div>';
 		}
 		if ( $column_name == 'wpseo-title' ) {
-			echo esc_html( $this->page_title( $post_id ) );
+			echo esc_html( apply_filters( 'wpseo_title', $this->page_title( $post_id ) ) );
 		}
 		if ( $column_name == 'wpseo-metadesc' ) {
-			echo esc_html( wpseo_get_value( 'metadesc', $post_id ) );
+			echo esc_html( apply_filters( 'wpseo_metadesc', wpseo_get_value( 'metadesc', $post_id ) ) );
 		}
 		if ( $column_name == 'wpseo-focuskw' ) {
 			$focuskw = wpseo_get_value( 'focuskw', $post_id );
