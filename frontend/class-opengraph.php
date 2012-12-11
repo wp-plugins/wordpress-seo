@@ -32,7 +32,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 		$this->options = get_option( 'wpseo_social' );
 
 		global $fb_ver;
-		if ( isset( $fb_ver ) ) {
+		if ( isset( $fb_ver ) || class_exists( 'Facebook_Loader' ) ) {
 			add_filter( 'fb_meta_tags', array( $this, 'facebook_filter' ), 10, 1 );
 		} else {
 			add_filter( 'language_attributes', array( $this, 'add_opengraph_namespace' ) );

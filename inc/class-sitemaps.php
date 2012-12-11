@@ -24,6 +24,11 @@ class WPSEO_Sitemaps {
 	 */
 	private $bad_sitemap = false;
 
+	/**
+	 * The maximum number of entries per sitemap page
+	 */
+	private $max_entries = 1000;
+
 	function __construct() {
 		if ( !defined( 'ENT_XML1' ) )
 			define( "ENT_XML1", 16 );
@@ -86,6 +91,10 @@ class WPSEO_Sitemaps {
 	function init() {
 		$GLOBALS['wp']->add_query_var( 'sitemap' );
 		$GLOBALS['wp']->add_query_var( 'sitemap_n' );
+
+		$options = get_wpseo_options();
+		$this->max_entries = ( isset( $options['entries-per-page'] ) && $options['entries-per-page'] != '' ) ? intval($options['entries-per-page']) : 1000;
+
 		add_rewrite_rule( 'sitemap_index\.xml$', 'index.php?sitemap=1', 'top' );
 		add_rewrite_rule( '([^/]+?)-sitemap([0-9]+)?\.xml$', 'index.php?sitemap=$matches[1]&sitemap_n=$matches[2]', 'top' );
 	}
@@ -157,14 +166,14 @@ class WPSEO_Sitemaps {
 			if ( !$count )
 				continue;
 
-			$n = ( $count > 1000 ) ? (int) ceil( $count / 1000 ) : 1;
+			$n = ( $count > $this->max_entries ) ? (int) ceil( $count / $this->max_entries ) : 1;
 			for ( $i = 0; $i < $n; $i++ ) {
 				$count = ( $n > 1 ) ? $i + 1 : '';
 
 				if ( empty( $count ) || $count == $n ) {
 					$date = $this->get_last_modified( $post_type );
 				} else {
-					$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status IN ('publish','inherit') AND post_type = %s ORDER BY post_modified_gmt ASC LIMIT 1 OFFSET %d", $post_type, $i * 1000 + 999 ) );
+					$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status IN ('publish','inherit') AND post_type = %s ORDER BY post_modified_gmt ASC LIMIT 1 OFFSET %d", $post_type, $this->max_entries * ($i + 1) - 1 ) );
 					$date = date( 'c', strtotime( $date ) );
 				}
 
@@ -255,7 +264,7 @@ class WPSEO_Sitemaps {
 		$join_filter  = apply_filters( 'wpseo_typecount_join', $join_filter, $post_type );
 		$where_filter = '';
 		$where_filter = apply_filters( 'wpseo_typecount_where', $where_filter, $post_type );
-		$typecount    = $wpdb->get_var( "SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status IN ('publish','inherit') AND post_password = '' AND post_type = '$post_type' {$where_filter}" );
+		$typecount    = $wpdb->get_var( "SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status IN ('publish','inherit') AND post_password = '' AND post_type = '$post_type' ".$where_filter );
 
 		if ( $typecount == 0 && empty( $archive ) ) {
 			$this->bad_sitemap = true;
@@ -266,8 +275,8 @@ class WPSEO_Sitemaps {
 
 		$steps  = 25;
 		$n      = (int) get_query_var( 'sitemap_n' );
-		$offset = ( $n > 1 ) ? ( $n - 1 ) * 1000 : 0;
-		$total  = $offset + 1000;
+		$offset = ( $n > 1 ) ? ( $n - 1 ) * $this->max_entries : 0;
+		$total  = $offset + $this->max_entries;
 		if ( $total > $typecount )
 			$total = $typecount;
 

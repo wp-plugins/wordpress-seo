@@ -48,6 +48,11 @@ foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $tax ) {
 		$content .= $wpseo_admin_pages->checkbox( 'taxonomies-' . $tax->name . '-not_in_sitemap', $tax->labels->name . ' (<code>' . $tax->name . '</code>)' );
 }
 
+$content .= '<br/>';
+$content .= '<strong>' . __( 'Entries per page', 'wordpress-seo' ) . '</strong><br/>';
+$content .= '<p>' . __( 'Please enter the max number of entries per sitemap page:', 'wordpress-seo' ) . '</p>';
+$content .= $wpseo_admin_pages->textinput( 'entries-per-page', __( 'Max entries per sitemap page', 'wordpress-seo' ) );
+
 $content .= '<br class="clear"/>';
 $content .= '</div>';
 

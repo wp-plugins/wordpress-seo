@@ -156,6 +156,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 * Switch tracking to a daily cronjob instead of an admin process to prevent tracking from slowing down admin interface.
 * Focus keyword detection now properly works for diacritical focus keywords as well.
 * Properly apply filters to meta desc and titles in admin grid.
+* Properly detect new versions of Facebook plugin too.
 
 = 1.3.1.1 =
 
