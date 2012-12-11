@@ -12,7 +12,9 @@ global $wpseo_admin_pages;
 
 $options = get_site_option( 'wpseo_ms' );
 
-if ( check_admin_referer( 'wpseo-network-settings' ) && isset( $_POST[ 'wpseo_submit' ] ) ) {
+if ( isset( $_POST[ 'wpseo_submit' ] ) ) {
+	check_admin_referer( 'wpseo-network-settings' );
+
 	foreach ( array( 'access', 'defaultblog' ) as $opt ) {
 		$options[ $opt ] = $_POST[ 'wpseo_ms' ][ $opt ];
 	}
@@ -20,7 +22,8 @@ if ( check_admin_referer( 'wpseo-network-settings' ) && isset( $_POST[ 'wpseo_su
 	echo '<div id="message" class="updated"><p>' . __( 'Settings Updated.', 'wordpress-seo' ) . '</p></div>';
 }
 
-if ( check_admin_referer( 'wpseo-network-restore' ) && isset( $_POST[ 'wpseo_restore_blog' ] ) ) {
+if ( isset( $_POST[ 'wpseo_restore_blog' ] ) ) {
+	check_admin_referer( 'wpseo-network-restore' );
 	if ( isset( $_POST[ 'wpseo_ms' ][ 'restoreblog' ] ) && is_numeric( $_POST[ 'wpseo_ms' ][ 'restoreblog' ] ) ) {
 		$blog = get_blog_details( $_POST[ 'wpseo_ms' ][ 'restoreblog' ] );
 		if ( $blog ) {

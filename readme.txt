@@ -157,6 +157,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 * Focus keyword detection now properly works for diacritical focus keywords as well.
 * Properly apply filters to meta desc and titles in admin grid.
 * Properly detect new versions of Facebook plugin too.
+* Allow changing of the number of posts per XML sitemap, to prevent memory issues on certain installs.
 
 = 1.3.1.1 =
 

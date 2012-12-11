@@ -37,7 +37,6 @@ if ( isset( $_POST['import'] ) ) {
 	check_admin_referer( 'wpseo-import' );
 
 	global $wpdb;
-	$msg      = '';
 	$replace  = false;
 	$deletekw = false;
 
@@ -199,7 +198,7 @@ if ( isset( $_POST['import'] ) ) {
 		replace_meta( '_aioseop_description', '_yoast_wpseo_metadesc', $replace );
 		replace_meta( '_aioseop_keywords', '_yoast_wpseo_metakeywords', $replace );
 		replace_meta( '_aioseop_title', '_yoast_wpseo_title', $replace );
-		$msg .= '<p>' . __( 'All in One SEO data successfully imported.', 'wordpress-seo' ) . '</p>';
+		$msg .= __( 'All in One SEO data successfully imported.', 'wordpress-seo' );
 	}
 	if ( isset( $_POST['wpseo']['importaioseoold'] ) ) {
 		replace_meta( 'description', '_yoast_wpseo_metadesc', $replace );
