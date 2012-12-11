@@ -272,6 +272,9 @@ class WPSEO_Admin_Pages {
 		if ( !isset( $options[$var] ) )
 			$options[$var] = false;
 
+		if ( $options[$var] === true )
+			$options[$var] = 'on';
+
 		if ( $label_left !== false ) {
 			if ( !empty( $label_left ) )
 				$label_left .= ':';

@@ -37,7 +37,7 @@ $content .= $wpseo_admin_pages->checkbox( 'xml_ping_ask', __( "Ping Ask.com", 'w
 $content .= '<br/><strong>' . __( 'Exclude post types', 'wordpress-seo' ) . '</strong><br/>';
 $content .= '<p>' . __( 'Please check the appropriate box below if there\'s a post type that you do <strong>NOT</strong> want to include in your sitemap:', 'wordpress-seo' ) . '</p>';
 foreach ( get_post_types( array( 'public' => true ), 'objects' ) as $pt ) {
-	$content .= $wpseo_admin_pages->checkbox( 'post_types-' . $pt->name . '-not_in_sitemap', $pt->labels->name );
+	$content .= $wpseo_admin_pages->checkbox( 'post_types-' . $pt->name . '-not_in_sitemap', $pt->labels->name . ' (<code>' . $pt->name . '</code>)' );
 }
 
 $content .= '<br/>';
@@ -45,7 +45,7 @@ $content .= '<strong>' . __( 'Exclude taxonomies', 'wordpress-seo' ) . '</strong
 $content .= '<p>' . __( 'Please check the appropriate box below if there\'s a taxonomy that you do <strong>NOT</strong> want to include in your sitemap:', 'wordpress-seo' ) . '</p>';
 foreach ( get_taxonomies( array( 'public' => true ), 'objects' ) as $tax ) {
 	if ( isset( $tax->labels->name ) && trim( $tax->labels->name ) != '' )
-		$content .= $wpseo_admin_pages->checkbox( 'taxonomies-' . $tax->name . '-not_in_sitemap', $tax->labels->name );
+		$content .= $wpseo_admin_pages->checkbox( 'taxonomies-' . $tax->name . '-not_in_sitemap', $tax->labels->name . ' (<code>' . $tax->name . '</code>)' );
 }
 
 $content .= '<br class="clear"/>';

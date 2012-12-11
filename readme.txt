@@ -148,6 +148,12 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 * Updated Spanish (es_ES) translation.
 * Fixed bug where non-admin users couldn't save their profile updates.
 * Fixed bug with the same OpenGraph image appearing multiple times.
+* Fixed bug that would prevent import and export of plugin settings.
+* Try to do a redirect back after saving settings.
+* Properly allow for attachment pages in XML sitemaps, default them to off.
+* Fixed annoying bug where checkboxes wouldn't display as "checked" even when the value was set to true.
+* Show post type name and taxonomy name (as opposed to label) next to labels in XML sitemap settings to more easily identify post types and taxonomies.
+* Switch tracking to a daily cronjob instead of an admin process to prevent tracking from slowing down admin interface.
 
 = 1.3.1.1 =
 

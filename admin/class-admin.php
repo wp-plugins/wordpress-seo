@@ -3,8 +3,8 @@
  * @package Admin
  */
 
-if ( !defined('WPSEO_VERSION') ) {
-	header('HTTP/1.0 403 Forbidden');
+if ( !defined( 'WPSEO_VERSION' ) ) {
+	header( 'HTTP/1.0 403 Forbidden' );
 	die;
 }
 
@@ -87,8 +87,8 @@ class WPSEO_Admin {
 		register_setting( 'yoast_wpseo_social_options', 'wpseo_social' );
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() ) {
-			if ( get_option('wpseo') == '1pseo_social' )
-				delete_option('wpseo');
+			if ( get_option( 'wpseo' ) == '1pseo_social' )
+				delete_option( 'wpseo' );
 			register_setting( 'yoast_wpseo_multisite_options', 'wpseo_multisite' );
 		}
 	}
@@ -464,7 +464,7 @@ class WPSEO_Admin {
 		// Fix wrongness created by buggy version 1.2.2
 		if ( version_compare( $current_version, '1.2.4', '<' ) ) {
 			$options = get_option( 'wpseo_titles' );
-			if ( is_array($options) && isset( $options['title-home'] ) && $options['title-home'] == '%%sitename%% - %%sitedesc%% - 12345' ) {
+			if ( is_array( $options ) && isset( $options['title-home'] ) && $options['title-home'] == '%%sitename%% - %%sitedesc%% - 12345' ) {
 				$options['title-home'] = '%%sitename%% - %%sitedesc%%';
 				update_option( 'wpseo_titles', $options );
 			}
@@ -472,7 +472,7 @@ class WPSEO_Admin {
 
 		if ( version_compare( $current_version, '1.2.8', '<' ) ) {
 			$options = get_option( 'wpseo' );
-			if ( is_array($options) && isset( $options['presstrends'] ) ) {
+			if ( is_array( $options ) && isset( $options['presstrends'] ) ) {
 				$options['yoast_tracking'] = 'on';
 				unset( $options['presstrends'] );
 				update_option( 'wpseo', $options );
@@ -481,18 +481,25 @@ class WPSEO_Admin {
 
 		if ( version_compare( $current_version, '1.2.8.2', '<' ) ) {
 			$options = get_option( 'wpseo' );
-			if ( is_array($options) && isset( $options['presstrends'] ) ) {
+			if ( is_array( $options ) && isset( $options['presstrends'] ) ) {
 				$options['yoast_tracking'] = 'on';
 				unset( $options['presstrends'] );
 			}
-			if ( is_array($options) && isset( $options['presstrends_popup'] ) ) {
+			if ( is_array( $options ) && isset( $options['presstrends_popup'] ) ) {
 				$options['tracking_popup'] = 'on';
 				unset( $options['presstrends_popup'] );
 			}
 			update_option( 'wpseo', $options );
 		}
 
-		$options = get_option( 'wpseo' );
+		if ( version_compare( $current_version, '1.3.1.2', '<' ) ) {
+			$options = get_option( 'wpseo_xml' );
+
+			$options['post_types-attachment-not_in_sitemap'] = true;
+			update_option( 'wpseo_xml', $options );
+		}
+
+		$options            = get_option( 'wpseo' );
 		$options['version'] = WPSEO_VERSION;
 		update_option( 'wpseo', $options );
 	}

@@ -98,7 +98,7 @@ function wpseo_admin_init() {
 		update_option( 'wpseo', $options );
 	}
 
-	if ( isset( $options['yoast_tracking'] ) && ( 'on' ==  $options['yoast_tracking'] || true === $options['yoast_tracking'] ) ) {
+	if ( isset( $options['yoast_tracking'] ) && $options['yoast_tracking'] ) {
 		require WPSEO_PATH.'admin/class-tracking.php';
 	}
 

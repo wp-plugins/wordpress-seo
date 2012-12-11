@@ -147,13 +147,12 @@ class WPSEO_Sitemaps {
 
 		// reference post type specific sitemaps
 		foreach ( get_post_types( array( 'public' => true ) ) as $post_type ) {
-			if ( $post_type == 'attachment' )
-				continue;
-
 			if ( isset( $options['post_types-' . $post_type . '-not_in_sitemap'] ) && $options['post_types-' . $post_type . '-not_in_sitemap'] )
 				continue;
 
-			$count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts WHERE post_type = %s AND post_status = 'publish' LIMIT 1", $post_type ) );
+			$query = $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts WHERE post_type = '%s' AND post_status IN ('publish','inherit')", $post_type );
+
+			$count = $wpdb->get_var( $query );
 			// don't include post types with no posts
 			if ( !$count )
 				continue;
@@ -165,7 +164,7 @@ class WPSEO_Sitemaps {
 				if ( empty( $count ) || $count == $n ) {
 					$date = $this->get_last_modified( $post_type );
 				} else {
-					$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status = 'publish' AND post_type = %s ORDER BY post_modified_gmt ASC LIMIT 1 OFFSET %d", $post_type, $i * 1000 + 999 ) );
+					$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status IN ('publish','inherit') AND post_type = %s ORDER BY post_modified_gmt ASC LIMIT 1 OFFSET %d", $post_type, $i * 1000 + 999 ) );
 					$date = date( 'c', strtotime( $date ) );
 				}
 
@@ -212,7 +211,7 @@ class WPSEO_Sitemaps {
 
 		if (
 			( isset( $options['post_types-' . $post_type . '-not_in_sitemap'] ) && $options['post_types-' . $post_type . '-not_in_sitemap'] )
-			|| in_array( $post_type, array( 'revision', 'nav_menu_item', 'attachment' ) )
+			|| in_array( $post_type, array( 'revision', 'nav_menu_item' ) )
 		) {
 			$this->bad_sitemap = true;
 			return;
@@ -256,7 +255,7 @@ class WPSEO_Sitemaps {
 		$join_filter  = apply_filters( 'wpseo_typecount_join', $join_filter, $post_type );
 		$where_filter = '';
 		$where_filter = apply_filters( 'wpseo_typecount_where', $where_filter, $post_type );
-		$typecount    = $wpdb->get_var( "SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status = 'publish' AND post_password = '' AND post_type = '$post_type' {$where_filter}" );
+		$typecount    = $wpdb->get_var( "SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status IN ('publish','inherit') AND post_password = '' AND post_type = '$post_type' {$where_filter}" );
 
 		if ( $typecount == 0 && empty( $archive ) ) {
 			$this->bad_sitemap = true;
@@ -284,7 +283,7 @@ class WPSEO_Sitemaps {
 			$posts = $wpdb->get_results( "SELECT l.ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
 			FROM ( 
 				SELECT ID FROM $wpdb->posts {$join_filter}
-						WHERE post_status = 'publish'
+						WHERE post_status IN ('publish','inherit')
 						AND	post_password = ''
 						AND post_type = '$post_type'
 						{$where_filter}
@@ -492,7 +491,7 @@ class WPSEO_Sitemaps {
 					ON		term_tax.term_taxonomy_id = term_rel.term_taxonomy_id
 					AND		term_tax.taxonomy = '$c->taxonomy'
 					AND		term_tax.term_id = $c->term_id
-					WHERE	p.post_status = 'publish'
+					WHERE	p.post_status IN ('publish','inherit')
 					AND		p.post_password = ''";
 			$url['mod'] = $wpdb->get_var( $sql );
 			$url['chf'] = 'weekly';
@@ -619,7 +618,7 @@ class WPSEO_Sitemaps {
 			$key  = 'lastpostmodified:gmt:' . $post_type;
 			$date = wp_cache_get( $key, 'timeinfo' );
 			if ( !$date ) {
-				$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status = 'publish' AND post_type = %s ORDER BY post_modified_gmt DESC LIMIT 1", $post_type ) );
+				$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status IN ('publish','inherit') AND post_type = %s ORDER BY post_modified_gmt DESC LIMIT 1", $post_type ) );
 				if ( $date )
 					wp_cache_set( $key, $date, 'timeinfo' );
 			}

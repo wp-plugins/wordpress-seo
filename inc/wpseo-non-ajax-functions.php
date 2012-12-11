@@ -74,6 +74,7 @@ function wpseo_defaults() {
 	if ( !is_array( get_option( 'wpseo_xml' ) ) ) {
 		$opt = array(
 			'enablexmlsitemap' => 'on',
+			'post_types-attachment-not_in_sitemap' => true
 		);
 		update_option( 'wpseo_xml', $opt );
 	}

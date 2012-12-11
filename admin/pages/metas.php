@@ -113,23 +113,27 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 		echo '<br/>';
 	}
 
-	echo '<h2>' . __( 'Custom Post Type Archives', 'wordpress-seo' ) . '</h2>';
-	echo '<p>' . __( 'Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.', 'wordpress-seo' ) . '</p>';
+	$post_types = get_post_types( array( 'public' => true, '_builtin' => false ), 'objects' );
 
-	foreach ( get_post_types( array( 'public' => true, '_builtin' => false ), 'objects' ) as $pt ) {
-		if ( !$pt->has_archive )
-			continue;
+	if ( count( $post_types ) > 0 ) {
+		echo '<h2>' . __( 'Custom Post Type Archives', 'wordpress-seo' ) . '</h2>';
+		echo '<p>' . __( 'Note: instead of templates these are the actual titles and meta descriptions for these custom post type archive pages.', 'wordpress-seo' ) . '</p>';
 
-		$name = $pt->name;
+		foreach ( $post_types as $pt ) {
+			if ( !$pt->has_archive )
+				continue;
 
-		echo '<h4>' . esc_html( ucfirst( $pt->labels->name ) ) . '</h4>';
-		echo $wpseo_admin_pages->textinput( 'title-ptarchive-' . $name, __( 'Title', 'wordpress-seo' ) );
-		echo $wpseo_admin_pages->textarea( 'metadesc-ptarchive-' . $name, __( 'Meta description', 'wordpress-seo' ), '', 'metadesc' );
-		if ( isset( $options[ 'breadcrumbs-enable' ] ) && $options[ 'breadcrumbs-enable' ] )
-			echo $wpseo_admin_pages->textinput( 'bctitle-ptarchive-' . $name, __( 'Breadcrumbs Title', 'wordpress-seo' ) );
-		echo $wpseo_admin_pages->checkbox( 'noindex-ptarchive-' . $name, '<code>noindex, follow</code>', __( 'Meta Robots', 'wordpress-seo' ) );
+			$name = $pt->name;
+
+			echo '<h4>' . esc_html( ucfirst( $pt->labels->name ) ) . '</h4>';
+			echo $wpseo_admin_pages->textinput( 'title-ptarchive-' . $name, __( 'Title', 'wordpress-seo' ) );
+			echo $wpseo_admin_pages->textarea( 'metadesc-ptarchive-' . $name, __( 'Meta description', 'wordpress-seo' ), '', 'metadesc' );
+			if ( isset( $options[ 'breadcrumbs-enable' ] ) && $options[ 'breadcrumbs-enable' ] )
+				echo $wpseo_admin_pages->textinput( 'bctitle-ptarchive-' . $name, __( 'Breadcrumbs Title', 'wordpress-seo' ) );
+			echo $wpseo_admin_pages->checkbox( 'noindex-ptarchive-' . $name, '<code>noindex, follow</code>', __( 'Meta Robots', 'wordpress-seo' ) );
+		}
+		unset( $pt, $post_type );
 	}
-	unset( $pt, $post_type );
 
 	?>
 </div>

@@ -19,6 +19,11 @@ if ( isset( $_GET['allow_tracking'] ) && check_admin_referer( 'wpseo_activate_tr
 	else
 		$options['yoast_tracking'] = 'off';
 	update_option( 'wpseo', $options );
+
+	if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
+		wp_safe_redirect( $_SERVER['HTTP_REFERER'], 307 );
+		exit;
+	}
 }
 
 $wpseo_admin_pages->admin_header( __( 'General Settings', 'wordpress-seo' ), true, 'yoast_wpseo_options', 'wpseo' );

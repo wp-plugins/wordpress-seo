@@ -311,7 +311,7 @@ class WPSEO_Frontend {
 			$title = $this->get_title_from_options( 'title-search' );
 
 			if ( empty( $title ) )
-				$title_part = sprintf( __( 'Search for "%s"', 'wordpress-seo' ), get_search_query() );
+				$title_part = sprintf( __( 'Search for "%s"', 'wordpress-seo' ), esc_html( get_search_query() ) );
 		} else if ( is_category() || is_tag() || is_tax() ) {
 			$title = $this->get_taxonomy_title();
 
