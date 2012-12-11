@@ -492,7 +492,7 @@ class WPSEO_Admin {
 			update_option( 'wpseo', $options );
 		}
 
-		if ( version_compare( $current_version, '1.3.1.2', '<' ) ) {
+		if ( version_compare( $current_version, '1.3.2', '<' ) ) {
 			$options = get_option( 'wpseo_xml' );
 
 			$options['post_types-attachment-not_in_sitemap'] = true;
