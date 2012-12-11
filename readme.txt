@@ -154,6 +154,8 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 * Fixed annoying bug where checkboxes wouldn't display as "checked" even when the value was set to true.
 * Show post type name and taxonomy name (as opposed to label) next to labels in XML sitemap settings to more easily identify post types and taxonomies.
 * Switch tracking to a daily cronjob instead of an admin process to prevent tracking from slowing down admin interface.
+* Focus keyword detection now properly works for diacritical focus keywords as well.
+
 
 = 1.3.1.1 =
 

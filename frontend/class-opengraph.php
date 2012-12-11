@@ -253,19 +253,18 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			global $post;
 
 			if ( is_front_page() ) {
-				$og_image = '';
 				if ( isset( $this->options['og_frontpage_image'] ) )
-					$og_image = $this->options['og_frontpage_image'];
-
-				$this->image_output( $og_image );
+					$this->image_output( $this->options['og_frontpage_image'] );
 			}
 
-			if ( function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $post->ID ) )
-				$this->image_output( wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'medium' ) ) );
+			if ( function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $post->ID ) ) {
+				$thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'medium' ) );
+				$this->image_output( $thumb[0] );
+			}
 
 			if ( preg_match_all( '/<img [^>]+>/', $post->post_content, $matches ) ) {
 				foreach ( $matches[0] as $img ) {
-					if ( preg_match( '/src=("|\')([^"|\']+)("|\')/', $img, $match ) )
+					if ( preg_match( '/src=("|\')(.*?)\1/', $img, $match ) )
 						$this->image_output( $match[2] );
 				}
 			}
