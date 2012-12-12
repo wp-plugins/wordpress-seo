@@ -141,13 +141,15 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
-= Trunk =
+= 1.3.3 =
 
 * Properly `$wpdb->prepare` all queries that need preparing.
 * Fix wrong escaping in admin pointers.
 * Make %%currentdate%% and %%currenttime%% variables respect WP date format settings.
 * Add %%currentday%% format.
 * Force remove Jetpack OpenGraph.
+* Fix the weird addition of `noindex, nofollow` on URLs with ?replytocom that was added in 3.5.
+* Force XML sitemap to be displayed on the proper domain URL, so XSLT works.
 
 = 1.3.2 =
 

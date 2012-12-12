@@ -115,8 +115,8 @@ class WPSEO_Sitemaps {
 		}
 
 		$wphost = parse_url( get_site_url(), PHP_URL_HOST );
-		if ( $_SERVER['SERVER_NAME'] != $wphost ) {
-			wp_redirect( trailingslashit( get_site_url() ) . $_SERVER['REQUEST_URI'], 301 );
+		if ( isset( $_SERVER['SERVER_NAME'] ) && $_SERVER['SERVER_NAME'] != $wphost ) {
+			wp_redirect( rtrim( get_site_url(), '/' ) . $_SERVER['REQUEST_URI'], 301 );
 		}
 		$this->output();
 		die();

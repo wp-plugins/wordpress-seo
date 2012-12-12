@@ -87,6 +87,9 @@ class WPSEO_Frontend {
 
 		if ( isset( $options['title_test'] ) && $options['title_test'] )
 			add_filter( 'wpseo_title', array( $this, 'title_test_helper' ) );
+
+		if ( isset( $_GET['replytocom'] ) )
+			remove_action( 'wp_head', 'wp_no_robots' );
 	}
 
 	/**
@@ -878,7 +881,6 @@ class WPSEO_Frontend {
 	 * Outputs noindex values for the current page.
 	 */
 	function noindex_page() {
-		$this->debug_marker();
 		echo '<meta name="robots" content="noindex" />' . "\n";
 	}
 
