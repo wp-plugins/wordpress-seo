@@ -38,6 +38,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			add_filter( 'language_attributes', array( $this, 'add_opengraph_namespace' ) );
 			add_action( 'wpseo_head', array( $this, 'opengraph' ) );
 		}
+		remove_action( 'wp_head', 'jetpack_og_tags' );
 		add_action( 'wpseo_head', array( $this, 'wpseo_opengraph_action' ) );
 	}
 
