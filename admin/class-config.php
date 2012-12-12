@@ -156,7 +156,7 @@ class WPSEO_Admin_Pages {
 	 */
 	function delete_meta( $metakey ) {
 		global $wpdb;
-		$wpdb->query( "DELETE FROM $wpdb->postmeta WHERE meta_key = '$metakey'" );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s", $metakey ) );
 	}
 
 	/**

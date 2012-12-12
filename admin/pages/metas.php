@@ -189,7 +189,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%date%%</th>
 				<td>' . __( 'Replaced with the date of the post/page', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%title%%</th>
 				<td>' . __( 'Replaced with the title of the post/page', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -197,7 +197,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%sitename%%</th>
 				<td>' . __( 'The site\'s name', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%sitedesc%%</th>
 				<td>' . __( 'The site\'s tagline / description', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -205,7 +205,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%excerpt%%</th>
 				<td>' . __( 'Replaced with the post/page excerpt (or auto-generated if it does not exist)', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%excerpt_only%%</th>
 				<td>' . __( 'Replaced with the post/page excerpt (without auto-generation)', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -213,7 +213,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%tag%%</th>
 				<td>' . __( 'Replaced with the current tag/tags', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%category%%</th>
 				<td>' . __( 'Replaced with the post categories (comma separated)', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -221,7 +221,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%category_description%%</th>
 				<td>' . __( 'Replaced with the category description', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%tag_description%%</th>
 				<td>' . __( 'Replaced with the tag description', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -229,7 +229,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%term_description%%</th>
 				<td>' . __( 'Replaced with the term description', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%term_title%%</th>
 				<td>' . __( 'Replaced with the term name', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -237,7 +237,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%pt_single%%</th>
 				<td>' . __( 'Replaced with the post type single label', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%pt_plural%%</th>
 				<td>' . __( 'Replaced with the post type plural label', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -245,7 +245,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%modified%%</th>
 				<td>' . __( 'Replaced with the post/page modified time', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%id%%</th>
 				<td>' . __( 'Replaced with the post/page ID', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -253,7 +253,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%name%%</th>
 				<td>' . __( 'Replaced with the post/page author\'s \'nicename\'', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%userid%%</th>
 				<td>' . __( 'Replaced with the post/page author\'s userid', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -270,30 +270,34 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<td>' . __( 'Replaced with the current date', 'wordpress-seo' ) . '</td>
 			</tr>
 			<tr class="alt">
+				<th>%%currentday%%</th>
+				<td>' . __( 'Replaced with the current day', 'wordpress-seo' ) . '</td>
+			</tr>
+			<tr>
 				<th>%%currentmonth%%</th>
 				<td>' . __( 'Replaced with the current month', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr>
+			<tr class="alt">
 				<th>%%currentyear%%</th>
 				<td>' . __( 'Replaced with the current year', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%page%%</th>
 				<td>' . __( 'Replaced with the current page number (i.e. page 2 of 4)', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr>
+			<tr class="alt">
 				<th>%%pagetotal%%</th>
 				<td>' . __( 'Replaced with the current page total', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%pagenumber%%</th>
 				<td>' . __( 'Replaced with the current page number', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr>
+			<tr class="alt">
 				<th>%%caption%%</th>
 				<td>' . __( 'Attachment caption', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%focuskw%%</th>
 				<td>' . __( 'Replaced with the posts focus keyword', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -301,7 +305,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%cf_&lt;custom-field-name&gt;%%</th>
 				<td>' . __( 'Replaced with a posts custom field value', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%ct_&lt;custom-tax-name&gt;%%</th>
 				<td>' . __( 'Replaced with a posts custom taxonomies, comma separated.', 'wordpress-seo' ) . '</td>
 			</tr>
@@ -309,7 +313,7 @@ if ( ( isset( $_GET[ 'updated' ] ) && $_GET[ 'updated' ] == 'true' ) || ( isset(
 				<th>%%ct_desc_&lt;custom-tax-name&gt;%%</th>
 				<td>' . __( 'Replaced with a custom taxonomoies description', 'wordpress-seo' ) . '</td>
 			</tr>
-			<tr class="alt">
+			<tr>
 				<th>%%sep%%</th>
 				<td>' . __( 'The separator defined in your theme\'s <code>wp_title()</code> tag.', 'wordpress-seo' ) . '</td>
 			</tr>

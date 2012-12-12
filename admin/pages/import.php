@@ -19,7 +19,7 @@ global $wpseo_admin_pages;
  */
 function replace_meta( $old_metakey, $new_metakey, $replace = false ) {
 	global $wpdb;
-	$oldies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->postmeta WHERE meta_key = '$old_metakey'" ) );
+	$oldies = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $wpdb->postmeta WHERE meta_key = %s", $old_metakey ) );
 	foreach ( $oldies as $old ) {
 		// Prevent inserting new meta values for posts that already have a value for that new meta key
 		$check = get_post_meta( $old->post_id, $new_metakey, true );

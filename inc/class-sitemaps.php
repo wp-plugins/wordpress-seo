@@ -240,7 +240,8 @@ class WPSEO_Sitemaps {
 		$where_filter = '';
 		$where_filter = apply_filters( 'wpseo_typecount_where', $where_filter, $post_type );
 
-		$typecount = $wpdb->get_var( "SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status IN ('publish','inherit') AND post_password = '' AND post_type = '$post_type' " . $where_filter );
+		$query = $wpdb->prepare( "SELECT COUNT(ID) FROM $wpdb->posts {$join_filter} WHERE post_status IN ('publish','inherit') AND post_password = '' AND post_type = %s " . $where_filter, $post_type );
+		$typecount = $wpdb->get_var( $query );
 
 		if ( $total > $typecount )
 			$total = $typecount;
@@ -287,6 +288,7 @@ class WPSEO_Sitemaps {
 		// We grab post_date, post_name, post_author and post_status too so we can throw these objects into get_permalink, which saves a get_post call for each permalink.
 		while ( $total > $offset ) {
 
+			// Make sure you're wpdb->preparing everything you throw into this!!
 			$join_filter  = apply_filters( 'wpseo_posts_join', false, $post_type );
 			$where_filter = apply_filters( 'wpseo_posts_where', false, $post_type );
 
@@ -307,15 +309,6 @@ class WPSEO_Sitemaps {
 					ORDER BY l.ID", $post_type, $steps, $offset );
 
 			$posts = $wpdb->get_results( $query );
-
-			/*			$posts = $wpdb->get_results("SELECT ID, post_content, post_name, post_author, post_parent, post_modified_gmt, post_date, post_date_gmt
-			   FROM $wpdb->posts {$join_filter}
-			   WHERE post_status = 'publish'
-			   AND	post_password = ''
-			   AND post_type = '$post_type'
-			   {$where_filter}
-			   ORDER BY post_modified ASC
-			   LIMIT $steps OFFSET $offset"); */
 
 			$offset = $offset + $steps;
 
@@ -475,7 +468,7 @@ class WPSEO_Sitemaps {
 			$url = array();
 
 			if ( wpseo_get_term_meta( $c, $c->taxonomy, 'noindex' )
-				&& wpseo_get_term_meta( $c, $c->taxonomy, 'sitemap_include' ) != 'always'
+				&& !in_array( wpseo_get_term_meta( $c, $c->taxonomy, 'sitemap_include' ), array( 'always', '-' ) )
 			)
 				continue;
 
@@ -497,16 +490,16 @@ class WPSEO_Sitemaps {
 			}
 
 			// Grab last modified date
-			$sql        = "SELECT MAX(p.post_date) AS lastmod
+			$sql        = $wpdb->prepare( "SELECT MAX(p.post_date) AS lastmod
 					FROM	$wpdb->posts AS p
 					INNER JOIN $wpdb->term_relationships AS term_rel
 					ON		term_rel.object_id = p.ID
 					INNER JOIN $wpdb->term_taxonomy AS term_tax
 					ON		term_tax.term_taxonomy_id = term_rel.term_taxonomy_id
-					AND		term_tax.taxonomy = '$c->taxonomy'
-					AND		term_tax.term_id = $c->term_id
+					AND		term_tax.taxonomy = %s
+					AND		term_tax.term_id = %d
 					WHERE	p.post_status IN ('publish','inherit')
-					AND		p.post_password = ''";
+					AND		p.post_password = ''", $c->taxonomy, $c->term_id );
 			$url['mod'] = $wpdb->get_var( $sql );
 			$url['chf'] = 'weekly';
 			$output .= $this->sitemap_url( $url );
