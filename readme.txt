@@ -141,6 +141,11 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= Trunk =
+
+* Prevent notice for images without alt tags.
+* Use mb_string when possible.
+
 = 1.3.3 =
 
 * Properly `$wpdb->prepare` all queries that need preparing.
