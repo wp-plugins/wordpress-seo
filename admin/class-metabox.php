@@ -467,11 +467,16 @@ class WPSEO_Metabox {
 	 */
 	function do_meta_box( $meta_box ) {
 		$content = '';
+		$meta_box_value = '';
 
 		if ( !isset( $meta_box['name'] ) ) {
 			$meta_box['name'] = '';
 		} else {
-			$meta_box_value = wpseo_get_value( $meta_box['name'] );
+			if ( wpseo_get_value( $meta_box['name'] ) !== false ) {
+				$meta_box_value = wpseo_get_value( $meta_box['name'] );
+			} else if ( isset( $meta_box['std'] ) ) {
+				$meta_box_value = $meta_box['std'];
+			}
 			$meta_box['name'] = esc_attr( $meta_box['name'] );
 		}
 
@@ -482,9 +487,6 @@ class WPSEO_Metabox {
 		$placeholder = '';
 		if ( isset( $meta_box['placeholder'] ) && !empty( $meta_box['placeholder'] ) )
 			$placeholder = $meta_box['placeholder'];
-
-		if ( ( !isset( $meta_box_value ) || empty( $meta_box_value ) ) && isset( $meta_box['std'] ) )
-			$meta_box_value = $meta_box['std'];
 
 		$content .= '<tr>';
 		$content .= '<th scope="row"><label for="yoast_wpseo_' . $meta_box['name'] . '">' . $meta_box['title'] . ':</label></th>';
@@ -527,7 +529,7 @@ class WPSEO_Metabox {
 				break;
 			case "checkbox":
 				$checked = '';
-				if ( $meta_box_value != 'off' )
+				if ( $meta_box_value == 'on' || $meta_box_value == true )
 					$checked = 'checked="checked"';
 				$expl = ( isset( $meta_box['expl'] ) ) ? esc_html( $meta_box['expl'] ) : '';
 				$content .= '<input type="checkbox" id="yoast_wpseo_' . $meta_box['name'] . '" name="yoast_wpseo_' . $meta_box['name'] . '" ' . $checked . ' class="yoast' . $class . '"/> ' . $expl . '<br />';

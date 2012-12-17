@@ -114,10 +114,10 @@ class WPSEO_Sitemaps {
 			return;
 		}
 
-		$wphost = parse_url( get_site_url(), PHP_URL_HOST );
-		if ( isset( $_SERVER['SERVER_NAME'] ) && $_SERVER['SERVER_NAME'] != $wphost ) {
-			wp_redirect( rtrim( get_site_url(), '/' ) . $_SERVER['REQUEST_URI'], 301 );
-		}
+//		$wphost = parse_url( get_site_url(), PHP_URL_HOST );
+//		if ( isset( $_SERVER['SERVER_NAME'] ) && $_SERVER['SERVER_NAME'] != $wphost ) {
+//			wp_redirect( rtrim( get_site_url(), '/' ) . $_SERVER['REQUEST_URI'], 301 );
+//		}
 		$this->output();
 		die();
 	}

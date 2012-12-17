@@ -19,7 +19,7 @@ function wpseo_get_value( $val, $postid = 0 ) {
 	$postid = absint( $postid );
 	if ( $postid === 0 ) {
 		global $post;
-		if ( isset( $post ) )
+		if ( isset( $post ) && isset( $post->post_status ) && $post->post_status != 'auto-draft')
 			$postid = $post->ID;
 		else
 			return false;
