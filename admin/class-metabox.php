@@ -217,7 +217,7 @@ class WPSEO_Metabox {
 		foreach ( get_post_types( array( 'public'=> true ) ) as $posttype ) {
 			if ( isset( $options['hideeditbox-' . $posttype] ) && $options['hideeditbox-' . $posttype] )
 				continue;
-			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', 'wordpress-seo' ), array( $this, 'meta_box' ), $posttype, 'normal', 'high' );
+			add_meta_box( 'wpseo_meta', __( 'WordPress SEO by Yoast', 'wordpress-seo' ), array( $this, 'meta_box' ), $posttype, 'normal', apply_filters( 'wpseo_metabox_prio', 'high' ) );
 		}
 	}
 
@@ -1432,7 +1432,7 @@ class WPSEO_Metabox {
 		preg_match_all( '/<img[^>]+>/im', $post->post_content, $matches );
 		$imgs['alts'] = array();
 		foreach ( $matches[0] as $img ) {
-			if ( preg_match( '/alt=("|\')(.*?)\1/', $img, $alt ) )
+			if ( preg_match( '/alt=("|\')(.*?)\1|', $img, $alt ) )
 				$imgs['alts'][] = $this->strtolower_utf8( $alt[2] );
 		}
 		if ( preg_match_all( '/\[gallery/', $post->post_content, $matches ) ) {

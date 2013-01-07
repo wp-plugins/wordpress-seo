@@ -141,6 +141,11 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= 1.3.4.2 =
+
+* Added missing filter for meta box priority.
+* Fixed bug in JS encoding.
+
 = 1.3.4.1 =
 
 * Bug in page analysis regex.
