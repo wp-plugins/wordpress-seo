@@ -1432,7 +1432,7 @@ class WPSEO_Metabox {
 		preg_match_all( '/<img[^>]+>/im', $post->post_content, $matches );
 		$imgs['alts'] = array();
 		foreach ( $matches[0] as $img ) {
-			if ( preg_match( '/alt=("|\')(.*?)\1|', $img, $alt ) )
+			if ( preg_match( '/alt=("|\')(.*?)\1/', $img, $alt ) )
 				$imgs['alts'][] = $this->strtolower_utf8( $alt[2] );
 		}
 		if ( preg_match_all( '/\[gallery/', $post->post_content, $matches ) ) {
