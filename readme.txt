@@ -147,7 +147,6 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 * Improved logic for rel=publisher on frontpage.
 * Allow variables in meta description for post type archive.
 * Improved counting of images for page analysis.
-*
 * updated Turkish (tr_TR)
 * updated Russian (ru_RU)
 * updated Indonesian (id_ID)
