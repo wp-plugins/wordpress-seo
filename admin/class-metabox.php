@@ -1104,7 +1104,7 @@ class WPSEO_Metabox {
 
 		// Images
 		$imgs          = array();
-		$imgs['count'] = $this->get_image_count( $xpath );
+		$imgs['count'] = substr_count( $post->post_content, '<img' );
 		$imgs          = $this->get_images_alt_text( $post, $imgs );
 		$this->score_images_alt_text( $job, $results, $imgs );
 		unset( $imgs );
@@ -1445,18 +1445,6 @@ class WPSEO_Metabox {
 			}
 		}
 		return $imgs;
-	}
-
-	/**
-	 * Use XPATH to count the number of images.
-	 *
-	 * @param object $xpath An XPATH object of the document
-	 * @return int Image count
-	 */
-	function get_image_count( &$xpath ) {
-		$query       = "//img|//IMG";
-		$dom_objects = $xpath->query( $query );
-		return count( $dom_objects );
 	}
 
 	/**

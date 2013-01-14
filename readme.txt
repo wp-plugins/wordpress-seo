@@ -141,15 +141,19 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
-= trunk =
+= 1.3.4.4 =
 
+* Bug with revisions in XML sitemap for some weird combinations.
+* Improved logic for rel=publisher on frontpage.
+* Allow variables in meta description for post type archive.
+* Improved counting of images for page analysis.
+*
 * updated Turkish (tr_TR)
 * updated Russian (ru_RU)
 * updated Indonesian (id_ID)
 * updated French (fr_FR)
 * updated Czech (cs_CZ)
 * added Japanese (ja)
-
 
 = 1.3.4.3 =
 
