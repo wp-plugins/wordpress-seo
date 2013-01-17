@@ -141,6 +141,13 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= trunk =
+
+* Updated Hebrew (he_IL)
+* Updated Italian (it_IT)
+* Updated Dutch (nl_NL)
+* Updated Swedish (sv_SE)
+
 = 1.3.4.4 =
 
 * Bug with revisions in XML sitemap for some weird combinations.
