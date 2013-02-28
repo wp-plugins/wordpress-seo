@@ -141,6 +141,11 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
+= trunk =
+
+* Updated .pot file
+* Updated bg_BG, bs_BA, cs_CZ, fa_IR, hu_HU, pl_PL & ru_RU
+
 = 1.4 =
 
 * i18n & documentation:
