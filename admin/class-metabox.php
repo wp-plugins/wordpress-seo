@@ -260,7 +260,8 @@ class WPSEO_Metabox {
 			"type"         => "text",
 			"title"        => __( 'Focus Keyword', 'wordpress-seo' ),
 			"autocomplete" => "off",
-			"help"         => sprintf( "Pick the main keyword or keyphrase that this post/page is about.<br/><br/>Read %sthis post%s for more info.", "<a href='http://yoast.com/focus-keyword/'>", '</a>' )
+			"help"         => sprintf( "Pick the main keyword or keyphrase that this post/page is about.<br/><br/>Read %sthis post%s for more info.", "<a href='http://yoast.com/focus-keyword/'>", '</a>' ),
+			"description"  => "<div id='focuskwresults'></div>",
 		);
 		$mbs['title']          = array(
 			"name"        => "title",

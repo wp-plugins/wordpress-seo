@@ -70,12 +70,14 @@ class WPSEO_Admin_Pages {
 		?>
     <div class="postbox-container" style="width:261px;">
 		<div id="sidebar">
+			<?php if ( ! class_exists( 'wpseo_Video_Sitemap' ) ) { ?>
 			<h3><?php _e('Improve your Video SEO!', 'wordpress-seo'); ?></h3>
 			<a target="_blank" href="http://yoast.com/wordpress/video-seo/#utm_source=wordpress-seo-config&utm_medium=banner&utm_campaign=video-seo-banner"><img src="<?php echo WPSEO_URL; ?>/images/banner-video-seo.png" alt="Banner WordPress SEO Video SEO extension"/></a>
-
+			<?php } ?>
+			<?php if ( ! class_exists( 'wpseo_Video_Manual' ) ) { ?>
             <h3><?php _e('WordPress SEO training videos', 'wordpress-seo'); ?></h3>
 			<a target="_blank" href="http://yoast.com/wordpress/video-manual-wordpress-seo/#utm_source=wordpress-seo-config&utm_medium=banner&utm_campaign=video-manual-banner"><img src="<?php echo WPSEO_URL; ?>/images/banner-video-seo-manual.png" alt="Banner WordPress SEO Video manual"/></a>
-
+			<?php } ?>
             <h3><?php _e('Have Team Yoast review your site', 'wordpress-seo'); ?></h3>
             <a target="_blank" href="https://yoast.com/hire-us/website-review/#utm_source=wordpress-seo-config&utm_medium=banner&utm_campaign=website-review-banner"><img src="<?php echo WPSEO_URL; ?>/images/banner-website-review.png" alt="Website Review banner"/></a>
 			<?php

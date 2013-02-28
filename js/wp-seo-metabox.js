@@ -96,6 +96,8 @@ function testFocusKw() {
         html += 'Meta description: ' + ptest( jQuery('#yoast_wpseo_metadesc').val(), p );
         html += '</p>';
         jQuery('#focuskwresults').html(html);
+    } else {
+        jQuery('#focuskwresults').html('');
     }
 }
 
