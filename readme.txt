@@ -141,9 +141,15 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
-= trunk =
+= 1.4.2 =
 
-* Updated bs_BA, cs_CZ, da_DK, de_DE, fa_IR, fr_FR, he_IL, hu_HU, id_ID, it_IT, nl_NL, pl_PL, pt_BR, ru_RU and tr_TR
+* Bugfixes
+    * Made the sitemaps class load in backend too so it always generates rewrites correctly.
+    * Changed > to /> in class-twitter.php for validation as XHTML.
+    * Small fix in metabox CSS for small screens (thx [Ryan Hellyer](http://ryanhellyer.net)).
+    * Load classes on plugins_loaded instead of immediately on load to allow WPML to filter options.
+* i18n
+    * Updated bs_BA, cs_CZ, da_DK, de_DE, fa_IR, fr_FR, he_IL, hu_HU, id_ID, it_IT, nl_NL, pl_PL, pt_BR, ru_RU and tr_TR
 
 = 1.4.1 =
 
