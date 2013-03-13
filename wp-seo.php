@@ -105,7 +105,6 @@ function wpseo_admin_init() {
 		require WPSEO_PATH . 'admin/class-tracking.php';
 	}
 
-
 	require WPSEO_PATH . 'admin/class-admin.php';
 
 	global $pagenow;

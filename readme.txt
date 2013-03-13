@@ -1,8 +1,8 @@
 === WordPress SEO by Yoast ===
 Contributors: joostdevalk
 Donate link: http://yoast.com/
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl.html
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
 Requires at least: 3.3
 Tested up to: 3.5
@@ -136,10 +136,18 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 3. The WordPress SEO settings for a taxonomy.
 4. The fully configurable XML sitemap for WordPress SEO.
 5. Easily import SEO data from All In One SEO pack and HeadSpace2 SEO.
-6. Example of the Linkdex Page Analysis functionality.
+6. Example of the Page Analysis functionality.
 7. The advanced section of the WordPress SEO meta box.
 
 == Changelog ==
+
+= trunk =
+
+* Bugfixes
+    * Register core SEO menu at a lower than default prio so other plugins can tie in more easily.
+    * Remove alt= from page analysis score divs.
+    * Make site tracking use the site hash consistently between plugins.
+    * Improve popup pointer removal.
 
 = 1.4.2 =
 
@@ -180,7 +188,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
     * Slight performance improvement in options call by adding some caching (kudos to @Rarst as well).
     * Changed inner workings of search engine ping, adding YOAST_SEO_PING_IMMEDIATELY constant to allow immediate ping on publish.
     * Changed design of meta box, moving much of the help text out in favor of clicking on a help icon.
-    * Removed Linkdex box.
+    * Removed Linkdex branding from page analysis functionality.
 
 = 1.3.4.4 =
 
@@ -451,7 +459,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 	* Fixes to OpenGraph images for homepage.
 	* Fixed a notice in OpenGraph class on 404 pages.
 	* Fixed notices in OpenGraph admin when selecting Facebook app as admin.
-	* Fixed a bug where half the Linkdex analyses wouldn't work when the visual editor is disabled.
+	* Fixed a bug where half the Page analyses wouldn't work when the visual editor is disabled.
 	* Changed the mime type of the XSL file for XML sitemaps to text/xml, so Firefox will display them properly.
 	* Made sure the default OpenGraph image will always show up when there's no other image.
 	* Updated tablesorting JS used in XML Sitemaps.
@@ -565,7 +573,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 = 1.1.1 =
 
-* Fixed `sprintf` bug in Linkdex check.
+* Fixed `sprintf` bug in page analysis.
 * Fixed bug that caused inability to edit / save the search page title.
 * Fixed bug that caused inability to edit / save the "parent" blog in multisite settings.
 * Removed ability to edit WP Super Cache .htaccess file as it doesn't seem to be there anymore.
@@ -702,7 +710,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 	* OpenGraph:
 		* Moved all OpenGraph code to specific OpenGraph class.
 		* Added option to specify and add FB Page and App ID and FB admin ID or ID's.
-	* Linkdex:
+	* Page Analaysis:
 		* Fixed bug in detection of headings with an ID or other attribute.
 	* Several performance optimizations to class includes.
 	* Some fixes in JavaScript keyword detection and keyword bolding in snippet when using colon and semicolons etc in title or meta description.
@@ -727,7 +735,7 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 	* No longer uses Google JS API for jQuery UI CSS, but included the needed classes in the plugins CSS files.
 	* Properly update sitemap for custom post types on publication.
 	* Fixed a notice in heading detection when no headings were found.
-	* Fixed a typo in Linkdex messages.
+	* Fixed a typo in Page Analysis messages.
 
 = 0.3.4 =
 

@@ -33,11 +33,11 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 			// Start of Metrics
 			global $wpdb;
 
-			$options = get_option( 'wpseo' );
+			$hash = get_option( 'Yoast_Tracking_Hash' );
 
-			if ( !isset( $options['hash'] ) || empty( $options['hash'] ) ) {
-				$options['hash'] = md5( site_url() );
-				update_option( 'wpseo', $options );
+			if ( !isset( $hash ) || !$hash || empty( $hash ) ) {
+				$hash = md5( site_url() );
+				update_option( 'Yoast_Tracking_Hash', $hash );
 			}
 
 			$data = get_transient( 'yoast_tracking_cache' );
@@ -98,7 +98,7 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 
 				$data = array(
 					'site'     => array(
-						'hash'      => $options['hash'],
+						'hash'      => $hash,
 						'url'       => site_url(),
 						'name'      => get_bloginfo( 'name' ),
 						'version'   => get_bloginfo( 'version' ),
