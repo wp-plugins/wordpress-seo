@@ -146,6 +146,8 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 * Fix changelog for 1.4.3
 * Bugfixes
     * Fix activation bug.
+* i18n
+	* Updated es_ES, id_ID, he_IL.
 
 = 1.4.3 =
 
