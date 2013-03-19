@@ -141,7 +141,12 @@ rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 las
 
 == Changelog ==
 
-= trunk =
+= 1.4.4 =
+
+* Bugfixes
+    * Fix activation bug.
+
+= 1.4.3 =
 
 * Bugfixes
     * Register core SEO menu at a lower than default prio so other plugins can tie in more easily.

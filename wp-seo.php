@@ -54,7 +54,7 @@ if ( version_compare( PHP_VERSION, '5.2', '<' ) ) {
 	}
 }
 
-define( 'WPSEO_VERSION', '1.4.3' );
+define( 'WPSEO_VERSION', '1.4.4' );
 
 $pluginurl = plugin_dir_url( __FILE__ );
 if ( preg_match( '/^https/', $pluginurl ) && !preg_match( '/^https/', get_bloginfo( 'url' ) ) )
@@ -69,9 +69,6 @@ function wpseo_init() {
 
 	if ( isset( $options['stripcategorybase'] ) && $options['stripcategorybase'] )
 		require WPSEO_PATH . 'inc/class-rewrite.php';
-
-	if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX )
-		require WPSEO_PATH . 'inc/wpseo-non-ajax-functions.php';
 
 	if ( isset( $options['enablexmlsitemap'] ) && $options['enablexmlsitemap'] )
 		require WPSEO_PATH . 'inc/class-sitemaps.php';
@@ -128,6 +125,9 @@ function wpseo_admin_init() {
 }
 
 add_action( 'plugins_loaded', 'wpseo_init', 14 );
+
+if ( !defined( 'DOING_AJAX' ) || !DOING_AJAX )
+	require WPSEO_PATH . 'inc/wpseo-non-ajax-functions.php';
 
 if ( is_admin() ) {
 	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
