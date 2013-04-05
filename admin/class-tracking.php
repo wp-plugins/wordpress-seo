@@ -9,7 +9,11 @@ if ( !defined( 'WPSEO_VERSION' ) ) {
 }
 
 /**
- * Class that creates the tracking functionality for WP SEO, as the core class might be used in more plugins, it's checked for existence first.
+ * Class that creates the tracking functionality for WP SEO, as the core class might be used in more plugins,
+ * it's checked for existence first.
+ *
+ * NOTE: this functionality is opt-in. Disabling the tracking in the settings or saying no when asked will cause
+ * this file to not even be loaded.
  */
 if ( !class_exists( 'Yoast_Tracking' ) ) {
 	class Yoast_Tracking {
@@ -84,6 +88,9 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 
 				$plugins = array();
 				foreach ( get_option( 'active_plugins' ) as $plugin_path ) {
+					if ( !function_exists( 'get_plugin_data' ) )
+						require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
 					$plugin_info = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin_path );
 
 					$slug           = str_replace( '/' . basename( $plugin_path ), '', $plugin_path );
