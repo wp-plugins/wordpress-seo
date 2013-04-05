@@ -31,7 +31,7 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 		 */
 		function tracking() {
 			// Start of Metrics
-			global $wpdb;
+			global $blog_id, $wpdb;
 
 			$hash = get_option( 'Yoast_Tracking_Hash' );
 
@@ -103,7 +103,7 @@ if ( !class_exists( 'Yoast_Tracking' ) ) {
 						'name'      => get_bloginfo( 'name' ),
 						'version'   => get_bloginfo( 'version' ),
 						'multisite' => is_multisite(),
-						'users'     => count( get_users() ),
+						'users'     => $wpdb->get_var( "SELECT COUNT(*) FROM wp_users INNER JOIN wp_usermeta ON (wp_users.ID = wp_usermeta.user_id) WHERE 1 = 1 AND ( wp_usermeta.meta_key = 'wp_{$blog_id}_capabilities' ) " ),
 						'lang'      => get_locale(),
 					),
 					'pts'      => $pts,
