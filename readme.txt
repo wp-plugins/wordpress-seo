@@ -89,45 +89,7 @@ For more info, check out the following articles:
 
 == Frequently Asked Questions ==
 
-= The SEO title output for the plugin doesn't work as expected =
-
-You've set up a template for your titles, but things get added to it when they're output? You can do two things: either enable "Force rewrite titles" on the SEO -> Titles settings page, or go into your header.php and change the title element to just this:
-
-`<title><?php wp_title(''); ?></title>`
-
-= I'm not seeing a meta description in my `<head>` section? =
-
-Check whether your theme's `header.php` file contains a call to [wp_head()](http://codex.wordpress.org/Function_Reference/wp_head).
-
-= My meta descriptions aren't showing up in the search result pages =
-
-There are two possible issues with a meta description:
-
-1. You're putting out more than one of them due to multiple plugins adding a description, for instance the WordBooker plugin adds a description too but has an option to disable it, other SEO plugins running might be another cause.
-1. You're not seeing your meta description show up in the search result pages. Google will not alway show your meta description, the likelihood of your meta description appearing in the search results increases incredibly when your meta description contains the sought for keyword though, which is why the focus keyword functionality checks for the appearance of the focus keyword in the description.
-
-= Page X, Y, Z for plugin X doesn't work with your plugin enabled =
-
-Disable the clean permalinks feature on the SEO -> Permalinks settings page.
-
-= Does your plugin allow for Google News Sitemaps too? =
-
-It does! You'll need an add-on module for that though, which you can download from the [News SEO](http://yoast.com/wordpress/seo/news-seo/) module homepage!
-
-= Why is WordPress SEO better than All In One SEO Pack? =
-
-It's not a secret that the author of this plugin, Joost de Valk, aka Yoast, doesn't really like All In One SEO Pack. The main reason is that All in One SEO pack has a default option for auto generating meta descriptions that is actually making it harder for people to rank well in a lot of cases, giving them a false sense of security.
-
-Once you'll start using this plugin, you won't ask that question anymore, you'll just ask yourself "why does anyone still use All In One SEO"? There's several things this plugin does better: it has a snippet preview in the write post screen that'll help you optimize your titles, meta descriptions and copy instantly while working on your posts and pages.
-
-Also, other than All In One SEO Pack, this plugin has a completely working canonical implementation for all pages within your site, whereas the one in All In One SEO pack is broken, it was originally written by the author of this plugin, so he knows. It comes with XML Sitemaps, an XML News sitemap module, loads and loads of robots meta options and other options to improve your SEO.
-
-= I want to use your XML Sitemaps with NGINX, is that possible? =
-
-Yes, of course! Here are the rewrite rules you'll need:
-
-`rewrite ^/sitemap_index\.xml$ /index.php?sitemap=1 last;
-rewrite ^/([^/]+?)-sitemap([0-9]+)?\.xml$ /index.php?sitemap=$1&sitemap_n=$2 last;`
+You'll find the [FAQ on Yoast.com](http://yoast.com/wordpress/seo/faq/).
 
 == Screenshots ==
 
