@@ -103,6 +103,9 @@ You'll find the [FAQ on Yoast.com](http://yoast.com/wordpress/seo/faq/).
 
 == Changelog ==
 
+= trunk =
+* Updated .pot file
+
 = 1.4.7 =
 
 * Properly fix security bug that should've been fixed in 1.4.5.
