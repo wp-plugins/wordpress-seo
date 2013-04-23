@@ -312,3 +312,127 @@ function allow_custom_field_edits( $allcaps, $cap, $args ) {
 	return $allcaps;
 }
 add_filter( 'user_has_cap', 'allow_custom_field_edits', 0, 3 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function wpseo_sitemap_handler( $atts, $content = null ) {
+	extract( shortcode_atts( array(
+		'authors' => true,
+		'pages' => true,
+		'posts' => true,
+		// ...etc
+	), $atts ) );
+	  
+	// Get any existing copy of our transient data
+	if ( false !== ( $output = get_transient( 'yo_out' ) ) ) {
+		// $output .= 'CACHE';
+		// return $output;
+	}
+
+	$output = '';
+	// create author list
+	if ($authors !== 'no') {
+		$output .= '<h2 id="authors">Authors</h2><ul>';	  
+		// use echo => false b/c shortcode format screws up
+		$author_list = wp_list_authors(
+			array(
+				'exclude_admin' => false,
+				'echo' => false,
+			)
+		);
+		$output .= $author_list;
+		$output .= '</ul>';
+	}
+
+	// create page list
+	if ($pages !== 'no') {
+		$output .= '<h2 id="pages">Pages</h2><ul>';	  
+		// Add pages you'd like to exclude in the exclude here
+		// possibly have this controlled by shortcode params
+		$page_list = wp_list_pages(
+			array(
+				'exclude' => '',
+				'title_li' => '',
+				'echo' => false,
+			)
+		);
+		$output .= $page_list;
+		$output .= '</ul>';
+	}
+	
+	// create post list
+	if ($posts !== 'no') {
+		$output .= '<h2 id="posts">Posts</h2><ul>';
+		// Add categories you'd like to exclude in the exclude here
+		// possibly have this controlled by shortcode params
+		$cats = get_categories('exclude=');
+		foreach ($cats as $cat) {
+			$output .= "<li><h3>".$cat->cat_name."</h3>";
+			$output .= "<ul>";
+			
+			// TODO: might need work around for < WP 3.5, no support for NOT EXISTS		
+			$args = array(
+				'post_type' => 'post',
+				'post_status' => 'publish',
+				
+				'posts_per_page' => -1,
+				'cat' => $cat->cat_ID,
+				
+				'meta_query' => array(
+					'relation' => 'OR',
+					// include of this key doesn't exists
+					array(
+						'key' => '_yoast_wpseo_meta-robots-noindex',
+						'value' => '', // This is ignored, but is necessary...
+						'compare' => 'NOT EXISTS'
+					),
+					// OR if key does exists include if it is not 1
+					array(
+						'key' => '_yoast_wpseo_meta-robots-noindex',
+						'value' => '1',
+						'compare' => '!='
+					),
+					// OR this key overrides it
+					array(
+						'key' => '_yoast_wpseo_sitemap-html-include',
+						'value' => 'always',
+						'compare' => '='
+					)
+				)
+			);
+			
+			$posts = get_posts( $args );
+			foreach ($posts as $post) {
+				$category = get_the_category( $post->ID );
+				
+				// Only display a post link once, even if it's in multiple categories
+				if ($category[0]->cat_ID == $cat->cat_ID) {
+					$output .= '<li><a href="'.get_permalink($post->ID).'">'.get_the_title($post->ID).'</a></li>';
+				}
+			}
+			
+			$output .= "</ul>";
+			$output .= "</li>";
+		}
+	}
+	
+	$output .= '</ul>';
+	
+	set_transient( 'yo_out', $output, 60 );
+	// delete_transient( 'yo_out' );
+	return $output;
+}
+add_shortcode( 'wpseo_sitemap', 'wpseo_sitemap_handler' );
+
