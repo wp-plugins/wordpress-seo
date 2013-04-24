@@ -396,6 +396,20 @@ class WPSEO_Metabox {
 				),
 			);
 		}
+		if ( wpseo_get_value( 'meta-robots-noindex', $post->ID ) === '1' ) {
+			$mbs['sitemap-html-include'] = array(
+				"name"        => "sitemap-html-include",
+				"std"         => "-",
+				"type"        => "select",
+				"title"       => __( "Include in HTML Sitemap", 'wordpress-seo' ),
+				"description" => __( "Should this page be in the HTML Sitemap at all times, regardless of Robots Meta settings?", 'wordpress-seo' ),
+				"options"     => array(
+					"-"      => __( "Auto detect", 'wordpress-seo' ),
+					"always" => __( "Always include", 'wordpress-seo' ),
+					"never"  => __( "Never include", 'wordpress-seo' ),
+				),
+			);
+		}
 		$mbs['canonical'] = array(
 			"name"        => "canonical",
 			"std"         => "",

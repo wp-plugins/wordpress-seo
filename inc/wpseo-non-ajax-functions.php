@@ -3,6 +3,8 @@
  * @package Internals
  */
 
+include 'class-sitemap-walker.php';
+ 
 if ( !defined( 'WPSEO_VERSION' ) ) {
 	header( 'HTTP/1.0 403 Forbidden' );
 	die;
@@ -328,23 +330,27 @@ add_filter( 'user_has_cap', 'allow_custom_field_edits', 0, 3 );
 
 
 function wpseo_sitemap_handler( $atts, $content = null ) {
-	extract( shortcode_atts( array(
-		'authors' => true,
-		'pages' => true,
-		'posts' => true,
-		// ...etc
-	), $atts ) );
-	  
+	
+	$display_authors = ($atts['authors'] !== 'no') ? true : false;
+	$display_pages   = ($atts['pages'] !== 'no') ? true : false;
+	$display_posts   = ($atts['posts'] !== 'no') ? true : false;
+	
+	// Delete the transient if any of these are no
+	if ( $authors === 'no' || $pages === 'no' || $posts === 'no' ) {
+		delete_transient( 'html-sitemap' );
+	}
+	
 	// Get any existing copy of our transient data
-	if ( false !== ( $output = get_transient( 'yo_out' ) ) ) {
-		// $output .= 'CACHE';
+	if ( false !== ( $output = get_transient( 'html-sitemap' ) ) ) {
+		// $output .= 'CACHE'; // debug
 		// return $output;
 	}
 
+	
 	$output = '';
 	// create author list
-	if ($authors !== 'no') {
-		$output .= '<h2 id="authors">Authors</h2><ul>';	  
+	if ( $display_authors ) {
+		$output .= '<h2 id="authors">'.__( 'Authors', 'wordpress-seo' ).'</h2><ul>';
 		// use echo => false b/c shortcode format screws up
 		$author_list = wp_list_authors(
 			array(
@@ -357,8 +363,8 @@ function wpseo_sitemap_handler( $atts, $content = null ) {
 	}
 
 	// create page list
-	if ($pages !== 'no') {
-		$output .= '<h2 id="pages">Pages</h2><ul>';	  
+	if ( $display_pages ) {
+		$output .= '<h2 id="pages">'.__( 'Pages', 'wordpress-seo' ).'</h2><ul>';
 		// Add pages you'd like to exclude in the exclude here
 		// possibly have this controlled by shortcode params
 		$page_list = wp_list_pages(
@@ -373,16 +379,15 @@ function wpseo_sitemap_handler( $atts, $content = null ) {
 	}
 	
 	// create post list
-	if ($posts !== 'no') {
-		$output .= '<h2 id="posts">Posts</h2><ul>';
+	if ( $display_posts ) {
+		$output .= '<h2 id="posts">'.__( 'Posts', 'wordpress-seo' ).'</h2><ul>';
 		// Add categories you'd like to exclude in the exclude here
 		// possibly have this controlled by shortcode params
 		$cats = get_categories('exclude=');
-		foreach ($cats as $cat) {
+		foreach ( $cats as $cat ) {
 			$output .= "<li><h3>".$cat->cat_name."</h3>";
 			$output .= "<ul>";
 			
-			// TODO: might need work around for < WP 3.5, no support for NOT EXISTS		
 			$args = array(
 				'post_type' => 'post',
 				'post_status' => 'publish',
@@ -392,7 +397,7 @@ function wpseo_sitemap_handler( $atts, $content = null ) {
 				
 				'meta_query' => array(
 					'relation' => 'OR',
-					// include of this key doesn't exists
+					// include if this key doesn't exists
 					array(
 						'key' => '_yoast_wpseo_meta-robots-noindex',
 						'value' => '', // This is ignored, but is necessary...
@@ -412,8 +417,9 @@ function wpseo_sitemap_handler( $atts, $content = null ) {
 					)
 				)
 			);
-			
+
 			$posts = get_posts( $args );
+			
 			foreach ($posts as $post) {
 				$category = get_the_category( $post->ID );
 				
@@ -427,12 +433,53 @@ function wpseo_sitemap_handler( $atts, $content = null ) {
 			$output .= "</li>";
 		}
 	}
-	
 	$output .= '</ul>';
 	
-	set_transient( 'yo_out', $output, 60 );
-	// delete_transient( 'yo_out' );
+	
+	// create custom post type list
+	$args = array(
+		'public'   => true,
+		'_builtin' => false
+	); 
+	// get all public non-builtin post types
+	$post_types = get_post_types( $args, 'object', 'and' );
+	
+	foreach ( $post_types as $post_type ) {
+		// if ($post_type->name == 'note') {
+			$output .= create_type_sitemap_template( $post_type );
+		// }
+	}
+	
+	
+	set_transient( 'html-sitemap', $output, 60 );
 	return $output;
 }
 add_shortcode( 'wpseo_sitemap', 'wpseo_sitemap_handler' );
 
+
+
+function create_type_sitemap_template( $post_type ) {
+	$output = '<h2 id="'.$post_type->name.'">'.__( $post_type->label, 'wordpress-seo' ).'</h2><ul>';
+	
+	// Get all registered taxonomy of this post type
+	$taxs = get_object_taxonomies( $post_type->name, 'object' );
+	
+	// Build the taxonomy tree
+	$walker = new Sitemap_Walker();
+	foreach( $taxs as $key => $tax ) {
+		$output .= wp_list_categories(
+			array( 
+				'title_li' => __( $tax->labels->name ),
+				'echo' => false,
+				'taxonomy' => $key,				
+				// 'hierarchical' => 0, // uncomment this for a flat list
+				
+				'walker' => $walker,
+				'post_type' => $post_type->name // arg used by the Walker class
+			)
+		);
+	}
+	
+	$output .= '</ul>';
+	return $output;
+}
