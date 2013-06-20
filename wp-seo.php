@@ -42,9 +42,7 @@ if ( !defined( 'WPSEO_BASENAME' ) )
 
 define( 'WPSEO_FILE', __FILE__ );
 
-add_filter( 'wp_loaded', function() {
-	load_plugin_textdomain( 'wordpress-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-} );
+load_plugin_textdomain( 'wordpress-seo', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 if ( version_compare( PHP_VERSION, '5.2', '<' ) ) {
 	if ( is_admin() && ( !defined( 'DOING_AJAX' ) || !DOING_AJAX ) ) {
