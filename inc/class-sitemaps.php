@@ -8,6 +8,9 @@ if ( !defined( 'WPSEO_VERSION' ) ) {
 	die;
 }
 
+/**
+ * Class WPSEO_Sitemaps
+ */
 class WPSEO_Sitemaps {
 	/**
 	 * Content of the sitemap to output.
@@ -627,18 +630,14 @@ class WPSEO_Sitemaps {
 	/**
 	 * Build the sub-sitemap for authors
 	 *
-	 * 
+	 * @since 1.4.8
 	 */
 	function build_user_map() {
-		global $wpdb;
-
-		$options = get_wpseo_options();
 		$output = '';
 
 		$steps  = 25;
 		$n      = (int) get_query_var( 'sitemap_n' );
 		$offset = ( $n > 1 ) ? ( $n - 1 ) * $this->max_entries : 0;
-		$total  = $offset + $this->max_entries;
 
 		// initial query to fill in missing usermeta with the current timestamp
 		$users = get_users( array(			
@@ -656,38 +655,21 @@ class WPSEO_Sitemaps {
 			update_user_meta( $user->ID, '_yoast_wpseo_profile_updated', time() );
 		}
 
-
 		// query for users with this meta
 		$users = get_users( array(
 			'who' => 'authors',
 			'offset' => $offset,
 			'number' => $steps,
-			// 'fields' => 'all_with_meta',
-			
 			'meta_key' => '_yoast_wpseo_profile_updated',
 			'orderby' => 'meta_value_num',
 			'order' => 'ASC',
-
-			// 'meta_query' => array (
-				// array(
-					// 'key' => 'wpseo_profile_updated',
-			// 		// 'compare' => '=',
-			// 		// 'value' => '1369862987',			
-				// )
-			// )
-
 		) );
 		
 		$users = apply_filters( 'wpseo_sitemap_exclude_author', $users );		
 
 		// ascending sort
-		usort( $users, function($a, $b) {
-			if ($a->_yoast_wpseo_profile_updated == $b->_yoast_wpseo_profile_updated) {
-		    	return 0;  
-		  	}  
-		  	return ($a->_yoast_wpseo_profile_updated > $b->_yoast_wpseo_profile_updated) ? 1 : -1;  
-		}  );
-			
+		usort( $users, array( $this, 'user_map_sorter') );
+				
 		foreach ($users as $user) {
 			if ($author_link = get_author_posts_url( $user->ID ) ) {
 				$output .= $this->sitemap_url( array(
@@ -834,6 +816,24 @@ class WPSEO_Sitemaps {
 		$user = isset( $pieces[1] ) ? $pieces[1] : '';
 		return get_user_by( 'slug', $user );
 	}
+
+	
+	/**
+	 * Sorts an array of WP_User by the _yoast_wpseo_profile_updated meta field
+	 * 
+	 * since 1.6
+	 *
+	 * @param Wp_User $a The first WP user
+	 * @param Wp_User $b The second WP user
+	 * @return int 0 if equal, 1 if $a is larger else or -1;
+	 */
+	private function user_map_sorter($a, $b) {
+		if ($a->_yoast_wpseo_profile_updated == $b->_yoast_wpseo_profile_updated) {
+	    	return 0;  
+	  	}  
+	  	return ($a->_yoast_wpseo_profile_updated > $b->_yoast_wpseo_profile_updated) ? 1 : -1;  
+	}
+
 }
 
 global $wpseo_sitemaps;
