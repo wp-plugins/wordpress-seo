@@ -190,9 +190,10 @@ class WPSEO_Sitemaps {
 					$date = $this->get_last_modified( $post_type );
 				} else {
 					$date = $wpdb->get_var( $wpdb->prepare( "SELECT post_modified_gmt FROM $wpdb->posts WHERE post_status IN ('publish','inherit') AND post_type = %s ORDER BY post_modified_gmt ASC LIMIT 1 OFFSET %d", $post_type, $this->max_entries * ( $i + 1 ) - 1 ) );
-					$date = date( 'c', strtotime( $date ) );
 				}
 
+				$date = date( 'c', strtotime( $date ) );
+				
 				$this->sitemap .= '<sitemap>' . "\n";
 				$this->sitemap .= '<loc>' . home_url( $base . $post_type . '-sitemap' . $count . '.xml' ) . '</loc>' . "\n";
 				$this->sitemap .= '<lastmod>' . htmlspecialchars( $date ) . '</lastmod>' . "\n";
@@ -213,15 +214,13 @@ class WPSEO_Sitemaps {
 			if ( !$wpdb->get_var( $wpdb->prepare( "SELECT term_id FROM $wpdb->term_taxonomy WHERE taxonomy = %s AND count != 0 LIMIT 1", $tax ) ) )
 				continue;
 
-			$steps     = 25;
+			$steps     = $this->max_entries;
 			$all_terms = get_terms( $tax, array( 'hide_empty' => true, 'fields' => 'names' ) );
 			$count     = count( $all_terms );
 			$n         = ( $count > $this->max_entries ) ? (int) ceil( $count / $this->max_entries ) : 1;
 
 			for ( $i = 0; $i < $n; $i++ ) {
 				$count = ( $n > 1 ) ? $i + 1 : '';
-
-				$offset = ( $i > 0 ) ? ( $i ) * $this->max_entries : 0;
 				$taxobj = get_taxonomy( $tax );
 
 				if ( ( empty( $count ) || $count == $n ) && false ) {
@@ -254,6 +253,7 @@ class WPSEO_Sitemaps {
 				// Retrieve the post_types that are registered to this taxonomy and then retrieve last modified date for all of those combined.
 				// $taxobj = get_taxonomy( $tax );
 				// $date   = $this->get_last_modified( $taxobj->object_type );
+				$date = date( 'c', strtotime( $date ) );
 
 				$this->sitemap .= '<sitemap>' . "\n";
 				$this->sitemap .= '<loc>' . home_url( $base . $tax . '-sitemap' . $count . '.xml' ) . '</loc>' . "\n";
@@ -566,7 +566,7 @@ class WPSEO_Sitemaps {
 		global $wpdb;
 		$output = '';
 
-		$steps  = 25;
+		$steps  = $this->max_entries;
 		$n      = (int) get_query_var( 'sitemap_n' );
 		$offset = ( $n > 1 ) ? ( $n - 1 ) * $this->max_entries : 0;
 		$total  = $offset + $this->max_entries;
