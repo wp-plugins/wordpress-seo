@@ -1272,5 +1272,9 @@ You'll find the [FAQ on Yoast.com](http://yoast.com/wordpress/seo/faq/).
 
 == Upgrade Notice ==
 
+= 1.4.12 =
+Upgrade to prevent issues with XML sitemaps and missing save buttons on some settings pages.
+
+
 = 0.3.4 =
 Upgrade immediately to make sure your WordPress install is secure.
