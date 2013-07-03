@@ -29,7 +29,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * Class constructor.
 	 */
 	public function __construct() {
-		$this->options = get_option( 'wpseo_social' );
+		$this->options = get_wpseo_options();
 
 		global $fb_ver;
 		if ( isset( $fb_ver ) || class_exists( 'Facebook_Loader' ) ) {
@@ -43,6 +43,9 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 			add_action( 'wpseo_opengraph', array( $this, 'description'), 11 );
 			add_action( 'wpseo_opengraph', array( $this, 'url'), 12 );
 			add_action( 'wpseo_opengraph', array( $this, 'site_name'), 13 );
+			add_action( 'wpseo_opengraph', array( $this, 'article_author_facebook'), 14 );
+			add_action( 'wpseo_opengraph', array( $this, 'website_facebook'), 15 );
+
 			add_action( 'wpseo_opengraph', array( $this, 'type'), 5 );
 			add_action( 'wpseo_opengraph', array( $this, 'image'), 30 );
 		}
@@ -54,6 +57,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * Main OpenGraph output.
 	 */
 	public function opengraph() {
+		wp_reset_query();
 		do_action( 'wpseo_opengraph' );
 	}
 
@@ -89,6 +93,32 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	}
 
 	/**
+	 * Outputs the authors FB page.
+	 *
+	 * @link https://developers.facebook.com/blog/post/2013/06/19/platform-updates--new-open-graph-tags-for-media-publishers-and-more/
+	 */
+	public function article_author_facebook() {
+		if ( !is_singular() )
+			return;
+
+		global $post;
+		$facebook = apply_filters( 'wpseo_opengraph_author_facebook', get_the_author_meta( 'facebook', $post->post_author ) );
+
+		if ( $facebook && !empty( $facebook ) )
+			echo "<meta property='article:author' content='" . esc_attr( $facebook ) . "'/>\n";
+	}
+
+	/**
+	 * Outputs the websites FB page.
+	 *
+	 * @link https://developers.facebook.com/blog/post/2013/06/19/platform-updates--new-open-graph-tags-for-media-publishers-and-more/
+	 */
+	public function website_facebook() {
+		if ( isset( $this->options['facebook_site'] ) && $this->options['facebook_site'] )
+			echo "<meta property='article:publisher' content='" . esc_attr( $this->options['facebook_site'] ) . "'/>\n";
+	}
+
+	/**
 	 * Outputs the site owner
 	 */
 	public function site_owner() {
@@ -102,6 +132,7 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 				else
 					$adminstr = $admin_id;
 			}
+			$adminstr = apply_filters( 'wpseo_opengraph_admin', $adminstr );
 			echo "<meta property='fb:admins' content='" . esc_attr( $adminstr ) . "'/>\n";
 		}
 	}
@@ -113,7 +144,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * @return string $title
 	 */
 	public function og_title( $echo = true ) {
-		$title = $this->title( '' );
+		$title = apply_filters( 'wpseo_opengraph_title', $this->title( '' ) );
+
 		if ( $echo !== false )
 			echo "<meta property='og:title' content='" . esc_attr( $title ) . "'/>\n";
 		else
@@ -124,7 +156,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * Outputs the canonical URL as OpenGraph URL, which consolidates likes and shares.
 	 */
 	public function url() {
-		echo "<meta property='og:url' content='" . esc_attr( $this->canonical( false ) ) . "'/>\n";
+		$url = apply_filters( 'wpseo_opengraph_url', $this->canonical( false ) );
+		echo "<meta property='og:url' content='" . esc_attr( $url ) . "'/>\n";
 	}
 
 	/**
@@ -242,14 +275,15 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * @return bool
 	 */
 	public function image() {
+		
+		global $post;
+
+		if ( is_front_page() ) {
+			if ( isset( $this->options['og_frontpage_image'] ) )
+				$this->image_output( $this->options['og_frontpage_image'] );
+		}
+
 		if ( is_singular() ) {
-			global $post;
-
-			if ( is_front_page() ) {
-				if ( isset( $this->options['og_frontpage_image'] ) )
-					$this->image_output( $this->options['og_frontpage_image'] );
-			}
-
 			if ( function_exists( 'has_post_thumbnail' ) && has_post_thumbnail( $post->ID ) ) {
 				$thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), apply_filters( 'wpseo_opengraph_image_size', 'large' ) );
 				$this->image_output( $thumb[0] );
@@ -276,10 +310,22 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * @return string $ogdesc
 	 */
 	public function description( $echo = true ) {
-		$ogdesc = wpseo_get_value( 'opengraph-description' );
+		$ogdesc = '';
+		
+		if ( is_front_page() ) {
+			if ( isset( $this->options['og_frontpage_desc'] ) )
+				$ogdesc = $this->options['og_frontpage_desc'];
+		}
 
-		if ( !$ogdesc )
-			$ogdesc = $this->metadesc( false );
+		if ( is_singular() ) {
+			$ogdesc = wpseo_get_value( 'opengraph-description' );
+			if ( !$ogdesc )
+				$ogdesc = $this->metadesc( false );
+
+			// og:description is still blank so grab it from get_the_excerpt()
+			if ( !$ogdesc )
+				$ogdesc = strip_tags( get_the_excerpt() );
+		}
 
 		$ogdesc = apply_filters( 'wpseo_opengraph_desc', $ogdesc );
 
@@ -296,7 +342,8 @@ class WPSEO_OpenGraph extends WPSEO_Frontend {
 	 * Output the site name straight from the blog info.
 	 */
 	public function site_name() {
-		echo "<meta property='og:site_name' content='" . esc_attr( get_bloginfo( 'name' ) ) . "'/>\n";
+		$name = apply_filters( 'wpseo_opengraph_site_name', get_bloginfo( 'name' ) );
+		echo "<meta property='og:site_name' content='" . esc_attr( $name ) . "'/>\n";
 	}
 }
 

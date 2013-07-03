@@ -120,6 +120,7 @@ function wpseo_replace_vars( $string, $args, $omit = array() ) {
 		'post_title'    => '',
 		'taxonomy'      => '',
 		'term_id'       => '',
+		'term404'		=> '',
 	);
 
 	if ( isset( $args['post_content'] ) )
@@ -168,13 +169,14 @@ function wpseo_replace_vars( $string, $args, $omit = array() ) {
 		'%%page%%'         => ( $max_num_pages > 1 && $pagenum > 1 ) ? sprintf( $sep . ' ' . __( 'Page %d of %d', 'wordpress-seo' ), $pagenum, $max_num_pages ) : '',
 		'%%pagetotal%%'    => $max_num_pages,
 		'%%pagenumber%%'   => $pagenum,
+		'%%term404%%'	   => sanitize_text_field ( str_replace( '-', ' ', $r->term404 ) ),
 	);
 
 	if ( isset( $r->ID ) ) {
 		$replacements = array_merge( $replacements, array(
 			'%%caption%%'      => $r->post_excerpt,
 			'%%category%%'     => wpseo_get_terms( $r->ID, 'category' ),
-			'%%excerpt%%' 	   => ( !empty( $r->post_excerpt ) ) ? strip_tags( $r->post_excerpt ) : ( ( extension_loaded( 'mbstring' ) === true ) ? mb_substr( strip_shortcodes( strip_tags( $r->post_content ) ), 0, 155, 'UTF-8' ) : substr( strip_shortcodes( strip_tags( utf8_decode( $r->post_content ) ) ), 0, 155 ) ),
+			'%%excerpt%%'      => ( !empty( $r->post_excerpt ) ) ? strip_tags( $r->post_excerpt ) : wp_html_excerpt( strip_shortcodes( $r->post_content ),155 ),
 			'%%excerpt_only%%' => strip_tags( $r->post_excerpt ),
 			'%%focuskw%%'      => wpseo_get_value( 'focuskw', $r->ID ),
 			'%%id%%'           => $r->ID,
@@ -316,6 +318,21 @@ function wpseo_strip_shortcode( $text ) {
 }
 
 /**
+ * Redirect /sitemap.xml to /sitemap_index.xml
+ */
+function wpseo_xml_redirect_sitemap() {
+	global $wp_query;
+	
+	$current_url =( isset($_SERVER["HTTPS"] ) && $_SERVER["HTTPS"]=='on' ) ? 'https://' : 'http://';
+	$current_url .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
+
+	// must be 'sitemap.xml' and must be 404
+	if ( home_url( '/sitemap.xml' ) == $current_url && $wp_query->is_404) {
+		wp_redirect( home_url( '/sitemap_index.xml' ) );
+	}
+}
+
+/**
  * Initialize sitemaps. Add sitemap rewrite rules and query var
  */
 function wpseo_xml_sitemaps_init() {
@@ -323,12 +340,16 @@ function wpseo_xml_sitemaps_init() {
 	if ( !isset( $options['enablexmlsitemap'] ) || !$options['enablexmlsitemap'] )
 		return;
 
+	// redirects sitemap.xml to sitemap_index.xml
+	add_action( 'template_redirect', 'wpseo_xml_redirect_sitemap', 0 );
+
 	$GLOBALS['wp']->add_query_var( 'sitemap' );
 	$GLOBALS['wp']->add_query_var( 'sitemap_n' );
+	$GLOBALS['wp']->add_query_var( 'xslt' );
 	add_rewrite_rule( 'sitemap_index\.xml$', 'index.php?sitemap=1', 'top' );
 	add_rewrite_rule( '([^/]+?)-sitemap([0-9]+)?\.xml$', 'index.php?sitemap=$matches[1]&sitemap_n=$matches[2]', 'top' );
+	add_rewrite_rule( 'sitemap\.xslt$', 'index.php?xslt=1', 'top' );
 }
-
 add_action( 'init', 'wpseo_xml_sitemaps_init', 1 );
 
 /**
