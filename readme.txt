@@ -153,7 +153,7 @@ This release contains tons and tons of bugfixes, thanks in *large* part to [Jrf]
     * Hide advanced tab for users for which it has been disabled, as [suggested by jrgmartin](https://github.com/jdevalk/wordpress-seo/issues/93) - props [Jrf](http://profiles.wordpress.org/jrf).
     * Updated Facebook supported locales list for og:locale
 
-*i18n
+* i18n
     * Updated languages tr_TK, fi, ru_RU & da_DK
     * Added language hi_IN
     * Updated wordpress-seo.pot file
