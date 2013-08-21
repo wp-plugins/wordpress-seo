@@ -117,7 +117,7 @@ This release contains tons and tons of bugfixes, thanks in *large* part to [Jrf]
     * Fixed bug in shortcode removal from meta description as reported by [professor44](http://profiles.wordpress.org/professor44/) - props [Jrf](http://profiles.wordpress.org/jrf).
     * Fixed bug preventing saving of taxonomy meta data on first try - props [Jrf](http://profiles.wordpress.org/jrf).
     * Fixed small (potential) issue in wpseo_title_test() - props [Jrf](http://profiles.wordpress.org/jrf).
-    * Fixed bug where RSS excerpt would be double wrapped in <p> tags as reported by [mikeprince](http://profiles.wordpress.org/mikeprince) - props [Jrf](http://profiles.wordpress.org/jrf).
+    * Fixed bug where RSS excerpt would be double wrapped in `<p>` tags as reported by [mikeprince](http://profiles.wordpress.org/mikeprince) - props [Jrf](http://profiles.wordpress.org/jrf).
     * Fixed HTML validation error: Duplicate id Twitter on Social tab - props [Jrf](http://profiles.wordpress.org/jrf).
     * Fixed undefined index notice as reported by [szepeviktor](http://profiles.wordpress.org/szepeviktor).
     * Fixed error in a database query as reported by [Watch Teller](http://wordpress.org/support/profile/watchteller) - props [Jrf](http://profiles.wordpress.org/jrf).
