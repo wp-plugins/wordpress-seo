@@ -14,13 +14,13 @@ Improve your WordPress SEO: Write better content and have a fully optimized Word
 
 WordPress out of the box is already technically quite a good platform for SEO, this was true when I wrote my original [WordPress SEO](https://yoast.com/articles/wordpress-seo/) article in 2008 (and updated every few months) and it's still true today, but that doesn't mean you can't improve it further! This plugin is written from the ground up by Joost de Valk and his team at [Yoast](https://yoast.com/) to improve your site's SEO on *all* needed aspects. While this [WordPress SEO plugin](https://yoast.com/wordpress/plugins/seo/) goes the extra mile to take care of all the technical optimization, more on that below, it first and foremost helps you write better content.  WordPress SEO forces you to choose a focus keyword when you're writing your articles, and then makes sure you use that focus keyword everywhere.
 
-> <h4>Premium Support</h4>
+> <strong>Premium Support</strong><br/>
 > The Yoast team does not provide support for the WordPress SEO plugin on the WordPress.org forums. One on one email support is available to people who bought the [Premium WordPress SEO plugin](https://yoast.com/wordpress/plugins/seo-premium/) only.
 > Note that the Premium SEO plugin has several extra features too so it might be well worth your investment!
 >
 > You should also check out the [Local SEO](https://yoast.com/wordpress/plugins/local-seo/) and [Video SEO](https://yoast.com/wordpress/plugins/video-seo/) extensions to WordPress SEO, these of course come with support too.
 
-> <h4>Bug Reports</h4>
+> <strong>Bug Reports</strong><br/>
 > Bug reports for WordPress SEO are [welcomed on GitHub](https://github.com/Yoast/wordpress-seo). Please note GitHub is _not_ a support forum and issues that aren't properly qualified as bugs will be closed.
 
 = Write better content with WordPress SEO =
