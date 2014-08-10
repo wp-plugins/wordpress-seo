@@ -79,11 +79,12 @@ Read [this migration guide](https://yoast.com/all-in-one-seo-pack-migration/) if
 Currently a huge translation project is underway, translating WordPress SEO in as much as 24 languages. So far, the translations for French and Dutch are complete, but we still need help on a lot of other languages, so if you're good at translating, please join us at [translate.yoast.com](http://translate.yoast.com).
 
 = News SEO =
-Be sure to also check out the [News SEO module](https://yoast.com/wordpress/plugins/news-seo/) if you need Google News Sitemaps. It tightly integrates with WordPress SEO to give you the combined power of News Sitemaps and full Search Engine Optimization.
+Be sure to also check out the premium [News SEO module](https://yoast.com/wordpress/plugins/news-seo/) if you need Google News Sitemaps. It tightly integrates with WordPress SEO to give you the combined power of News Sitemaps and full Search Engine Optimization.
 
 = Further Reading =
 For more info, check out the following articles:
 
+* The [WordPress SEO Knowledgebase](http://kb.yoast.com/category/42-wordpress-seo).
 * [WordPress SEO - The definitive Guide by Yoast](https://yoast.com/articles/wordpress-seo/).
 * Once you have great SEO, you'll need the [best WordPress Hosting](https://yoast.com/articles/wordpress-hosting/).
 * The [WordPress SEO Plugin](https://yoast.com/wordpress/plugins/seo/) official homepage.
