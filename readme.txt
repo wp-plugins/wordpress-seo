@@ -4,9 +4,9 @@ Donate link: https://yoast.com/
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: seo, SEO, google, meta, meta description, search engine optimization, xml sitemap, xml sitemaps, google sitemap, sitemap, sitemaps, robots meta, rss, rss footer, yahoo, bing, news sitemaps, XML News Sitemaps, WordPress SEO, WordPress SEO by Yoast, yoast, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, seo pack
-Requires at least: 3.6
+Requires at least: 3.5
 Tested up to: 3.9.1
-Stable tag: 1.5.4.2
+Stable tag: 1.5.5
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the WordPress SEO plugin by Yoast.
 
@@ -93,13 +93,13 @@ For more info, check out the following articles:
 
 == Installation ==
 
-1. Upload the `wordress-seo` folder to the `/wp-content/plugins/` directory
+1. Upload the `wordpress-seo` folder to the `/wp-content/plugins/` directory
 1. Activate the WordPress SEO plugin through the 'Plugins' menu in WordPress
 1. Configure the plugin by going to the `SEO` menu that appears in your admin menu
 
 == Frequently Asked Questions ==
 
-The best way to get help for WordPress SEO is by [buying the premium version](https://yoast.com/wordpress/plugins/seo-premium/) and emailing our support team. You can also check our [WordPress SEO knowledge base](http://kb.yoast.com/category/42-wordpress-seo).
+You'll find the [FAQ on Yoast.com](https://yoast.com/wordpress/plugins/seo/faq/).
 
 == Screenshots ==
 
@@ -112,6 +112,43 @@ The best way to get help for WordPress SEO is by [buying the premium version](ht
 7. The advanced section of the WordPress SEO meta box.
 
 == Changelog ==
+
+= 1.5.5 =
+Release Date: August 12th, 2014
+
+* Bugfixes:
+	* WP Shortlinks weren't always removed when user did choose to remove them as reported in [issue #1397](https://github.com/Yoast/wordpress-seo/issues/1397), props [Firebird75](https://github.com/Firebird75).
+	* Fixed the way we prevent Jetpack from outputting OpenGraph tags. Props [jeherve](https://github.com/jeherve).
+	* Symlinking the plugin should now work. Props [crewstyle](https://github.com/crewstyle) and [dannyvankooten](https://github.com/dannyvankooten).
+	* Fix warnings on new site creation multisite as reported in [issue #1368](https://github.com/Yoast/wordpress-seo/issues/1368), props [jrfnl](https://github.com/jrfnl) and [jennybeaumont](https://github.com/jennybeaumont).
+	* Fixed redirect loop which occurred on multi-word search or when search query contained special characters and the 'redirect ugly URL's' option was on, as reported by [inventurblogger](https://github.com/inventurblogger) in [issue #1340](https://github.com/Yoast/wordpress-seo/issues/1340).
+	* Fixed double separators in snippet preview as reported by [GermanKiwi](https://github.com/GermanKiwi) in [issue #1321](https://github.com/Yoast/wordpress-seo/issues/1321), props [Jrf](http://profiles.wordpress.org/jrf).
+	* Fixed slashes in title in snippet preview as reported by [fittedwebdesign](https://github.com/fittedwebdesign) in [issue #1333](https://github.com/Yoast/wordpress-seo/issues/1333), props [Jrf](http://profiles.wordpress.org/jrf).
+	* Fixed re-introduced js compatibility issue with Soliloquy slider as reported by [ajsonnick](https://github.com/ajsonnick) in [issue #1343](https://github.com/Yoast/wordpress-seo/issues/1343), props [Jrf](http://profiles.wordpress.org/jrf).
+	* Fixed a bug where we could do a query in XML Sitemaps even when there were no posts to query for.
+	* If the sitemap is empty, add the homepage URL to make sure it doesn't throw errors in GWT.
+	* Change how we set 404's for non existing sitemap files, as reported in [#1383](https://github.com/Yoast/wordpress-seo/issues/1383) props [Dinglebat](https://github.com/Dinglebat).
+	* Fix issues with conflicting expectations being plugins/theme of the user meta twitter field - url vs twitter id, props [Jrf](http://profiles.wordpress.org/jrf).
+	* Fix how the first paragraph test for the keyword is done after a solid bug report by [squelchdesign](squelchdesign).
+	* Fix how we're handling protocol relative image URLs in the XML sitemap.
+	* Fix page analysis slug test for keywords with special characters.
+	* Properly set "No score" result for posts that have no focus keyword.
+
+* Enhancements:
+	* Drastically improved performance of snippet preview rendering.
+	* Added Facebook / OpenGraph title input and Google+ title input and image upload field to Social tab.
+	* Added Facebook / OpenGraph title input for the homepage on SEO -> Social settings page.
+	* Changed Facebook / OpenGraph default image and homepage image input fields to use the media uploader.
+	* Added a new title separator feature on the Titles admin page.
+	* Merged the bulk editor pages for titles and descriptions into one menu item "bulk editor".
+	* Added `noimageindex` option to advanced meta robots options.
+	* Bulk editor rights are no longer added for contributors, only for editors and up.
+	* If an archives meta description template has `%%page` variables, show it on page 2 and onwards of archives too.
+	* Add a confirm dialog when resetting setting to default.
+	* Add sorting by publication date in bulk editor as [requested by krogsgard here](https://github.com/Yoast/wordpress-seo/issues/1269).
+
+* Other:
+	* Remove references to deprecated Video Manual plugin.
 
 = 1.5.4.2 =
 Release Date: July 16th, 2014
