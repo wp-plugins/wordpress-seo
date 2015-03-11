@@ -116,6 +116,11 @@ You'll find the [FAQ on Yoast.com](https://yoast.com/wordpress/plugins/seo/faq/)
 
 == Changelog ==
 
+= 1.6.4 =
+
+* Bugfixes:
+	* Fix for CSRF security issue in bulk editor.
+
 = 1.6.3 =
 
 * Bugfixes:
