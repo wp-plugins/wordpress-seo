@@ -100,8 +100,8 @@ if ( ! class_exists( 'WPSEO_Bulk_List_Table' ) ) {
 			$this->current_filter = ( ! empty( $_GET['post_type_filter'] ) ) ? $_GET['post_type_filter'] : 1;
 			$this->current_status = ( ! empty( $_GET['post_status'] ) ) ? $_GET['post_status'] : 1;
 			$this->current_order  = array(
-				'order'   => ( ! empty( $_GET['order'] ) ) ? $_GET['order'] : 'asc',
-				'orderby' => ( ! empty( $_GET['orderby'] ) ) ? $_GET['orderby'] : 'post_title',
+				'order'   => $this->sanitize_order( $_GET['order'] ),
+				'orderby' => $this->sanitize_orderby( $_GET['orderby'] ),
 			);
 			$this->page_url       = "&type={$this->page_type}#top#{$this->page_type}";
 
@@ -109,6 +109,42 @@ if ( ! class_exists( 'WPSEO_Bulk_List_Table' ) ) {
 
 		}
 
+		/**
+		 * Heavily restricts the possible columns by which a user can order the table in the bulk editor, thereby preventing a possible CSRF vulnerability.
+		 *
+		 * @param $orderby
+		 *
+		 * @return string
+		 */
+		protected function sanitize_orderby( $orderby ) {
+			$valid_column_names = array(
+				'post_title',
+				'post_type',
+				'post_date',
+			);
+
+			if ( in_array( $orderby, $valid_column_names ) ) {
+				return $orderby;
+			}
+
+			return 'post_title';
+		}
+
+		/**
+		 * Makes sure the order clause is always ASC or DESC for the bulk editor table, thereby preventing a possible CSRF vulnerability.
+		 *
+		 * @param $order
+		 *
+		 * @return string
+		 */
+		protected function sanitize_order( $order ) {
+			if ( in_array( strtoupper( $order ), array( 'ASC', 'DESC', ) ) ) {
+				return $order;
+			}
+
+			return 'ASC';
+		}
+		
 		/**
 		 *    Used in the constructor to build a reference list of post types the current user can edit.
 		 */
